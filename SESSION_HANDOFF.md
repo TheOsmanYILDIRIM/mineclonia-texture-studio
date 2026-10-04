@@ -307,20 +307,27 @@ Relevant commits:
 
 ## Detail close-button fix — 2026-10-04
 
-The mobile/detail × close path was simplified and fixed in:
+The mobile/detail × close path is now hardened in two steps:
 
 - `80bcdee63aa45f04c74ecb6088ebcd6403e42d69`
-  — `fix: make detail close action single-path and touch safe`
+  — centralized the close flow in `closeDetail()` and removed the old click + pointerup double-close path.
+- `0b67c73db8fc133b0fa5a91ac630552ee23e0f65`
+  — made the close header sticky, gave the × control an explicit 44×44 mobile touch target, raised it above gesture/preview layers, and reduced activation to one normal `click` listener.
 
-Root cause: the close control had both `click` and `pointerup` close handlers. On touch devices, closing the sheet on `pointerup` could remove the overlay before the following click dispatch, allowing click-through/reopen behavior against the texture grid. The close flow is now centralized in `closeDetail()` and closes only from the canonical click path; backdrop and Escape reuse the same function. The function also resets preview gesture state and stops animation.
+The previous implementation mixed pointer-specific handlers around a small control inside a scrollable touch drawer. The current implementation uses one close function and one activation path; backdrop and Escape still reuse the same close behavior. Closing also stops animation, resets preview gesture state, and clears the active texture.
 
-Static JavaScript syntax parsing passed before commit.
+Verification after the latest commit:
+- both inline JavaScript blocks parse successfully;
+- exactly one × click listener is present;
+- no × pointerdown/pointerup listener remains;
+- backdrop close remains wired;
+- the close button is `type="button"` and has a dedicated mobile hit target.
 
-Live Android verification is still required; do not mark this as device-verified until tested on the production page.
+Physical Android tap verification on the deployed page is still required before calling the device behavior fully verified.
 
 ## Next concrete work
 
-1. Open the live site on Android and verify the latest × close-button fix from `80bcdee63aa45f04c74ecb6088ebcd6403e42d69`.
+1. Open the live site on Android and verify the latest × close-button fix from `0b67c73db8fc133b0fa5a91ac630552ee23e0f65`.
 2. Continue runtime-role auditing beyond entity assets, especially ambiguous P1 ITEMS/effects/overlays:
    - trace exact filename in Mineclonia source
    - identify node/item/HUD/particle/overlay/state/tint behavior
