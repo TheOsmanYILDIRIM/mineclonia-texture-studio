@@ -481,3 +481,22 @@ Entity / UV atlas rule:
 - preserve exact atlas alpha structure.
 
 The app enforces these requirements at prompt-output time so built-in prompts, JSON/manual overrides, exported prompts, and future prompt-library additions receive the same transparency constraint without duplicating it into every stored prompt body.
+
+
+### Entity alpha rule after production feedback
+
+For Entity / locked-UV atlases, keep the prompt-side alpha instruction **short**. Repeating long transparency, edge-cleanup, and mask language can make the image model focus on reconstructing the mask and slightly drift UV boundaries.
+
+Use this principle:
+
+- preserve the exact source UV layout and alpha mask;
+- edit RGB/material appearance only inside the existing occupied source pixels;
+- do not move/repack islands or regenerate transparency;
+- no background;
+- if realism conflicts with UV geometry, UV geometry wins.
+
+Do not stack a second long generic transparency block onto Entity prompts.
+
+The app also enforces this structurally on import: for Entity assets, the edited image keeps its generated RGB/material detail but its alpha channel is replaced with the original source texture's alpha mask, scaled with nearest-neighbor semantics to the imported output dimensions. This makes alpha/UV boundary preservation an application invariant instead of relying only on prompt compliance.
+
+Entity seam-offset editing is disabled because offsetting the atlas would intentionally move the structural mask.
