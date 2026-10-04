@@ -41,6 +41,35 @@ const normalize = lastBlock('async function normalizeTextureBlobTo(blob,meta,tar
 expect(normalize.includes('if(sw<=dw && sh<=dh)return blob'), 'normalization must never upscale textures already within the target');
 expect(source.includes('<option value="64">64px</option>') && source.includes('<option value="128">128px</option>') && source.includes('<option value="256">256px</option>') && source.includes('<option value="512">512px</option>'), 'all four target-resolution controls must exist');
 
+
+const init = lastBlock('async function init()');
+expect(init.includes("setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn')"), 'startup must immediately leave the indefinite preparing state');
+expect(init.includes('setTimeout(()=>bootstrapStorageInBackground(),0)'), 'storage bootstrap must run after the UI is interactive');
+expect(!init.includes('await hydrateChangedPathsFast()'), 'startup must not synchronously wait for remote original-texture hydration');
+
+const storageBootstrap = lastBlock('async function bootstrapStorageInBackground()');
+expect(storageBootstrap.includes('changedHydrationPromise=hydrateChangedPathsFast(edits)'), 'changed-state verification must continue in the background');
+
+const primaryStorage = lastBlock('async function initStorage()');
+expect(primaryStorage.includes("setTimeout(()=>{settled=true;rej(Error('IndexedDB açılışı zaman aşımına uğradı'))},2500)"), 'primary IndexedDB open must have a timeout');
+
+const scaledStorage = lastBlock('async function initScaledStorage()');
+expect(scaledStorage.includes("setTimeout(()=>{settled=true;rej(Error('Scaled IndexedDB açılışı zaman aşımına uğradı'))},2500)"), 'scaled IndexedDB open must have a timeout');
+
+const originalBlob = lastBlock('async function originalBlob(path)');
+expect(originalBlob.includes('new AbortController()') && originalBlob.includes('signal:controller.signal'), 'upstream original fetch must be abortable');
+expect(originalBlob.includes('setTimeout(()=>controller.abort(),12000)'), 'upstream original fetch must have a bounded timeout');
+
+expect(exportPack.includes('await changedHydrationPromise.catch(()=>{})'), 'texturepack export must wait for background changed-state verification');
+expect(exportPack.includes('await editWriteQueue.catch(()=>{})'), 'texturepack export must wait for pending edit persistence');
+
+const scriptBlocks = [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match=>match[1]);
+expect(scriptBlocks.length >= 2, 'expected inline script blocks');
+for (const [index, script] of scriptBlocks.entries()) {
+  try { new Function(script); }
+  catch (error) { fail(`inline script ${index + 1} has a syntax error: ${error.message}`); }
+}
+
 expect(!source.includes('<<<<<<<') && !source.includes('>>>>>>>'), 'merge-conflict markers must not be present');
 
 if (process.exitCode) process.exit(process.exitCode);
