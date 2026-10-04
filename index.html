@@ -360,7 +360,35 @@ async function refreshAnimPreview(){
  draw(); animPlaying=true; $('animToggle').textContent='Durdur'; animTimer=setInterval(()=>{ if(!animPlaying) return; f=(f+1)%spec.frames; draw(); }, 140);
 }
 
-function promptFor(x){const d=defaultPromptFor(x);const o=PROMPT_OVERRIDES.get(x.id);return {id:x.id,label:d.label,text:o||d.text,source:o?'JSON/özel':d.source}}
+const TRANSPARENCY_OUTPUT_MARKER='TRANSPARENCY / BACKGROUND REQUIREMENT:';
+const ENTITY_TRANSPARENCY_MARKER='TRANSPARENCY / ATLAS INTEGRITY:';
+const TRANSPARENCY_OUTPUT_REQUIREMENT=`TRANSPARENCY / BACKGROUND REQUIREMENT:
+Preserve and respect transparency exactly where relevant.
+The final output must have a transparent background wherever the source uses transparency or empty space.
+Do not place the texture on a solid, colored, white, black, or scenic background.
+Do not fill transparent or unused regions.
+Keep all empty or background regions fully transparent.
+If the asset contains alpha-cutout areas, preserve them cleanly and accurately.
+Output must be game-ready and background-free.
+
+IMPORTANT OUTPUT REQUIREMENT:
+Return a clean game-ready texture with correct alpha transparency.
+Keep all intended empty/background regions fully transparent.
+Do not generate any solid background.`;
+const ENTITY_TRANSPARENCY_REQUIREMENT=`TRANSPARENCY / ATLAS INTEGRITY:
+Preserve the exact transparency structure of the source atlas.
+Every empty region outside the UV islands must remain fully transparent.
+Do not paint into empty atlas space.
+Do not add any backdrop, canvas color, glow field, shadow field, or environmental background.
+Treat transparent space as locked.
+Final output must be a clean PNG-style texture atlas with transparency intact.`;
+function applyPromptOutputRequirements(text,x){
+ let out=String(text||'').trimEnd();
+ if(!out.includes(TRANSPARENCY_OUTPUT_MARKER)) out+='\n\n'+TRANSPARENCY_OUTPUT_REQUIREMENT;
+ if(assetTypeOf(x)==='Entity'&&!out.includes(ENTITY_TRANSPARENCY_MARKER)) out+='\n\n'+ENTITY_TRANSPARENCY_REQUIREMENT;
+ return out;
+}
+function promptFor(x){const d=defaultPromptFor(x);const o=PROMPT_OVERRIDES.get(x.id);return {id:x.id,label:d.label,text:applyPromptOutputRequirements(o||d.text,x),source:o?'JSON/özel':d.source}}
 function promptEntry(x){const p=promptFor(x);return {id:x.id,path:x.path,name:x.name,priority:x.priority,label:p.label,prompt:p.text}}
 function downloadJson(obj,name){dl(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),name)}
 function parsePromptPayload(obj){let arr;if(Array.isArray(obj))arr=obj;else if(obj&&Array.isArray(obj.prompts))arr=obj.prompts;else if(obj&&(obj.id||obj.path))arr=[obj];else throw Error('JSON formatı tanınmadı');let applied=0,missing=[];for(const e of arr){if(!e||typeof e.prompt!=='string')continue;let meta=null;if(typeof e.id==='string')meta=textureMeta(e.id);if(!meta&&typeof e.path==='string')meta=CATALOG.find(x=>x.path===e.path);if(!meta){missing.push(e.id||e.path||'(kimlik yok)');continue}PROMPT_OVERRIDES.set(meta.id,e.prompt);applied++}savePromptOverrides();return {applied,missing}}
