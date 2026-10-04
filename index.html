@@ -501,8 +501,8 @@ async function lockEntityAlphaToSource(blob,meta){
  eg.putImageData(ed,0,0);
  return await canvasPngBlob(edited)
 }
-async function prepareImportedTextureBlob(blob,meta){
- let out=await normalizeTextureBlob(blob,meta);
+async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
+ let out=await normalizeTextureBlob(blob,meta,targetRes);
  if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
  return out
 }
@@ -512,6 +512,21 @@ async function blobsEqual(a,b){
  if(!a||!b||a.size!==b.size)return false;
  const [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]);
  const av=new Uint8Array(aa),bv=new Uint8Array(bb);for(let i=0;i<av.length;i++)if(av[i]!==bv[i])return false;return true
+}
+async function texturePixelsEqual(a,b){
+ if(!a||!b)return false;
+ if(await blobsEqual(a,b))return true;
+ const [ca,cb]=await Promise.all([decodeBlobToCanvas(a),decodeBlobToCanvas(b)]);
+ if(ca.width!==cb.width||ca.height!==cb.height)return false;
+ const ad=ca.getContext('2d',{willReadFrequently:true}).getImageData(0,0,ca.width,ca.height).data;
+ const bd=cb.getContext('2d',{willReadFrequently:true}).getImageData(0,0,cb.width,cb.height).data;
+ if(ad.length!==bd.length)return false;
+ for(let i=0;i<ad.length;i++)if(ad[i]!==bd[i])return false;
+ return true
+}
+async function textureMatchesOriginal(blob,meta){
+ if(!blob||!meta)return false;
+ try{return await texturePixelsEqual(blob,await originalBlob(meta.path))}catch(err){console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);return false}
 }
 async function meaningfulEdits(){
  const raw=await allEdits(), out=[];
@@ -736,8 +751,7 @@ async function importZip(file){
    let blob=await f.async('blob');
    blob=await prepareImportedTextureBlob(blob,meta);
    try{
-     const orig=await originalBlob(meta.path);
-     if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;processed++;continue}
+     if(await textureMatchesOriginal(blob,meta)){await delEdit(meta.path);same++;processed++;continue}
    }catch(err){console.warn(err)}
    await putEdit(meta.path,blob);
    queueScaled(meta.path,blob,meta,BACKGROUND_RESOLUTION);
@@ -767,11 +781,14 @@ async function exportPack(){
    if(!edits.length){toast('Değiştirilmiş texture yok');return}
    const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
    root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
-   let done=0,cachedCount=0,nativeCount=0;
+   let done=0,scaledCount=0,nativeCount=0;
    for(const e of edits){
-     const cached=await getScaled(e.path,TARGET_RESOLUTION);
-     const outBlob=cached?.blob||e.blob;
-     if(cached) cachedCount++; else nativeCount++;
+     const meta=CATALOG.find(x=>x.path===e.path);
+     if(!meta)continue;
+     const before=await decodeBlobToCanvas(e.blob);
+     const outBlob=await prepareImportedTextureBlob(e.blob,meta,TARGET_RESOLUTION);
+     const after=await decodeBlobToCanvas(outBlob);
+     if(after.width!==before.width||after.height!==before.height)scaledCount++; else nativeCount++;
      root.file(e.path,outBlob,{compression:'STORE'});
      done++;
      if(done===1||done===edits.length||done%25===0){
@@ -782,7 +799,7 @@ async function exportPack(){
        await new Promise(requestAnimationFrame);
      }
    }
-   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,cachedResolutionCount:cachedCount,nativeResolutionFallbackCount:nativeCount,paths:edits.map(e=>e.path)};
+   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,scaledToTargetCount:scaledCount,nativeOrAlreadyWithinTargetCount:nativeCount,paths:edits.map(e=>e.path)};
    root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
    btn.textContent='ZIP %70';
    setSaveState('ZIP oluşturuluyor…','warn');
@@ -1017,8 +1034,7 @@ async function importPng(file,seam=false){
   setSaveState(`Dosya hazırlanıyor • ${TARGET_RESOLUTION}px…`,'warn');
   let b=await prepareImportedTextureBlob(file,target);
   if(seam)b=await imageBlobTransform(b,true);
-  const orig=await originalBlob(target.path).catch(()=>null);
-  if(orig&&await blobsEqual(b,orig)){
+  if(await textureMatchesOriginal(b,target)){
     await delEdit(target.path);
     toast('Dosya orijinalle birebir aynı • değişiklik sayılmadı');
     return;
@@ -1053,8 +1069,7 @@ async function hydrateChangedPathsFast(){
   for(const e of edits){
     const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
     try{
-      const orig=await originalBlob(e.path);
-      if(await blobsEqual(e.blob,orig)){same++;continue}
+      if(await textureMatchesOriginal(e.blob,meta)){same++;continue}
     }catch(err){console.warn('Değişiklik doğrulanamadı',e.path,err)}
     changedPathsFast.add(e.path);
     checked++;
