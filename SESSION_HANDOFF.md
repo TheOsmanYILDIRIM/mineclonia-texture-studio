@@ -501,3 +501,23 @@ Verification:
 
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
+
+
+## Export/downscale + identical-texture fix — 2026-10-04
+
+Code fix already landed on `main` in:
+- `04a0f5a15efe5b87d160d02b644aa604c3bd72ae` — `fix: enforce export target resolution and ignore identical textures`
+
+What changed:
+- texturepack export no longer falls back to a higher/native-resolution blob when the selected 64/128/256/512 target cache is missing; each exported edited texture is prepared against the currently selected target during export;
+- imported/saved textures use a fast byte-equality check and, when needed, exact RGBA pixel equality against the original so re-encoded but visually identical PNGs are not counted as changed;
+- startup hydration uses the same original-match logic, so stale full-pack imports that are actually unchanged are excluded from `changedPathsFast` and therefore from texturepack export;
+- the final single-file import path also ignores pixel-identical originals immediately.
+
+Verification:
+- both inline JavaScript blocks parse successfully after the change;
+- the active/final `importPng()` calls `prepareImportedTextureBlob(...)` and `textureMatchesOriginal(...)`;
+- the active/final `exportPack()` calls `prepareImportedTextureBlob(e.blob, meta, TARGET_RESOLUTION)` for every exported changed texture;
+- 64/128/256/512 resolution options are present.
+
+Working rule going forward: do not push new implementation work directly to `main` unless explicitly requested; use a branch first.
