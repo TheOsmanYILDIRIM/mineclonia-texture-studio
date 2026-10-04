@@ -425,3 +425,26 @@ Do not call something an entity UV atlas, block surface, animation, or item mere
 
 When runtime role is unresolved after code search, mark the role as unresolved and preserve structure rather than inventing a semantic interpretation.
 
+### Particle/effect prompts must encode the trigger context
+
+For any runtime particle/effect sprite, do not stop at labeling it "particle".
+
+Before authoring, determine and record:
+- which entity/system emits it,
+- the exact gameplay event or persistent state that causes emission,
+- whether it is ambient, impact, damage, attack, movement, weather, panic/status, death, or another context,
+- particle amount/count,
+- spawner duration,
+- particle lifetime,
+- rendered size,
+- velocity / acceleration / gravity behavior,
+- glow/emission level,
+- collision behavior,
+- whether the sprite pool is reused by more than one system.
+
+These runtime facts should shape the prompt. A particle that exists continuously around a luminous creature needs a different visual treatment from a damage burst, attack spark, rain splash, panic/sweat droplet, or death particle even if their PNG silhouettes look similar.
+
+If one texture is reused in multiple contexts, write the prompt for the **shared semantic denominator**, not for only one caller. Example: `mobs_mc_wolf_splash_0–3.png` are used both when a wet wolf shakes itself dry and by the terrified-villager effect, so they should remain neutral liquid/sweat-like droplet sprites rather than wolf-specific imagery.
+
+Likewise, distinguish ambient particles from event particles. `extra_mobs_glow_squid_glint1–4.png` are persistent ambient Glow Squid glint particles; they are not the damage-triggered ink jet.
+
