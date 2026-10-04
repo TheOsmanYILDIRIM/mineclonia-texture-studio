@@ -398,3 +398,27 @@ Relevant commits:
 - `96a243810561857fdf727599eaf97ca08f6aa557` — pin dark app surfaces on mobile
 
 Entity prompt rule now explicitly forbids edge expansion/contraction, feathering, blur, anti-aliasing, erosion/dilation, gap bridging, halo/background creation, and any repaint across the source mask boundary. Exact source UV alignment wins over realism and transparency aesthetics.
+
+
+## Entity UV consistency hardening — 2026-10-04
+
+User testing showed that even the stricter transparency wording could reduce UV-edge consistency because the image model was still being asked to reason heavily about transparency/mask reconstruction.
+
+The fix is now structural rather than prompt-only:
+
+- `8aca51587cb0adcbb18caaaea3841f30940ddd32` — Entity imports now replace generated alpha with the original source texture alpha mask. Generated RGB/material detail is preserved; source alpha is authoritative.
+- `c1b418d4ee052d6dac425e08a87594d301c709bf` — Entity prompt suffix was shortened to a compact UV/alpha lock and Entity seam-offset editing was disabled.
+- `a3f72ebe13d6e825c4d06e141f4665bba4363ebc` — prompt guide updated to avoid long repeated transparency instructions for Entity atlases.
+
+Current Entity invariant:
+- source UV geometry and alpha mask are authoritative;
+- prompt asks only for RGB/material replacement within the existing structure;
+- on PNG/ZIP import, source alpha is reapplied with nearest-neighbor scaling to the edited image dimensions;
+- no Entity seam-offset transform is allowed;
+- no generic long transparency suffix is stacked onto Entity prompts.
+
+Verification:
+- both inline JavaScript blocks parse successfully;
+- no merge-conflict markers remain;
+- dark mobile theme pinning remains present;
+- Entity alpha-lock helper is wired into single PNG import and ZIP import.
