@@ -467,3 +467,13 @@ Verification:
 - no merge-conflict markers remain;
 - dark mobile theme pinning remains present;
 - Entity alpha-lock helper is wired into single PNG import and ZIP import.
+
+## Texture target resolutions + ZIP export — 2026-10-04
+
+- Texture target selector now supports **64 / 128 / 256 / 512 px**.
+- Selected target remains a downscale ceiling: larger imports are reduced with the existing Lanczos path; smaller source images are not upscaled.
+- Backup restore accepts all four target values and scaled-cache cleanup covers all four sizes.
+- Texturepack export no longer performs original-vs-edit byte comparisons. It exports the app's recorded edits directly, waits for pending edit persistence, stores PNGs in ZIP without redundant DEFLATE recompression, and shows file/progress status during generation.
+
+Resolution support commit:
+- `4a16b72e7ff8976fee4e056e1399eabe7dc4dfe8` — add 64px and 128px texture targets
