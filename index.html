@@ -311,7 +311,7 @@ async function updateTilePreview(){if(!active)return;const box=$('tilePreview');
 const MINECLONIA_COMMIT='209ec2dc96adbf7f5ba083816d90596492ec53b5';
 let entity3dState={raf:0,renderer:null,scene:null,camera:null,root:null,yaw:-0.55,pitch:0.18,zoom:1,drag:false,lastX:0,lastY:0,meta:null,token:0,modules:null,sourceEdit:true,texture:null,targetMaterials:[]};
 const ENTITY_PREVIEW_MAP={
-  'ENTITIES/mobs_mc/extra_mobs_piglin.png':'assets/models-assimp/mobs_mc_piglin.glb'
+  'ENTITIES/mobs_mc/extra_mobs_piglin.png':'assets/models-textured/mobs_mc_piglin.glb'
 };
 async function entity3dModules(){
   if(entity3dState.modules)return entity3dState.modules;
@@ -347,16 +347,14 @@ async function openEntity3D(meta){
     const {THREE,GLTFLoader}=await entity3dModules();if(token!==entity3dState.token)return;const c=$('entity3dCanvas');
     const renderer=new THREE.WebGLRenderer({canvas:c,alpha:false,antialias:true});renderer.setClearColor(0x090b0e,1);renderer.outputColorSpace=THREE.SRGBColorSpace;
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,1,.01,1000),loader=new GLTFLoader();
-    const gltf=await loader.loadAsync(glb+'?v=assimp1');if(token!==entity3dState.token){renderer.dispose();return}
+    const gltf=await loader.loadAsync(glb+'?v=textured1');if(token!==entity3dState.token){renderer.dispose();return}
     const root=gltf.scene;scene.add(root);root.updateMatrixWorld(true);
     const box3=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();box3.getSize(size);box3.getCenter(center);root.position.sub(center);root.updateMatrixWorld(true);
     const maxDim=Math.max(size.x,size.y,size.z)||1;camera.position.set(0,0,maxDim*2.2);camera.near=Math.max(.001,maxDim/1000);camera.far=maxDim*50;camera.lookAt(0,0,0);camera.updateProjectionMatrix();
     entity3dState.renderer=renderer;entity3dState.scene=scene;entity3dState.camera=camera;entity3dState.root=root;entity3dState.meta=meta;
-    const mats=[];root.traverse(o=>{if(!o.isMesh)return;const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{if(m&&!mats.includes(m))mats.push(m)})});
-    entity3dState.targetMaterials=mats;entity3dState.sourceEdit=!!(await getEdit(meta.path));
-    $('entity3dEdit').classList.toggle('primary',entity3dState.sourceEdit);$('entity3dOrig').classList.toggle('primary',!entity3dState.sourceEdit);
-    if(entity3dState.sourceEdit&&mats.length)await entity3dSwapTexture();
-    $('entity3dMeta').textContent='mobs_mc_piglin.glb · Assimp · UV/material korunuyor · '+mats.length+' texture material';$('entity3dMsg').style.display='none';entity3dRender();
+    entity3dState.targetMaterials=[];entity3dState.sourceEdit=false;
+    $('entity3dOrig').disabled=true;$('entity3dEdit').disabled=true;
+    $('entity3dMeta').textContent='mobs_mc_piglin.glb · Assimp · texture GLB içine gömülü';$('entity3dMsg').style.display='none';entity3dRender();
   }catch(e){console.warn('3D preview',e);$('entity3dMeta').textContent='Assimp GLB yükleme hatası';$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='3D önizleme hatası: '+(e&&e.message?e.message:String(e))}
 }
 async function openDetail(x){active=x;$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('origImg').src=await blobUrl(x.path,false);const edit=await getEdit(x.path);$('editImg').src=edit?URL.createObjectURL(edit.blob):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();const pr=promptFor(x);$('promptFamily').textContent=pr.label+' · '+pr.source;$('textureId').textContent='ID: '+x.id;$('promptText').value=pr.text;$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview();await openEntity3D(x)}
