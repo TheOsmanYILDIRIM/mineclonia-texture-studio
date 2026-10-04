@@ -352,7 +352,7 @@ async function openEntity3D(meta){
     const box3=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();box3.getSize(size);box3.getCenter(center);root.position.sub(center);root.updateMatrixWorld(true);
     const maxDim=Math.max(size.x,size.y,size.z)||1;camera.position.set(0,0,maxDim*2.2);camera.near=Math.max(.001,maxDim/1000);camera.far=maxDim*50;camera.lookAt(0,0,0);camera.updateProjectionMatrix();
     entity3dState.renderer=renderer;entity3dState.scene=scene;entity3dState.camera=camera;entity3dState.root=root;entity3dState.meta=meta;
-    const mats=[];root.traverse(o=>{if(!o.isMesh)return;const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{if(m&&m.map&&!mats.includes(m))mats.push(m)})});
+    const mats=[];root.traverse(o=>{if(!o.isMesh)return;const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{if(m&&!mats.includes(m))mats.push(m)})});
     entity3dState.targetMaterials=mats;entity3dState.sourceEdit=!!(await getEdit(meta.path));
     $('entity3dEdit').classList.toggle('primary',entity3dState.sourceEdit);$('entity3dOrig').classList.toggle('primary',!entity3dState.sourceEdit);
     if(entity3dState.sourceEdit&&mats.length)await entity3dSwapTexture();
