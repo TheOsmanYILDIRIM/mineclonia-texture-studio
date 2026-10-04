@@ -21,24 +21,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y assimp-utils python3-pil
-      - name: Locate Piglin source texture
-        id: texture
+      - name: Fetch Piglin texture from Mineclonia
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          hits=[p for p in Path('.').rglob('extra_mobs_piglin.png') if '.git' not in p.parts]
-          print("found:", [str(p) for p in hits])
-          if not hits:
-              raise SystemExit("extra_mobs_piglin.png not found in repository")
-          Path('/tmp/piglin_texture_path').write_text(str(hits[0]))
-          PY
+          mkdir -p /tmp/mineclonia-textures
+          curl -fL --retry 3 \
+            https://raw.githubusercontent.com/mark-wiemer/mineclonia/209ec2dc96adbf7f5ba083816d90596492ec53b5/mods/ENTITIES/mobs_mc/textures/extra_mobs_piglin.png \
+            -o /tmp/mineclonia-textures/extra_mobs_piglin.png
+          test -s /tmp/mineclonia-textures/extra_mobs_piglin.png
+          file /tmp/mineclonia-textures/extra_mobs_piglin.png
       - name: Stage B3D with its texture
         run: |
           rm -rf /tmp/piglin-preview
           mkdir -p /tmp/piglin-preview
           cp assets/models-src/mobs_mc_piglin.b3d /tmp/piglin-preview/
-          TEX="$(cat /tmp/piglin_texture_path)"
-          cp "$TEX" /tmp/piglin-preview/extra_mobs_piglin.png
+          cp /tmp/mineclonia-textures/extra_mobs_piglin.png /tmp/piglin-preview/extra_mobs_piglin.png
           # Common B3D exporters may store only a basename; provide the same image
           # under the source model's expected neighborhood and inspect Assimp info.
           cd /tmp/piglin-preview
