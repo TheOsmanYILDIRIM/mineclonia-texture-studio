@@ -776,7 +776,7 @@ async function importZip(file){
 async function importProjectBackup(file){
  const z=await JSZip.loadAsync(file);const mf=z.file('Mineclonia_Texture_Studio_Backup/manifest.json')||z.file('manifest.json');
  if(!mf)throw new Error('Geçerli proje yedeği değil');const m=JSON.parse(await mf.async('string'));
- if(m.format!=='mineclonia-texture-studio-backup')throw new Error('Yedek formatı tanınmadı');if(m.targetResolution===256||m.targetResolution===512){TARGET_RESOLUTION=m.targetResolution;if($('resolution'))$('resolution').value=String(TARGET_RESOLUTION)}
+ if(m.format!=='mineclonia-texture-studio-backup')throw new Error('Yedek formatı tanınmadı');if([64,128,256,512].includes(m.targetResolution)){TARGET_RESOLUTION=m.targetResolution;if($('resolution'))$('resolution').value=String(TARGET_RESOLUTION)}
  let ok=0,missing=0;for(const e of (m.edits||[])){const x=CATALOG.find(v=>v.id===e.id)||CATALOG.find(v=>v.path===e.path);const f=z.file('Mineclonia_Texture_Studio_Backup/'+e.file)||z.file(e.file);if(!x||!f){missing++;continue}const blob=await f.async('blob');await putEdit(x.path,blob);queueScaled(x.path,blob,x,BACKGROUND_RESOLUTION);if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION)queueScaled(x.path,blob,x,TARGET_RESOLUTION);ok++;}
  let pc=0;if(m.promptOverrides&&typeof m.promptOverrides==='object'){for(const [id,prompt] of Object.entries(m.promptOverrides)){if(CATALOG.some(x=>x.id===id)&&typeof prompt==='string'){PROMPT_OVERRIDES.set(id,prompt);pc++;}}savePromptOverrides();}
  await applyFilter();toast(`${ok} düzenleme, ${pc} prompt geri yüklendi${missing?`, ${missing} eşleşmedi`:''}`)
