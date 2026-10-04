@@ -23,6 +23,8 @@ int main(int argc,char**argv){
   size_t base=1;
   for(u32 b=0;b<mesh->getMeshBufferCount();++b){
     IMeshBuffer* mb=mesh->getMeshBuffer(b);
+    out << "g material_" << b << "\\n";
+    out << "usemtl material_" << b << "\\n";
     const u32 vc=mb->getVertexCount();
     const E_VERTEX_TYPE type=mb->getVertexType();
     for(u32 i=0;i<vc;++i){
