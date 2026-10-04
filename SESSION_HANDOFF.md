@@ -409,16 +409,11 @@ Verification:
 
 ## Next concrete work
 
-1. Review/merge PR #2 only through the branch/PR workflow; do not direct-push implementation changes to `main`.
-2. After PR #2 is merged and Pages deploys, reload the Android app/site so `hydrateChangedPathsFast()` re-evaluates legacy stored edits.
-3. Verify on-device:
-   - 64 / 128 / 256 / 512 selected targets downscale larger PNGs;
-   - smaller PNGs are not upscaled;
-   - visually identical old rescaled copies no longer appear in the changed set or exported pack;
-   - Texturepack ZIP shows progress and completes;
-   - mobile detail close button remains reliable.
-4. Then continue runtime-role auditing beyond entity assets, especially ambiguous P1 ITEMS/effects/overlays, and revise prompts only when runtime code contradicts current semantics.
-5. Do not regress entity alpha locking, animation atlas resolution, or pinch-zoom behavior.
+1. Merge PR #2 to `main` and confirm the GitHub Pages deployment completes.
+2. On Android, reload the live site and confirm the status no longer remains on “kayıt hazırlanıyor…”.
+3. Verify a real Texturepack ZIP export with existing edits at the needed target resolution and confirm visible progress/completion.
+4. Spot-check that visually identical legacy rescaled copies disappear from the changed set after background verification.
+5. Then continue runtime-role auditing beyond entity assets; do not regress entity alpha locking, animation atlas resolution, or pinch zoom.
 ## UI regression fix — 2026-10-04
 
 A live UI regression (white main background and visually lost top/bottom controls) was traced to unresolved Git merge conflict markers accidentally committed inside `index.html` around the main stylesheet and detail-sheet markup. The browser therefore parsed the style block inconsistently.
@@ -501,6 +496,25 @@ Verification:
 
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
+
+## Startup/storage hang fix — 2026-10-04
+
+The first-load “kayıt hazırlanıyor…” hang was traced to startup synchronously awaiting changed-state hydration. That hydration can fetch the original Mineclonia texture for every persisted edit and compare pixels, so slow/stalled upstream requests kept the UI in the preparing state indefinitely.
+
+Branch fixes:
+- `678e50e2f6a3dba07bdc402a5cbcacbbbe40bfbe` — make startup/storage initialization nonblocking.
+- `fe0adab532c47cf481614200ac5ee9f287e3e701` — extend regression guards to startup/storage behavior and inline-JS syntax.
+
+Current behavior:
+- filters, controls, detail bindings, and first render are initialized before storage hydration;
+- the status immediately leaves the indefinite “preparing” state and reports background loading;
+- primary and scaled IndexedDB opens fall back after 2.5 seconds instead of hanging forever;
+- original Mineclonia texture fetches abort after 12 seconds;
+- persisted edit paths are surfaced quickly, then exact unchanged/original detection runs in the background;
+- Texturepack export waits for changed-state verification and pending writes before packaging;
+- background verification failures conservatively keep an edit marked changed rather than silently losing it.
+
+GitHub Actions runtime guard run #4 passed on the startup fix and also parses the inline JavaScript for syntax errors.
 
 ## Resolution/runtime-override regression status — 2026-10-04
 
