@@ -356,3 +356,16 @@ Static verification: the current inline JavaScript parses successfully after the
 3. Revise any P1 prompt whose current semantic assumptions conflict with runtime code.
 4. Preserve `PROMPT_AUTHORING_GUIDE.md` as the persistent methodology and extend it when new semantic asset classes are discovered.
 5. Do not regress the completed animation atlas/high-resolution or pinch-zoom work.
+
+## UI regression fix — 2026-10-04
+
+A live UI regression (white main background and visually lost top/bottom controls) was traced to unresolved Git merge conflict markers accidentally committed inside `index.html` around the main stylesheet and detail-sheet markup. The browser therefore parsed the style block inconsistently.
+
+Fixed in:
+- `b0d9508939b93fc41c65805222ce2a364e360253` — resolve stylesheet conflict and restore dark UI
+
+Verification:
+- no `<<<<<<< / ======= / >>>>>>>` markers remain;
+- both inline JavaScript blocks parse successfully;
+- dark page background, top bar, bottom bar and button theme rules are present;
+- the close button remains `type="button"` with the simplified mobile-safe interaction.
