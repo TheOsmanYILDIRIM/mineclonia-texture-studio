@@ -728,15 +728,25 @@ async function importPng(file,seam=false){
   await openDetail(active); await applyFilter();
 }
 async function importZip(file){
- const z=await JSZip.loadAsync(file);let changed=0,same=0,ambiguous=0;
- for(const [path,f] of Object.entries(z.files)){
-   if(f.dir||!path.toLowerCase().endsWith('.png'))continue;
+ const z=await JSZip.loadAsync(file);let changed=0,same=0,ambiguous=0,processed=0;
+ const pngs=Object.entries(z.files).filter(([path,f])=>!f.dir&&path.toLowerCase().endsWith('.png'));
+ setSaveState(`ZIP içe aktarılıyor • 0/${pngs.length}`,'warn');
+ for(const [path,f] of pngs){
    const meta=catalogMatchForZipPath(path);if(!meta){ambiguous++;continue}
    let blob=await f.async('blob');
-   try{const orig=await originalBlob(meta.path);if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;continue}}catch(err){console.warn(err)}
-   await putEdit(meta.path,blob); queueScaled(meta.path,blob,meta,BACKGROUND_RESOLUTION); if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(meta.path,blob,meta,TARGET_RESOLUTION); changed++
+   blob=await prepareImportedTextureBlob(blob,meta);
+   try{
+     const orig=await originalBlob(meta.path);
+     if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;processed++;continue}
+   }catch(err){console.warn(err)}
+   await putEdit(meta.path,blob);
+   queueScaled(meta.path,blob,meta,BACKGROUND_RESOLUTION);
+   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(meta.path,blob,meta,TARGET_RESOLUTION);
+   changed++;processed++;
+   if(processed===1||processed===pngs.length||processed%20===0){setSaveState(`ZIP içe aktarılıyor • ${processed}/${pngs.length}`,'warn');await new Promise(requestAnimationFrame)}
  }
- toast(`${changed} değişiklik içe aktarıldı${same?`, ${same} orijinal atlandı`:''}${ambiguous?`, ${ambiguous} eşleşmedi`:''}`);applyFilter()
+ toast(`${changed} değişiklik içe aktarıldı • ${same} birebir orijinal yok sayıldı${ambiguous?` • ${ambiguous} eşleşmedi`:''}`);
+ setSaveState('İçe aktarma tamamlandı','ok');applyFilter()
 }
 async function importProjectBackup(file){
  const z=await JSZip.loadAsync(file);const mf=z.file('Mineclonia_Texture_Studio_Backup/manifest.json')||z.file('manifest.json');
@@ -753,7 +763,7 @@ async function exportPack(){
  btn.textContent='Hazırlanıyor…';
  setSaveState('Texturepack hazırlanıyor…','warn');
  try{
-   const edits=(await allEdits()).filter(e=>CATALOG.some(x=>x.path===e.path));
+   const edits=(await allEdits()).filter(e=>changedPathsFast.has(e.path)&&CATALOG.some(x=>x.path===e.path));
    if(!edits.length){toast('Değiştirilmiş texture yok');return}
    const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
    root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
@@ -1004,9 +1014,15 @@ async function render(){
 async function importPng(file,seam=false){
   if(!active||!file)return;
   const target={...active};
-  let b=file;
-  setSaveState('Dosya hazırlanıyor…','warn');
+  setSaveState(`Dosya hazırlanıyor • ${TARGET_RESOLUTION}px…`,'warn');
+  let b=await prepareImportedTextureBlob(file,target);
   if(seam)b=await imageBlobTransform(b,true);
+  const orig=await originalBlob(target.path).catch(()=>null);
+  if(orig&&await blobsEqual(b,orig)){
+    await delEdit(target.path);
+    toast('Dosya orijinalle birebir aynı • değişiklik sayılmadı');
+    return;
+  }
   const rec={path:target.path,blob:b,updatedAt:Date.now()};
   hotEdits.set(target.path,rec); changedPathsFast.add(target.path);
   const u=setFastEditUrl(target.path,b);
@@ -1014,7 +1030,7 @@ async function importPng(file,seam=false){
   if(active&&active.path===target.path){
     $('editImg').src=u; $('editImg').style.opacity=1; $('compare').value=50; updateCompare(); tileEdited=true; $('tileSource').textContent='Yeni';
   }
-  toast((seam?'Seam dönüşü':'Yeni texture')+' görseli anında güncellendi');
+  toast((seam?'Seam dönüşü':'Yeni texture')+` • ${TARGET_RESOLUTION}px hedef`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
   queuePersistFast(target.path,b);
   queueScaled(target.path,b,target,BACKGROUND_RESOLUTION);
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
@@ -1033,7 +1049,18 @@ async function delEdit(path){
 async function hydrateChangedPathsFast(){
   changedPathsFast.clear();
   const edits=await allEdits();
-  for(const e of edits) changedPathsFast.add(e.path);
+  let checked=0,same=0;
+  for(const e of edits){
+    const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
+    try{
+      const orig=await originalBlob(e.path);
+      if(await blobsEqual(e.blob,orig)){same++;continue}
+    }catch(err){console.warn('Değişiklik doğrulanamadı',e.path,err)}
+    changedPathsFast.add(e.path);
+    checked++;
+    if(checked%25===0)await new Promise(requestAnimationFrame);
+  }
+  if(same)console.info(`${same} kayıt orijinalle birebir aynı olduğu için değişiklik sayılmadı`);
 }
 
 async function init(){
