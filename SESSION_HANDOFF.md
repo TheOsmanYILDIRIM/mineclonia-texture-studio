@@ -305,9 +305,22 @@ Relevant commits:
 - `1f5bf0053d45705787d825f086a08f3f226fe759` — add canonical agent workflow and Brain handoff rules
 - `89d30348bae45a4496cb243b8948c907d717f1aa` — make GitHub the canonical project source
 
+## Detail close-button fix — 2026-10-04
+
+The mobile/detail × close path was simplified and fixed in:
+
+- `80bcdee63aa45f04c74ecb6088ebcd6403e42d69`
+  — `fix: make detail close action single-path and touch safe`
+
+Root cause: the close control had both `click` and `pointerup` close handlers. On touch devices, closing the sheet on `pointerup` could remove the overlay before the following click dispatch, allowing click-through/reopen behavior against the texture grid. The close flow is now centralized in `closeDetail()` and closes only from the canonical click path; backdrop and Escape reuse the same function. The function also resets preview gesture state and stops animation.
+
+Static JavaScript syntax parsing passed before commit.
+
+Live Android verification is still required; do not mark this as device-verified until tested on the production page.
+
 ## Next concrete work
 
-1. Open the live site on Android and verify the × close-button fix from `bf0a5b2...`.
+1. Open the live site on Android and verify the latest × close-button fix from `80bcdee63aa45f04c74ecb6088ebcd6403e42d69`.
 2. Continue runtime-role auditing beyond entity assets, especially ambiguous P1 ITEMS/effects/overlays:
    - trace exact filename in Mineclonia source
    - identify node/item/HUD/particle/overlay/state/tint behavior
