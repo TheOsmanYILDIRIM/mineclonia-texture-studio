@@ -309,82 +309,52 @@ let tileN=1,tileEdited=true;
 async function updateTilePreview(){if(!active)return;const box=$('tilePreview');document.querySelectorAll('[data-tile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.tile)===tileN));if(tileN===1){box.classList.remove('show');$('preview').style.display='block';return}$('preview').style.display='none';box.classList.add('show');const url=await blobUrl(active.path,tileEdited);box.style.backgroundImage=`url("${url}")`;box.style.backgroundSize=`${100/tileN}% ${100/tileN}%`;box.style.backgroundPosition='0 0';}
 
 const MINECLONIA_COMMIT='209ec2dc96adbf7f5ba083816d90596492ec53b5';
-const MINECLONIA_MODEL_ROOT=`https://raw.githubusercontent.com/mark-wiemer/mineclonia/${MINECLONIA_COMMIT}/mods/ENTITIES/mobs_mc/models/`;
-let entity3dState={raf:0,gl:null,program:null,buffers:null,texture:null,yaw:-0.55,pitch:0.18,zoom:2.8,drag:false,lastX:0,lastY:0,meta:null,sourceEdit:true,token:0};
-function entityModelCandidates(name){
- let n=name.toLowerCase().replace(/\.png$/,'');
- const out=[]; const add=x=>{if(x&&!out.includes(x))out.push(x)};
- if(n.includes('glow_squid')) add('extra_mobs_glow_squid.b3d');
- if(n.includes('piglin_brute')||n.includes('piglin')) add('mobs_mc_piglin.b3d');
- if(n.includes('zombified_piglin')||n.includes('zombiepig')){add('mobs_mc_zombiepig.b3d');add('mobs_mc_piglin.b3d')}
- if(n.includes('cat_')||n.endsWith('_cat')||n.includes('ocelot')) add('mobs_mc_cat.b3d');
- if(n.includes('wolf')) add('mobs_mc_wolf.b3d');
- if(n.includes('horse')) add('mobs_mc_horse.b3d');
- if(n.includes('llama')) add('mobs_mc_llama.b3d');
- if(n.includes('salmon')) add('extra_mobs_salmon.b3d');
- if(n.includes('cod')) add('extra_mobs_cod.b3d');
- if(n.includes('dolphin')) add('extra_mobs_dolphin.b3d');
- if(n.includes('tropical_fish')){add('extra_mobs_tropical_fish_a.b3d');add('extra_mobs_tropical_fish_b.b3d')}
- if(n.includes('hoglin')||n.includes('zoglin')) add('extra_mobs_hoglin.b3d');
- if(n.includes('strider')) add('extra_mobs_strider.b3d');
- let stem=n.replace(/^extra_mobs_/,'').replace(/^mobs_mc_/,'');
- for(const suffix of ['_all_black','_black','_british_shorthair','_calico','_jellie','_persian','_ragdoll','_red','_siamese','_tabby','_white','_ocelot','_angry','_tame','_collar','_armor','_glint1','_glint2','_glint3','_glint4']) if(stem.endsWith(suffix)) stem=stem.slice(0,-suffix.length);
- add(`mobs_mc_${stem}.b3d`); add(`extra_mobs_${stem}.b3d`);
- return out;
+let entity3dState={raf:0,renderer:null,scene:null,camera:null,root:null,texture:null,yaw:-0.55,pitch:0.18,zoom:1,drag:false,lastX:0,lastY:0,meta:null,sourceEdit:true,token:0,modules:null};
+const ENTITY_GLB_MAP={
+  'ENTITIES/mobs_mc/extra_mobs_piglin.png':'assets/models/mobs_mc_piglin.glb'
+};
+async function entity3dModules(){
+  if(entity3dState.modules)return entity3dState.modules;
+  const THREE=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/+esm');
+  const mod=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js/+esm');
+  entity3dState.modules={THREE,GLTFLoader:mod.GLTFLoader};
+  return entity3dState.modules;
 }
-function b3dReadCString(dv,o,end){let a=[];while(o.i<end){const b=dv.getUint8(o.i++);if(!b)break;a.push(b)}return new TextDecoder().decode(new Uint8Array(a))}
-function qmat(px,py,pz,sx,sy,sz,qw,qx,qy,qz){
- const x2=qx+qx,y2=qy+qy,z2=qz+qz,xx=qx*x2,xy=qx*y2,xz=qx*z2,yy=qy*y2,yz=qy*z2,zz=qz*z2,wx=qw*x2,wy=qw*y2,wz=qw*z2;
- return [ (1-(yy+zz))*sx,(xy+wz)*sx,(xz-wy)*sx,0,(xy-wz)*sy,(1-(xx+zz))*sy,(yz+wx)*sy,0,(xz+wy)*sz,(yz-wx)*sz,(1-(xx+yy))*sz,0,px,py,pz,1];
-}
-function mmul(a,b){let r=new Array(16).fill(0);for(let c=0;c<4;c++)for(let rr=0;rr<4;rr++)for(let k=0;k<4;k++)r[c*4+rr]+=a[k*4+rr]*b[c*4+k];return r}
-function mpoint(m,x,y,z){return [m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]]}
-function minvAffine(m){
- const a00=m[0],a01=m[4],a02=m[8],a10=m[1],a11=m[5],a12=m[9],a20=m[2],a21=m[6],a22=m[10];
- const b01=a22*a11-a12*a21,b11=-a22*a10+a12*a20,b21=a21*a10-a11*a20;
- let det=a00*b01+a01*b11+a02*b21;if(Math.abs(det)<1e-10)return [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];det=1/det;
- const r00=b01*det,r01=(-a22*a01+a02*a21)*det,r02=(a12*a01-a02*a11)*det;
- const r10=b11*det,r11=(a22*a00-a02*a20)*det,r12=(-a12*a00+a02*a10)*det;
- const r20=b21*det,r21=(-a21*a00+a01*a20)*det,r22=(a11*a00-a01*a10)*det;
- const tx=m[12],ty=m[13],tz=m[14];
- return [r00,r10,r20,0,r01,r11,r21,0,r02,r12,r22,0,-(r00*tx+r01*ty+r02*tz),-(r10*tx+r11*ty+r12*tz),-(r20*tx+r21*ty+r22*tz),1]
-}
-function qnorm4(q){const n=Math.hypot(q[0],q[1],q[2],q[3])||1;return q.map(v=>v/n)}
-function qmix4(a,b,t){let bb=b.slice(),dot=a[0]*bb[0]+a[1]*bb[1]+a[2]*bb[2]+a[3]*bb[3];if(dot<0)bb=bb.map(v=>-v);return qnorm4(a.map((v,i)=>v+(bb[i]-v)*t))}
-function b3dSample(node,bit,field,frame,def){
- const a=[];for(const ks of node.keySets)if(ks.flags&bit)for(const k of ks.keys)if(k[field])a.push(k);if(!a.length)return def.slice();a.sort((x,y)=>x.frame-y.frame);
- if(frame<=a[0].frame)return a[0][field].slice();if(frame>=a[a.length-1].frame)return a[a.length-1][field].slice();
- let lo=a[0],hi=a[a.length-1];for(let i=1;i<a.length;i++)if(a[i].frame>=frame){lo=a[i-1];hi=a[i];break}const t=(frame-lo.frame)/Math.max(1e-9,hi.frame-lo.frame);
- if(bit===4)return qmix4(lo[field],hi[field],t);return lo[field].map((v,i)=>v+(hi[field][i]-v)*t)
-}
-function parseB3D(buf,frame=0){
- const dv=new DataView(buf),le=true,meshes=[],roots=[];let o={i:0};
- function chunkHeader(end){if(o.i+8>end)return null;let id='';for(let j=0;j<4;j++)id+=String.fromCharCode(dv.getUint8(o.i++));const len=dv.getInt32(o.i,le);o.i+=4;const e=o.i+len;if(e>end||len<0)throw Error('Bozuk B3D chunk: '+id);return {id,end:e}}
- const root=chunkHeader(dv.byteLength);if(!root||root.id!=='BB3D')throw Error('Geçersiz B3D');o.i+=4;
- function mesh(end,owner){o.i+=4;const m={owner,verts:[],uvs:[],inds:[]};while(o.i<end){const ch=chunkHeader(end);if(!ch)break;if(ch.id==='VRTS'){const flags=dv.getInt32(o.i,le),sets=dv.getInt32(o.i+4,le),size=dv.getInt32(o.i+8,le);o.i+=12;while(o.i<ch.end){const x=dv.getFloat32(o.i,le),y=dv.getFloat32(o.i+4,le),z=dv.getFloat32(o.i+8,le);o.i+=12;if(flags&1)o.i+=12;if(flags&2)o.i+=16;let u=0,v=0;for(let ss=0;ss<sets;ss++)for(let k=0;k<size;k++){const val=dv.getFloat32(o.i,le);o.i+=4;if(ss===0&&k===0)u=val;if(ss===0&&k===1)v=val}m.verts.push([x,y,z]);m.uvs.push([u,v])}}else if(ch.id==='TRIS'){o.i+=4;while(o.i+12<=ch.end){m.inds.push(dv.getInt32(o.i,le),dv.getInt32(o.i+4,le),dv.getInt32(o.i+8,le));o.i+=12}}o.i=ch.end}meshes.push(m);return m}
- function keys(end,node){const flags=dv.getInt32(o.i,le);o.i+=4;const ks={flags,keys:[]};while(o.i<end){const k={frame:dv.getInt32(o.i,le)};o.i+=4;if(flags&1){k.pos=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le)];o.i+=12}if(flags&2){k.scale=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le)];o.i+=12}if(flags&4){k.rot=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le),dv.getFloat32(o.i+12,le)];o.i+=16}ks.keys.push(k)}node.keySets.push(ks)}
- function bone(end,node,meshRef){if(!meshRef){o.i=end;return}node.boneMesh=meshRef;node.weights=[];while(o.i+8<=end){node.weights.push([dv.getInt32(o.i,le),dv.getFloat32(o.i+4,le)]);o.i+=8}}
- function node(end,parent,inheritedMesh){const name=b3dReadCString(dv,o,end),pos=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le)];o.i+=12;const scale=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le)];o.i+=12;const rot=[dv.getFloat32(o.i,le),dv.getFloat32(o.i+4,le),dv.getFloat32(o.i+8,le),dv.getFloat32(o.i+12,le)];o.i+=16;const n={name,pos,scale,rot,parent,children:[],keySets:[],mesh:null,boneMesh:null,weights:null};if(parent)parent.children.push(n);else roots.push(n);let currentMesh=inheritedMesh;while(o.i<end){const ch=chunkHeader(end);if(!ch)break;if(ch.id==='MESH'){currentMesh=mesh(ch.end,n);n.mesh=currentMesh}else if(ch.id==='BONE')bone(ch.end,n,currentMesh);else if(ch.id==='KEYS')keys(ch.end,n);else if(ch.id==='NODE')node(ch.end,n,currentMesh);else if(ch.id==='ANIM'){if(o.i+12<=ch.end)n.anim={flags:dv.getInt32(o.i,le),frames:dv.getInt32(o.i+4,le),fps:dv.getFloat32(o.i+8,le)}}o.i=ch.end}return n}
- while(o.i<root.end){const ch=chunkHeader(root.end);if(!ch)break;if(ch.id==='NODE')node(ch.end,null,null);o.i=ch.end}
- const I=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
- function prep(n,pBind,pCur){n.bindLocal=qmat(n.pos[0],n.pos[1],n.pos[2],n.scale[0],n.scale[1],n.scale[2],n.rot[0],n.rot[1],n.rot[2],n.rot[3]);n.bindGlobal=mmul(pBind,n.bindLocal);n.invBind=minvAffine(n.bindGlobal);const pp=b3dSample(n,1,'pos',frame,n.pos),ss=b3dSample(n,2,'scale',frame,n.scale),rr=b3dSample(n,4,'rot',frame,n.rot);n.curLocal=qmat(pp[0],pp[1],pp[2],ss[0],ss[1],ss[2],rr[0],rr[1],rr[2],rr[3]);n.curGlobal=mmul(pCur,n.curLocal);for(const c of n.children)prep(c,n.bindGlobal,n.curGlobal)}for(const r of roots)prep(r,I,I);
- const allNodes=[];(function walk(ns){for(const n of ns){allNodes.push(n);walk(n.children)}})(roots);
- const verts=[],uvs=[],inds=[];
- for(const m of meshes){const count=m.verts.length,acc=Array.from({length:count},()=>[0,0,0]),sum=new Float32Array(count),meshBind=m.owner?m.owner.bindGlobal:I,meshCur=m.owner?m.owner.curGlobal:I;for(const n of allNodes)if(n.boneMesh===m&&n.weights){for(const [vid,w] of n.weights){if(vid<0||vid>=count||!Number.isFinite(w)||w<=0)continue;const bg=mpoint(meshBind,...m.verts[vid]),bl=mpoint(n.invBind,...bg),cg=mpoint(n.curGlobal,...bl);acc[vid][0]+=cg[0]*w;acc[vid][1]+=cg[1]*w;acc[vid][2]+=cg[2]*w;sum[vid]+=w}}const base=verts.length/3;for(let i=0;i<count;i++){const rest=mpoint(meshCur,...m.verts[i]),rem=Math.max(0,1-sum[i]);verts.push(acc[i][0]+rest[0]*rem,acc[i][1]+rest[1]*rem,acc[i][2]+rest[2]*rem);uvs.push(...m.uvs[i])}for(const ii of m.inds)inds.push(base+ii)}
- if(!inds.length)throw Error('Mesh geometrisi yok');return {verts:new Float32Array(verts),uvs:new Float32Array(uvs),inds:new Uint32Array(inds)}
-}
-function v3dShader(gl,type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s)||'shader');return s}
-function v3dProgram(gl){const vs=v3dShader(gl,gl.VERTEX_SHADER,`attribute vec3 p;attribute vec2 t;uniform mat4 mvp;varying vec2 uv;void main(){uv=t;gl_Position=mvp*vec4(p,1.0);}`),fs=v3dShader(gl,gl.FRAGMENT_SHADER,`precision mediump float;varying vec2 uv;uniform sampler2D tex;void main(){vec4 c=texture2D(tex,vec2(uv.x,1.0-uv.y));if(c.a<0.05)discard;gl_FragColor=c;}`);const pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);return pr}
-function perspective(f,a,n,f2){const q=1/Math.tan(f/2),nf=1/(n-f2);return [q/a,0,0,0,0,q,0,0,0,0,(f2+n)*nf,-1,0,0,2*f2*n*nf,0]}
-function rx(a){let c=Math.cos(a),s=Math.sin(a);return [1,0,0,0,0,c,s,0,0,-s,c,0,0,0,0,1]}function ry(a){let c=Math.cos(a),s=Math.sin(a);return [c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1]}function trans(z){return [1,0,0,0,0,1,0,0,0,0,1,0,0,0,z,1]}
-function fitGeometry(g){let min=[1e9,1e9,1e9],max=[-1e9,-1e9,-1e9];for(let i=0;i<g.verts.length;i+=3)for(let k=0;k<3;k++){min[k]=Math.min(min[k],g.verts[i+k]);max[k]=Math.max(max[k],g.verts[i+k])}const c=min.map((v,k)=>(v+max[k])/2),size=Math.max(...max.map((v,k)=>v-min[k]))||1;for(let i=0;i<g.verts.length;i+=3){g.verts[i]=(g.verts[i]-c[0])/size*2;g.verts[i+1]=(g.verts[i+1]-c[1])/size*2;g.verts[i+2]=(g.verts[i+2]-c[2])/size*2}return g}
-async function loadModelCandidate(meta){let last;for(const m of entityModelCandidates(meta.name)){try{const r=await fetch(MINECLONIA_MODEL_ROOT+m,{cache:'force-cache'});if(!r.ok){last=Error(String(r.status));continue}return {model:m,geom:fitGeometry(parseB3D(await r.arrayBuffer(),20))}}catch(e){last=e}}throw last||Error('Model eşleşmesi yok')}
 async function entity3dTextureBlob(){return entity3dState.sourceEdit?displayBlob(active.path):originalBlob(active.path)}
-async function entity3dUploadTexture(){const gl=entity3dState.gl;if(!gl)return;const blob=await entity3dTextureBlob(),img=await createImageBitmap(blob);if(entity3dState.texture)gl.deleteTexture(entity3dState.texture);const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);entity3dState.texture=t;img.close&&img.close()}
-function entity3dRender(){const s=entity3dState,gl=s.gl,c=$('entity3dCanvas');if(!gl||!s.buffers)return;const dpr=Math.min(2,devicePixelRatio||1),w=Math.max(1,Math.floor(c.clientWidth*dpr)),h=Math.max(1,Math.floor(c.clientHeight*dpr));if(c.width!==w||c.height!==h){c.width=w;c.height=h}gl.viewport(0,0,w,h);gl.clearColor(.035,.045,.055,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.useProgram(s.program);const aspect=w/h,proj=perspective(0.75,aspect,.05,20),model=mmul(rx(s.pitch),ry(s.yaw)),view=trans(-s.zoom),mvp=mmul(proj,mmul(view,model));gl.uniformMatrix4fv(gl.getUniformLocation(s.program,'mvp'),false,new Float32Array(mvp));gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,s.texture);gl.uniform1i(gl.getUniformLocation(s.program,'tex'),0);gl.bindBuffer(gl.ARRAY_BUFFER,s.buffers.v);let loc=gl.getAttribLocation(s.program,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,s.buffers.u);loc=gl.getAttribLocation(s.program,'t');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,s.buffers.i);gl.drawElements(gl.TRIANGLES,s.buffers.count,s.buffers.type,0);s.raf=requestAnimationFrame(entity3dRender)}
-function entity3dStop(){if(entity3dState.raf)cancelAnimationFrame(entity3dState.raf);entity3dState.raf=0;entity3dState.token++}
-function entity3dBindControls(){const st=$('entity3dStage');if(st.dataset.bound)return;st.dataset.bound='1';st.addEventListener('pointerdown',e=>{entity3dState.drag=true;entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY;st.setPointerCapture(e.pointerId)});st.addEventListener('pointermove',e=>{if(!entity3dState.drag)return;entity3dState.yaw+=(e.clientX-entity3dState.lastX)*.012;entity3dState.pitch=Math.max(-1.2,Math.min(1.2,entity3dState.pitch+(e.clientY-entity3dState.lastY)*.01));entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY});st.addEventListener('pointerup',()=>entity3dState.drag=false);$('entity3dOrig').onclick=async()=>{entity3dState.sourceEdit=false;$('entity3dOrig').classList.add('primary');$('entity3dEdit').classList.remove('primary');await entity3dUploadTexture()};$('entity3dEdit').onclick=async()=>{entity3dState.sourceEdit=true;$('entity3dEdit').classList.add('primary');$('entity3dOrig').classList.remove('primary');await entity3dUploadTexture()};$('entity3dReset').onclick=()=>{entity3dState.yaw=-.55;entity3dState.pitch=.18;entity3dState.zoom=2.8}}
-async function openEntity3D(meta){entity3dStop();const box=$('entity3d');if(assetTypeOf(meta)!=='Entity'){$('entity3d').classList.remove('show');return}box.classList.add('show');$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='Mineclonia modeli yükleniyor…';$('entity3dMeta').textContent='GitHub snapshot '+MINECLONIA_COMMIT.slice(0,8);entity3dBindControls();const token=entity3dState.token;try{const got=await loadModelCandidate(meta);if(token!==entity3dState.token)return;const c=$('entity3dCanvas'),gl=c.getContext('webgl2',{alpha:false,antialias:true})||c.getContext('webgl',{alpha:false,antialias:true});if(!gl)throw Error('WebGL desteklenmiyor');const pr=v3dProgram(gl),g=got.geom,v=gl.createBuffer(),u=gl.createBuffer(),i=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,v);gl.bufferData(gl.ARRAY_BUFFER,g.verts,gl.STATIC_DRAW);gl.bindBuffer(gl.ARRAY_BUFFER,u);gl.bufferData(gl.ARRAY_BUFFER,g.uvs,gl.STATIC_DRAW);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,i);let type;if(typeof WebGL2RenderingContext!=='undefined'&&gl instanceof WebGL2RenderingContext){gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,g.inds,gl.STATIC_DRAW);type=gl.UNSIGNED_INT}else{const max=Math.max(...g.inds);if(max>65535){const ext=gl.getExtension('OES_element_index_uint');if(!ext)throw Error('Bu mesh WebGL2 veya OES_element_index_uint gerektiriyor');gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,g.inds,gl.STATIC_DRAW);type=gl.UNSIGNED_INT}else{const i16=new Uint16Array(g.inds);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,i16,gl.STATIC_DRAW);type=gl.UNSIGNED_SHORT}}entity3dState.gl=gl;entity3dState.program=pr;entity3dState.buffers={v,u,i,count:g.inds.length,type};entity3dState.meta=meta;entity3dState.sourceEdit=!!(await getEdit(meta.path));$('entity3dEdit').classList.toggle('primary',entity3dState.sourceEdit);$('entity3dOrig').classList.toggle('primary',!entity3dState.sourceEdit);await entity3dUploadTexture();$('entity3dMeta').textContent=`${got.model} · gerçek Mineclonia B3D`; $('entity3dMsg').style.display='none';entity3dRender()}catch(e){console.warn('3D preview',e);$('entity3dMeta').textContent='3D model eşleşmedi';$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='3D önizleme hatası: '+(e&&e.message?e.message:String(e))}}
+async function entity3dMakeTexture(){
+  const {THREE}=await entity3dModules();
+  const blob=await entity3dTextureBlob(),url=URL.createObjectURL(blob);
+  try{
+    const tex=await new Promise((resolve,reject)=>new THREE.TextureLoader().load(url,resolve,undefined,reject));
+    tex.flipY=false;tex.colorSpace=THREE.SRGBColorSpace;tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;tex.needsUpdate=true;
+    return tex;
+  }finally{URL.revokeObjectURL(url)}
+}
+function entity3dApplyTexture(tex){
+  const mods=entity3dState.modules;if(!mods||!entity3dState.root)return;const {THREE}=mods;
+  if(entity3dState.texture)entity3dState.texture.dispose();entity3dState.texture=tex;
+  entity3dState.root.traverse(o=>{if(!o.isMesh)return;const old=o.material;if(Array.isArray(old))old.forEach(m=>m&&m.dispose&&m.dispose());else old&&old.dispose&&old.dispose();o.material=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.01,side:THREE.DoubleSide,skinning:!!o.isSkinnedMesh})});
+}
+async function entity3dUploadTexture(){if(!entity3dState.root)return;entity3dApplyTexture(await entity3dMakeTexture())}
+function entity3dRender(){const s=entity3dState,c=$('entity3dCanvas');if(!s.renderer||!s.scene||!s.camera||!s.root)return;const w=Math.max(1,c.clientWidth),h=Math.max(1,c.clientHeight);s.renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));s.renderer.setSize(w,h,false);s.camera.aspect=w/h;s.camera.updateProjectionMatrix();s.root.rotation.y=s.yaw;s.root.rotation.x=s.pitch;s.camera.zoom=s.zoom;s.camera.updateProjectionMatrix();s.renderer.render(s.scene,s.camera);s.raf=requestAnimationFrame(entity3dRender)}
+function entity3dStop(){const s=entity3dState;if(s.raf)cancelAnimationFrame(s.raf);s.raf=0;s.token++;if(s.texture){s.texture.dispose();s.texture=null}if(s.renderer){s.renderer.dispose();s.renderer=null}s.scene=s.camera=s.root=null}
+function entity3dBindControls(){const st=$('entity3dStage');if(st.dataset.bound)return;st.dataset.bound='1';st.addEventListener('pointerdown',e=>{entity3dState.drag=true;entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY;st.setPointerCapture(e.pointerId)});st.addEventListener('pointermove',e=>{if(!entity3dState.drag)return;entity3dState.yaw+=(e.clientX-entity3dState.lastX)*.012;entity3dState.pitch=Math.max(-1.2,Math.min(1.2,entity3dState.pitch+(e.clientY-entity3dState.lastY)*.01));entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY});st.addEventListener('pointerup',()=>entity3dState.drag=false);st.addEventListener('wheel',e=>{e.preventDefault();entity3dState.zoom=Math.max(.45,Math.min(3.5,entity3dState.zoom*(e.deltaY>0?.9:1.1)))},{passive:false});$('entity3dOrig').onclick=async()=>{entity3dState.sourceEdit=false;$('entity3dOrig').classList.add('primary');$('entity3dEdit').classList.remove('primary');await entity3dUploadTexture()};$('entity3dEdit').onclick=async()=>{entity3dState.sourceEdit=true;$('entity3dEdit').classList.add('primary');$('entity3dOrig').classList.remove('primary');await entity3dUploadTexture()};$('entity3dReset').onclick=()=>{entity3dState.yaw=-.55;entity3dState.pitch=.18;entity3dState.zoom=1}}
+async function openEntity3D(meta){
+  entity3dStop();const box=$('entity3d'),glb=ENTITY_GLB_MAP[meta.path];if(!glb){box.classList.remove('show');return}
+  box.classList.add('show');$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='Gerçek Mineclonia GLB modeli yükleniyor…';$('entity3dMeta').textContent=glb;entity3dBindControls();const token=entity3dState.token;
+  try{
+    const {THREE,GLTFLoader}=await entity3dModules();if(token!==entity3dState.token)return;const c=$('entity3dCanvas');
+    const renderer=new THREE.WebGLRenderer({canvas:c,alpha:false,antialias:true});renderer.setClearColor(0x090b0e,1);renderer.outputColorSpace=THREE.SRGBColorSpace;
+    const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,1,.01,1000),loader=new GLTFLoader();
+    const gltf=await new Promise((resolve,reject)=>loader.load(glb,resolve,undefined,reject));if(token!==entity3dState.token){renderer.dispose();return}
+    const root=gltf.scene;scene.add(root);root.updateMatrixWorld(true);
+    // Use the converter's actual skeleton/bind pose. We do not run our old B3D parser at all.
+    const box3=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();box3.getSize(size);box3.getCenter(center);root.position.sub(center);root.updateMatrixWorld(true);
+    const maxDim=Math.max(size.x,size.y,size.z)||1;camera.position.set(0,0,maxDim*2.2);camera.near=Math.max(.001,maxDim/1000);camera.far=maxDim*50;camera.lookAt(0,0,0);camera.updateProjectionMatrix();
+    entity3dState.renderer=renderer;entity3dState.scene=scene;entity3dState.camera=camera;entity3dState.root=root;entity3dState.meta=meta;entity3dState.sourceEdit=!!(await getEdit(meta.path));$('entity3dEdit').classList.toggle('primary',entity3dState.sourceEdit);$('entity3dOrig').classList.toggle('primary',!entity3dState.sourceEdit);await entity3dUploadTexture();
+    $('entity3dMeta').textContent='mobs_mc_piglin.glb · b3d2glb · GLTFLoader';$('entity3dMsg').style.display='none';entity3dRender();
+  }catch(e){console.warn('3D preview',e);$('entity3dMeta').textContent='GLB yükleme hatası';$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='3D önizleme hatası: '+(e&&e.message?e.message:String(e))}
+}
 async function openDetail(x){active=x;$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('origImg').src=await blobUrl(x.path,false);const edit=await getEdit(x.path);$('editImg').src=edit?URL.createObjectURL(edit.blob):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();const pr=promptFor(x);$('promptFamily').textContent=pr.label+' · '+pr.source;$('textureId').textContent='ID: '+x.id;$('promptText').value=pr.text;$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview();await openEntity3D(x)}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
