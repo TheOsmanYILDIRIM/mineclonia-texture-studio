@@ -259,6 +259,18 @@ Do not encode assumptions about the original low resolution into the prompt. The
 
 When alpha exists, explicitly preserve its functional logic.
 
+**Important correction from production testing:** transparency instructions must never encourage the model to redraw, clean up, smooth, or reinterpret UV/mask edges. For entity atlases, exact UV/alpha geometry has higher priority than the request for a transparent background.
+
+For entity/locked-atlas assets:
+- treat the source alpha mask as coordinate-locked structural data;
+- preserve every island contour and internal cutout exactly;
+- do not expand, contract, feather, blur, anti-alias, round, erode, dilate, or otherwise alter mask edges;
+- do not add or remove even a thin border around an island;
+- transparent source pixels remain transparent and occupied source pixels stay within the same footprint;
+- material detail must stop exactly at the original mask boundary;
+- if realism or transparency aesthetics conflict with UV alignment, exact UV alignment wins.
+
+
 Do not:
 
 - fill transparent regions accidentally
