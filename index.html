@@ -360,32 +360,36 @@ async function refreshAnimPreview(){
  draw(); animPlaying=true; $('animToggle').textContent='Durdur'; animTimer=setInterval(()=>{ if(!animPlaying) return; f=(f+1)%spec.frames; draw(); }, 140);
 }
 
-const TRANSPARENCY_OUTPUT_MARKER='TRANSPARENCY / BACKGROUND REQUIREMENT:';
-const ENTITY_TRANSPARENCY_MARKER='TRANSPARENCY / ATLAS INTEGRITY:';
-const TRANSPARENCY_OUTPUT_REQUIREMENT=`TRANSPARENCY / BACKGROUND REQUIREMENT:
-Preserve and respect transparency exactly where relevant.
-The final output must have a transparent background wherever the source uses transparency or empty space.
-Do not place the texture on a solid, colored, white, black, or scenic background.
-Do not fill transparent or unused regions.
-Keep all empty or background regions fully transparent.
-If the asset contains alpha-cutout areas, preserve them cleanly and accurately.
-Output must be game-ready and background-free.
+const TRANSPARENCY_OUTPUT_MARKER='ALPHA / BACKGROUND LOCK:';
+const ENTITY_TRANSPARENCY_MARKER='UV + ALPHA MASK LOCK — HIGHEST PRIORITY:';
+const TRANSPARENCY_OUTPUT_REQUIREMENT=`ALPHA / BACKGROUND LOCK:
+Treat the source alpha channel as locked structural data, not as an area to redesign.
+Do not create new transparency and do not remove existing transparency.
+Pixels/regions that are transparent in the source must remain transparent; pixels/regions that are opaque in the source must remain occupied.
+Preserve the source silhouette and alpha-edge coordinates exactly. Do not expand, contract, feather, blur, soften, round, anti-alias, or reinterpret mask boundaries.
+Do not add a white, black, colored, scenic, shadow, glow, or environmental background.
+Material/detail changes must stay strictly inside the source occupied mask.
+When transparency conflicts with shape fidelity, the ORIGINAL SOURCE MASK AND BOUNDARIES WIN.`;
 
-IMPORTANT OUTPUT REQUIREMENT:
-Return a clean game-ready texture with correct alpha transparency.
-Keep all intended empty/background regions fully transparent.
-Do not generate any solid background.`;
-const ENTITY_TRANSPARENCY_REQUIREMENT=`TRANSPARENCY / ATLAS INTEGRITY:
-Preserve the exact transparency structure of the source atlas.
-Every empty region outside the UV islands must remain fully transparent.
-Do not paint into empty atlas space.
-Do not add any backdrop, canvas color, glow field, shadow field, or environmental background.
-Treat transparent space as locked.
-Final output must be a clean PNG-style texture atlas with transparency intact.`;
+const ENTITY_TRANSPARENCY_REQUIREMENT=`UV + ALPHA MASK LOCK — HIGHEST PRIORITY:
+The source UV atlas is a coordinate-locked structural template. Exact UV geometry has higher priority than realism, transparency aesthetics, edge smoothing, or material detail.
+Preserve every UV island's exact position, size, orientation, spacing, outer contour, internal cutout, and occupied/empty pixel boundary.
+Preserve the alpha mask exactly as supplied by the source. Do not infer a new silhouette from the creature, material, or transparent background.
+Do not move, resize, rotate, warp, round, smooth, feather, blur, anti-alias, expand, contract, erode, dilate, or repaint any UV-island edge.
+Do not add or remove even a thin painted border around an island. Do not bridge gaps between islands. Do not fill empty atlas space.
+Transparent source pixels must remain transparent; occupied source pixels must remain inside the exact same mask footprint.
+All new fur, skin, cloth, bone, scale, metal, markings, weathering, and micro-detail must terminate at the original mask boundary without crossing it.
+Do not add any backdrop, canvas fill, shadow field, glow field, halo, outline, or environmental background.
+If visual realism conflicts with exact UV alignment, EXACT UV ALIGNMENT AND THE ORIGINAL ALPHA MASK WIN.
+Final output must remain directly usable on the original model without edge drift or seam mismatch.`;
+
 function applyPromptOutputRequirements(text,x){
  let out=String(text||'').trimEnd();
+ if(assetTypeOf(x)==='Entity'){
+   if(!out.includes(ENTITY_TRANSPARENCY_MARKER)) out+='\n\n'+ENTITY_TRANSPARENCY_REQUIREMENT;
+   return out;
+ }
  if(!out.includes(TRANSPARENCY_OUTPUT_MARKER)) out+='\n\n'+TRANSPARENCY_OUTPUT_REQUIREMENT;
- if(assetTypeOf(x)==='Entity'&&!out.includes(ENTITY_TRANSPARENCY_MARKER)) out+='\n\n'+ENTITY_TRANSPARENCY_REQUIREMENT;
  return out;
 }
 function promptFor(x){const d=defaultPromptFor(x);const o=PROMPT_OVERRIDES.get(x.id);return {id:x.id,label:d.label,text:applyPromptOutputRequirements(o||d.text,x),source:o?'JSON/özel':d.source}}
