@@ -1,0 +1,111 @@
+# AGENTS.md — Mineclonia Texture Studio
+
+This repository is the canonical source of truth for the Mineclonia Texture Studio project.
+
+## Read order for a new working session
+
+1. `AGENTS.md` — working contract and source-of-truth rules.
+2. `README.md` — project/deployment entry point.
+3. `SESSION_HANDOFF.md` — current state, completed work, open work, and next concrete step.
+4. `PROMPT_AUTHORING_GUIDE.md` — persistent texture-prompt methodology.
+
+Current code on `main` always outranks stale prose. If a handoff note conflicts with the repository state, verify the code/history and repair the handoff instead of forcing the code to match old notes.
+
+## Source of truth and memory
+
+- GitHub repository: `TheOsmanYILDIRIM/mineclonia-texture-studio`.
+- Canonical branch: `main`.
+- Production: GitHub Pages from `main` through GitHub Actions.
+- The repository is authoritative for code, prompts, classifications, project decisions, and current work state.
+- Avenox/Beyin is a continuity index, not a second project database. It should store only concise pointers/outcomes needed to rediscover this repository and its current continuation point.
+- If Beyin and the repository disagree, verify current GitHub state first; GitHub wins for project state and Beyin should then be refreshed.
+
+Do not duplicate large prompt catalogs, source files, or long handoff history into Beyin.
+
+## Core project invariants
+
+Texture Studio edits Mineclonia textures while preserving gameplay structure and identity.
+
+Protect, as applicable:
+
+- UV/mask layout
+- transparency
+- animation topology/frame order
+- tileability
+- silhouette and occupied/empty regions
+- runtime compositing/tint behavior
+- gameplay readability
+
+The shared visual target is grounded dark-fantasy material realism: weathered, somber, muted, tactile, physically believable, restrained in saturation and lighting, and never merely enlarged HD pixel art.
+
+## Runtime semantics rule
+
+Do not infer a texture's real role from filename, folder, dimensions, or appearance alone when runtime use is ambiguous.
+
+Trace the exact filename through Mineclonia source and determine its actual runtime role. Runtime code wins over naming intuition.
+
+This is especially important for:
+
+- entity skins vs overlays
+- tintable layers
+- particle/effect sprites
+- item masks
+- HUD assets
+- animations
+- node faces
+- reusable/composited textures
+
+For particle/effect textures, determine the trigger/context and relevant runtime behavior before authoring or revising the prompt.
+
+## Prompt rules
+
+`PROMPT_AUTHORING_GUIDE.md` is the canonical prompt-authoring method.
+
+Key non-negotiables:
+
+- No generic fallback prompt.
+- Production prompts are asset-specific or deliberately controlled variants.
+- Locked UV/entity atlases must preserve their exact islands/masks.
+- Entity dimensions alone must never trigger animation-strip treatment.
+- Animated textures preserve frame topology while edited resolution may increase.
+- Runtime role and gameplay function outrank decorative realism.
+
+## Existing decisions that must not silently regress
+
+- The abandoned browser Piglin/B3D 3D-preview experiment stays removed unless the user explicitly requests its return.
+- High-resolution edited animation atlases must reconstruct at the edited cell resolution, not be forced back to the original low resolution.
+- Main Original/New comparison preview supports mobile pinch zoom/pan without modifying texture data.
+- Runtime-role classification exists because directory names are not semantically sufficient.
+
+## Session / handoff protocol
+
+Before meaningful changes:
+
+1. Read `SESSION_HANDOFF.md`.
+2. Inspect current `main` HEAD/recent commits.
+3. Verify relevant implementation before assuming an old note is still true.
+
+After meaningful changes:
+
+1. Commit the actual project change first.
+2. Update `SESSION_HANDOFF.md` so it contains:
+   - what changed,
+   - why,
+   - evidence/commit references,
+   - what remains open,
+   - the next concrete step,
+   - important non-regression constraints.
+3. Keep the handoff concise enough to resume work; do not turn it into a raw chronological log.
+4. Record only a compact source-backed outcome/pointer in Avenox/Beyin. The repository remains canonical.
+
+Do not store private chain-of-thought or raw tool logs in the repository.
+
+## Deployment discipline
+
+Production is GitHub Pages. Netlify configuration may remain as legacy/supporting project material, but Netlify is not the production source of truth unless the user explicitly changes that decision.
+
+When changing deployment-sensitive files, verify the GitHub Pages workflow/result before claiming production is updated.
+
+## Default continuation point
+
+Unless newer repository state says otherwise, use the `Next concrete work` section in `SESSION_HANDOFF.md` as the continuation queue.
