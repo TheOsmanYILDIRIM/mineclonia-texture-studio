@@ -12,9 +12,16 @@ https://theosmanyildirim.github.io/mineclonia-texture-studio/
 
 Deployment is GitHub Pages from `main` via GitHub Actions. Netlify is not the production source of truth.
 
-Current main HEAD at this handoff:
-`bf0a5b2fe9a455f4fd54365af9e61da85bb88892`
-— `fix: make detail close button reliable on mobile`
+Repository state immediately before this handoff refresh:
+`89d30348bae45a4496cb243b8948c907d717f1aa`
+— `docs: make GitHub the canonical project source`
+
+Continuity standard:
+- `AGENTS.md` defines the working contract for future agents.
+- This repository and current `main` are the canonical project state.
+- `SESSION_HANDOFF.md` is the concise resume card, not a second source tree.
+- Avenox/Beyin stores only a compact pointer/outcome needed to rediscover this repo and continuation point.
+- If memory conflicts with current GitHub state, verify `main`; GitHub wins and memory must be refreshed.
 
 ## Core direction
 
@@ -287,6 +294,16 @@ Ask:
 7. How should those runtime facts change the visual prompt?
 
 The prompt must describe the asset's **actual gameplay job**, not merely its apparent visual subject.
+
+## Continuity standardization completed
+
+- Added `AGENTS.md` with source-of-truth, prompt, runtime-role, deployment, and handoff rules.
+- Corrected `README.md` so GitHub Pages / `main` is clearly canonical and Netlify is legacy/supporting only.
+- Repo remains the authoritative home for detailed project knowledge; Beyin should carry only compact continuity pointers.
+
+Relevant commits:
+- `1f5bf0053d45705787d825f086a08f3f226fe759` — add canonical agent workflow and Brain handoff rules
+- `89d30348bae45a4496cb243b8948c907d717f1aa` — make GitHub the canonical project source
 
 ## Next concrete work
 
