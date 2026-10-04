@@ -345,6 +345,23 @@ Behavior:
 
 Static verification: the current inline JavaScript parses successfully after the change.
 
+## Entity UV/alpha drift correction — 2026-10-04
+
+Production testing showed that generic transparency wording reduced UV-map consistency by encouraging the image model to redraw or clean up alpha edges.
+
+Current rule:
+- entity atlases do NOT receive the generic transparency/background instruction;
+- entity alpha is treated as read-only structural data;
+- visual edits are RGB/material replacement strictly inside the existing occupied mask;
+- no alpha-value changes, edge smoothing, anti-aliasing, feathering, erosion/dilation, island expansion/contraction, halo, outline, or regenerated silhouette;
+- exact UV/alpha alignment wins over realism and transparency aesthetics.
+
+Relevant commits:
+- `96ce3fd35f4f6e9223be2d765dde7f4a349b9426` — lock entity UV masks before transparency
+- `078fe282c089e92e31d52af981ecbc09b8b9c229` — make entity alpha channel read-only
+
+Inline JavaScript syntax parsing passes after the change.
+
 ## Next concrete work
 
 1. Verify the mobile close button on the live Android site after Pages deployment.
