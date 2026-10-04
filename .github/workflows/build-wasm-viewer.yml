@@ -28,10 +28,12 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           p=Path('irr/src/CMakeLists.txt')
-          s=p.read_text()
-          s=s.replace('\\tCGLTFMeshFileLoader.h\\n','').replace('\\tCGLTFMeshFileLoader.cpp\\n','')
-          p.write_text(s)
+          lines=p.read_text().splitlines()
+          lines=[line for line in lines if 'CGLTFMeshFileLoader' not in line]
+          p.write_text('\\n'.join(lines)+'\\n')
+          assert 'CGLTFMeshFileLoader' not in p.read_text()
           PY
+          ! grep -n 'CGLTFMeshFileLoader' irr/src/CMakeLists.txt
       - name: Configure
         working-directory: wasm-viewer
         env:
