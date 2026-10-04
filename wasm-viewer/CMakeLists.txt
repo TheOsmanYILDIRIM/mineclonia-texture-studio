@@ -3,6 +3,11 @@ project(irrlicht_b3d_web CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Minimal dependency target expected by IrrlichtMt's mesh loaders.
+add_library(tiniergltf INTERFACE)
+add_library(tiniergltf::tiniergltf ALIAS tiniergltf)
+target_include_directories(tiniergltf INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/vendor/luanti/lib/tiniergltf")
+
 # Luanti's IrrlichtMt is supplied by the workflow under vendor/luanti/irr.
 add_subdirectory(vendor/luanti/irr irr-build)
 
