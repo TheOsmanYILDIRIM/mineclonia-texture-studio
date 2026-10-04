@@ -25,6 +25,13 @@ jobs:
           git clone --filter=blob:none --no-checkout https://github.com/paradust7/luanti.git wasm-viewer/vendor/luanti
           cd wasm-viewer/vendor/luanti
           git checkout 038b341fe861370433aea8eb6317f0bbd87303ba -- irr lib/tiniergltf
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('irr/src/CMakeLists.txt')
+          s=p.read_text()
+          s=s.replace('\\tCGLTFMeshFileLoader.h\\n','').replace('\\tCGLTFMeshFileLoader.cpp\\n','')
+          p.write_text(s)
+          PY
       - name: Configure
         working-directory: wasm-viewer
         env:
