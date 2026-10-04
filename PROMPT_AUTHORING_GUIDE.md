@@ -374,3 +374,54 @@ When asked to prepare prompts:
 7. if the source image does not reveal enough to safely infer a structural rule, preserve rather than invent.
 
 This file is the persistent prompt-authoring memory for Mineclonia Texture Studio.
+
+## 21. Resolve the texture's runtime role from Mineclonia code before authoring
+
+Directory location and filename are only hints. They are not authoritative semantic types.
+
+Before writing or revising a prompt for an ambiguous texture, trace how Mineclonia actually uses the file.
+
+Use this evidence order:
+
+1. **Direct code reference**
+   - Search the exact filename in Mineclonia source.
+   - Inspect the surrounding Lua table/function, not only the matched line.
+   - Determine whether the file is assigned to an entity texture list, composed with `^`, colorized, used in a particle spawner, used as inventory/wield image, used as node tiles, used as an animation frame/strip, or used as another dependent layer.
+
+2. **Runtime field / operator semantics**
+   - `textures = {...}` on a mesh/entity usually means entity/body or entity overlay material.
+   - `particlespawners`, `texpool`, or `p.texture` inside a particle-spawner definition means a particle/effect sprite, even if the file physically lives under `ENTITIES/**`.
+   - Texture composition operators such as `base^overlay`, opacity modifiers, `makealpha`, and `colorize` indicate dependent overlays/masks, not standalone skins.
+   - A colorized overlay must keep neutral/tintable material behavior; do not bake a conflicting final color.
+   - Node `tiles`, inventory images, wield images, HUD masks, and animated definitions must be treated according to those runtime roles.
+
+3. **Conversion/source mapping**
+   - Check Mineclonia's conversion table when available to recover the upstream Minecraft asset category/path.
+   - Use this as corroborating evidence, not as a replacement for runtime code.
+
+4. **Sibling usage**
+   - Inspect adjacent variants and the code that selects between them.
+   - Determine whether numbered files are animation frames, particle-pool alternatives, charge states, growth stages, biome/profession layers, dyeable overlays, or independent textures.
+
+5. **Image structure**
+   - Only after runtime role is known, use dimensions, alpha, occupied regions, and visual structure to write the material/effect instructions.
+
+### Important examples discovered from code
+
+- `extra_mobs_glow_squid_glint1.png` through `glint4.png` are **particle-spawner sprites**, not Glow Squid body UV overlays. The source code places them into a particle pool with short lifetime, small sprite size, and glow.
+- `mobs_mc_wolf_splash_0.png` through `splash_3.png` are **particle-pool splash sprites**, not wolf skin overlays.
+- `mobs_mc_creeper_charge.png` is a **dependent entity overlay** composited over the Creeper texture with reduced opacity.
+- `mobs_mc_enderman_eyes.png` and `mobs_mc_spider_eyes.png` are **eye overlays/layers** combined with the base entity texture.
+- `mobs_mc_cat_collar.png` and `mobs_mc_wolf_collar.png` are **colorized collar overlays**; the engine applies the selected collar color, so prompts must preserve tintability and must not bake one final dye color.
+- `mobs_mc_horse_markings_*.png` are **marking overlays** selected and combined with horse base coats.
+- `mobs_mc_sheep_fur.png` is a **dye-colorized wool/fur layer**, so its authored texture must remain compatible with engine colorization.
+- `mobs_mc_pig_saddle.png` is a **saddle overlay/material layer** reused on the pig and also by the strider code.
+
+### Rule
+
+If runtime code contradicts the directory name or filename intuition, **runtime code wins**.
+
+Do not call something an entity UV atlas, block surface, animation, or item merely because of its folder, dimensions, or name. Determine what the engine actually does with it first.
+
+When runtime role is unresolved after code search, mark the role as unresolved and preserve structure rather than inventing a semantic interpretation.
+
