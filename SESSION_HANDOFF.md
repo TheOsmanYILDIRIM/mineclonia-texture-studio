@@ -409,11 +409,10 @@ Verification:
 
 ## Next concrete work
 
-1. Merge PR #2 to `main` and confirm the GitHub Pages deployment completes.
-2. On Android, reload the live site and confirm the status no longer remains on “kayıt hazırlanıyor…”.
-3. Verify a real Texturepack ZIP export with existing edits at the needed target resolution and confirm visible progress/completion.
-4. Spot-check that visually identical legacy rescaled copies disappear from the changed set after background verification.
-5. Then continue runtime-role auditing beyond entity assets; do not regress entity alpha locking, animation atlas resolution, or pinch zoom.
+1. On Android, reload the live site and confirm the status no longer remains on “kayıt hazırlanıyor…”.
+2. Verify a real Texturepack ZIP export with existing edits at the needed target resolution and confirm visible progress/completion.
+3. Spot-check that visually identical legacy rescaled copies disappear from the changed set after background verification.
+4. Then continue runtime-role auditing beyond entity assets; do not regress entity alpha locking, animation atlas resolution, or pinch zoom.
 ## UI regression fix — 2026-10-04
 
 A live UI regression (white main background and visually lost top/bottom controls) was traced to unresolved Git merge conflict markers accidentally committed inside `index.html` around the main stylesheet and detail-sheet markup. The browser therefore parsed the style block inconsistently.
@@ -529,13 +528,4 @@ Verified on current `main` after that merge:
 
 A remaining duplicate-function override was then found: the final/runtime-winning `importProjectBackup()` still accepted only 256/512 even though an earlier definition had been updated for 64/128/256/512.
 
-Current fix is isolated on:
-- branch `fix/runtime-resolution-override-guards`
-- PR #2: `Fix runtime resolution override regressions`
-- `d000d5fa9fc492203df26338e2543e76d2900a96` — fix final backup-restore resolution gate
-- `851925f40f3bb4db449cf18fa4fcfb2e5619ad92` — add standalone runtime-winning path regression guard
-- `37bb0b6331e6128012eba38695218fed8f25e33b` — run the guard in GitHub Actions for PRs and `main`
-
-The first PR #2 CI run completed successfully. The guard checks final/runtime-winning PNG import, ZIP import, export, backup restore, no-upscale behavior, all four target options, STORE compression, and merge-conflict markers.
-
-Do not merge this implementation by direct push. After PR #2 is merged through review, perform the Android/browser reload and real texturepack export verification described in `Next concrete work`.
+PR #2 was squash-merged to `main` as `2cb178b850bba9eb89bb22ecfbeed67da1069b32` (`fix: harden texture startup and resolution runtime paths`). Main runtime guards and the GitHub Pages deployment both completed successfully. Remaining verification is device-side Android behavior and a real export using the user's persisted edits.
