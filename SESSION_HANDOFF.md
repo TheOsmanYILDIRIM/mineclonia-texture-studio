@@ -12,9 +12,9 @@ https://theosmanyildirim.github.io/mineclonia-texture-studio/
 
 Deployment is GitHub Pages from `main` via GitHub Actions. Netlify is not the production source of truth.
 
-Repository state immediately before this handoff refresh:
-`89d30348bae45a4496cb243b8948c907d717f1aa`
-— `docs: make GitHub the canonical project source`
+Current canonical `main` HEAD before PR #2:
+`8e45165ccb132e3d57e48a1c9500e72e05c5c87e`
+— `fix: normalize identical textures across resolutions`
 
 Continuity standard:
 - `AGENTS.md` defines the working contract for future agents.
@@ -409,16 +409,11 @@ Verification:
 
 ## Next concrete work
 
-1. Verify the mobile close button on the live Android site after Pages deployment.
-2. Continue runtime-role auditing beyond entity assets, especially ambiguous P1 ITEMS/effects/overlays:
-   - trace exact filename in Mineclonia source
-   - identify node/item/HUD/particle/overlay/state/tint behavior
-   - identify relevant mesh/model or node registration when applicable
-   - identify trigger/event semantics for effects
-3. Revise any P1 prompt whose current semantic assumptions conflict with runtime code.
-4. Preserve `PROMPT_AUTHORING_GUIDE.md` as the persistent methodology and extend it when new semantic asset classes are discovered.
-5. Do not regress the completed animation atlas/high-resolution or pinch-zoom work.
-
+1. Merge PR #2 to `main` and confirm the GitHub Pages deployment completes.
+2. On Android, reload the live site and confirm the status no longer remains on “kayıt hazırlanıyor…”.
+3. Verify a real Texturepack ZIP export with existing edits at the needed target resolution and confirm visible progress/completion.
+4. Spot-check that visually identical legacy rescaled copies disappear from the changed set after background verification.
+5. Then continue runtime-role auditing beyond entity assets; do not regress entity alpha locking, animation atlas resolution, or pinch zoom.
 ## UI regression fix — 2026-10-04
 
 A live UI regression (white main background and visually lost top/bottom controls) was traced to unresolved Git merge conflict markers accidentally committed inside `index.html` around the main stylesheet and detail-sheet markup. The browser therefore parsed the style block inconsistently.
@@ -502,13 +497,45 @@ Verification:
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
 
-## Resolution/identical-texture regression fix — 2026-10-04
+## Startup/storage hang fix — 2026-10-04
 
-Branch: `fix/texture-resolution-and-identical-detection`
+The first-load “kayıt hazırlanıyor…” hang was traced to startup synchronously awaiting changed-state hydration. That hydration can fetch the original Mineclonia texture for every persisted edit and compare pixels, so slow/stalled upstream requests kept the UI in the preparing state indefinitely.
 
-- Existing runtime already exports only tracked changed paths and re-normalizes each exported PNG to the selected 64/128/256/512 target when the stored image is larger than that target.
-- Existing byte/pixel equality was insufficient for stale records produced by older export/import cycles when the same visual texture existed at a different resolution.
-- `textureMatchesOriginal()` now canonicalizes both the stored edit and source original to the same lower width and compares decoded pixels there. This lets visually identical rescaled copies fall out of the changed set instead of being re-exported forever.
-- Direct pushes to `main` are avoided for this fix; work is isolated on the branch and should be reviewed/merged through PR.
+Branch fixes:
+- `678e50e2f6a3dba07bdc402a5cbcacbbbe40bfbe` — make startup/storage initialization nonblocking.
+- `fe0adab532c47cf481614200ac5ee9f287e3e701` — extend regression guards to startup/storage behavior and inline-JS syntax.
 
-Verification still needed after merge: reload the app so `hydrateChangedPathsFast()` re-evaluates old stored edits, confirm unchanged count drops, then export once at each needed target resolution.
+Current behavior:
+- filters, controls, detail bindings, and first render are initialized before storage hydration;
+- the status immediately leaves the indefinite “preparing” state and reports background loading;
+- primary and scaled IndexedDB opens fall back after 2.5 seconds instead of hanging forever;
+- original Mineclonia texture fetches abort after 12 seconds;
+- persisted edit paths are surfaced quickly, then exact unchanged/original detection runs in the background;
+- Texturepack export waits for changed-state verification and pending writes before packaging;
+- background verification failures conservatively keep an edit marked changed rather than silently losing it.
+
+GitHub Actions runtime guard run #4 passed on the startup fix and also parses the inline JavaScript for syntax errors.
+
+## Resolution/runtime-override regression status — 2026-10-04
+
+PR #1 was squash-merged to `main` as:
+- `8e45165ccb132e3d57e48a1c9500e72e05c5c87e` — cross-resolution identical-texture comparison.
+
+Verified on current `main` after that merge:
+- runtime-winning single PNG import uses `prepareImportedTextureBlob(file,target)` and `textureMatchesOriginal(b,target)`;
+- runtime-winning ZIP import uses the same normalization and unchanged detection;
+- runtime-winning Texturepack export filters through `changedPathsFast` and re-normalizes each changed PNG to the selected target;
+- normalization remains a downscale ceiling and does not upscale textures already within the target.
+
+A remaining duplicate-function override was then found: the final/runtime-winning `importProjectBackup()` still accepted only 256/512 even though an earlier definition had been updated for 64/128/256/512.
+
+Current fix is isolated on:
+- branch `fix/runtime-resolution-override-guards`
+- PR #2: `Fix runtime resolution override regressions`
+- `d000d5fa9fc492203df26338e2543e76d2900a96` — fix final backup-restore resolution gate
+- `851925f40f3bb4db449cf18fa4fcfb2e5619ad92` — add standalone runtime-winning path regression guard
+- `37bb0b6331e6128012eba38695218fed8f25e33b` — run the guard in GitHub Actions for PRs and `main`
+
+The first PR #2 CI run completed successfully. The guard checks final/runtime-winning PNG import, ZIP import, export, backup restore, no-upscale behavior, all four target options, STORE compression, and merge-conflict markers.
+
+Do not merge this implementation by direct push. After PR #2 is merged through review, perform the Android/browser reload and real texturepack export verification described in `Next concrete work`.

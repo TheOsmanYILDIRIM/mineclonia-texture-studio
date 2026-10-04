@@ -43,9 +43,16 @@ function upstreamTextureUrl(meta){
 async function originalBlob(path){
   const meta=CATALOG.find(x=>x.path===path);if(!meta)throw Error('Katalog kaydı bulunamadı: '+path);
   const url=upstreamTextureUrl(meta);
-  const r=await fetch(url,{cache:'force-cache'});
-  if(!r.ok) throw Error(`Mineclonia kaynak texture bulunamadı (${r.status}): ${path}`);
-  return await r.blob();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),12000);
+  try{
+    const r=await fetch(url,{cache:'force-cache',signal:controller.signal});
+    if(!r.ok) throw Error(`Mineclonia kaynak texture bulunamadı (${r.status}): ${path}`);
+    return await r.blob();
+  }catch(err){
+    if(err?.name==='AbortError')throw Error('Mineclonia kaynak texture zaman aşımı: '+path);
+    throw err;
+  }finally{clearTimeout(timer)}
 }
 async function displayBlob(path){const e=await getEdit(path);return e?.blob || await originalBlob(path)}
 async function blobUrl(path,preferEdit=true){const key=(preferEdit?'e:':'o:')+path;if(urlCache.has(key))return urlCache.get(key);const b=preferEdit?await displayBlob(path):await originalBlob(path);const u=URL.createObjectURL(b);urlCache.set(key,u);return u}
@@ -152,7 +159,16 @@ function dataURLToBlob(s){const [h,b]=s.split(','),m=(h.match(/data:([^;]+)/)||[
 async function initStorage(){
   if(!('indexedDB' in window)){storageMode='local';return}
   try{
-    dbp=await new Promise((res,rej)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE,{keyPath:'path'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error||Error('IndexedDB açılamadı'));r.onblocked=()=>rej(Error('IndexedDB blocked'))});
+    dbp=await new Promise((res,rej)=>{
+      let settled=false;
+      const r=indexedDB.open(DB,1);
+      const finish=(fn,value)=>{if(settled)return;settled=true;clearTimeout(timer);fn(value)};
+      const timer=setTimeout(()=>{settled=true;rej(Error('IndexedDB açılışı zaman aşımına uğradı'))},2500);
+      r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE,{keyPath:'path'})};
+      r.onsuccess=()=>{if(settled){try{r.result.close()}catch(_){};return}finish(res,r.result)};
+      r.onerror=()=>finish(rej,r.error||Error('IndexedDB açılamadı'));
+      r.onblocked=()=>finish(rej,Error('IndexedDB blocked'));
+    });
     storageMode='indexeddb';
   }catch(e){console.warn('IndexedDB unavailable',e);storageMode='local';dbp=null}
 }
@@ -640,11 +656,14 @@ async function initScaledStorage(){
   if(!('indexedDB' in window)) return;
   try{
     scaledDbp = await new Promise((res,rej)=>{
+      let settled=false;
       const r=indexedDB.open(SCALED_DB,1);
+      const finish=(fn,value)=>{if(settled)return;settled=true;clearTimeout(timer);fn(value)};
+      const timer=setTimeout(()=>{settled=true;rej(Error('Scaled IndexedDB açılışı zaman aşımına uğradı'))},2500);
       r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(SCALED_STORE)) r.result.createObjectStore(SCALED_STORE,{keyPath:'key'}); };
-      r.onsuccess=()=>res(r.result);
-      r.onerror=()=>rej(r.error||Error('Scaled IndexedDB açılamadı'));
-      r.onblocked=()=>rej(Error('Scaled IndexedDB blocked'));
+      r.onsuccess=()=>{if(settled){try{r.result.close()}catch(_){};return}finish(res,r.result)};
+      r.onerror=()=>finish(rej,r.error||Error('Scaled IndexedDB açılamadı'));
+      r.onblocked=()=>finish(rej,Error('Scaled IndexedDB blocked'));
     });
   }catch(e){ console.warn('scaled storage unavailable',e); scaledDbp=null; }
 }
@@ -776,7 +795,7 @@ async function importZip(file){
 async function importProjectBackup(file){
  const z=await JSZip.loadAsync(file);const mf=z.file('Mineclonia_Texture_Studio_Backup/manifest.json')||z.file('manifest.json');
  if(!mf)throw new Error('Geçerli proje yedeği değil');const m=JSON.parse(await mf.async('string'));
- if(m.format!=='mineclonia-texture-studio-backup')throw new Error('Yedek formatı tanınmadı');if(m.targetResolution===256||m.targetResolution===512){TARGET_RESOLUTION=m.targetResolution;if($('resolution'))$('resolution').value=String(TARGET_RESOLUTION)}
+ if(m.format!=='mineclonia-texture-studio-backup')throw new Error('Yedek formatı tanınmadı');if([64,128,256,512].includes(m.targetResolution)){TARGET_RESOLUTION=m.targetResolution;if($('resolution'))$('resolution').value=String(TARGET_RESOLUTION)}
  let ok=0,missing=0;for(const e of (m.edits||[])){const x=CATALOG.find(v=>v.id===e.id)||CATALOG.find(v=>v.path===e.path);const f=z.file('Mineclonia_Texture_Studio_Backup/'+e.file)||z.file(e.file);if(!x||!f){missing++;continue}const blob=await f.async('blob');await putEdit(x.path,blob);queueScaled(x.path,blob,x,BACKGROUND_RESOLUTION);if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION)queueScaled(x.path,blob,x,TARGET_RESOLUTION);ok++;}
  let pc=0;if(m.promptOverrides&&typeof m.promptOverrides==='object'){for(const [id,prompt] of Object.entries(m.promptOverrides)){if(CATALOG.some(x=>x.id===id)&&typeof prompt==='string'){PROMPT_OVERRIDES.set(id,prompt);pc++;}}savePromptOverrides();}
  await applyFilter();toast(`${ok} düzenleme, ${pc} prompt geri yüklendi${missing?`, ${missing} eşleşmedi`:''}`)
@@ -788,6 +807,9 @@ async function exportPack(){
  btn.textContent='Hazırlanıyor…';
  setSaveState('Texturepack hazırlanıyor…','warn');
  try{
+   btn.textContent='Değişiklikler doğrulanıyor…';
+   await changedHydrationPromise.catch(()=>{});
+   await editWriteQueue.catch(()=>{});
    const edits=(await allEdits()).filter(e=>changedPathsFast.has(e.path)&&CATALOG.some(x=>x.path===e.path));
    if(!edits.length){toast('Değiştirilmiş texture yok');return}
    const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
@@ -1073,37 +1095,83 @@ async function delEdit(path){
   });
   await editWriteQueue; await applyFilter();
 }
-async function hydrateChangedPathsFast(){
-  changedPathsFast.clear();
-  const edits=await allEdits();
-  let checked=0,same=0;
+let changedHydrationPromise=Promise.resolve({complete:true,total:0,same:0});
+
+async function hydrateChangedPathsFast(seedEdits=null){
+  const edits=seedEdits||await allEdits();
+  for(const e of edits){
+    if(CATALOG.some(x=>x.path===e.path))changedPathsFast.add(e.path);
+  }
+  updateStatFast();
+  let processed=0,same=0,failed=0;
   for(const e of edits){
     const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
     try{
-      if(await textureMatchesOriginal(e.blob,meta)){same++;continue}
-    }catch(err){console.warn('Değişiklik doğrulanamadı',e.path,err)}
-    changedPathsFast.add(e.path);
-    checked++;
-    if(checked%25===0)await new Promise(requestAnimationFrame);
+      if(await textureMatchesOriginal(e.blob,meta)){changedPathsFast.delete(e.path);same++}
+      else changedPathsFast.add(e.path);
+    }catch(err){
+      failed++;
+      changedPathsFast.add(e.path);
+      console.warn('Değişiklik doğrulanamadı',e.path,err);
+    }
+    processed++;
+    if(processed===1||processed===edits.length||processed%10===0){
+      updateStatFast();
+      await new Promise(requestAnimationFrame);
+    }
   }
-  if(same)console.info(`${same} kayıt orijinalle birebir aynı olduğu için değişiklik sayılmadı`);
+  if(same)console.info(`${same} kayıt orijinalle aynı olduğu için değişiklik sayılmadı`);
+  return {complete:failed===0,total:processed,same,failed};
+}
+
+async function bootstrapStorageInBackground(){
+  try{
+    await initStorage();
+    setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad');
+    initScaledStorage().catch(err=>console.warn('scaled storage init',err));
+    const edits=await allEdits();
+    for(const e of edits)if(CATALOG.some(x=>x.path===e.path))changedPathsFast.add(e.path);
+    await applyFilter();
+    changedHydrationPromise=hydrateChangedPathsFast(edits)
+      .then(async result=>{await applyFilter();return result})
+      .catch(err=>{console.warn('background changed-state hydration',err);return {complete:false,total:edits.length,same:0,failed:edits.length}});
+  }catch(e){
+    console.warn('storage bootstrap',e);
+    storageMode='memory';
+    setSaveState('Hazır • sadece oturum','bad');
+  }
 }
 
 async function init(){
-  // UI first: do not parse any texture ZIP before controls are visible.
   loadPromptOverrides();
-  $('stat').textContent='Arayüz hazır • P0 görselleri sırayla yüklenecek';
+  $('stat').textContent='Arayüz hazır';
+  setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn');
   await buildFilters();
   await new Promise(requestAnimationFrame);
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
-  try{await initStorage(); await initScaledStorage(); await hydrateChangedPathsFast(); setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad')}catch(e){console.warn('storage init',e);setSaveState('Sadece oturumda • yedek al','bad')}
-  $('resolution').value=String(TARGET_RESOLUTION);$('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Ana çözünürlük '+TARGET_RESOLUTION+'px')};$('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();$('runtimeRole').onchange=()=>applyFilter();$('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};$('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
+
+  $('resolution').value=String(TARGET_RESOLUTION);
+  $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Ana çözünürlük '+TARGET_RESOLUTION+'px')};
+  $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();$('runtimeRole').onchange=()=>applyFilter();
+  $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
+  $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
-  $('compare').oninput=updateCompare;$('preview').onclick=()=>{const v=Number($('compare').value);$('compare').value=v<50?100:0;updateCompare()};$('downloadOriginal').onclick=async()=>dl(await originalBlob(active.path),active.name);$('downloadEdited').onclick=async()=>{const e=await getEdit(active.path);if(!e)return toast('Henüz yeni sürüm yok');dl(e.blob,active.name)};$('uploadEdited').onclick=()=>$('fileEdited').click();$('fileEdited').onchange=e=>importPng(e.target.files[0],false);$('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};$('seamImport').onclick=()=>$('fileSeam').click();$('fileSeam').onchange=e=>importPng(e.target.files[0],true);
-$('animToggle').onclick=()=>{if(!active||!isAnimatedStrip(active))return;animPlaying=!animPlaying;$('animToggle').textContent=animPlaying?'Durdur':'Oynat'};
-$('exportAtlas').onclick=async()=>{if(!active||!isAnimatedStrip(active))return;const blob=await displayBlob(active.path);const atlas=await stripBlobToAtlasBlob(blob,active);dl(atlas,active.name.replace(/\.png$/,'_ATLAS_EDIT.png'));toast('Kare atlas indirildi')};
-$('importAtlas').onclick=()=>{if(active&&isAnimatedStrip(active))$('fileAnimAtlas').click()};
-$('fileAnimAtlas').onchange=async e=>{const f=e.target.files[0]; e.target.value=''; if(!f||!active||!isAnimatedStrip(active))return; toast('Atlas strip hâline çevriliyor…'); const strip=await atlasBlobToStripBlob(f,active); await putEdit(active.path,strip); toast('Atlas geri yüklendi ve strip olarak kaydedildi'); await openDetail(active); await applyFilter()};
-$('revert').onclick=async()=>{if(!active)return;await delEdit(active.path);toast('Orijinale dönüldü');await openDetail(active);await applyFilter()};$('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);await applyFilter()}
-init().catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';alert('Başlatma hatası: '+e.message)})
+  $('compare').oninput=updateCompare;
+  $('preview').onclick=()=>{const v=Number($('compare').value);$('compare').value=v<50?100:0;updateCompare()};
+  $('downloadOriginal').onclick=async()=>dl(await originalBlob(active.path),active.name);
+  $('downloadEdited').onclick=async()=>{const e=await getEdit(active.path);if(!e)return toast('Henüz yeni sürüm yok');dl(e.blob,active.name)};
+  $('uploadEdited').onclick=()=>$('fileEdited').click();$('fileEdited').onchange=e=>importPng(e.target.files[0],false);
+  $('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};
+  $('seamImport').onclick=()=>$('fileSeam').click();$('fileSeam').onchange=e=>importPng(e.target.files[0],true);
+  $('animToggle').onclick=()=>{if(!active||!isAnimatedStrip(active))return;animPlaying=!animPlaying;$('animToggle').textContent=animPlaying?'Durdur':'Oynat'};
+  $('exportAtlas').onclick=async()=>{if(!active||!isAnimatedStrip(active))return;const blob=await displayBlob(active.path);const atlas=await stripBlobToAtlasBlob(blob,active);dl(atlas,active.name.replace(/\.png$/,'_ATLAS_EDIT.png'));toast('Kare atlas indirildi')};
+  $('importAtlas').onclick=()=>{if(active&&isAnimatedStrip(active))$('fileAnimAtlas').click()};
+  $('fileAnimAtlas').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!active||!isAnimatedStrip(active))return;toast('Atlas strip hâline çevriliyor…');const strip=await atlasBlobToStripBlob(f,active);await putEdit(active.path,strip);toast('Atlas geri yüklendi ve strip olarak kaydedildi');await openDetail(active);await applyFilter()};
+  $('revert').onclick=async()=>{if(!active)return;await delEdit(active.path);toast('Orijinale dönüldü');await openDetail(active);await applyFilter()};
+  $('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);
+
+  await applyFilter();
+  setTimeout(()=>bootstrapStorageInBackground(),0);
+}
+init().catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
 </script></body></html>
