@@ -522,15 +522,31 @@ async function meaningfulEdits(){
  return out
 }
 async function exportPack(){
- const edits=await meaningfulEdits();
- if(!edits.length)return toast('Gerçekten değiştirilmiş texture yok');
- const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
- root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
- for(const e of edits)root.file(e.path,e.blob);
- const manifest={format:'mineclonia-dark-realism-delta',version:2,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,paths:edits.map(e=>e.path)};
- root.file('changed_textures.json',JSON.stringify(manifest,null,2));
- const out=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
- dl(out,'Mineclonia_Dark_Realism_delta.zip');toast(`${edits.length} gerçekten değiştirilmiş texture export edildi`)
+ const btn=$('exportPack'),oldLabel=btn.textContent;
+ btn.disabled=true;btn.textContent='ZIP • kayıtlar hazırlanıyor…';setSaveState('ZIP hazırlanıyor…','warn');
+ try{
+   await editWriteQueue.catch(()=>{});
+   const edits=(await allEdits()).filter(e=>CATALOG.some(x=>x.path===e.path));
+   if(!edits.length){toast('Değiştirilmiş texture yok');return}
+   const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
+   root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
+   for(let i=0;i<edits.length;i++){
+     const e=edits[i];root.file(e.path,e.blob,{compression:'STORE'});
+     if(i===0||i===edits.length-1||i%20===0){btn.textContent=`ZIP • dosyalar ${i+1}/${edits.length}`;await new Promise(requestAnimationFrame)}
+   }
+   const manifest={format:'mineclonia-dark-realism-delta',version:3,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,paths:edits.map(e=>e.path)};
+   root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
+   const out=await z.generateAsync({type:'blob',compression:'STORE',streamFiles:true},m=>{
+     const p=Math.max(0,Math.min(100,Math.round(m.percent||0)));btn.textContent=`ZIP • %${p}`;setSaveState(`ZIP oluşturuluyor • %${p}`,'warn');
+   });
+   btn.textContent='ZIP • indiriliyor…';dl(out,'Mineclonia_Dark_Realism_delta.zip');
+   toast(`${edits.length} texture ZIP olarak hazırlandı`);
+ }catch(err){
+   console.error('texturepack export',err);toast('ZIP oluşturulamadı: '+(err?.message||err));setSaveState('ZIP hatası','bad');
+ }finally{
+   btn.disabled=false;btn.textContent=oldLabel;
+   setTimeout(()=>setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad'),400);
+ }
 }
 function catalogMatchForZipPath(zipPath){
  const clean=zipPath.replace(/^\/+/, '');
@@ -555,7 +571,7 @@ async function exportProjectBackup(){
  const manifest={format:'mineclonia-texture-studio-backup',version:1,createdAt:new Date().toISOString(),edits:[],targetResolution:TARGET_RESOLUTION,promptOverrides:Object.fromEntries(PROMPT_OVERRIDES)};
  for(const e of edits){const x=CATALOG.find(v=>v.path===e.path);if(!x)continue;const fn=`edits/${x.id}.png`;root.file(fn,e.blob);manifest.edits.push({id:x.id,path:x.path,name:x.name,file:fn});}
  root.file('manifest.json',JSON.stringify(manifest,null,2));
- const out=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+ const out=await z.generateAsync({type:'blob',compression:'STORE',streamFiles:true});
  dl(out,'Mineclonia_Texture_Studio_Backup.zip');toast(`${manifest.edits.length} düzenleme + ${PROMPT_OVERRIDES.size} prompt yedeklendi`)
 }
 async function importProjectBackup(file){
