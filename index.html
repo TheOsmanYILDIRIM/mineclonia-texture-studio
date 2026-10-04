@@ -526,7 +526,18 @@ async function texturePixelsEqual(a,b){
 }
 async function textureMatchesOriginal(blob,meta){
  if(!blob||!meta)return false;
- try{return await texturePixelsEqual(blob,await originalBlob(meta.path))}catch(err){console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);return false}
+ try{
+   const original=await originalBlob(meta.path);
+   if(await texturePixelsEqual(blob,original))return true;
+   const [editedCanvas,originalCanvas]=await Promise.all([decodeBlobToCanvas(blob),decodeBlobToCanvas(original)]);
+   const commonWidth=Math.min(editedCanvas.width,originalCanvas.width);
+   if(commonWidth<1)return false;
+   const [editedCanonical,originalCanonical]=await Promise.all([
+     normalizeTextureBlobTo(blob,meta,commonWidth),
+     normalizeTextureBlobTo(original,meta,commonWidth)
+   ]);
+   return await texturePixelsEqual(editedCanonical,originalCanonical);
+ }catch(err){console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);return false}
 }
 async function meaningfulEdits(){
  const raw=await allEdits(), out=[];
