@@ -1,0 +1,78 @@
+name: Build textured Piglin GLB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/models-src/mobs_mc_piglin.b3d'
+      - 'assets/source-textures/extra_mobs_piglin.png'
+      - '.github/workflows/build-textured-piglin.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y assimp-utils python3-pil
+      - name: Locate Piglin source texture
+        id: texture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          hits=[p for p in Path('.').rglob('extra_mobs_piglin.png') if '.git' not in p.parts]
+          print("found:", [str(p) for p in hits])
+          if not hits:
+              raise SystemExit("extra_mobs_piglin.png not found in repository")
+          Path('/tmp/piglin_texture_path').write_text(str(hits[0]))
+          PY
+      - name: Stage B3D with its texture
+        run: |
+          rm -rf /tmp/piglin-preview
+          mkdir -p /tmp/piglin-preview
+          cp assets/models-src/mobs_mc_piglin.b3d /tmp/piglin-preview/
+          TEX="$(cat /tmp/piglin_texture_path)"
+          cp "$TEX" /tmp/piglin-preview/extra_mobs_piglin.png
+          # Common B3D exporters may store only a basename; provide the same image
+          # under the source model's expected neighborhood and inspect Assimp info.
+          cd /tmp/piglin-preview
+          assimp info mobs_mc_piglin.b3d | tee /tmp/piglin-assimp-info.txt
+          assimp export mobs_mc_piglin.b3d mobs_mc_piglin_textured.glb -f glb2
+          test -s mobs_mc_piglin_textured.glb
+      - name: Verify GLB contains texture/image data
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          p='/tmp/piglin-preview/mobs_mc_piglin_textured.glb'
+          b=open(p,'rb').read()
+          assert b[:4]==b'glTF'
+          off=12; js=None; bins=[]
+          while off+8<=len(b):
+              n,t=struct.unpack_from('<II',b,off); off+=8
+              chunk=b[off:off+n]; off+=n
+              if t==0x4E4F534A: js=json.loads(chunk.rstrip(b' \0'))
+              elif t==0x004E4942: bins.append(chunk)
+          assert js is not None
+          print('materials',len(js.get('materials',[])),'textures',len(js.get('textures',[])),'images',len(js.get('images',[])))
+          print('image defs',js.get('images',[]))
+          print('material defs',js.get('materials',[]))
+          assert js.get('images'), 'GLB has no images; Assimp did not package the Piglin texture'
+          assert js.get('textures'), 'GLB has no textures'
+          PY
+      - name: Publish textured GLB
+        run: |
+          mkdir -p assets/models-textured
+          cp /tmp/piglin-preview/mobs_mc_piglin_textured.glb assets/models-textured/mobs_mc_piglin.glb
+          ls -lh assets/models-textured/mobs_mc_piglin.glb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/models-textured/mobs_mc_piglin.glb
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "build: package Piglin texture into Assimp GLB [skip ci]"
+          git push
