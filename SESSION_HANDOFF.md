@@ -477,3 +477,27 @@ Verification:
 
 Resolution support commit:
 - `4a16b72e7ff8976fee4e056e1399eabe7dc4dfe8` — add 64px and 128px texture targets
+
+
+## Resolution + unchanged-texture fix — 2026-10-04
+
+Commit:
+- `428d8043e16d0f2700e8766c3d4711a3020780f3`
+  — `fix: enforce target resolution and ignore unchanged textures`
+
+What changed:
+- The final/runtime-winning `importPng()` now calls `prepareImportedTextureBlob()`, so the selected 64/128/256/512 target is actually applied instead of being bypassed by a later override.
+- ZIP import uses the same normalization path before storing textures.
+- Persisted textures are compared once against their canonical originals during changed-state hydration; byte-identical PNGs are not marked changed.
+- ZIP export now uses `changedPathsFast`, so exact-original records left in storage are excluded without repeating expensive comparisons during export.
+- Direct single-file import also rejects a byte-identical original as a change.
+
+Verification:
+- Both inline JavaScript blocks parse successfully.
+- The runtime-winning import path contains `prepareImportedTextureBlob(file,target)`.
+- ZIP import contains `prepareImportedTextureBlob(blob,meta)`.
+- Export filters by `changedPathsFast`.
+- 64/128/256/512 options are all present.
+
+Workflow note:
+- User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
