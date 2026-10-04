@@ -325,6 +325,27 @@ Verification after the latest commit:
 
 Physical Android tap verification on the deployed page is still required before calling the device behavior fully verified.
 
+## Prompt transparency enforcement — 2026-10-04
+
+All effective app prompts now receive a mandatory transparency/background requirement at prompt-output time.
+
+Code commit:
+- `7ade4f3893b352cc3a457890f38a6215850032c6`
+  — adds a shared transparency suffix for every prompt and an additional locked-alpha atlas rule for Entity assets.
+
+Guide commit:
+- `2e93aaf4db9d8bd340fcb7deb9819fe76a19bd76`
+  — records the mandatory transparency-output standard.
+
+Behavior:
+- built-in prompts, manual/JSON overrides, single-prompt export, and bulk prompt export all receive the rule through `promptFor()`;
+- source-transparent/empty regions must remain transparent;
+- solid/colored/scenic backgrounds are explicitly forbidden;
+- Entity UV atlases additionally treat transparent space outside islands as locked;
+- duplicate suffixes are prevented by marker checks.
+
+Static verification: the current inline JavaScript parses successfully after the change.
+
 ## Next concrete work
 
 1. Open the live site on Android and verify the latest × close-button fix from `0b67c73db8fc133b0fa5a91ac630552ee23e0f65`.
