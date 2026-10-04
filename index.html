@@ -309,7 +309,7 @@ let tileN=1,tileEdited=true;
 async function updateTilePreview(){if(!active)return;const box=$('tilePreview');document.querySelectorAll('[data-tile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.tile)===tileN));if(tileN===1){box.classList.remove('show');$('preview').style.display='block';return}$('preview').style.display='none';box.classList.add('show');const url=await blobUrl(active.path,tileEdited);box.style.backgroundImage=`url("${url}")`;box.style.backgroundSize=`${100/tileN}% ${100/tileN}%`;box.style.backgroundPosition='0 0';}
 
 const MINECLONIA_COMMIT='209ec2dc96adbf7f5ba083816d90596492ec53b5';
-let entity3dState={raf:0,renderer:null,scene:null,camera:null,root:null,yaw:-0.55,pitch:0.18,zoom:1,drag:false,lastX:0,lastY:0,meta:null,token:0,modules:null};
+let entity3dState={raf:0,renderer:null,scene:null,camera:null,root:null,yaw:-0.55,pitch:0.18,zoom:1,drag:false,lastX:0,lastY:0,meta:null,token:0,modules:null,sourceEdit:true,texture:null,targetMaterials:[]};
 const ENTITY_PREVIEW_MAP={
   'ENTITIES/mobs_mc/extra_mobs_piglin.png':'assets/models-assimp/mobs_mc_piglin.glb'
 };
@@ -319,13 +319,30 @@ async function entity3dModules(){
   const mod=await import('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js/+esm');
   entity3dState.modules={THREE,GLTFLoader:mod.GLTFLoader};return entity3dState.modules;
 }
+async function entity3dTextureBlob(){return entity3dState.sourceEdit?displayBlob(active.path):originalBlob(active.path)}
+async function entity3dSwapTexture(){
+  const s=entity3dState,{THREE}=await entity3dModules();if(!s.root||!s.targetMaterials.length)return;
+  const blob=await entity3dTextureBlob(),url=URL.createObjectURL(blob);
+  try{
+    const tex=await new Promise((resolve,reject)=>new THREE.TextureLoader().load(url,resolve,undefined,reject));
+    const ref=s.targetMaterials[0].map;
+    tex.flipY=ref?ref.flipY:false;tex.colorSpace=THREE.SRGBColorSpace;
+    tex.wrapS=ref?ref.wrapS:THREE.ClampToEdgeWrapping;tex.wrapT=ref?ref.wrapT:THREE.ClampToEdgeWrapping;
+    tex.magFilter=ref?ref.magFilter:THREE.NearestFilter;tex.minFilter=ref?ref.minFilter:THREE.NearestFilter;
+    tex.channel=ref&&ref.channel!==undefined?ref.channel:0;tex.needsUpdate=true;
+    if(s.texture&&s.texture!==ref)s.texture.dispose();s.texture=tex;
+    s.targetMaterials.forEach(m=>{m.map=tex;m.needsUpdate=true});
+  }finally{URL.revokeObjectURL(url)}
+}
 function entity3dRender(){const s=entity3dState,c=$('entity3dCanvas');if(!s.renderer||!s.scene||!s.camera||!s.root)return;const w=Math.max(1,c.clientWidth),h=Math.max(1,c.clientHeight);s.renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));s.renderer.setSize(w,h,false);s.camera.aspect=w/h;s.camera.updateProjectionMatrix();s.root.rotation.y=s.yaw;s.root.rotation.x=s.pitch;s.camera.zoom=s.zoom;s.camera.updateProjectionMatrix();s.renderer.render(s.scene,s.camera);s.raf=requestAnimationFrame(entity3dRender)}
-function entity3dStop(){const s=entity3dState;if(s.raf)cancelAnimationFrame(s.raf);s.raf=0;s.token++;if(s.renderer){s.renderer.dispose();s.renderer=null}s.scene=s.camera=s.root=null}
-function entity3dBindControls(){const st=$('entity3dStage');if(st.dataset.bound)return;st.dataset.bound='1';st.addEventListener('pointerdown',e=>{entity3dState.drag=true;entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY;st.setPointerCapture(e.pointerId)});st.addEventListener('pointermove',e=>{if(!entity3dState.drag)return;entity3dState.yaw+=(e.clientX-entity3dState.lastX)*.012;entity3dState.pitch=Math.max(-1.2,Math.min(1.2,entity3dState.pitch+(e.clientY-entity3dState.lastY)*.01));entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY});st.addEventListener('pointerup',()=>entity3dState.drag=false);st.addEventListener('pointercancel',()=>entity3dState.drag=false);st.addEventListener('wheel',e=>{e.preventDefault();entity3dState.zoom=Math.max(.45,Math.min(3.5,entity3dState.zoom*(e.deltaY>0?.9:1.1)))},{passive:false});$('entity3dReset').onclick=()=>{entity3dState.yaw=-.55;entity3dState.pitch=.18;entity3dState.zoom=1}}
+function entity3dStop(){const s=entity3dState;if(s.raf)cancelAnimationFrame(s.raf);s.raf=0;s.token++;if(s.texture){s.texture.dispose();s.texture=null}if(s.renderer){s.renderer.dispose();s.renderer=null}s.scene=s.camera=s.root=null;s.targetMaterials=[]}
+function entity3dBindControls(){const st=$('entity3dStage');if(st.dataset.bound)return;st.dataset.bound='1';st.addEventListener('pointerdown',e=>{entity3dState.drag=true;entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY;st.setPointerCapture(e.pointerId)});st.addEventListener('pointermove',e=>{if(!entity3dState.drag)return;entity3dState.yaw+=(e.clientX-entity3dState.lastX)*.012;entity3dState.pitch=Math.max(-1.2,Math.min(1.2,entity3dState.pitch+(e.clientY-entity3dState.lastY)*.01));entity3dState.lastX=e.clientX;entity3dState.lastY=e.clientY});st.addEventListener('pointerup',()=>entity3dState.drag=false);st.addEventListener('pointercancel',()=>entity3dState.drag=false);st.addEventListener('wheel',e=>{e.preventDefault();entity3dState.zoom=Math.max(.45,Math.min(3.5,entity3dState.zoom*(e.deltaY>0?.9:1.1)))},{passive:false});$('entity3dOrig').onclick=async()=>{entity3dState.sourceEdit=false;$('entity3dOrig').classList.add('primary');$('entity3dEdit').classList.remove('primary');await entity3dSwapTexture()};
+$('entity3dEdit').onclick=async()=>{entity3dState.sourceEdit=true;$('entity3dEdit').classList.add('primary');$('entity3dOrig').classList.remove('primary');await entity3dSwapTexture()};
+$('entity3dReset').onclick=()=>{entity3dState.yaw=-.55;entity3dState.pitch=.18;entity3dState.zoom=1}}
 async function openEntity3D(meta){
   entity3dStop();const box=$('entity3d'),glb=ENTITY_PREVIEW_MAP[meta.path];if(!glb){box.classList.remove('show');return}
   box.classList.add('show');$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='Assimp GLB kendi materyalleriyle yükleniyor…';$('entity3dMeta').textContent=glb;entity3dBindControls();const token=entity3dState.token;
-  $('entity3dOrig').disabled=true;$('entity3dEdit').disabled=true;
+  $('entity3dOrig').disabled=false;$('entity3dEdit').disabled=false;
   try{
     const {THREE,GLTFLoader}=await entity3dModules();if(token!==entity3dState.token)return;const c=$('entity3dCanvas');
     const renderer=new THREE.WebGLRenderer({canvas:c,alpha:false,antialias:true});renderer.setClearColor(0x090b0e,1);renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -335,7 +352,11 @@ async function openEntity3D(meta){
     const box3=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();box3.getSize(size);box3.getCenter(center);root.position.sub(center);root.updateMatrixWorld(true);
     const maxDim=Math.max(size.x,size.y,size.z)||1;camera.position.set(0,0,maxDim*2.2);camera.near=Math.max(.001,maxDim/1000);camera.far=maxDim*50;camera.lookAt(0,0,0);camera.updateProjectionMatrix();
     entity3dState.renderer=renderer;entity3dState.scene=scene;entity3dState.camera=camera;entity3dState.root=root;entity3dState.meta=meta;
-    $('entity3dMeta').textContent='mobs_mc_piglin.glb · Assimp · materyal override YOK';$('entity3dMsg').style.display='none';entity3dRender();
+    const mats=[];root.traverse(o=>{if(!o.isMesh)return;const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{if(m&&m.map&&!mats.includes(m))mats.push(m)})});
+    entity3dState.targetMaterials=mats;entity3dState.sourceEdit=!!(await getEdit(meta.path));
+    $('entity3dEdit').classList.toggle('primary',entity3dState.sourceEdit);$('entity3dOrig').classList.toggle('primary',!entity3dState.sourceEdit);
+    if(entity3dState.sourceEdit&&mats.length)await entity3dSwapTexture();
+    $('entity3dMeta').textContent='mobs_mc_piglin.glb · Assimp · UV/material korunuyor · '+mats.length+' texture material';$('entity3dMsg').style.display='none';entity3dRender();
   }catch(e){console.warn('3D preview',e);$('entity3dMeta').textContent='Assimp GLB yükleme hatası';$('entity3dMsg').style.display='flex';$('entity3dMsg').textContent='3D önizleme hatası: '+(e&&e.message?e.message:String(e))}
 }
 async function openDetail(x){active=x;$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('origImg').src=await blobUrl(x.path,false);const edit=await getEdit(x.path);$('editImg').src=edit?URL.createObjectURL(edit.blob):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();const pr=promptFor(x);$('promptFamily').textContent=pr.label+' · '+pr.source;$('textureId').textContent='ID: '+x.id;$('promptText').value=pr.text;$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview();await openEntity3D(x)}
