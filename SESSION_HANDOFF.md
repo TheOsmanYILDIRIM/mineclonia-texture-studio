@@ -369,3 +369,15 @@ Verification:
 - both inline JavaScript blocks parse successfully;
 - dark page background, top bar, bottom bar and button theme rules are present;
 - the close button remains `type="button"` with the simplified mobile-safe interaction.
+
+
+## UV/alpha prompt correction — 2026-10-04
+
+Production feedback showed that the earlier generic transparency suffix reduced entity UV-map edge fidelity. The app now treats entity alpha/UV geometry as the highest-priority locked structure and no longer appends the generic transparency/background block to entity prompts.
+
+Relevant commits:
+- `96ce3fd35f4f6e9223be2d765dde7f4a349b9426` — lock entity UV masks before transparency
+- `4959fe6478af4e43c9547887993f2e00c59f49f3` — document exact UV/alpha priority
+- `96a243810561857fdf727599eaf97ca08f6aa557` — pin dark app surfaces on mobile
+
+Entity prompt rule now explicitly forbids edge expansion/contraction, feathering, blur, anti-aliasing, erosion/dilation, gap bridging, halo/background creation, and any repaint across the source mask boundary. Exact source UV alignment wins over realism and transparency aesthetics.
