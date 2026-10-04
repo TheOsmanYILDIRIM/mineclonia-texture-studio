@@ -731,30 +731,53 @@ async function importProjectBackup(file){
  await applyFilter();toast(`${ok} düzenleme, ${pc} prompt geri yüklendi${missing?`, ${missing} eşleşmedi`:''}`)
 }
 async function exportPack(){
- const edits=await meaningfulEdits();
- if(!edits.length)return toast('Gerçekten değiştirilmiş texture yok');
- const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
- root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
- let done=0;
- for(const e of edits){
-   const meta=CATALOG.find(x=>x.path===e.path);
-   let outBlob=null;
-   const cached=await getScaled(e.path,TARGET_RESOLUTION);
-   if(cached) outBlob=cached.blob;
-   else {
-     outBlob=await normalizeTextureBlobTo(e.blob,meta,TARGET_RESOLUTION);
-     await putScaled(e.path,TARGET_RESOLUTION,outBlob);
+ const btn=$('exportPack');
+ const originalLabel=btn.textContent;
+ btn.disabled=true;
+ btn.textContent='Hazırlanıyor…';
+ setSaveState('Texturepack hazırlanıyor…','warn');
+ try{
+   const edits=(await allEdits()).filter(e=>CATALOG.some(x=>x.path===e.path));
+   if(!edits.length){toast('Değiştirilmiş texture yok');return}
+   const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
+   root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
+   let done=0,cachedCount=0,nativeCount=0;
+   for(const e of edits){
+     const cached=await getScaled(e.path,TARGET_RESOLUTION);
+     const outBlob=cached?.blob||e.blob;
+     if(cached) cachedCount++; else nativeCount++;
+     root.file(e.path,outBlob,{compression:'STORE'});
+     done++;
+     if(done===1||done===edits.length||done%25===0){
+       const pct=Math.round(done/edits.length*70);
+       btn.textContent=`Paketleniyor %${pct}`;
+       setSaveState(`Texturepack: ${done}/${edits.length}`,'warn');
+       $('stat').textContent=`Export: ${done}/${edits.length} • ${storageLabel()}`;
+       await new Promise(requestAnimationFrame);
+     }
    }
-   root.file(e.path,outBlob);
-   done++;
-   if(done===1 || done===edits.length || done%10===0) $('stat').textContent=`Export: ${done}/${edits.length} • ${storageLabel()}`;
+   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,cachedResolutionCount:cachedCount,nativeResolutionFallbackCount:nativeCount,paths:edits.map(e=>e.path)};
+   root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
+   btn.textContent='ZIP %70';
+   setSaveState('ZIP oluşturuluyor…','warn');
+   const out=await z.generateAsync({type:'blob',compression:'STORE'},meta=>{
+     const pct=70+Math.round((meta.percent||0)*.30);
+     btn.textContent=`ZIP %${Math.min(100,pct)}`;
+     setSaveState(`ZIP oluşturuluyor • %${Math.min(100,pct)}`,'warn');
+   });
+   btn.textContent='İndiriliyor…';
+   dl(out,'Mineclonia_Dark_Realism_delta.zip');
+   setSaveState('Texturepack hazır','ok');
+   toast(`${edits.length} texture export edildi${nativeCount?` · ${nativeCount} dosya kayıtlı doğal çözünürlüğünde`:''}`);
+   await applyFilter();
+ }catch(err){
+   console.error('Texturepack export failed',err);
+   setSaveState('Texturepack export hatası','bad');
+   alert('Texturepack ZIP oluşturulamadı: '+(err?.message||err));
+ }finally{
+   btn.disabled=false;
+   btn.textContent=originalLabel;
  }
- const manifest={format:'mineclonia-dark-realism-delta',version:3,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,backgroundCached256:true,paths:edits.map(e=>e.path)};
- root.file('changed_textures.json',JSON.stringify(manifest,null,2));
- const out=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
- dl(out,'Mineclonia_Dark_Realism_delta.zip');
- toast(`${edits.length} değiştirilmiş texture export edildi (${TARGET_RESOLUTION}px)`);
- await applyFilter();
 }
 
 
