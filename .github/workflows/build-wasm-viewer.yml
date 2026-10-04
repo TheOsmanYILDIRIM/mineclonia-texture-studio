@@ -27,11 +27,19 @@ jobs:
           git checkout 038b341fe861370433aea8eb6317f0bbd87303ba -- irr lib/tiniergltf
       - name: Configure
         working-directory: wasm-viewer
+        env:
+          CFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
+          CXXFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
+          LDFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
         run: |
-          emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENGL3=OFF -DENABLE_GLES2=ON \
-            -DZLIB_LIBRARY=/dev/null -DJPEG_LIBRARY=/dev/null -DPNG_LIBRARY=/dev/null
+          embuilder build zlib libpng libjpeg sdl2
+          emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENGL3=OFF -DENABLE_GLES2=ON
       - name: Build
         working-directory: wasm-viewer
+        env:
+          CFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
+          CXXFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
+          LDFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
         run: cmake --build build -j2
       - name: Stage web runtime
         run: |
