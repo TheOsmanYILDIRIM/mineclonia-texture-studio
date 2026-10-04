@@ -33,7 +33,9 @@ jobs:
           LDFLAGS: "-sUSE_ZLIB=1 -sUSE_LIBPNG=1 -sUSE_LIBJPEG=1 -sUSE_SDL=2"
         run: |
           embuilder build zlib libpng libjpeg sdl2
-          printf '' > /tmp/egl_stub.c\n          emcc -c /tmp/egl_stub.c -o /tmp/egl_stub.o\n          emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENGL3=OFF -DENABLE_GLES2=ON -DEGL_LIBRARY=/tmp/egl_stub.o -DEGL_INCLUDE_DIR=$EMSDK/upstream/emscripten/cache/sysroot/include
+          printf '' > /tmp/egl_stub.c
+          emcc -c /tmp/egl_stub.c -o /tmp/egl_stub.o
+          emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_OPENGL3=OFF -DENABLE_GLES2=ON -DEGL_LIBRARY=/tmp/egl_stub.o -DEGL_INCLUDE_DIR=$EMSDK/upstream/emscripten/cache/sysroot/include
       - name: Build
         working-directory: wasm-viewer
         env:
