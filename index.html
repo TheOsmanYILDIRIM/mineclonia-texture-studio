@@ -280,12 +280,16 @@ async function atlasBlobToStripBlob(blob, meta){
  if(cellW<1 || cellH<1) throw Error('Atlas hücre boyutu hesaplanamadı');
  const usedW=cellW*spec.cols, usedH=cellH*spec.rows;
  const trimX=Math.floor((src.width-usedW)/2), trimY=Math.floor((src.height-usedH)/2);
- const out=document.createElement('canvas'); out.width=meta.w; out.height=meta.h; const g=out.getContext('2d');
+ const frameOut=Math.max(1,Math.min(cellW,cellH));
+ const out=document.createElement('canvas');
+ out.width=spec.vertical?frameOut:frameOut*spec.frames;
+ out.height=spec.vertical?frameOut*spec.frames:frameOut;
+ const g=out.getContext('2d');
  g.clearRect(0,0,out.width,out.height); g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high';
  for(let i=0;i<spec.frames;i++){
    const sx=trimX+(i%spec.cols)*cellW, sy=trimY+Math.floor(i/spec.cols)*cellH;
-   const dx=spec.vertical?0:i*spec.frame, dy=spec.vertical?i*spec.frame:0;
-   g.drawImage(src,sx,sy,cellW,cellH,dx,dy,spec.frame,spec.frame);
+   const dx=spec.vertical?0:i*frameOut, dy=spec.vertical?i*frameOut:0;
+   g.drawImage(src,sx,sy,cellW,cellH,dx,dy,frameOut,frameOut);
  }
  return await canvasPngBlob(out);
 }
