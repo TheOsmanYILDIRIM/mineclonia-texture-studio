@@ -448,3 +448,24 @@ If one texture is reused in multiple contexts, write the prompt for the **shared
 
 Likewise, distinguish ambient particles from event particles. `extra_mobs_glow_squid_glint1–4.png` are persistent ambient Glow Squid glint particles; they are not the damage-triggered ink jet.
 
+
+
+## 22. Mandatory transparency output rule
+
+Every effective prompt emitted by the app must explicitly preserve alpha transparency and prohibit generated backgrounds.
+
+Global rule:
+- preserve source transparency and alpha-cutout logic;
+- keep intended empty/background regions fully transparent;
+- never add white, black, colored, scenic, shadow-field, or other generated backgrounds;
+- never fill unused transparent regions;
+- return a game-ready background-free texture where transparency is part of the source.
+
+Entity / UV atlas rule:
+- transparent space outside UV islands is locked;
+- every empty region outside the islands remains fully transparent;
+- never paint into unused atlas space;
+- never add backdrop, canvas color, glow field, shadow field, or environmental background;
+- preserve exact atlas alpha structure.
+
+The app enforces these requirements at prompt-output time so built-in prompts, JSON/manual overrides, exported prompts, and future prompt-library additions receive the same transparency constraint without duplicating it into every stored prompt body.
