@@ -261,16 +261,15 @@ The intent:
 
 ## Detail close button
 
-The user later reported that the × close button did not work on mobile.
+The mobile close button unreliability was diagnosed and resolved:
+- **Root Cause**: The previous `bf0a5b2` fix registered both `click` and `pointerup` handlers on `#close`. On touch devices, `pointerup` fired and removed `.open` (`display: none`), immediately unmasking the background grid. The browser's synthetic `click` at the touch coordinates then fell through to the underlying `<button class="card">`, triggering `card.onclick -> openDetail()`, instantly reopening the sheet.
+- **Fix**: Replaced dual `click`/`pointerup` bindings with a single canonical `closeDetailSheet()` triggered via `closeBtn.onclick` (with `preventDefault` & `stopPropagation`). Added `type="button"`, `aria-label="Kapat"`, and styling (`flex-shrink:0; position:relative; z-index:2; touch-action:manipulation; pointer-events:auto`) to ensure clear layering and touch handling. Extracted binding to `bindDetailSheetEvents()`.
+- **Verification**: Verified JS syntax with Node.js and simulated click propagation/tap-through and backdrop click behaviors.
 
-This was fixed on main in two commits:
-
-- `71c13828a077428a26deda116102fee86c7bb1d5`
-  — restore texture detail close button
-- `bf0a5b2fe9a455f4fd54365af9e61da85bb88892`
-  — make detail close button reliable on mobile
-
-At this handoff the close-button issue is considered patched in code. The next session should verify it on the live Android site before changing it again.
+Relevant commits:
+- `71c13828a077428a26deda116102fee86c7bb1d5` — restore texture detail close button
+- `bf0a5b2fe9a455f4fd54365af9e61da85bb88892` — initial mobile close button attempt
+- `e0ed308` — streamline mobile close button with single canonical click activation
 
 ## README
 
@@ -348,7 +347,7 @@ Static verification: the current inline JavaScript parses successfully after the
 
 ## Next concrete work
 
-1. Open the live site on Android and verify the latest × close-button fix from `0b67c73db8fc133b0fa5a91ac630552ee23e0f65`.
+1. Verify the mobile close button on the live Android site after Pages deployment.
 2. Continue runtime-role auditing beyond entity assets, especially ambiguous P1 ITEMS/effects/overlays:
    - trace exact filename in Mineclonia source
    - identify node/item/HUD/particle/overlay/state/tint behavior
