@@ -384,6 +384,29 @@ Current behavior:
 
 Static parsing of both inline JavaScript blocks passed after the change.
 
+## Texturepack ZIP export fix — 2026-10-04
+
+Texturepack export was slow/silent because it first compared every edited PNG against the original byte-by-byte and then recompressed already-compressed PNG files with DEFLATE level 6 on-device.
+
+Fixed in:
+- `3f54862ce0d960feab31844fc7780f2279fc321d`
+  — `fix: make texturepack export fast and visible`
+
+Current export behavior:
+- waits for pending edit writes to settle;
+- exports the edit store directly instead of refetching/comparing every original;
+- stores PNGs in ZIP with `STORE` (no redundant recompression);
+- uses streaming ZIP generation;
+- shows file-count progress first, then ZIP percentage on the export button/status line;
+- disables the export button while a ZIP is being built;
+- restores the normal button/status state on success or failure;
+- backup ZIP export also uses `STORE`.
+
+Verification:
+- both inline JavaScript blocks parse successfully;
+- Texturepack export no longer contains DEFLATE;
+- progress callback and pending-write wait are present.
+
 ## Next concrete work
 
 1. Verify the mobile close button on the live Android site after Pages deployment.
