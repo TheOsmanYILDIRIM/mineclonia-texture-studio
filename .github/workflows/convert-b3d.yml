@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install b3d2glb
-        run: cargo install b3d2glb --version 0.4.3 --locked
+        run: cargo install b3d2glb --version 0.4.5 --locked
 
       - name: Convert models with skinning and animations
         run: |
