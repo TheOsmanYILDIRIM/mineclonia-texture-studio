@@ -374,7 +374,8 @@ When transparency conflicts with shape fidelity, the ORIGINAL SOURCE MASK AND BO
 const ENTITY_TRANSPARENCY_REQUIREMENT=`UV + ALPHA MASK LOCK — HIGHEST PRIORITY:
 The source UV atlas is a coordinate-locked structural template. Exact UV geometry has higher priority than realism, transparency aesthetics, edge smoothing, or material detail.
 Preserve every UV island's exact position, size, orientation, spacing, outer contour, internal cutout, and occupied/empty pixel boundary.
-Preserve the alpha mask exactly as supplied by the source. Do not infer a new silhouette from the creature, material, or transparent background.
+Preserve the alpha channel exactly as supplied by the source. Treat alpha as READ-ONLY structural data: do not change alpha values, do not infer a new silhouette, and do not regenerate transparency from the creature or material.
+Perform the visual edit as an RGB/material replacement strictly inside the existing occupied mask. Outside the source mask, leave pixels fully transparent exactly as they are.
 Do not move, resize, rotate, warp, round, smooth, feather, blur, anti-alias, expand, contract, erode, dilate, or repaint any UV-island edge.
 Do not add or remove even a thin painted border around an island. Do not bridge gaps between islands. Do not fill empty atlas space.
 Transparent source pixels must remain transparent; occupied source pixels must remain inside the exact same mask footprint.
