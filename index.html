@@ -311,11 +311,13 @@ async function updateTilePreview(){if(!active)return;const box=$('tilePreview');
 const MINECLONIA_COMMIT='209ec2dc96adbf7f5ba083816d90596492ec53b5';
 const MINECLONIA_MODEL_ROOT=`https://raw.githubusercontent.com/mark-wiemer/mineclonia/${MINECLONIA_COMMIT}/mods/ENTITIES/mobs_mc/models/`;
 let entity3dState={raf:0,gl:null,program:null,buffers:null,texture:null,yaw:-0.55,pitch:0.18,zoom:2.8,drag:false,lastX:0,lastY:0,meta:null,sourceEdit:true,token:0};
-function entityModelCandidates(name){
+function entityModelCandidates(name,path=''){
+ const full=(path||name).toLowerCase();
  let n=name.toLowerCase().replace(/\.png$/,'');
  const out=[]; const add=x=>{if(x&&!out.includes(x))out.push(x)};
+ if(full==='entities/mobs_mc/extra_mobs_piglin.png') return ['mobs_mc_piglin.b3d'];
  if(n.includes('glow_squid')) add('extra_mobs_glow_squid.b3d');
- if(n.includes('piglin_brute')||n.includes('piglin')) add('mobs_mc_piglin.b3d');
+ if(n.includes('piglin_brute')) add('mobs_mc_piglin.b3d');
  if(n.includes('zombified_piglin')||n.includes('zombiepig')){add('mobs_mc_zombiepig.b3d');add('mobs_mc_piglin.b3d')}
  if(n.includes('cat_')||n.endsWith('_cat')||n.includes('ocelot')) add('mobs_mc_cat.b3d');
  if(n.includes('wolf')) add('mobs_mc_wolf.b3d');
