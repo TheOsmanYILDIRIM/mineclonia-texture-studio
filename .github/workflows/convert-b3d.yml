@@ -16,19 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Assimp
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y assimp-utils
-      - name: Convert models
+
+      - name: Install b3d2glb
+        run: cargo install b3d2glb --version 0.4.3 --locked
+
+      - name: Convert models with skinning and animations
         run: |
           mkdir -p assets/models
-          shopt -s nullglob
-          for f in assets/models-src/*.b3d; do
-            name="$(basename "$f" .b3d)"
-            assimp export "$f" "assets/models/$name.glb" -f glb2
-          done
+          b3d2glb -b -o assets/models assets/models-src
           ls -lh assets/models
+
       - name: Commit generated GLB
         run: |
           if git diff --quiet -- assets/models && [ -z "$(git status --porcelain assets/models)" ]; then
