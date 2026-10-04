@@ -326,7 +326,7 @@ async function entity3dMakeTexture(){
   const blob=await entity3dTextureBlob(),url=URL.createObjectURL(blob);
   try{
     const tex=await new Promise((resolve,reject)=>new THREE.TextureLoader().load(url,resolve,undefined,reject));
-    tex.flipY=false;tex.colorSpace=THREE.SRGBColorSpace;tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;tex.needsUpdate=true;
+    tex.flipY=true;tex.colorSpace=THREE.SRGBColorSpace;tex.magFilter=THREE.NearestFilter;tex.minFilter=THREE.NearestFilter;tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;tex.needsUpdate=true;
     return tex;
   }finally{URL.revokeObjectURL(url)}
 }
