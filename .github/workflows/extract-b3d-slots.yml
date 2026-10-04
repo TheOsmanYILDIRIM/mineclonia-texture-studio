@@ -1,0 +1,42 @@
+name: Extract B3D texture slots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/models-src/**'
+      - 'tools/extract_b3d_texture_slots.cpp'
+      - '.github/workflows/extract-b3d-slots.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Irrlicht
+        run: sudo apt-get update && sudo apt-get install -y libirrlicht-dev
+      - name: Build extractor
+        run: g++ -std=c++17 -O2 tools/extract_b3d_texture_slots.cpp -I/usr/include/irrlicht -lIrrlicht -o /tmp/extract_slots
+      - name: Extract Piglin slots
+        run: |
+          mkdir -p assets/model-meta
+          /tmp/extract_slots assets/models-src/mobs_mc_piglin.b3d | tee assets/model-meta/mobs_mc_piglin.json
+          python3 - <<'PY'
+          import json
+          p='assets/model-meta/mobs_mc_piglin.json'
+          d=json.load(open(p))
+          assert d['slots'], d
+          print('texture slots:', d['slots'])
+          PY
+      - name: Commit metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/model-meta/mobs_mc_piglin.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "build: extract Piglin B3D texture slots [skip ci]"
+          git push
