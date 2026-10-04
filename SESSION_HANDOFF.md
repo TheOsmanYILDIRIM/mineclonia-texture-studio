@@ -362,6 +362,28 @@ Relevant commits:
 
 Inline JavaScript syntax parsing passes after the change.
 
+## Texturepack ZIP export performance — 2026-10-04
+
+The previous export path was expensive on mobile because it:
+- re-compared every saved edit against the original texture at export time;
+- synchronously generated missing scaled copies while exporting;
+- then DEFLATE-compressed thousands of PNG files even though PNG data is already compressed;
+- gave almost no visible progress during the slowest phase.
+
+Fixed in:
+- `e8358dc6f04d294a6967c657838c02a30e6eb96c`
+  — `perf: make texturepack export fast and observable`
+
+Current behavior:
+- export reads the already-saved edit set directly;
+- uses an existing target-resolution cache when present, otherwise packages the saved edited PNG without blocking to rescale it;
+- stores PNG entries with ZIP `STORE` instead of wasting CPU recompressing PNGs;
+- updates the Texturepack ZIP button and save-status text throughout preparation and ZIP generation;
+- yields to the browser periodically so Android UI remains responsive;
+- surfaces a real error message if ZIP generation fails.
+
+Static parsing of both inline JavaScript blocks passed after the change.
+
 ## Next concrete work
 
 1. Verify the mobile close button on the live Android site after Pages deployment.
