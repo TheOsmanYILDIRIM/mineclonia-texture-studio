@@ -371,18 +371,11 @@ Do not add a white, black, colored, scenic, shadow, glow, or environmental backg
 Material/detail changes must stay strictly inside the source occupied mask.
 When transparency conflicts with shape fidelity, the ORIGINAL SOURCE MASK AND BOUNDARIES WIN.`;
 
-const ENTITY_TRANSPARENCY_REQUIREMENT=`UV + ALPHA MASK LOCK — HIGHEST PRIORITY:
-The source UV atlas is a coordinate-locked structural template. Exact UV geometry has higher priority than realism, transparency aesthetics, edge smoothing, or material detail.
-Preserve every UV island's exact position, size, orientation, spacing, outer contour, internal cutout, and occupied/empty pixel boundary.
-Preserve the alpha channel exactly as supplied by the source. Treat alpha as READ-ONLY structural data: do not change alpha values, do not infer a new silhouette, and do not regenerate transparency from the creature or material.
-Perform the visual edit as an RGB/material replacement strictly inside the existing occupied mask. Outside the source mask, leave pixels fully transparent exactly as they are.
-Do not move, resize, rotate, warp, round, smooth, feather, blur, anti-alias, expand, contract, erode, dilate, or repaint any UV-island edge.
-Do not add or remove even a thin painted border around an island. Do not bridge gaps between islands. Do not fill empty atlas space.
-Transparent source pixels must remain transparent; occupied source pixels must remain inside the exact same mask footprint.
-All new fur, skin, cloth, bone, scale, metal, markings, weathering, and micro-detail must terminate at the original mask boundary without crossing it.
-Do not add any backdrop, canvas fill, shadow field, glow field, halo, outline, or environmental background.
-If visual realism conflicts with exact UV alignment, EXACT UV ALIGNMENT AND THE ORIGINAL ALPHA MASK WIN.
-Final output must remain directly usable on the original model without edge drift or seam mismatch.`;
+const ENTITY_TRANSPARENCY_REQUIREMENT=`UV / ALPHA LOCK:
+Keep the original UV layout and source alpha mask EXACTLY unchanged. Do not redraw, regenerate, expand, shrink, soften, or reinterpret island edges or transparency.
+Edit RGB/material appearance only inside the existing occupied source pixels. Do not move, resize, rotate, warp, merge, split, or repack UV islands.
+Outside the original occupied mask must remain transparent. Do not add any background.
+If realism conflicts with the source UV geometry, the source UV geometry wins.`;
 
 function applyPromptOutputRequirements(text,x){
  let out=String(text||'').trimEnd();
@@ -495,8 +488,26 @@ async function normalizeTextureBlob(blob,meta){
  const out=document.createElement('canvas');out.width=dw;out.height=dh;out.getContext('2d').putImageData(resized,0,0);
  return await canvasPngBlob(out)
 }
+async function lockEntityAlphaToSource(blob,meta){
+ if(!meta||assetTypeOf(meta)!=='Entity')return blob;
+ const [edited,sourceBlob]=await Promise.all([decodeBlobToCanvas(blob),originalBlob(meta.path)]);
+ const source=await decodeBlobToCanvas(sourceBlob);
+ const w=edited.width,h=edited.height;
+ const mask=document.createElement('canvas');mask.width=w;mask.height=h;
+ const mg=mask.getContext('2d',{willReadFrequently:true});mg.imageSmoothingEnabled=false;mg.clearRect(0,0,w,h);mg.drawImage(source,0,0,w,h);
+ const eg=edited.getContext('2d',{willReadFrequently:true});
+ const ed=eg.getImageData(0,0,w,h), md=mg.getImageData(0,0,w,h);
+ for(let i=3;i<ed.data.length;i+=4)ed.data[i]=md.data[i];
+ eg.putImageData(ed,0,0);
+ return await canvasPngBlob(edited)
+}
+async function prepareImportedTextureBlob(blob,meta){
+ let out=await normalizeTextureBlob(blob,meta);
+ if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
+ return out
+}
 async function imageBlobTransform(blob, offset=false){return await new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.imageSmoothingEnabled=false;if(!offset){g.drawImage(im,0,0)}else{const w=c.width,h=c.height,dx=Math.floor(w/2),dy=Math.floor(h/2);g.drawImage(im, dx,dy);g.drawImage(im,dx-w,dy);g.drawImage(im,dx,dy-h);g.drawImage(im,dx-w,dy-h)}c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(Error('PNG oluşturulamadı'))},'image/png')};im.onerror=()=>rej(Error('PNG okunamadı'));im.src=u})}
-async function importPng(file,seam=false){if(!active||!file)return;toast('Yüksek kaliteli küçültme…');let b=await normalizeTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+' · '+TARGET_RESOLUTION+'px Lanczos-3 kaydedildi');await openDetail(active);await applyFilter(); setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
+async function importPng(file,seam=false){if(!active||!file)return;toast(assetTypeOf(active)==='Entity'?'UV maskesi kaynaktan kilitleniyor…':'Yüksek kaliteli küçültme…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+(assetTypeOf(active)==='Entity'?' · kaynak alpha kilitli':' · '+TARGET_RESOLUTION+'px Lanczos-3 kaydedildi'));await openDetail(active);await applyFilter(); setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
 async function blobsEqual(a,b){
  if(!a||!b||a.size!==b.size)return false;
  const [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]);
@@ -531,7 +542,7 @@ async function importZip(file){
  for(const [path,f] of Object.entries(z.files)){
    if(f.dir||!path.toLowerCase().endsWith('.png'))continue;
    const meta=catalogMatchForZipPath(path);if(!meta){ambiguous++;continue}
-   let blob=await f.async('blob');blob=await normalizeTextureBlob(blob,meta);
+   let blob=await f.async('blob');blob=await prepareImportedTextureBlob(blob,meta);
    try{const orig=await originalBlob(meta.path);if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;continue}}catch(err){console.warn(err)}
    await putEdit(meta.path,blob);changed++
  }
