@@ -229,7 +229,7 @@ function p1SpecialPromptFor(x){
 }
 
 
-function isAnimatedStrip(x){return !!(x&&x.w&&x.h&&((x.h>x.w&&x.h%x.w===0)||(x.w>x.h&&x.w%x.h===0)))}
+function isAnimatedStrip(x){return !!(x&&assetTypeOf(x)!=='Entity'&&x.w&&x.h&&((x.h>x.w&&x.h%x.w===0)||(x.w>x.h&&x.w%x.h===0)))}
 function animSpec(x){
  if(!isAnimatedStrip(x)) return null;
  const vertical=x.h>=x.w, frame=vertical?x.w:x.h, frames=vertical?Math.round(x.h/x.w):Math.round(x.w/x.h);
