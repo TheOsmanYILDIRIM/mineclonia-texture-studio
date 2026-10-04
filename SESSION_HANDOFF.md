@@ -501,3 +501,14 @@ Verification:
 
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
+
+## Resolution/identical-texture regression fix — 2026-10-04
+
+Branch: `fix/texture-resolution-and-identical-detection`
+
+- Existing runtime already exports only tracked changed paths and re-normalizes each exported PNG to the selected 64/128/256/512 target when the stored image is larger than that target.
+- Existing byte/pixel equality was insufficient for stale records produced by older export/import cycles when the same visual texture existed at a different resolution.
+- `textureMatchesOriginal()` now canonicalizes both the stored edit and source original to the same lower width and compares decoded pixels there. This lets visually identical rescaled copies fall out of the changed set instead of being re-exported forever.
+- Direct pushes to `main` are avoided for this fix; work is isolated on the branch and should be reviewed/merged through PR.
+
+Verification still needed after merge: reload the app so `hydrateChangedPathsFast()` re-evaluates old stored edits, confirm unchanged count drops, then export once at each needed target resolution.
