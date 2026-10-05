@@ -1,3 +1,23 @@
+## Authored UV reference runtime wiring — 2026-10-05
+
+- Fixed the three-stage UV reference path so authored prompts are actually consumed by the UI.
+- **Authored reference prompts are now actually consumed by the UI; authored-first, dynamic-fallback-second.**
+- Added one shared `AUTHORED_UV_REFS` loader/cache for both Mobs and Armor.
+- Mobs loader reads `status=done` + `file` entries from `prompts/mobs/manifest.json`; authored `.txt` contents are stored verbatim by texture ID.
+- Armor loader reads the manifest batch and stores each `reference_prompt` verbatim by texture ID.
+- `copyMobPrompt('ref')` now calls `referencePromptFor(active)`: authored Map lookup first, dynamic `mobCreatureRefPromptFor` / `mobArmorRefPromptFor` fallback second.
+- Ref button remains a local Map lookup after initialization; no per-click GitHub/fetch operation.
+- Corrected only the four `leather_desat` Armor reference prompts to explicitly remain neutral/tint-friendly for runtime colorization.
+- Acceptance checks: `extra_mobs_cod.png` and Mob #30 resolve to their authored TXT contents; Mob #31 (`mobs_mc_horse_creamy.png`) remains pending and therefore uses fallback; Armor chain and another Armor entry resolve to their batch-authored references; Armor inventory exclusion remains clean.
+- Block regression check: the existing `loadBlockReferencePrompts()` implementation is byte-for-byte unchanged from the pre-wiring commit.
+- Both inline JavaScript blocks parse successfully with `new Function`.
+
+Commits:
+- `ee77fe53defb224f499c698deeab2f9647e55e49` — tint-friendly `leather_desat` authored references.
+- `11e3028f33305b3a6e438b4fe6c21c16890859ca` — authored-first UV reference runtime wiring.
+
+Next concrete work: continue Mob reference authoring from manifest order 31 when explicitly requested.
+
 ## Armor UV reference completion — 2026-10-05
 
 - Authored deliberate Armor Reference prompts for all **32** worn player-armor UV atlases in `prompts/armor/batch_001_032.json`.
