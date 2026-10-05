@@ -35,3 +35,5 @@ jobs:
           git add index.html AGENTS.md PROMPT_AUTHORING_GUIDE.md SESSION_HANDOFF.md
           git commit -m "feat: switch P0 to reference-first prompts"
           git push
+
+# retry after migration script syntax repair
