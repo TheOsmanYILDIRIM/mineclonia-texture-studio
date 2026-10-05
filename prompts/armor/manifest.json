@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "kind": "armor_uv_prompt_manifest",
+  "workflow": "three_stage_hq_uv_reference_transfer",
+  "total": 32,
+  "done": 0,
+  "pending": 32,
+  "last_completed_id": null,
+  "last_completed_name": null,
+  "next_id": "tex_84a83caec5",
+  "next_name": "mcl_armor_boots_chain.png",
+  "notes": [
+    "Only 64x32 worn player-armor UV atlases are included.",
+    "Inventory icons (mcl_armor_inv_*), trim item sprites, smithing templates, HUD assets and other item images are explicitly excluded.",
+    "HQ UV and Final UV use shared dynamic templates; each armor UV can receive an authored material/reference prompt."
+  ],
+  "entries": [
+    {
+      "order": 1,
+      "id": "tex_84a83caec5",
+      "name": "mcl_armor_boots_chain.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_chain.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 2,
+      "id": "tex_c271a9dbf1",
+      "name": "mcl_armor_boots_copper.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_copper.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 3,
+      "id": "tex_a97e0bfa6e",
+      "name": "mcl_armor_boots_diamond.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_diamond.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 4,
+      "id": "tex_4cc2c1f9ba",
+      "name": "mcl_armor_boots_gold.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_gold.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 5,
+      "id": "tex_459055bde9",
+      "name": "mcl_armor_boots_iron.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_iron.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 6,
+      "id": "tex_2a33f6bb01",
+      "name": "mcl_armor_boots_leather.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_leather.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 7,
+      "id": "tex_57b0426674",
+      "name": "mcl_armor_boots_leather_desat.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_leather_desat.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 8,
+      "id": "tex_d2fac86849",
+      "name": "mcl_armor_boots_netherite.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_netherite.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 9,
+      "id": "tex_f9d46510d0",
+      "name": "mcl_armor_chestplate_chain.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_chain.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 10,
+      "id": "tex_f98465371b",
+      "name": "mcl_armor_chestplate_copper.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_copper.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 11,
+      "id": "tex_4ee587d7eb",
+      "name": "mcl_armor_chestplate_diamond.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_diamond.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 12,
+      "id": "tex_1ef1b952ca",
+      "name": "mcl_armor_chestplate_gold.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_gold.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 13,
+      "id": "tex_7aed472c0a",
+      "name": "mcl_armor_chestplate_iron.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_iron.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 14,
+      "id": "tex_1cf3c09993",
+      "name": "mcl_armor_chestplate_leather.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_leather.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 15,
+      "id": "tex_5f97bf19fa",
+      "name": "mcl_armor_chestplate_leather_desat.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_leather_desat.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 16,
+      "id": "tex_b3a9a24f8e",
+      "name": "mcl_armor_chestplate_netherite.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_netherite.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 17,
+      "id": "tex_7ff15ade04",
+      "name": "mcl_armor_helmet_chain.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_chain.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 18,
+      "id": "tex_a545e31f29",
+      "name": "mcl_armor_helmet_copper.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_copper.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 19,
+      "id": "tex_11c998901f",
+      "name": "mcl_armor_helmet_diamond.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_diamond.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 20,
+      "id": "tex_5c012266f6",
+      "name": "mcl_armor_helmet_gold.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_gold.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 21,
+      "id": "tex_ed9f065608",
+      "name": "mcl_armor_helmet_iron.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_iron.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 22,
+      "id": "tex_52339ba119",
+      "name": "mcl_armor_helmet_leather.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_leather.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 23,
+      "id": "tex_fe07858c16",
+      "name": "mcl_armor_helmet_leather_desat.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_leather_desat.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 24,
+      "id": "tex_80b5489262",
+      "name": "mcl_armor_helmet_netherite.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_netherite.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 25,
+      "id": "tex_84de4f9334",
+      "name": "mcl_armor_leggings_chain.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_chain.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 26,
+      "id": "tex_90e123276d",
+      "name": "mcl_armor_leggings_copper.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_copper.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 27,
+      "id": "tex_6d51567db2",
+      "name": "mcl_armor_leggings_diamond.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_diamond.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 28,
+      "id": "tex_b1fd250c67",
+      "name": "mcl_armor_leggings_gold.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_gold.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 29,
+      "id": "tex_eb654689e0",
+      "name": "mcl_armor_leggings_iron.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_iron.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 30,
+      "id": "tex_0a0fc32079",
+      "name": "mcl_armor_leggings_leather.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_leather.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 31,
+      "id": "tex_b29be90a2d",
+      "name": "mcl_armor_leggings_leather_desat.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_leather_desat.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 32,
+      "id": "tex_c6278f24b0",
+      "name": "mcl_armor_leggings_netherite.png",
+      "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_netherite.png",
+      "priority": "P2",
+      "workflow_role": "armor_uv",
+      "status": "pending",
+      "file": null
+    }
+  ]
+}
