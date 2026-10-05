@@ -38,6 +38,20 @@ Commit:
 Commit:
 - `eb742e2e4ab118a915b8dab0412ac78651e38747`.
 
+## P0 reference semantics audit — 2026-10-05
+
+A broader audit found the acacia-top issue was part of a larger naming/semantics risk.
+
+Fixes:
+- all 41 original/core P0 textures now have an explicit semantic reference subject instead of relying on filename regex guessing;
+- tree side vs trunk end-grain, planks, foliage, flowing/source fluids, grass top/side-overlay/snowed-side, and oak/jungle/birch/spruce variants are explicitly distinguished;
+- promoted P1 assets now require the existing classifier to return exactly **Block**; **Functional Block** assets such as beds, doors, chests, furnaces, fences, etc. are no longer promoted into P0;
+- technical/sprite-like block records such as light placeholders, barrier/void, vine/web, sea-pickle-off sprites, sugar, grass shadow and ladder are excluded from material-P0 promotion;
+- generalized semantic rules cover oriented block faces (top/side/bottom), stripped logs, podzol/mycelium/path, sandstone/red sandstone, deepslate, coral/prismarine, ores, glass, wool and other promoted material blocks.
+
+Commit:
+- `b5307f347a27afefc7da93026f0c38ccac3e9519`.
+
 ## Project
 
 Repository:
