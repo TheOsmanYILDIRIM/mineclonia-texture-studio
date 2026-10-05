@@ -93,82 +93,99 @@ async function displayBlob(path){const e=await getEdit(path);return e?.blob || a
 async function blobUrl(path,preferEdit=true){const key=(preferEdit?'e:':'o:')+path;if(urlCache.has(key))return urlCache.get(key);const b=preferEdit?await displayBlob(path):await originalBlob(path);const u=URL.createObjectURL(b);urlCache.set(key,u);return u}
 function priorityColor(p){return {P0:'#ff6b6b',P1:'#ffad5a',P2:'#ffd65a',P3:'#71a7ff',P4:'#a98cff',P5:'#84909f',P6:'#616a75'}[p]||'#999'}
 const MINECLONIA_INVENTORY_TABS=[
- ['blocks','Building Blocks'],
- ['deco','Decoration Blocks'],
- ['redstone','Redstone'],
- ['rail','Transportation'],
- ['food','Foodstuffs'],
- ['tools','Tools'],
- ['combat','Combat'],
- ['mobs','Mobs'],
- ['brew','Brewing'],
- ['matr','Materials'],
- ['misc','Miscellaneous'],
- ['nici','Not in Creative Inventory']
+ ['blocks','Building Blocks'],['deco','Decoration Blocks'],['redstone','Redstone'],['rail','Transportation'],
+ ['food','Foodstuffs'],['tools','Tools'],['combat','Combat'],['mobs','Mobs'],['brew','Brewing'],
+ ['matr','Materials'],['misc','Miscellaneous'],['nici','Not in Creative Inventory']
 ];
-
+const TEXTURE_TECH_CATEGORIES=[
+ ['terrain','Terrain / Natural'],['stone','Stone / Masonry'],['wood','Wood Sets'],['ores','Ores / Minerals'],
+ ['plants','Plants / Foliage'],['crops','Crops / Farming'],['liquids','Liquids'],['animated','Animated Textures'],
+ ['passive','Passive Mobs'],['hostile','Hostile Mobs'],['boss','Bosses'],['npc','Villagers / NPCs'],
+ ['player','Player'],['armor','Armor / Wearables'],['vehicles','Vehicles'],['items','General Items'],
+ ['tools-tech','Tools'],['weapons','Weapons / Combat'],['food-tech','Food'],['materials','Materials'],
+ ['workstations','Workstations'],['containers','Containers'],['doors','Doors / Trapdoors'],['redstone-tech','Redstone Components'],
+ ['hud','HUD'],['gui','GUI / Menus'],['icons','Icons / Indicators'],['overlays','Overlays'],
+ ['particles','Particles'],['effects','Effects / VFX'],['sky','Sky / Weather'],['environment','Environment'],
+ ['maps','Maps / Minimap'],['debug','System / Debug'],['other','Other / Unresolved']
+];
+function textureFacts(x){
+ const p=String(x.path||''),parts=p.split('/'),top=(parts[0]||'').toUpperCase(),mod=(parts[1]||'').toLowerCase();
+ const n=String(x.name||parts.at(-1)||'').toLowerCase(),q=(p+' '+n).toLowerCase();
+ return {p,parts,top,mod,n,q,broad:assetTypeOf(x)};
+}
 function minecloniaInventoryCategoriesOf(x){
- const p=String(x.path||''),parts=p.split('/'),top=parts[0]||'',mod=parts[1]||'',n=String(x.name||'').toLowerCase();
- const out=new Set(),add=(...ids)=>ids.forEach(id=>out.add(id));
- const broad=assetTypeOf(x);
-
+ const {top,mod,n,q,broad}=textureFacts(x),out=new Set(),add=(...ids)=>ids.forEach(id=>out.add(id));
  if(top==='ENTITIES'){
-   if(mod==='mcl_boats'||mod==='mcl_minecarts'||/boat|minecart|rail/.test(n))add('rail');
-   else add('mobs');
+   if(/boat|minecart/.test(q))add('rail'); else add('mobs');
    return [...out];
  }
- if(top==='HUD'||top==='PLAYER'){add('misc');return [...out]}
-
- if(top==='ITEMS'&&parts[1]==='REDSTONE')add('redstone');
- if(/redstone|repeater|comparator|piston|observer|dispenser|dropper|lever|button|pressure_plate|daylight_detector|target/.test(mod+' '+n))add('redstone');
- if(/minecart|rail|boat/.test(mod+' '+n))add('rail');
-
- if(mod==='mcl_tools'){
-   if(/sword|bow|crossbow|arrow|trident|mace|shield/.test(n))add('combat');
-   else add('tools');
- }
- if(/mcl_fishing|shears|flint_and_steel|compass|clock/.test(mod+' '+n))add('tools');
- if(/mcl_armor|shield|bow|crossbow|arrow|trident|mace|weapon|sword/.test(mod+' '+n))add('combat');
-
- if(/mcl_potions|mcl_brewing/.test(mod)||/potion|dragon_breath|brewing/.test(n))add('brew');
-
- if(mod==='mcl_farming'||/apple|bread|cookie|cake|stew|carrot|potato|beetroot|melon|pumpkin_pie|berry|food|meat|pork|beef|chicken|mutton|rabbit|fish|cod|salmon/.test(n)){
-   if(/stage_|stem_|farmland|soil|hayblock|pumpkin_(side|top|face)|melon_(side|top)/.test(n))add('deco');
-   else add('food');
- }
- if(/mcl_honey|mcl_mushrooms|mcl_mobitems/.test(mod)&&/honey|stew|mushroom|meat|pork|beef|chicken|mutton|rabbit|fish|cod|salmon/.test(n))add('food');
-
- if(mod==='mcl_core'&&/(_lump|nugget|ingot|diamond|emerald|lapis|stick|paper|bowl|flint|feather|string|leather|brick\.png|clay_lump)/.test(n))add('matr');
- if(/mcl_dyes|mcl_raw_ores|mcl_amethyst/.test(mod)&&/(item|shard|crystal|dye|raw|ingot|nugget)/.test(n))add('matr');
- if(/craftitem|material|ingredient/.test(n))add('matr');
-
- const decoMods=new Set(['mcl_flowers','mcl_panes','mcl_fences','mcl_doors','mcl_beds','mcl_chests','mcl_torches','mcl_lanterns','mcl_banners','mcl_heads','mcl_flowerpots','mcl_signs','mcl_bells','mcl_lectern','mcl_loom','mcl_crafting_table','mcl_cartography_table','mcl_fletching_table','mcl_composters','mcl_barrels','mcl_beehives','mcl_armor_stand','mcl_jukebox']);
- if(decoMods.has(mod)||broad==='Plant / Foliage')add('deco');
-
- const buildingMods=new Set(['mcl_core','mcl_deepslate','mcl_blackstone','mcl_nether','mcl_end','mcl_colorblocks','mcl_wool','mcl_copper','mcl_mud','mcl_sponges','mcl_stairs','mcl_walls','mcl_ocean','mcl_bamboo','mcl_crimson','mcl_mangrove','mcl_dripstone','mcl_lush_caves','mcl_pale_oak']);
- if(buildingMods.has(mod)&&broad!=='Item'&&broad!=='Plant / Foliage')add('blocks');
- if(broad==='Functional Block')add('deco');
-
- if(/glass|pane|wool|carpet|torch|lantern|fence|wall|door|trapdoor|bed|chest|barrel|bookshelf|flower|sapling|leaves|coral|seagrass|kelp|cactus|reeds|lichen/.test(n))add('deco');
- if(/stone|cobble|brick|plank|wood|log|tree|dirt|sand|gravel|ore|deepslate|blackstone|terracotta|concrete|prismarine|quartz|basalt|netherrack|end_stone|bedrock/.test(n)&&broad!=='Item')add('blocks');
- if(/spawn_egg|mobs_chicken_egg/.test(n))add('mobs');
- if(/barrier|debug|structure_void|unknown_node|blank|placeholder/.test(n))add('nici');
-
+ if(top==='HUD'||top==='PLAYER'||/particle|effect|overlay|weather|sky|sun|moon|rain|snow/.test(q)){add('misc');return [...out]}
+ if(/redstone|repeater|comparator|piston|observer|dispenser|dropper|lever|button|pressure_plate|daylight_detector|target|tripwire/.test(q))add('redstone');
+ if(/minecart|rail|boat|elytra/.test(q))add('rail');
+ if(mod==='mcl_tools'||/pickaxe|shovel|hoe|axe|shears|fishing_rod|flint_and_steel|compass|clock/.test(q))add('tools');
+ if(/mcl_armor|sword|bow|crossbow|arrow|trident|mace|shield|helmet|chestplate|leggings|boots/.test(q))add('combat');
+ if(/mcl_potions|mcl_brewing|potion|dragon_breath|brewing/.test(q))add('brew');
+ if(/apple|bread|cookie|cake|stew|carrot|potato|beetroot|melon|pumpkin_pie|berry|pork|beef|chicken|mutton|rabbit|cod|salmon|food/.test(q))add('food');
+ if(/ingot|nugget|diamond|emerald|lapis|stick|paper|bowl|flint|feather|string|leather|dye|shard|crystal|raw_/.test(q))add('matr');
+ if(/flower|sapling|leaves|coral|seagrass|kelp|cactus|reeds|lichen|glass|pane|wool|carpet|torch|lantern|fence|door|trapdoor|bed|chest|barrel|bookshelf|sign|banner|pot|workbench|crafting|furnace|anvil/.test(q)||broad==='Plant / Foliage'||broad==='Functional Block')add('deco');
+ if(/stone|cobble|brick|plank|wood|log|tree|dirt|sand|gravel|ore|deepslate|blackstone|terracotta|concrete|prismarine|quartz|basalt|netherrack|end_stone|bedrock|copper/.test(q)&&broad!=='Item')add('blocks');
+ if(/spawn_egg/.test(q))add('mobs');
+ if(/barrier|debug|structure_void|unknown_node|blank|placeholder/.test(q))add('nici');
  if(!out.size)add('misc');
  return [...out];
 }
-function minecloniaInventoryCategoryLabels(x){
- const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);
- return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id);
+function textureTechnicalCategoriesOf(x){
+ const {top,mod,n,q,broad}=textureFacts(x),out=new Set(),add=(...ids)=>ids.forEach(id=>out.add(id));
+ if(top==='HUD'||/\/hud\/|crosshair|hotbar|heart|hunger|armor_bar|experience|xp_bar|breath|damage_indicator/.test(q))add('hud');
+ if(/gui|inventory|menu|button|slot|container_gui|formspec|creative/.test(q))add('gui');
+ if(/icon|indicator|marker|pointer|reticle/.test(q))add('icons');
+ if(/overlay|vignette|pumpkinblur|underwater|portal_overlay|powder_snow/.test(q))add('overlays');
+ if(/particle|particles|smoke|spark|bubble|splash|flame|ash|drip|poof/.test(q))add('particles');
+ if(/effect|beam|glint|enchant|aura|explosion|flash|firework|vfx/.test(q))add('effects');
+ if(/sky|sun|moon|cloud|rain|snow|weather|stars/.test(q))add('sky');
+ if(/water|lava|river|liquid/.test(q))add('liquids');
+ if(/animated|animation|_anim|flowing|portal|fire_/.test(q))add('animated');
+ if(top==='PLAYER'||/player|steve|alex|skin/.test(q))add('player');
+ if(/armor|helmet|chestplate|leggings|boots|elytra|wearable/.test(q))add('armor');
+ if(top==='ENTITIES'||broad==='Entity'){
+   if(/dragon|wither|warden/.test(q))add('boss');
+   else if(/zombie|skeleton|creeper|spider|enderman|witch|slime|ghast|blaze|guardian|pillager|vindicator|evoker|ravager|piglin|hoglin|phantom|drowned|husk|stray|silverfish|endermite|shulker/.test(q))add('hostile');
+   else if(/villager|wandering_trader|npc/.test(q))add('npc');
+   else if(/boat|minecart/.test(q))add('vehicles');
+   else add('passive');
+ }
+ if(/boat|minecart|cart|vehicle/.test(q))add('vehicles');
+ if(/crop|wheat|carrot|potato|beetroot|stem|farmland|cocoa|nether_wart|stage_/.test(q))add('crops');
+ if(/flower|sapling|leaves|grass|fern|vine|coral|seagrass|kelp|cactus|reeds|lichen|mushroom|bamboo/.test(q))add('plants');
+ if(/ore|raw_|diamond|emerald|lapis|amethyst|coal|iron|gold|copper/.test(q))add('ores');
+ if(/stone|cobble|brick|deepslate|blackstone|terracotta|concrete|prismarine|quartz|basalt|netherrack|end_stone|bedrock/.test(q))add('stone');
+ if(/plank|wood|log|tree|bark|stripped|hyphae|stem/.test(q)&&!out.has('crops'))add('wood');
+ if(/dirt|sand|gravel|clay|mud|snow|ice|mycelium|podzol|nylium/.test(q))add('terrain');
+ if(/chest|barrel|shulker_box|container/.test(q))add('containers');
+ if(/crafting|furnace|smoker|blast_furnace|anvil|grindstone|loom|lectern|stonecutter|cartography|fletching|smithing|brewing_stand|composter/.test(q))add('workstations');
+ if(/door|trapdoor/.test(q))add('doors');
+ if(/redstone|repeater|comparator|piston|observer|dispenser|dropper|lever|pressure_plate|tripwire/.test(q))add('redstone-tech');
+ if(/sword|bow|crossbow|arrow|trident|mace|shield/.test(q))add('weapons');
+ if(/pickaxe|shovel|hoe|axe|shears|fishing_rod|flint_and_steel/.test(q))add('tools-tech');
+ if(/apple|bread|cookie|cake|stew|carrot|potato|beetroot|melon|berry|pork|beef|chicken|mutton|rabbit|cod|salmon/.test(q))add('food-tech');
+ if(/ingot|nugget|shard|crystal|dye|string|leather|paper|stick|flint|feather/.test(q))add('materials');
+ if(top==='ITEMS'&&![...out].some(v=>['tools-tech','weapons','food-tech','materials','armor'].includes(v)))add('items');
+ if(/map|minimap|map_/.test(q))add('maps');
+ if(/debug|unknown|placeholder|blank|missing|structure_void|barrier/.test(q))add('debug');
+ if(!out.size&&/environment|biome|fog/.test(q))add('environment');
+ if(!out.size)add('other');
+ return [...out];
 }
+function minecloniaInventoryCategoryLabels(x){const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id)}
 async function buildFilters(){
  const sel=$('category');
- sel.innerHTML='<option value="">Tüm envanter</option>'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');
+ sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
  const vals=['ALL','P0','P1','P2','P3','P4','P5','P6'];
  const counts=Object.fromEntries(vals.map(v=>[v,v==='ALL'?CATALOG.length:CATALOG.filter(x=>x.priority===v).length]));
  $('filters').innerHTML=vals.map(v=>`<button class="chip ${v==='P0'?'active':''}" data-p="${v}">${v==='ALL'?'Tümü':v} · ${counts[v]}</button>`).join('');
  $('filters').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const p=b.dataset.p;$('stat').textContent=(p==='ALL'?'Liste':p)+' hazırlanıyor…';applyFilter()}
 }
+function categoryMatches(x,cat){if(!cat)return true;const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
 function activePriority(){return document.querySelector('.chip.active')?.dataset.p||'P0'}
 function assetTypeOf(x){
  const p=x.path||'', n=(x.name||'').toLowerCase(), parts=p.split('/'), top=parts[0]||'', mod=parts[1]||'';
@@ -253,7 +270,7 @@ function runtimeRoleInfo(x){
  return info(broad||'Unresolved','','');
 }
 function runtimeRoleOf(x){return runtimeRoleInfo(x).role}
-async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&(!cat||minecloniaInventoryCategoriesOf(x).includes(cat))&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path)));page=0;return render()}
+async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path)));page=0;return render()}
 async function render(){
  const token=++renderToken,start=page*PAGE_SIZE,arr=filtered.slice(start,start+PAGE_SIZE);$('grid').innerHTML='';$('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPaths.size} değişti • ${storageLabel()}`;$('pageInfo').textContent=`${Math.min(page+1,Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)))} / ${Math.max(1,Math.ceil(filtered.length/PAGE_SIZE))}`;
  if(!arr.length){$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Bu filtrede texture yok.</div>';return}
@@ -1677,7 +1694,7 @@ async function putEdit(path,blob){
 }
 async function applyFilter(){
   const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();
-  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&(!cat||minecloniaInventoryCategoriesOf(x).includes(cat))&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path)));
+  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path)));
   page=0; render();
 }
 async function render(){
