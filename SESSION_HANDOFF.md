@@ -1,3 +1,12 @@
+## Legacy P1 prompt compression — 2026-10-05
+
+- Removed the six legacy `js/data/prompts-p1-*.js` shards (~1.59 MB total).
+- P1 fallback prompts are now generated from the existing compact `materialHints(x)` + `generatedPromptFor(x)` path.
+- Removed the redundant ~24 KB `p1SpecialPromptFor()`/ `p1Prompt()` chain.
+- New authored Block/Mobs/Armor reference prompt manifests remain unchanged and still take precedence in their dedicated workflows.
+- `js/app.js` parses successfully; no `P1_PROMPT_LIBRARY` or `p1SpecialPromptFor` references remain.
+- Branch remains `refactor/split-js-20261005`; main unchanged.
+
 ## JavaScript split / HTML de-bloat — 2026-10-05
 
 - Refactor branch: `refactor/split-js-20261005` (main was not modified directly).
