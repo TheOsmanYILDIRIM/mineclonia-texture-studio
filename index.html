@@ -91,6 +91,37 @@ async function originalBlob(path){
 }
 async function displayBlob(path){const e=await getEdit(path);return e?.blob || await originalBlob(path)}
 async function blobUrl(path,preferEdit=true){const key=(preferEdit?'e:':'o:')+path;if(urlCache.has(key))return urlCache.get(key);const b=preferEdit?await displayBlob(path):await originalBlob(path);const u=URL.createObjectURL(b);urlCache.set(key,u);return u}
+
+const THUMB_MAX_EDGE=192;
+const EDITOR_PREVIEW_MAX_EDGE=1024;
+async function previewBlob(blob,maxEdge){
+ if(!blob||!maxEdge)return blob;
+ let bmp=null;
+ try{
+   if('createImageBitmap' in window){
+     bmp=await createImageBitmap(blob);
+     const sw=bmp.width,sh=bmp.height,scale=Math.min(1,maxEdge/Math.max(sw,sh));
+     if(scale>=1){bmp.close?.();return blob}
+     const dw=Math.max(1,Math.round(sw*scale)),dh=Math.max(1,Math.round(sh*scale));
+     const canvas=document.createElement('canvas');canvas.width=dw;canvas.height=dh;
+     const g=canvas.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(bmp,0,0,dw,dh);
+     bmp.close?.();return await canvasPngBlob(canvas);
+   }
+ }catch(err){try{bmp?.close?.()}catch(_){} console.warn('preview bitmap fallback',err)}
+ const source=await decodeBlobToCanvas(blob),sw=source.width,sh=source.height,scale=Math.min(1,maxEdge/Math.max(sw,sh));
+ if(scale>=1)return blob;
+ const dw=Math.max(1,Math.round(sw*scale)),dh=Math.max(1,Math.round(sh*scale));
+ const canvas=document.createElement('canvas');canvas.width=dw;canvas.height=dh;
+ const g=canvas.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(source,0,0,dw,dh);
+ return await canvasPngBlob(canvas);
+}
+async function previewUrl(path,preferEdit=true,maxEdge=EDITOR_PREVIEW_MAX_EDGE){
+ const key=`p:${maxEdge}:${preferEdit?'e':'o'}:${path}`;
+ if(urlCache.has(key))return urlCache.get(key);
+ const source=preferEdit?await displayBlob(path):await originalBlob(path);
+ const small=await previewBlob(source,maxEdge);
+ const u=URL.createObjectURL(small);urlCache.set(key,u);return u;
+}
 function priorityColor(p){return {P0:'#ff6b6b',P1:'#ffad5a',P2:'#ffd65a',P3:'#71a7ff',P4:'#a98cff',P5:'#84909f',P6:'#616a75'}[p]||'#999'}
 const MINECLONIA_INVENTORY_TABS=[
  ['blocks','Building Blocks'],['deco','Decoration Blocks'],['redstone','Redstone'],['rail','Transportation'],
@@ -275,7 +306,7 @@ async function render(){
  const token=++renderToken,start=page*PAGE_SIZE,arr=filtered.slice(start,start+PAGE_SIZE);$('grid').innerHTML='';$('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPaths.size} değişti • ${storageLabel()}`;$('pageInfo').textContent=`${Math.min(page+1,Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)))} / ${Math.max(1,Math.ceil(filtered.length/PAGE_SIZE))}`;
  if(!arr.length){$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Bu filtrede texture yok.</div>';return}
  const cards=[];for(const x of arr){const b=document.createElement('button');b.className='card';b.innerHTML=`<img><span class="badge" style="color:${priorityColor(x.priority)}">${x.priority}</span>${changedPaths.has(x.path)?'<span class="changed"></span>':''}`;b.title=x.path;b.onclick=()=>openDetail(x);$('grid').appendChild(b);cards.push([x,b.querySelector('img')])}
- for(let i=0;i<cards.length;i+=6){if(token!==renderToken)return;await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await blobUrl(x.path,true)}catch(e){console.warn(x.path,e)}}));await new Promise(requestAnimationFrame)}
+ for(let i=0;i<cards.length;i+=6){if(token!==renderToken)return;await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}}));await new Promise(requestAnimationFrame)}
 }
 async function countChanged(){return (await allEdits()).length}
 
@@ -705,7 +736,7 @@ function bindDetailSheetEvents(){
   }
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('open'))closeDetailSheet()});
 }
-async function openDetail(x){active=x;resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await blobUrl(x.path,false);const edit=await getEdit(x.path);$('editImg').src=edit?URL.createObjectURL(edit.blob):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -786,6 +817,11 @@ async function lockEntityAlphaToSource(blob,meta){
 }
 async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
  let out=await normalizeTextureBlob(blob,meta,targetRes);
+ if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
+ return out
+}
+async function prepareStoredEditBlob(blob,meta){
+ let out=blob;
  if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
  return out
 }
@@ -887,7 +923,7 @@ async function importZip(file){
  for(const [path,f] of Object.entries(z.files)){
    if(f.dir||!path.toLowerCase().endsWith('.png'))continue;
    const meta=catalogMatchForZipPath(path);if(!meta){ambiguous++;continue}
-   let blob=await f.async('blob');blob=await prepareImportedTextureBlob(blob,meta);
+   let blob=await f.async('blob');blob=await prepareStoredEditBlob(blob,meta);
    try{const orig=await originalBlob(meta.path);if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;continue}}catch(err){console.warn(err)}
    await putEdit(meta.path,blob);changed++
  }
@@ -1114,10 +1150,10 @@ const BLOCK_REFERENCE_PROMPTS=new Map();
 let blockPromptManifest=null;
 async function loadBlockReferencePrompts(){
  try{
-  const r=await fetch(BLOCK_PROMPT_MANIFEST_URL,{cache:'no-store'});if(!r.ok)throw new Error('manifest '+r.status);
+  const r=await fetch(BLOCK_PROMPT_MANIFEST_URL,{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
   blockPromptManifest=await r.json();
   const done=(blockPromptManifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  const rows=await Promise.all(done.map(async e=>{try{const q=await fetch(e.file,{cache:'no-store'});if(!q.ok)return null;return await q.json()}catch{return null}}));
+  const rows=await Promise.all(done.map(async e=>{try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}catch{return null}}));
   for(const row of rows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
  }catch(e){console.warn('Block prompt manifest unavailable; inline fallback active',e)}
 }
@@ -1482,7 +1518,7 @@ async function importZip(file){
  for(const [path,f] of pngs){
    const meta=catalogMatchForZipPath(path);if(!meta){ambiguous++;continue}
    let blob=await f.async('blob');
-   blob=await prepareImportedTextureBlob(blob,meta);
+   blob=await prepareStoredEditBlob(blob,meta);
    try{
      if(await textureMatchesOriginal(blob,meta)){await delEdit(meta.path);same++;processed++;continue}
    }catch(err){console.warn(err)}
@@ -1682,9 +1718,11 @@ const changedPathsFast = new Set();
 const pendingChangedPaths = new Set();
 const cardRefsFast = new Map();
 function revoke(path){
-  for(const key of ['e:'+path]){
-    const u=urlCache.get(key);
-    if(u){ try{URL.revokeObjectURL(u)}catch(_){} urlCache.delete(key); }
+  for(const [key,u] of [...urlCache.entries()]){
+    if(key==='e:'+path||key.endsWith(':e:'+path)){
+      try{URL.revokeObjectURL(u)}catch(_){}
+      urlCache.delete(key);
+    }
   }
 }
 function setFastEditUrl(path,blob){
@@ -1696,7 +1734,7 @@ function setFastEditUrl(path,blob){
 function updateCardFast(path,url){
   const ref=cardRefsFast.get(path);
   if(ref){
-    ref.img.src=url;
+    previewUrl(path,true,THUMB_MAX_EDGE).then(u=>{if(cardRefsFast.get(path)===ref)ref.img.src=u}).catch(()=>{ref.img.src=url});
     if(!ref.card.querySelector('.changed')){
       const d=document.createElement('span'); d.className='changed'; ref.card.appendChild(d);
     }
@@ -1710,7 +1748,7 @@ function installPersistedEditFast(edit,{markChanged=false}={}){
   else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path);
   const url=setFastEditUrl(edit.path,edit.blob);
   const ref=cardRefsFast.get(edit.path);
-  if(ref)ref.img.src=url;
+  if(ref)previewUrl(edit.path,true,THUMB_MAX_EDGE).then(u=>{if(cardRefsFast.get(edit.path)===ref)ref.img.src=u}).catch(()=>{ref.img.src=url});
   if(markChanged)updateCardFast(edit.path,url);
 }
 function updateStatFast(){
@@ -1768,13 +1806,13 @@ async function render(){
  const cards=[];
  for(const x of arr){
    const b=document.createElement('button'); b.className='card';
-   b.innerHTML=`<img><span class="badge" style="color:${priorityColor(x.priority)}">${x.priority}</span>${changedPathsFast.has(x.path)?'<span class="changed"></span>':''}`;
+   b.innerHTML=`<img loading="lazy" decoding="async"><span class="badge" style="color:${priorityColor(x.priority)}">${x.priority}</span>${changedPathsFast.has(x.path)?'<span class="changed"></span>':''}`;
    b.title=x.path; b.onclick=()=>openDetail(x); $('grid').appendChild(b);
    const img=b.querySelector('img'); cardRefsFast.set(x.path,{card:b,img}); cards.push([x,img]);
  }
  for(let i=0;i<cards.length;i+=6){
    if(token!==renderToken)return;
-   await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await blobUrl(x.path,true)}catch(e){console.warn(x.path,e)}}));
+   await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}}));
    await new Promise(requestAnimationFrame);
  }
 }
@@ -1782,7 +1820,7 @@ async function importPng(file,seam=false){
   if(!active||!file)return;
   const target={...active};
   setSaveState(`Dosya hazırlanıyor • 16px→${TARGET_RESOLUTION}px ölçek…`,'warn');
-  let b=await prepareImportedTextureBlob(file,target);
+  let b=await prepareStoredEditBlob(file,target);
   if(seam)b=await imageBlobTransform(b,true);
   if(await textureMatchesOriginal(b,target)){
     await delEdit(target.path);
@@ -1899,7 +1937,6 @@ async function bootstrapStorageInBackground(){
 }
 
 async function init(){
-  await loadBlockReferencePrompts();
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
   setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn');
@@ -1928,6 +1965,7 @@ async function init(){
   $('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);
 
   await applyFilter();
+  setTimeout(()=>loadBlockReferencePrompts().then(()=>{if(active?.priority==='P0')renderActivePrompt()}).catch(console.warn),0);
   setTimeout(()=>bootstrapStorageInBackground(),0);
 }
 init().catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
