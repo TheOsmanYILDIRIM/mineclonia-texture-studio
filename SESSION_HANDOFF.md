@@ -936,3 +936,8 @@ Refined behavior:
 
 Commit:
 - `1593cfcb53f0c12d095b21ea15dd19c4612cd7a1` — tabbed Variant Lab + 1×1/3×3/6×6 seamless preview.
+
+## CI handoff — 2026-10-05
+- Runtime guards changed to run on `main` pushes/manual dispatch only; PR duplicate runs removed.
+- Added `concurrency` with `cancel-in-progress: true` so stale guard runs are cancelled.
+- Goal: avoid Action-minute waste from many small commits while keeping a final main-branch guard.
