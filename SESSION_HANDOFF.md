@@ -1,6 +1,16 @@
 # Texture Studio — Session Handoff
 
-Updated: 2026-10-04
+Updated: 2026-10-05
+
+## Current continuation — reference-first P0 prompts — 2026-10-05
+
+- P0 now uses two compact copy actions: **Ref prompt** and **Üretim prompt**; prompt text is hidden for P0.
+- Reference prompts carry the grounded dark-fantasy world/art direction and identify only the material subject, leaving surface detail creative.
+- The production prompt is one standard Original+Ref template: Image A = structure/function, Image B = dominant style/material language; only literal outer-canvas boundaries are seam-critical.
+- The former P0 creative alternative is retired from the visible workflow/export path.
+- Existing semantic classification promotes P1 **Block** and **Functional Block** textures (including brick-like block assets) into P0; filename guessing is not used for that promotion.
+- Non-P0 prompt behavior stays asset-specific/legacy.
+- Next: runtime guard + Pages deploy, then Android spot-check birch log, acacia/cobblestone, and one promoted P1 block.
 
 ## Project
 
