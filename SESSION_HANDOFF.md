@@ -580,5 +580,5 @@ Key commits:
 - `e8664a3306274b49eb961d30e176988b99ed6208` no-upscale source-aspect fitting
 - `3cd7093873ded451a331bab6673acf0a970f1ff4` final regression guards
 
-Runtime guard run #18 passed. Next step: merge PR #5, deploy Pages, then Android-check the one-time legacy cleanup and confirm subsequent reloads do not re-verify known changed records.
+PR #5 was squash-merged to `main` as `ac312ef5295dbda0116cb497f6fdd6102168196f` (`fix: persist verified changes and scale by source density`). Main runtime guards and GitHub Pages deployment both completed successfully. Remaining checks are device-side: let the one-time legacy/unknown verification finish, confirm later reloads skip known changed records, use P2–P6 reset if desired, and spot-check density scaling on block/entity assets.
 
