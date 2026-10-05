@@ -1189,11 +1189,15 @@ const AUTHORED_UV_REF_PROMISES={
  mobs:loadAuthoredReferenceSet('Mobs','prompts/mobs/manifest.json'),
  armor:loadAuthoredReferenceSet('Armor','prompts/armor/manifest.json')
 };
+function dynamicArmorRefPromptFor(x){
+ const m=mobPromptMeta(x);
+ return 'Create a high-quality visual MATERIAL REFERENCE for the worn player armor represented by "'+m.name+'".\n\nThis is reference art for a later UV-material transfer, NOT a UV map, texture atlas, inventory icon, item sprite, voxel render or game screenshot.\n\nARMOR IDENTITY:\n'+m.name+'\nRuntime role: '+m.role+'.\n\nMATERIAL:\n'+m.material+'. Preserve the practical identity of this exact armor piece and material. Show believable manufacturing character, wear, edge behavior, articulation/contact wear where appropriate, and restrained age without inventing new armor geometry, ornament, engravings, spikes, gems, straps or major components.\n\nART DIRECTION:\nGrounded dark-fantasy realism: ancient, weathered, somber, tactile and physically believable. Restrained saturation, soft neutral diffuse lighting, controlled micro-detail and honest material response. Avoid dramatic scene lighting, glossy toy finish, cartoon/anime styling, pixel art, voxel styling, text, UI and decorative props.\n\nREFERENCE FUNCTION:\nPrioritize readable material information, color relationships, manufacturing character and wear. Use a simple neutral unobtrusive background. The image must function as a clean appearance/material reference for transfer onto an already structurally correct player-armor UV atlas.';
+}
 function referencePromptFor(x){
  if(!x||!isThreeStageUvTexture(x))return null;
  const authored=AUTHORED_UV_REFS.get(x.id);
  if(typeof authored==='string'&&authored.length)return authored;
- return isArmorUvTexture(x)?mobArmorRefPromptFor(x):mobCreatureRefPromptFor(x);
+ return isArmorUvTexture(x)?dynamicArmorRefPromptFor(x):mobCreatureRefPromptFor(x);
 }
 let blockPromptManifest=null;
 async function loadBlockReferencePrompts(){
