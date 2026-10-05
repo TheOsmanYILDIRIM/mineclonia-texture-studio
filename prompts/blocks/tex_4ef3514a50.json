@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_4ef3514a50",
+  "label": "mcl_core_grass_side_snowed",
+  "texture_path": "ITEMS/mcl_core/mcl_core_grass_side_snowed.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for the exposed side of a grass-and-soil block after winter snow has settled over it. The material is a layered transition: a cold compact snow cap above dormant flattened grass, fine roots and dark frozen soil. Melt and refreeze have slightly hardened the boundary; tiny icy grains cling to vegetation while the earth beneath feels dense and cold rather than muddy. Keep snow muted off-white with restrained blue-gray depth, vegetation desaturated olive-brown, and soil dark earthy brown. Avoid thick scenic snowdrifts, icicles, bright green summer grass, dramatic frozen waterfalls or a clean horizontal diagram. The reference must clearly express a winter-exposed soil edge where snow, dormant turf and earth meet naturally. Let the source texture control the exact boundary geometry."
+}
