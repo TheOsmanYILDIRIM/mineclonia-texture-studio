@@ -3,21 +3,18 @@
 <style>
 :root{--bg:#0d0f12;--panel:#171a20;--panel2:#20242b;--line:#303641;--txt:#f5f7fa;--muted:#9aa4b2;--accent:#8fd14f;--warn:#ffca58;--danger:#ff6b6b;--safe:env(safe-area-inset-bottom,0px);color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;background:#0d0f12;background:var(--bg);color:#f5f7fa;color:var(--txt);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;height:100%}.app,main,.grid,.pager{background:#0d0f12;background:var(--bg);color:#f5f7fa;color:var(--txt)}button,input,select{font:inherit}button{touch-action:manipulation}.app{min-height:100%;padding-bottom:calc(76px + var(--safe))}.top{position:sticky;top:0;z-index:20;background:rgba(13,15,18,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px}.title{display:flex;align-items:center;justify-content:space-between;gap:8px}.title h1{font-size:16px;margin:0}.stat{font-size:12px;color:var(--muted)}.controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:9px}.controls .search{grid-column:1/-1;width:100%}.controls .select,.controls .btn{width:100%}.search,.select{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:10px 12px;min-width:0}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--txt);border-radius:12px;padding:10px 12px;font-weight:650}.btn.primary{background:var(--accent);color:#10140d;border-color:transparent}.btn.warn{background:var(--warn);color:#1a1300;border-color:transparent}.btn.danger{background:#482024;border-color:#7c333b}.filters{display:flex;overflow:auto;gap:7px;padding-top:8px;scrollbar-width:none}.chip{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:7px 11px;font-size:12px}.chip.active{background:#283820;color:#c9f69e;border-color:#527b35}.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:7px}.card{position:relative;min-width:0;aspect-ratio:1;border:1px solid #292e36;border-radius:8px;background:#111419;overflow:hidden;padding:0}.card img{width:100%;height:100%;display:block;object-fit:contain;image-rendering:auto;background-image:linear-gradient(45deg,#20242b 25%,transparent 25%),linear-gradient(-45deg,#20242b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#20242b 75%),linear-gradient(-45deg,transparent 75%,#20242b 75%);background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0}.badge{position:absolute;left:3px;top:3px;padding:2px 4px;border-radius:5px;background:rgba(0,0,0,.75);font-size:8px;font-weight:800}.changed{position:absolute;right:4px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px #111}.pager{display:flex;justify-content:center;align-items:center;gap:12px;padding:12px}.pager button{min-width:48px}.bottom{position:fixed;left:0;right:0;bottom:0;z-index:25;background:rgba(20,23,28,.97);border-top:1px solid var(--line);padding:8px 10px calc(8px + var(--safe));display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.sheet{position:fixed;z-index:50;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end}.sheet.open{display:flex}.drawer{width:100%;max-height:94vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:12px 12px calc(18px + var(--safe));box-shadow:0 -20px 60px rgba(0,0,0,.4)}.handle{width:46px;height:5px;border-radius:99px;background:#4b5360;margin:0 auto 10px}.meta{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.meta h2{font-size:16px;margin:0 0 4px;word-break:break-word}.path{font-size:11px;color:var(--muted);word-break:break-all}#close{flex-shrink:0;position:relative;z-index:2;touch-action:manipulation;pointer-events:auto}.preview{touch-action:none;position:relative;width:min(92vw,500px);aspect-ratio:1;margin:12px auto;background:#0b0d10;border:1px solid var(--line);border-radius:14px;overflow:hidden}.preview img{transform-origin:0 0;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:auto}.preview .editedClip{clip-path:inset(0 0 0 50%)}.compareCtl{display:flex;align-items:center;gap:8px;margin:8px 0}.compareCtl input{width:100%}
 .tileTools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:10px 0}.tileTools .mini{padding:8px 10px;border-radius:10px}.tileTools .mini.active{background:#dcecff;color:#101820;border-color:#dcecff}.tilePreview{display:none;width:min(92vw,500px);aspect-ratio:1;margin:10px auto;background:#0b0d10;border:1px solid var(--line);border-radius:14px;overflow:hidden;image-rendering:auto;background-repeat:repeat}.tilePreview.show{display:block}.animBox{margin-top:10px;background:#101318;border:1px solid #252a33;border-radius:14px;padding:10px;display:none}.animBox.show{display:block}.animHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.animMeta{font-size:11px;color:var(--muted)}.animCanvasWrap{display:flex;justify-content:center;align-items:center;background:#0b0d10;border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0}.animCanvasWrap canvas{width:min(76vw,260px);height:min(76vw,260px);image-rendering:auto;background:#0b0d10;border-radius:8px}.animBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.promptBox{margin-top:10px;background:#101318;border:1px solid #252a33;border-radius:14px;padding:10px}.promptHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}.promptTitle{font-size:12px;font-weight:700}.promptFamily{font-size:11px;color:var(--muted)}.textureId{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;color:#b7c4d4;word-break:break-all;margin-top:3px}.promptBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.promptManager{position:fixed;z-index:70;inset:0;background:rgba(0,0,0,.76);display:none;align-items:flex-end}.promptManager.open{display:flex}.promptMgrDrawer{width:100%;max-height:88vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:14px 12px calc(18px + var(--safe))}.promptMgrDrawer textarea{width:100%;min-height:200px;background:#0b0d10;color:#e8edf2;border:1px solid #272d35;border-radius:10px;padding:10px;font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}.promptBox textarea{width:100%;min-height:160px;resize:vertical;background:#0b0d10;color:#e8edf2;border:1px solid #272d35;border-radius:10px;padding:10px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions .wide{grid-column:1/-1}.hint{font-size:12px;line-height:1.45;color:var(--muted);background:#12151a;border:1px solid #252a33;border-radius:12px;padding:10px;margin-top:10px}.toast{position:fixed;z-index:100;left:50%;bottom:90px;transform:translateX(-50%);background:#252b33;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}.empty{padding:50px 20px;text-align:center;color:var(--muted)}
-.variantLab{position:fixed;z-index:80;inset:0;background:var(--bg);display:none;overflow:auto;padding-bottom:calc(86px + var(--safe))}
-.variantLab.open{display:block}.variantTop{position:sticky;top:0;z-index:3;background:rgba(13,15,18,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px}
-.variantTopRow{display:flex;gap:8px;align-items:center}.variantTopRow .select{flex:1}.variantTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 10px 0}
-.variantTab{padding:9px 6px;font-size:11px}.variantTab.active{background:var(--accent);color:#10140d;border-color:transparent}
-.variantBody{padding:10px}.variantModePane{display:none}.variantModePane.active{display:block}
-.variantModeHead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}.variantModeHead h3{font-size:14px;margin:0}.variantDesc{font-size:11px;color:var(--muted);line-height:1.35;margin-top:3px}
-.variantTileTabs{display:flex;gap:7px;justify-content:center;margin:8px 0}.variantTileTabs .btn.active{background:#dcecff;color:#101820;border-color:#dcecff}
-.variantStage{width:min(94vw,720px);aspect-ratio:1;margin:8px auto;background:#0b0d10;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background-repeat:repeat;background-position:0 0}
-.variantStage img{width:100%;height:100%;object-fit:contain;display:block}.variantNone{font-size:12px;color:var(--muted);padding:16px;text-align:center}
-.variantQuick{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;max-width:720px;margin:8px auto}.variantQuick .wide{grid-column:1/-1}
-.variantPromptDetails{max-width:720px;margin:8px auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
-.variantPromptDetails summary{cursor:pointer;padding:9px 10px;font-size:12px;font-weight:700;list-style:none}.variantPromptDetails summary::-webkit-details-marker{display:none}
-.variantPromptDetails[open] summary{border-bottom:1px solid var(--line)}.variantPrompt{width:100%;min-height:110px;max-height:180px;background:#0b0d10;color:var(--txt);border:0;padding:9px;font:10px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
-.variantWinnerBadge{display:none;font-size:11px;font-weight:800;color:#c9f69e}.variantModePane.winner .variantWinnerBadge{display:block}
-.variantRefMini{font-size:11px;color:var(--muted);text-align:center;min-height:16px;margin-top:4px}
+.variantLab{position:fixed;z-index:80;inset:0;background:var(--bg);display:none;overflow:auto;padding-bottom:calc(40px + var(--safe))}
+.variantLab.open{display:block}.variantTop{position:sticky;top:0;z-index:5;background:rgba(13,15,18,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px}
+.variantTopRow{display:flex;gap:7px;align-items:center}.variantTopRow .select{min-width:0;flex:1}.variantAdd{white-space:nowrap}
+.variantThumbStrip{display:flex;gap:7px;overflow-x:auto;padding:9px 10px 7px;scrollbar-width:none;overscroll-behavior-x:contain}.variantThumbStrip::-webkit-scrollbar{display:none}
+.variantThumb{position:relative;flex:0 0 58px;width:58px;height:58px;border:2px solid transparent;border-radius:10px;padding:0;background:#0b0d10;overflow:hidden}
+.variantThumb img{width:100%;height:100%;display:block;object-fit:cover}.variantThumb.selected{border-color:var(--accent)}.variantThumb.off{opacity:.28;filter:grayscale(.8)}
+.variantThumb.off::after{content:"×";position:absolute;inset:0;display:grid;place-items:center;font-size:32px;font-weight:900;color:#fff;text-shadow:0 2px 7px #000}.variantThumbName{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.7);font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.variantBody{padding:8px 10px 14px}.variantControls{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap;margin:4px 0 8px}.variantControls .btn{padding:8px 10px;font-size:11px}.variantControls .active{background:#dcecff;color:#101820;border-color:#dcecff}.variantControls .mix.active{background:var(--accent);color:#10140d;border-color:transparent}
+.variantStage{width:min(94vw,720px);aspect-ratio:1;margin:0 auto;background:#0b0d10;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;background-repeat:repeat;background-position:0 0}
+.variantStage.single{display:block;background-repeat:repeat}.variantStage img{width:100%;height:100%;object-fit:contain;display:block}.variantMixCell{background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+.variantNone{font-size:12px;color:var(--muted);padding:28px;text-align:center;display:grid;place-items:center;height:100%}
+.variantFooter{display:flex;gap:7px;max-width:720px;margin:8px auto 0}.variantFooter .btn{flex:1}.variantStatus{font-size:11px;color:var(--muted);text-align:center;min-height:18px;margin-top:6px}
 @media(min-width:700px){.grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;padding:12px}.controls{grid-template-columns:minmax(240px,1fr) 190px 160px 120px auto}.controls .search{grid-column:auto}.drawer{max-width:720px;margin:0 auto}.bottom{left:50%;transform:translateX(-50%);max-width:720px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm kategoriler</option></select><select class="select" id="assetType"><option value="">Tüm türler</option><option value="Block">Block</option><option value="Functional Block">Functional Block</option><option value="Item">Item</option><option value="Entity">Entity</option><option value="Plant / Foliage">Plant / Foliage</option><option value="Animated / Effect">Animated / Effect</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select><button class="btn" id="changedOnly">Değişenler</button></div><div class="filters" id="filters"></div></header>
@@ -28,43 +25,26 @@
 <input id="fileEdited" type="file" accept="image/png" hidden><input id="fileSeam" type="file" accept="image/png" hidden><input id="fileAnimAtlas" type="file" accept="image/png" hidden><input id="fileZip" type="file" accept=".zip,application/zip" hidden><input id="filePromptJson" type="file" accept="application/json,.json" hidden><input id="fileProjectBackup" type="file" accept=".zip,application/zip" hidden>
 <div class="promptManager" id="promptManager"><div class="promptMgrDrawer"><div class="handle"></div><div class="meta"><div><h2>Prompt JSON yöneticisi</h2><div class="path">Tekil: {"id":"tex_…","prompt":"…"} veya {"path":"ITEMS/…png","prompt":"…"} · Çoklu: {"prompts":[…]}</div></div><button class="btn" id="closePromptMgr">✕</button></div><div class="promptBtns" style="margin:12px 0"><button class="btn primary" id="importPromptJson">JSON içe aktar</button><button class="btn" id="exportAllPrompts">Tüm promptları indir</button><button class="btn" id="exportP0Prompts">P0 promptlarını indir</button><button class="btn" id="exportP0CreativePrompts" style="display:none">P0 yaratıcı promptları indir</button><button class="btn danger" id="clearPromptOverrides">Özel promptları sıfırla</button><button class="btn primary" id="exportProjectBackup">Proje yedeği indir</button><button class="btn" id="importProjectBackup">Proje yedeği yükle</button></div><div class="hint"><b>Kayıtlı texture temizleme</b><br>Yalnız seçilen priority\u0027nin PNG/edit kayıtlarını ve ölçek cache\u0027ini siler; promptlara dokunmaz.</div><div class="promptBtns" id="priorityResetBtns" style="margin:8px 0"><button class="btn danger" data-reset-priority="P0">P0 sıfırla</button><button class="btn danger" data-reset-priority="P1">P1 sıfırla</button><button class="btn danger" data-reset-priority="P2">P2 sıfırla</button><button class="btn danger" data-reset-priority="P3">P3 sıfırla</button><button class="btn danger" data-reset-priority="P4">P4 sıfırla</button><button class="btn danger" data-reset-priority="P5">P5 sıfırla</button><button class="btn danger" data-reset-priority="P6">P6 sıfırla</button><button class="btn danger" id="resetFuturePriorities">P2–P6 sıfırla</button></div><textarea id="promptJsonPreview" spellcheck="false" placeholder="JSON buraya yapıştırıp ‘Uygula’ diyebilirsin…"></textarea><div class="promptBtns"><button class="btn primary" id="applyPromptJsonText">JSON metnini uygula</button><button class="btn" id="copyPromptSchema">Şema örneğini kopyala</button></div><div class="hint">JSON kayıtları id veya tam texture path ile eşleşebilir. Aynı texture için yeni prompt mevcut özel promptu değiştirir. Tek kayıt veya yüzlerce kayıt bir kerede içe aktarılabilir.</div></div></div><div class="variantLab" id="variantLab">
   <div class="variantTop">
-    <div class="variantTopRow"><button class="btn" id="closeVariantLab">← Geri</button><select class="select" id="variantTexture"></select></div>
+    <div class="variantTopRow">
+      <button class="btn" id="closeVariantLab">←</button>
+      <select class="select" id="variantTexture"></select>
+      <button class="btn variantAdd" id="addVariantPngs">+ PNG</button>
+    </div>
     <div class="stat" id="variantMeta" style="margin-top:7px"></div>
   </div>
-  <div class="variantTabs">
-    <button class="btn variantTab active" data-vtab="original">Orijinal</button>
-    <button class="btn variantTab" data-vtab="current">Yeni ref.</button>
-    <button class="btn variantTab" data-vtab="none">Görselsiz</button>
-  </div>
+  <div class="variantThumbStrip" id="variantThumbStrip"></div>
   <div class="variantBody">
-    <div class="variantTileTabs">
-      <button class="btn active" data-vtile="1">1×1</button>
+    <div class="variantControls">
+      <button class="btn" data-vtile="1">1×1</button>
       <button class="btn" data-vtile="3">3×3</button>
-      <button class="btn" data-vtile="6">6×6</button>
+      <button class="btn active" data-vtile="6">6×6</button>
+      <button class="btn mix" id="variantMixToggle">Karışık</button>
     </div>
-    <section class="variantModePane active" data-vpane="original">
-      <div class="variantModeHead"><div><h3>Orijinal PNG referansı</h3><div class="variantDesc">Kaynak yalnız kimlik ve seam davranışını taşır; sonuç makro kompozisyonu yeniden kurar.</div></div><span class="variantWinnerBadge">AKTİF</span></div>
-      <div class="variantStage" id="variantStageOriginal"><div class="variantNone">Henüz sonuç yok</div></div>
-      <div class="variantRefMini" id="variantRefInfoOriginal">Referans: orijinal PNG</div>
-      <div class="variantQuick"><button class="btn" data-download-vref="original">Referansı indir</button><button class="btn" data-upload-variant="original">Sonucu yükle</button><button class="btn primary wide" data-activate-variant="original" disabled>Aktif yap</button></div>
-      <details class="variantPromptDetails"><summary>Prompt ▾</summary><textarea class="variantPrompt" id="variantPromptOriginal" readonly></textarea><button class="btn" style="width:100%;border-radius:0" data-copy-vprompt="original">Promptu kopyala</button></details>
-    </section>
-    <section class="variantModePane" data-vpane="current">
-      <div class="variantModeHead"><div><h3>Yeni texture referansı</h3><div class="variantDesc">Mevcut düzenlenmiş sürüm ikinci-pass tohumu olur; stil ve kalite ileri taşınır.</div></div><span class="variantWinnerBadge">AKTİF</span></div>
-      <div class="variantStage" id="variantStageCurrent"><div class="variantNone">Henüz sonuç yok</div></div>
-      <div class="variantRefMini" id="variantRefInfoCurrent">Referans: ana sayfadaki yeni texture</div>
-      <div class="variantQuick"><button class="btn" data-download-vref="current">Referansı indir</button><button class="btn" data-upload-variant="current">Sonucu yükle</button><button class="btn primary wide" data-activate-variant="current" disabled>Aktif yap</button></div>
-      <details class="variantPromptDetails"><summary>Prompt ▾</summary><textarea class="variantPrompt" id="variantPromptCurrent" readonly></textarea><button class="btn" style="width:100%;border-radius:0" data-copy-vprompt="current">Promptu kopyala</button></details>
-    </section>
-    <section class="variantModePane" data-vpane="none">
-      <div class="variantModeHead"><div><h3>Görselsiz üretim</h3><div class="variantDesc">Yalnız prompt. En özgür kompozisyon; seamless kalitesini 3×3/6×6 görünümde kontrol et.</div></div><span class="variantWinnerBadge">AKTİF</span></div>
-      <div class="variantStage" id="variantStageNone"><div class="variantNone">Henüz sonuç yok</div></div>
-      <div class="variantRefMini">Referans: yok</div>
-      <div class="variantQuick"><button class="btn wide" data-upload-variant="none">Sonucu yükle</button><button class="btn primary wide" data-activate-variant="none" disabled>Aktif yap</button></div>
-      <details class="variantPromptDetails"><summary>Prompt ▾</summary><textarea class="variantPrompt" id="variantPromptNone" readonly></textarea><button class="btn" style="width:100%;border-radius:0" data-copy-vprompt="none">Promptu kopyala</button></details>
-    </section>
+    <div class="variantStage single" id="variantStage"><div class="variantNone">PNG ekleyerek varyantları karşılaştır.</div></div>
+    <div class="variantStatus" id="variantStatus"></div>
+    <div class="variantFooter"><button class="btn primary" id="activateSelectedVariant" disabled>Seçileni aktif yap</button></div>
   </div>
-  <input id="variantFileOriginal" type="file" accept="image/png" hidden><input id="variantFileCurrent" type="file" accept="image/png" hidden><input id="variantFileNone" type="file" accept="image/png" hidden>
+  <input id="variantFiles" type="file" accept="image/png" multiple hidden>
 </div>
 <div class="toast" id="toast"></div>
 <script>/*!
@@ -943,111 +923,90 @@ promptFor=function(x,mode='classic'){
 };
 try{creativeP0PromptFor=()=>null}catch{}
 
-const VARIANT_MODES=['original','current','none'];
-const variantDrafts=new Map();
-let variantTextureId=null,variantMode='original',variantTileN=1;
-function variantKey(id,mode){return id+'::'+mode}
-function variantModePrompt(x,mode){
- const creative=creativeP0PromptFor(x);
- const base=(creative?applyCreativeOutputRequirements(creative.text,x):promptFor(x,'classic').text);
- if(mode==='original')return base+`\n\nREFERENCE STRATEGY — ORIGINAL PNG:\nAttach the ORIGINAL texture as the image reference. Use it only to identify material/gameplay role and to help maintain seamless border behavior. Do not match its large cracks, stains, knots, stones, tonal islands or macro-composition. The output should be a newly authored texture for the same material, not an HD remake.`;
- if(mode==='current')return base+`\n\nREFERENCE STRATEGY — CURRENT GENERATED PNG:\nAttach the CURRENT GENERATED/EDITED texture, not the original. Treat this newer texture as the primary composition/style seed. Preserve its strongest new material ideas and seamless behavior, then push realism, coherence, surface richness and dark-fantasy art direction further. Do not drift back toward the original source layout.`;
- return base+`\n\nREFERENCE STRATEGY — NO IMAGE:\nDo not attach any image reference. Generate this game texture from the written specification alone. Invent the macro-composition from scratch. The output must still be a flat, seamless game-ready texture with no scene or perspective. Because there is no source image to enforce borders, pay special attention to clean left-right and top-bottom tile continuity.`;
-}
+const variantSets=new Map();
+let variantTextureId=null,variantSelectedIndex=0,variantTileN=6,variantMixMode=false;
 function variantSelectedMeta(){return CATALOG.find(x=>x.id===variantTextureId)||null}
-function variantStageId(mode){return 'variantStage'+mode[0].toUpperCase()+mode.slice(1)}
-function variantSetTab(mode){
- variantMode=mode;
- document.querySelectorAll('[data-vtab]').forEach(b=>b.classList.toggle('active',b.dataset.vtab===mode));
- document.querySelectorAll('[data-vpane]').forEach(p=>p.classList.toggle('active',p.dataset.vpane===mode));
- renderVariantStage(mode);
+function variantList(){if(!variantTextureId)return[];if(!variantSets.has(variantTextureId))variantSets.set(variantTextureId,[]);return variantSets.get(variantTextureId)}
+function variantUrl(rec){if(!rec.url)rec.url=URL.createObjectURL(rec.blob);return rec.url}
+function variantEnabled(){return variantList().filter(v=>v.enabled!==false)}
+function variantMixIndex(i,n){let x=(i+1)*1103515245+12345;x=(x^(x>>>16))>>>0;return n?x%n:0}
+function renderVariantThumbs(){
+ const strip=$('variantThumbStrip'),list=variantList();
+ strip.innerHTML='';
+ if(!list.length){strip.innerHTML='<div class="stat" style="padding:12px 2px">Galeriden birden fazla PNG seçebilirsin.</div>';return}
+ list.forEach((rec,i)=>{
+   const b=document.createElement('button');b.className='variantThumb'+(!variantMixMode&&i===variantSelectedIndex?' selected':'')+(rec.enabled===false?' off':'');b.dataset.variantIndex=String(i);b.title=rec.name;
+   const im=document.createElement('img');im.src=variantUrl(rec);im.alt=rec.name;
+   const nm=document.createElement('span');nm.className='variantThumbName';nm.textContent=rec.name.replace(/\.png$/i,'');
+   b.append(im,nm);strip.appendChild(b);
+ });
 }
-function variantSetTile(n){
- variantTileN=n;
- document.querySelectorAll('[data-vtile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.vtile)===n));
- renderVariantStage(variantMode);
-}
-function variantBlob(mode){
- const x=variantSelectedMeta();if(!x)return null;
- return variantDrafts.get(variantKey(x.id,mode))?.blob||null;
-}
-function renderVariantStage(mode){
- const x=variantSelectedMeta(),el=$(variantStageId(mode));if(!x||!el)return;
- const blob=variantBlob(mode);
- if(el.dataset.objectUrl){URL.revokeObjectURL(el.dataset.objectUrl);delete el.dataset.objectUrl}
- el.innerHTML='';el.style.backgroundImage='none';el.style.backgroundSize='auto';
- if(!blob){el.innerHTML='<div class="variantNone">Henüz sonuç yok</div>';return}
- const u=URL.createObjectURL(blob);el.dataset.objectUrl=u;
- if(variantTileN===1){
-   const im=document.createElement('img');im.src=u;el.appendChild(im);
+function renderVariantStage(){
+ const stage=$('variantStage'),list=variantList(),enabled=variantEnabled();
+ stage.innerHTML='';stage.style.backgroundImage='none';stage.style.backgroundSize='auto';stage.style.gridTemplateColumns='';stage.style.gridTemplateRows='';stage.classList.remove('single');
+ document.querySelectorAll('[data-vtile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.vtile)===variantTileN));
+ $('variantMixToggle').classList.toggle('active',variantMixMode);
+ const selected=list[variantSelectedIndex]||null;
+ $('activateSelectedVariant').disabled=!selected||variantMixMode;
+ if(!list.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">PNG ekleyerek varyantları karşılaştır.</div>';$('variantStatus').textContent='';return}
+ if(variantMixMode){
+   if(!enabled.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">Tüm varyantlar kapalı. Üstteki thumbnail’lere dokunup geri açabilirsin.</div>';$('variantStatus').textContent='0 aktif varyant';return}
+   const n=Math.max(variantTileN,1),cells=n*n;stage.style.gridTemplateColumns=`repeat(${n},1fr)`;stage.style.gridTemplateRows=`repeat(${n},1fr)`;
+   for(let i=0;i<cells;i++){const rec=enabled[variantMixIndex(i,enabled.length)],cell=document.createElement('div');cell.className='variantMixCell';cell.style.backgroundImage=`url("${variantUrl(rec)}")`;cell.title=rec.name;stage.appendChild(cell)}
+   $('variantStatus').textContent=`Karışık · ${enabled.length}/${list.length} aktif · thumbnail’e dokunarak ele/geri ekle`;
  }else{
-   el.style.backgroundImage=`url("${u}")`;
-   el.style.backgroundSize=`${100/variantTileN}% ${100/variantTileN}%`;
+   stage.classList.add('single');
+   if(!selected){stage.innerHTML='<div class="variantNone">Bir varyant seç.</div>';return}
+   const u=variantUrl(selected);
+   if(variantTileN===1){const im=document.createElement('img');im.src=u;im.alt=selected.name;stage.appendChild(im)}
+   else{stage.style.backgroundImage=`url("${u}")`;stage.style.backgroundSize=`${100/variantTileN}% ${100/variantTileN}%`}
+   $('variantStatus').textContent=`${variantSelectedIndex+1}/${list.length} · ${selected.name}`;
  }
+}
+function renderVariantLab(){
+ const x=variantSelectedMeta();if(!x)return;
+ const list=variantList(),enabled=variantEnabled();
+ $('variantMeta').textContent=`${x.name} · ${list.length} varyant${variantMixMode?` · ${enabled.length} aktif`:''}`;
+ renderVariantThumbs();renderVariantStage();
 }
 async function populateVariantTextureSelect(){
  const sel=$('variantTexture');if(sel.dataset.ready)return;
  sel.innerHTML=CATALOG.map(x=>`<option value="${x.id}">${x.priority} · ${x.name}</option>`).join('');
- sel.dataset.ready='1';sel.onchange=()=>{variantTextureId=sel.value;renderVariantLab()};
+ sel.dataset.ready='1';sel.onchange=()=>{variantTextureId=sel.value;variantSelectedIndex=0;variantMixMode=false;renderVariantLab()};
 }
 async function openVariantLabFor(meta){
  await populateVariantTextureSelect();
  const chosen=meta||active||CATALOG[0];variantTextureId=chosen.id;$('variantTexture').value=chosen.id;
- $('variantLab').classList.add('open');await renderVariantLab();variantSetTab(variantMode);
+ $('variantLab').classList.add('open');renderVariantLab();
 }
-async function renderVariantLab(){
- const x=variantSelectedMeta();if(!x)return;
- $('variantMeta').textContent=`${x.path} · ${x.w}×${x.h} · ${TARGET_RESOLUTION}px hedef`;
- $('variantPromptOriginal').value=variantModePrompt(x,'original');
- $('variantPromptCurrent').value=variantModePrompt(x,'current');
- $('variantPromptNone').value=variantModePrompt(x,'none');
- const current=await getEdit(x.path);
- $('variantRefInfoCurrent').textContent=current?'Referans: ana sayfadaki yeni texture hazır':'Referans: yeni texture yok — önce ana sayfada bir sürüm seç';
- for(const mode of VARIANT_MODES){
-   const rec=variantDrafts.get(variantKey(x.id,mode));
-   const btn=document.querySelector(`[data-activate-variant="${mode}"]`);btn.disabled=!rec?.blob;
-   document.querySelector(`[data-vpane="${mode}"]`).classList.toggle('winner',!!rec?.winner);
-   renderVariantStage(mode);
+async function addVariantFiles(files){
+ const x=variantSelectedMeta();if(!x||!files?.length)return;
+ const list=variantList();let added=0;
+ for(const file of files){
+   if(!file.type.includes('png')&&!/\.png$/i.test(file.name))continue;
+   try{const blob=await prepareImportedTextureBlob(file,x);list.push({blob,name:file.name,enabled:true,url:null,addedAt:Date.now()});added++}catch(err){console.warn('Varyant PNG alınamadı',file.name,err)}
  }
+ if(added){variantSelectedIndex=Math.max(0,list.length-added);renderVariantLab();toast(`${added} varyant eklendi`)}
 }
-async function copyVariantPrompt(mode){
- const x=variantSelectedMeta();if(!x)return;
- const t=variantModePrompt(x,mode);
- try{await navigator.clipboard.writeText(t)}catch{const ta=$(mode==='original'?'variantPromptOriginal':mode==='current'?'variantPromptCurrent':'variantPromptNone');ta.select();document.execCommand('copy')}
- toast('Varyant promptu kopyalandı');
-}
-async function downloadVariantReference(mode){
- const x=variantSelectedMeta();if(!x)return;
- if(mode==='original')return dl(await originalBlob(x.path),x.name.replace(/\.png$/,'_ORIGINAL_REF.png'));
- if(mode==='current'){const e=await getEdit(x.path);if(!e)return toast('Henüz yeni texture yok');return dl(e.blob,x.name.replace(/\.png$/,'_CURRENT_REF.png'))}
-}
-async function storeVariantFile(mode,file){
- const x=variantSelectedMeta();if(!x||!file)return;
- const blob=await prepareImportedTextureBlob(file,x);
- variantDrafts.set(variantKey(x.id,mode),{blob,winner:false,updatedAt:Date.now()});
- variantMode=mode;await renderVariantLab();variantSetTab(mode);
- toast(mode==='original'?'Orijinal-referans sonucu yüklendi':mode==='current'?'Yeni-referans sonucu yüklendi':'Görselsiz sonuç yüklendi');
-}
-async function activateVariant(mode){
- const x=variantSelectedMeta(),rec=x&&variantDrafts.get(variantKey(x.id,mode));if(!x||!rec?.blob)return;
- for(const m of VARIANT_MODES){const r=variantDrafts.get(variantKey(x.id,m));if(r)r.winner=(m===mode)}
- await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await applyFilter();await renderVariantLab();variantSetTab(mode);
- toast('Kazanan ana texture olarak kaydedildi');
+async function activateSelectedVariant(){
+ const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
+ await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await applyFilter();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 $('openVariantLab').onclick=()=>openVariantLabFor(active||null);
 $('detailVariantLab').onclick=()=>openVariantLabFor(active);
 $('closeVariantLab').onclick=()=>$('variantLab').classList.remove('open');
+$('addVariantPngs').onclick=()=>$('variantFiles').click();
+$('variantFiles').onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
+$('activateSelectedVariant').onclick=activateSelectedVariant;
+$('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
 $('variantLab').addEventListener('click',e=>{
- const tab=e.target.closest('[data-vtab]');if(tab)return variantSetTab(tab.dataset.vtab);
- const tile=e.target.closest('[data-vtile]');if(tile)return variantSetTile(Number(tile.dataset.vtile));
- const cp=e.target.closest('[data-copy-vprompt]');if(cp)return copyVariantPrompt(cp.dataset.copyVprompt);
- const dr=e.target.closest('[data-download-vref]');if(dr)return downloadVariantReference(dr.dataset.downloadVref);
- const up=e.target.closest('[data-upload-variant]');if(up)return $('variantFile'+up.dataset.uploadVariant[0].toUpperCase()+up.dataset.uploadVariant.slice(1)).click();
- const ac=e.target.closest('[data-activate-variant]');if(ac)return activateVariant(ac.dataset.activateVariant);
+ const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
+ const thumb=e.target.closest('[data-variant-index]');if(!thumb)return;
+ const i=Number(thumb.dataset.variantIndex),list=variantList();if(!list[i])return;
+ if(variantMixMode)list[i].enabled=list[i].enabled===false;
+ else variantSelectedIndex=i;
+ renderVariantLab();
 });
-$('variantFileOriginal').onchange=e=>{const f=e.target.files[0];if(f)storeVariantFile('original',f);e.target.value=''};
-$('variantFileCurrent').onchange=e=>{const f=e.target.files[0];if(f)storeVariantFile('current',f);e.target.value=''};
-$('variantFileNone').onchange=e=>{const f=e.target.files[0];if(f)storeVariantFile('none',f);e.target.value=''};
 
 document.querySelector('.tileTools').addEventListener('click',async e=>{const b=e.target.closest('[data-tile]');if(b){tileN=Number(b.dataset.tile);if(active&&active.w!==active.h&&tileN>1){toast('Tile görünümü kare texture için');tileN=1}await updateTilePreview();return}if(e.target.id==='tileSource'){if(!active)return;const edit=await getEdit(active.path);if(!edit){tileEdited=false;toast('Bu texture henüz düzenlenmedi')}else tileEdited=!tileEdited;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';await updateTilePreview()}});
 $('copyPrompt').onclick=async()=>{try{await navigator.clipboard.writeText($('promptText').value);toast('Prompt kopyalandı')}catch{ $('promptText').select();document.execCommand('copy');toast('Prompt kopyalandı')}};
