@@ -2,12 +2,12 @@
   "schema_version": 1,
   "kind": "block_reference_manifest",
   "total": 202,
-  "done": 160,
-  "pending": 42,
-  "last_completed_id": "tex_4d9b5e1439",
-  "last_completed_name": "mcl_deepslate_tiles.png",
-  "next_id": "tex_2fb0ecc3bd",
-  "next_name": "mcl_deepslate_tiles_cracked.png",
+  "done": 202,
+  "pending": 0,
+  "last_completed_id": "tex_92f3681369",
+  "last_completed_name": "wool_yellow.png",
+  "next_id": null,
+  "next_name": null,
   "entries": [
     {
       "order": 1,
@@ -1294,336 +1294,336 @@
       "id": "tex_2fb0ecc3bd",
       "name": "mcl_deepslate_tiles_cracked.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tiles_cracked.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 162,
       "id": "tex_33c5bdc616",
       "name": "mcl_deepslate_top.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 163,
       "id": "tex_6cce6765d9",
       "name": "mcl_deepslate_tuff.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 164,
       "id": "tex_00776bee97",
       "name": "mcl_deepslate_tuff_bricks.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_bricks.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 165,
       "id": "tex_1115709556",
       "name": "mcl_deepslate_tuff_chiseled.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 166,
       "id": "tex_ebecab1eb0",
       "name": "mcl_deepslate_tuff_chiseled_bricks.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_bricks.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 167,
       "id": "tex_b09029f3d8",
       "name": "mcl_deepslate_tuff_chiseled_bricks_top.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_bricks_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 168,
       "id": "tex_913c6b6d38",
       "name": "mcl_deepslate_tuff_chiseled_top.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 169,
       "id": "tex_a9a6f2de2a",
       "name": "mcl_deepslate_tuff_polished.png",
       "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_polished.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 170,
       "id": "tex_6a9c70ed4f",
       "name": "mcl_ocean_brain_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_brain_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 171,
       "id": "tex_5bf78fd498",
       "name": "mcl_ocean_bubble_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_bubble_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 172,
       "id": "tex_10d1b9fa60",
       "name": "mcl_ocean_dead_brain_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_brain_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 173,
       "id": "tex_50ad7f9d25",
       "name": "mcl_ocean_dead_bubble_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_bubble_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 174,
       "id": "tex_6adc22ad77",
       "name": "mcl_ocean_dead_fire_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_fire_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 175,
       "id": "tex_b15c56fbfe",
       "name": "mcl_ocean_dead_horn_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_horn_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 176,
       "id": "tex_250ac4e03b",
       "name": "mcl_ocean_dead_tube_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_tube_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 177,
       "id": "tex_3f1dd05834",
       "name": "mcl_ocean_dried_kelp.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 178,
       "id": "tex_c07ab3fcdf",
       "name": "mcl_ocean_dried_kelp_bottom.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_bottom.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 179,
       "id": "tex_45870be672",
       "name": "mcl_ocean_dried_kelp_side.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_side.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 180,
       "id": "tex_7752607723",
       "name": "mcl_ocean_dried_kelp_top.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 181,
       "id": "tex_ef17a750b9",
       "name": "mcl_ocean_fire_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_fire_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 182,
       "id": "tex_e7aa7ea0d7",
       "name": "mcl_ocean_horn_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_horn_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 183,
       "id": "tex_8726808ea1",
       "name": "mcl_ocean_prismarine_bricks.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_prismarine_bricks.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 184,
       "id": "tex_8493cae69e",
       "name": "mcl_ocean_prismarine_dark.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_prismarine_dark.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 185,
       "id": "tex_a1365c610d",
       "name": "mcl_ocean_sea_lantern.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_sea_lantern.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 186,
       "id": "tex_ed4b608a0a",
       "name": "mcl_ocean_tube_coral_block.png",
       "texture_path": "ITEMS/mcl_ocean/mcl_ocean_tube_coral_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 187,
       "id": "tex_2285b455d8",
       "name": "mcl_wool_light_blue.png",
       "texture_path": "ITEMS/mcl_wool/mcl_wool_light_blue.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 188,
       "id": "tex_4df792be5a",
       "name": "mcl_wool_lime.png",
       "texture_path": "ITEMS/mcl_wool/mcl_wool_lime.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 189,
       "id": "tex_ec12f600e8",
       "name": "wool_black.png",
       "texture_path": "ITEMS/mcl_wool/wool_black.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 190,
       "id": "tex_a94edf6fe8",
       "name": "wool_blue.png",
       "texture_path": "ITEMS/mcl_wool/wool_blue.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 191,
       "id": "tex_6590faf2ef",
       "name": "wool_brown.png",
       "texture_path": "ITEMS/mcl_wool/wool_brown.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 192,
       "id": "tex_de1d7187cb",
       "name": "wool_cyan.png",
       "texture_path": "ITEMS/mcl_wool/wool_cyan.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 193,
       "id": "tex_d89e7873f8",
       "name": "wool_dark_green.png",
       "texture_path": "ITEMS/mcl_wool/wool_dark_green.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 194,
       "id": "tex_e07d939a27",
       "name": "wool_dark_grey.png",
       "texture_path": "ITEMS/mcl_wool/wool_dark_grey.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 195,
       "id": "tex_51dc269a04",
       "name": "wool_grey.png",
       "texture_path": "ITEMS/mcl_wool/wool_grey.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 196,
       "id": "tex_e8f6fc210b",
       "name": "wool_magenta.png",
       "texture_path": "ITEMS/mcl_wool/wool_magenta.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 197,
       "id": "tex_1edce0f737",
       "name": "wool_orange.png",
       "texture_path": "ITEMS/mcl_wool/wool_orange.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 198,
       "id": "tex_e1272b26d7",
       "name": "wool_pink.png",
       "texture_path": "ITEMS/mcl_wool/wool_pink.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 199,
       "id": "tex_b07d805aaf",
       "name": "wool_red.png",
       "texture_path": "ITEMS/mcl_wool/wool_red.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 200,
       "id": "tex_508612efc8",
       "name": "wool_violet.png",
       "texture_path": "ITEMS/mcl_wool/wool_violet.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 201,
       "id": "tex_96a21c08c7",
       "name": "wool_white.png",
       "texture_path": "ITEMS/mcl_wool/wool_white.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     },
     {
       "order": 202,
       "id": "tex_92f3681369",
       "name": "wool_yellow.png",
       "texture_path": "ITEMS/mcl_wool/wool_yellow.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/batch_161_202.json"
     }
   ],
   "batches": [
@@ -1632,6 +1632,12 @@
       "end": 160,
       "count": 100,
       "file": "prompts/blocks/batch_061_160.json"
+    },
+    {
+      "start": 161,
+      "end": 202,
+      "count": 42,
+      "file": "prompts/blocks/batch_161_202.json"
     }
   ]
 }
