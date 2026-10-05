@@ -767,8 +767,14 @@ async function resizeTextureBlobToDimensions(blob,dw,dh){
 async function normalizeTextureBlobTo(blob,meta,targetRes){
  const c=await decodeBlobToCanvas(blob),sw=c.width,sh=c.height;
  const target=targetTextureDimensions(meta,targetRes);
- if(sw<=target.width&&sh<=target.height)return blob;
- return await resizeTextureBlobToDimensions(blob,target.width,target.height)
+ const baseW=Math.max(1,Number(meta?.w)||sw),baseH=Math.max(1,Number(meta?.h)||sh);
+ const ratio=baseW/baseH;
+ const maxW=Math.min(sw,target.width),maxH=Math.min(sh,target.height);
+ let dw=Math.max(1,Math.floor(Math.min(maxW,maxH*ratio)));
+ let dh=Math.max(1,Math.round(dw/ratio));
+ if(dh>maxH){dh=Math.max(1,Math.floor(maxH));dw=Math.max(1,Math.round(dh*ratio))}
+ if(sw===dw&&sh===dh)return blob;
+ return await resizeTextureBlobToDimensions(blob,dw,dh)
 }
 async function normalizeTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
  return await normalizeTextureBlobTo(blob,meta,targetRes)
@@ -939,12 +945,12 @@ async function durableDbGet(path){
     r.onerror=()=>rej(r.error||new Error('Kayıt doğrulanamadı'));
   });
 }
-async function robustPersist(path,blob){
+async function robustPersist(path,blob,verification='changed'){
   hotEdits.set(path,{path,blob,updatedAt:Date.now()});
   revoke(path);
   setSaveState('Kaydediliyor…','warn');
   if(storageMode==='indexeddb'&&dbp){
-    await durableDbPut(path,blob);
+    await durableDbPut(path,blob,verification);
     const check=await durableDbGet(path);
     if(!check || !check.blob || check.blob.size!==blob.size) throw new Error('Kayıt geri okuma doğrulaması başarısız');
     hotEdits.set(path,check);
@@ -1084,13 +1090,13 @@ async function persistBlobOnly(path,blob,verification='changed'){
   if(storageMode==='local'){
     try{
       const data=await blobToDataURL(blob);
-      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now()}));
+      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
       if(!localStorage.getItem('mts:'+path)) throw new Error('localStorage doğrulama başarısız');
       setSaveState('Kaydedildi • yerel fallback','warn');
       return;
     }catch(e){ console.warn('local save failed',e); storageMode='memory'; }
   }
-  memoryEdits.set(path,{path,blob,updatedAt:Date.now()});
+  memoryEdits.set(path,{path,blob,updatedAt:Date.now(),verification});
   setSaveState('Sadece oturumda • yedek al','bad');
 }
 function queuePersistFast(path,blob,verification='changed'){
