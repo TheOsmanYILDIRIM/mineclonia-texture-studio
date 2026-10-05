@@ -974,77 +974,52 @@ async function importProjectBackup(file){
 
 
 /* P0 REFERENCE-FIRST PROMPT SYSTEM — 2026-10-05 */
-const P0_STANDARD_ORIGINAL_REF_PROMPT=`Use Image A to understand WHAT the texture is and how it functions in the game.
-
+function p0ProductionMeta(x){
+ const subject=p0ReferenceSubject(x),n=String(x?.name||'').toLowerCase();
+ let face='general material surface';
+ if(/_top\.png$|tree_top|log_top|wood_top/.test(n))face='top-facing / cut / upper surface as defined by Image A';
+ else if(/_side\.png$|tree_side|log_side/.test(n))face='side-facing surface as defined by Image A';
+ else if(/_bottom\.png$/.test(n))face='bottom-facing surface as defined by Image A';
+ else if(/_detail\.png$/.test(n))face='detail/overlay component whose functional placement is defined by Image A';
+ const tileable=assetTypeOf(x)==='Block'&&!/glass_.*detail/.test(n);
+ return {subject,face,tileable};
+}
+function p0ProductionPromptFor(x){
+ const m=p0ProductionMeta(x);
+ return `Use Image A to understand WHAT the texture is and how it functions in the game.
 Use Image B to determine HOW the final material should actually look.
 
-IMAGE A — SEMANTIC REFERENCE:
-Preserve the material identity, gameplay meaning, general scale, density, orientation, and functional character of Image A.
+SELECTED MATERIAL: ${m.subject}
+FACE / COMPONENT ROLE: ${m.face}
 
-Do NOT trace or preserve Image A's individual internal shapes, pixels, cracks, stones, grains, joints, markings, or exact feature placement.
+IMAGE A — SEMANTIC AND FUNCTIONAL REFERENCE:
+Preserve the material identity, gameplay meaning, general scale, density, orientation, face/component role, and functional character of Image A.
+Do NOT trace or preserve Image A's individual internal shapes, pixels, cracks, stones, grains, joints, markings, or exact feature placement unless that geometry is required by the stated face/component role.
+Image A defines the meaning and functional orientation of the texture, not its exact low-resolution surface composition.
 
-Image A defines the meaning of the texture, not its exact surface geometry.
-
-IMAGE B — VISUAL REFERENCE:
-Image B is the dominant reference for the final appearance.
-
-Rebuild the material using Image B's:
-material character,
-surface geometry,
-micro-detail,
-sharpness,
-local contrast,
-depth,
-weathering,
-irregularity,
-color relationships,
-and natural light behavior.
-
+IMAGE B — DOMINANT VISUAL REFERENCE:
+Rebuild the material using Image B's material character, surface geometry, micro-detail, sharpness, local contrast, depth, weathering, irregularity, color relationships, and natural light behavior.
 Do not merely recolor, soften, upscale, clean up, denoise, or beautify Image A.
+The final image should feel genuinely rebuilt in the visual language of Image B while remaining unmistakably ${m.subject}.
 
-The final image should feel genuinely rebuilt in the visual language of Image B.
-
-SEAMLESS TILING:
+${m.tileable?`SEAMLESS TILING:
 The final texture must tile seamlessly on all four sides.
-
-Achieve seamlessness by making the MATERIAL ITSELF continue physically across opposite boundaries.
-
-Treat:
-left and right edges as physically adjacent,
-and top and bottom edges as physically adjacent.
-
-Features reaching an edge should continue naturally from the corresponding opposite edge.
-
-This includes stones, cracks, joints, grain, fibers, veins, roots, surface relief, color variation, shadows, highlights, and other material features.
-
-The outer edges are NOT protected regions.
-You may substantially rebuild geometry at the boundaries to create real continuity.
-
-DO NOT achieve seamlessness by:
-blurring the borders,
-smoothing them,
-fading details,
-averaging colors,
-flattening lighting,
-reducing contrast,
-removing texture,
-making the borders neutral,
-or suppressing high-frequency detail.
-
-Preserve the same richness, sharpness, local contrast, depth, lighting variation, and micro-detail at the boundaries as in the center of the image.
-
-A seamless texture should look like one continuous larger material surface when repeated, not like an image whose borders were softened to hide the seam.
+Achieve seamlessness by making the MATERIAL ITSELF continue physically across opposite boundaries: left/right and top/bottom are physically adjacent.
+Features reaching an edge should continue naturally from the corresponding opposite edge, including material masses, cracks, joints, grain, fibers, veins, roots, relief, color variation, shadows and highlights.
+The outer edges are NOT protected regions; geometry may be rebuilt at the boundaries to create real continuation.
+Never fake seamlessness by blurring, smoothing, fading, averaging, flattening lighting, reducing contrast, removing texture, neutralizing borders, or suppressing high-frequency detail.
+Keep the same richness, sharpness, local contrast, depth and micro-detail at boundaries as in the center.`:`STRUCTURAL COMPONENT:
+This selected asset is not treated as a freely tileable generic square. Preserve the functional component/overlay placement communicated by Image A while rebuilding its material appearance from Image B.`}
 
 FINAL PRIORITY:
-1. Preserve what Image A represents and how it functions.
-2. Make the actual visual material strongly follow Image B.
-3. Create true geometric and material continuity across opposite edges.
-4. Preserve Image B's detail and visual energy all the way to the boundaries.
+1. Preserve what Image A represents, its face/component role, and how it functions.
+2. Make the actual material strongly follow Image B.
+3. ${m.tileable?'Create true physical continuity across opposite canvas edges.':'Preserve the functional placement/role defined by Image A.'}
+4. Preserve Image B's detail and visual energy without copying its composition.
 
-Do not copy Image B's composition.
-Do not preserve Image A's internal composition unnecessarily.
+Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.`;
+}
 
-Reconstruct the surface freely while preserving the semantic identity of Image A.`;
 
 const P0_REFERENCE_SUBJECT_EXACT={
  'default_acacia_leaves':'natural acacia foliage',
@@ -1349,7 +1324,7 @@ $('copyPrompt').onclick=async()=>{
 $('savePrompt').onclick=async()=>{
  if(!active)return;
  if(active.priority==='P0'){
-   try{await navigator.clipboard.writeText(P0_STANDARD_ORIGINAL_REF_PROMPT)}catch{const ta=document.createElement('textarea');ta.value=P0_STANDARD_ORIGINAL_REF_PROMPT;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+   try{await navigator.clipboard.writeText(p0ProductionPromptFor(active))}catch{const ta=document.createElement('textarea');ta.value=p0ProductionPromptFor(active);document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
    toast('Üretim promptu kopyalandı');return;
  }
  PROMPT_OVERRIDES.set(active.id,$('promptText').value);savePromptOverrides();renderActivePrompt();toast("Prompt bu texture ID'sine kaydedildi");
