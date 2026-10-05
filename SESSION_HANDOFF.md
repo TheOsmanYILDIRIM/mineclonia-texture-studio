@@ -639,3 +639,19 @@ Commits:
 - `4e636891c2c5eb3dcb264ecb408e390f406e6b75` — insertion cleanup
 
 Next check: runtime guards, then Android spot-check of one leaf, one wood/stone and one animation asset in both classic and creative prompt modes.
+
+
+## Creative P0 macro-composition reset — 2026-10-05
+
+User clarified the creative goal: the pack is not trying to make the original Mineclonia textures HD. The main failure mode was full-square textures inheriting the old texture's large cracks, patches, stones, knots, stains, veins, tonal islands and other macro features too faithfully.
+
+Fix:
+- creative mode now explicitly states that it is NOT an HD remake or faithful reconstruction;
+- source macro-composition is not preserved by default;
+- full-square material textures receive a strong `MACRO-COMPOSITION RESET` instruction to regenerate major forms and spatial distribution;
+- similarity should come from gameplay material identity, not source layout matching;
+- alpha/UV/frame structure remains locked only where functionally required.
+
+Commits:
+- `114015de7ee591aa4068f276a190a370fee53dcb` — reset macro composition in creative prompts
+- `f247cfc7bf196c265a191bb7e0f98851cefd4158` — document creative composition reset
