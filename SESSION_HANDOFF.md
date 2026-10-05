@@ -409,10 +409,11 @@ Verification:
 
 ## Next concrete work
 
-1. On Android, reload the live site and confirm the status no longer remains on “kayıt hazırlanıyor…”.
-2. Verify a real Texturepack ZIP export with existing edits at the needed target resolution and confirm visible progress/completion.
-3. Spot-check that visually identical legacy rescaled copies disappear from the changed set after background verification.
-4. Then continue runtime-role auditing beyond entity assets; do not regress entity alpha locking, animation atlas resolution, or pinch zoom.
+1. After PR #5 deploys, open the Android site once and let legacy/unknown records finish the one-time verification pass.
+2. Confirm the changed counter settles near the real edited count and subsequent reloads skip known changed records.
+3. Use P2–P6 reset now if those priorities should not carry any stored edits while work is still in P1.
+4. Verify 128 density behavior on both a 16×16 block and a 64×32 entity atlas.
+5. Continue P1 runtime-role/prompt work only after these storage/scaling checks pass.
 ## UI regression fix — 2026-10-04
 
 A live UI regression (white main background and visually lost top/bottom controls) was traced to unresolved Git merge conflict markers accidentally committed inside `index.html` around the main stylesheet and detail-sheet markup. The browser therefore parsed the style block inconsistently.
@@ -545,3 +546,39 @@ Verified on current `main` after that merge:
 A remaining duplicate-function override was then found: the final/runtime-winning `importProjectBackup()` still accepted only 256/512 even though an earlier definition had been updated for 64/128/256/512.
 
 PR #2 was squash-merged to `main` as `2cb178b850bba9eb89bb22ecfbeed67da1069b32` (`fix: harden texture startup and resolution runtime paths`). Main runtime guards and the GitHub Pages deployment both completed successfully. Remaining verification is device-side Android behavior and a real export using the user's persisted edits.
+
+## Persistent changed-state + density-aware scaling — 2026-10-05
+
+Branch/PR: `fix/verified-changes-and-density-scaling` / PR #5.
+
+Changed-state model:
+- persisted edit records carry `verification: changed` once confirmed;
+- new PNG edits are persisted as verified changed immediately after their import-time original check;
+- startup trusts known `changed` records and does not recompute them;
+- only legacy/unknown records are rechecked, with 8 bounded concurrent workers;
+- records proven equivalent to the original are permanently removed from edit storage and scaled cache;
+- failed verification remains pending/unknown and is not counted as changed;
+- the visible counter reports verified changed separately from “doğrulanıyor”.
+
+Resolution model:
+- 64/128/256/512 now mean the target density for a native 16px texture unit, not the literal width of every file;
+- target dimensions scale both original axes from catalog-native dimensions;
+- examples at 128: 16×16 block → 128×128, 64×32 entity atlas → 512×256, 32×64 atlas → 256×512;
+- malformed aspect output is fitted back to source aspect ratio without upscaling: e.g. 256×256 generated for a 64×32 entity becomes 256×128, not 512×256;
+- visually equivalent legacy rescale drift is tolerated when deciding whether an old record is actually unchanged.
+
+Management:
+- Prompt/backup manager now includes P0–P6 edit reset buttons and a fast P2–P6 reset.
+- These bulk-delete only stored texture edits + scaled cache for those priorities; prompts are preserved.
+
+Key commits:
+- `84ebcbf57c5fc673839eaf333ea138ed11fb5a4f` density scaling
+- `150bc47975c60e1bc5857c05fa0ea5e836917e49` tolerant unchanged detection
+- `905eb740de2642c1fd509e6718bf6061faa3d23f` verified-only counter
+- `5a729bbb1ede4c48ae5e6b151fc6aef6f32c1173` persistent verification + unknown-only concurrent scan
+- `ad05796726bb5286cfe69ca6d5d8fe16617a2c6b` priority reset controls
+- `e8664a3306274b49eb961d30e176988b99ed6208` no-upscale source-aspect fitting
+- `3cd7093873ded451a331bab6673acf0a970f1ff4` final regression guards
+
+Runtime guard run #18 passed. Next step: merge PR #5, deploy Pages, then Android-check the one-time legacy cleanup and confirm subsequent reloads do not re-verify known changed records.
+
