@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_f7e052c1e7",
+  "label": "mcl_core_planks_birch",
+  "texture_path": "ITEMS/mcl_core/mcl_core_planks_birch.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for old birch planks in a cool grounded dark-fantasy settlement. The wood begins pale and fine-grained, then acquires warm cream, muted straw and gray-beige variation from years of handling and weather. Fine fibers, subtle growth lines, small restrained knots and hand-planed waviness give it life without making it rustic caricature. Exposed areas may be slightly bleached while seams collect soft dirt. Avoid bright yellow lumber, white-painted boards, plywood striping, glossy Scandinavian furniture or repeated knots. Establish birch as light, practical timber with quiet detail and age, clearly distinct from heavier oak and darker spruce."
+}
