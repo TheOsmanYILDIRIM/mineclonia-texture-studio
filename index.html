@@ -540,20 +540,34 @@ async function texturePixelsEqual(a,b){
  for(let i=0;i<ad.length;i++)if(ad[i]!==bd[i])return false;
  return true
 }
+async function texturePixelsVisuallyEquivalent(a,b){
+ if(await texturePixelsEqual(a,b))return true;
+ const [ca,cb]=await Promise.all([decodeBlobToCanvas(a),decodeBlobToCanvas(b)]);
+ if(ca.width!==cb.width||ca.height!==cb.height)return false;
+ const ad=ca.getContext('2d',{willReadFrequently:true}).getImageData(0,0,ca.width,ca.height).data;
+ const bd=cb.getContext('2d',{willReadFrequently:true}).getImageData(0,0,cb.width,cb.height).data;
+ let total=0,count=0,outliers=0;
+ for(let i=0;i<ad.length;i+=4){
+   const aa=ad[i+3],ba=bd[i+3],alphaDelta=Math.abs(aa-ba);
+   total+=alphaDelta;count++;let maxDelta=alphaDelta;
+   if(aa>2||ba>2){for(let c=0;c<3;c++){const d=Math.abs(ad[i+c]-bd[i+c]);total+=d;count++;if(d>maxDelta)maxDelta=d}}
+   if(maxDelta>12)outliers++;
+ }
+ const mean=count?total/count:0,pixelCount=ad.length/4,outlierRatio=pixelCount?outliers/pixelCount:0;
+ return mean<=2.5&&outlierRatio<=0.02;
+}
 async function textureMatchesOriginal(blob,meta){
  if(!blob||!meta)return false;
- try{
-   const original=await originalBlob(meta.path);
-   if(await texturePixelsEqual(blob,original))return true;
-   const [editedCanvas,originalCanvas]=await Promise.all([decodeBlobToCanvas(blob),decodeBlobToCanvas(original)]);
-   const commonWidth=Math.min(editedCanvas.width,originalCanvas.width);
-   if(commonWidth<1)return false;
-   const [editedCanonical,originalCanonical]=await Promise.all([
-     normalizeTextureBlobTo(blob,meta,commonWidth),
-     normalizeTextureBlobTo(original,meta,commonWidth)
-   ]);
-   return await texturePixelsEqual(editedCanonical,originalCanonical);
- }catch(err){console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);return false}
+ const original=await originalBlob(meta.path);
+ if(await texturePixelsEqual(blob,original))return true;
+ const originalCanvas=await decodeBlobToCanvas(original);
+ const nativeW=Math.max(1,Number(meta.w)||originalCanvas.width);
+ const nativeH=Math.max(1,Number(meta.h)||originalCanvas.height);
+ const [editedCanonical,originalCanonical]=await Promise.all([
+   resizeTextureBlobToDimensions(blob,nativeW,nativeH),
+   resizeTextureBlobToDimensions(original,nativeW,nativeH)
+ ]);
+ return await texturePixelsVisuallyEquivalent(editedCanonical,originalCanonical);
 }
 async function meaningfulEdits(){
  const raw=await allEdits(), out=[];
