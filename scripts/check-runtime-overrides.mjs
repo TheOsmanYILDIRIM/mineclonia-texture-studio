@@ -37,8 +37,15 @@ const backup = lastBlock('async function importProjectBackup(file)');
 expect(backup.includes('[64,128,256,512].includes(m.targetResolution)'), 'runtime-winning backup restore must accept 64/128/256/512');
 expect(!backup.includes('m.targetResolution===256||m.targetResolution===512'), 'runtime-winning backup restore must not retain the old 256/512-only gate');
 
+const targetDims = lastBlock('function targetTextureDimensions(meta,targetRes)');
+expect(targetDims.includes('SOURCE_TEXEL_BASE=16') || source.includes('const SOURCE_TEXEL_BASE=16;'), 'density scaling must use 16px as the source texel baseline');
+expect(targetDims.includes('baseW*scale') && targetDims.includes('baseH*scale'), 'target dimensions must scale both native axes by source density');
 const normalize = lastBlock('async function normalizeTextureBlobTo(blob,meta,targetRes)');
-expect(normalize.includes('if(sw<=dw && sh<=dh)return blob'), 'normalization must never upscale textures already within the target');
+expect(normalize.includes('sw<=target.width&&sh<=target.height'), 'normalization must remain a downscale ceiling and never upscale smaller imports');
+const densityProbe = (w,h,target)=>({width:Math.round(w*(target/16)),height:Math.round(h*(target/16))});
+expect(JSON.stringify(densityProbe(16,16,128))===JSON.stringify({width:128,height:128}), '16x16 at 128 target must become 128x128');
+expect(JSON.stringify(densityProbe(64,32,128))===JSON.stringify({width:512,height:256}), '64x32 entity at 128 target must become 512x256');
+expect(JSON.stringify(densityProbe(32,64,128))===JSON.stringify({width:256,height:512}), '32x64 atlas at 128 target must become 256x512');
 expect(source.includes('<option value="64">64px</option>') && source.includes('<option value="128">128px</option>') && source.includes('<option value="256">256px</option>') && source.includes('<option value="512">512px</option>'), 'all four target-resolution controls must exist');
 
 
@@ -62,17 +69,22 @@ expect(originalBlob.includes('setTimeout(()=>controller.abort(),12000)'), 'upstr
 
 expect(exportPack.includes('await changedHydrationPromise.catch(()=>{})'), 'texturepack export must wait for background changed-state verification');
 expect(exportPack.includes('await editWriteQueue.catch(()=>{})'), 'texturepack export must wait for pending edit persistence');
+expect(source.includes("resolutionModel:'16px-source-density'"), 'export manifest must record density-based resolution semantics');
+expect(source.includes('texturePixelsVisuallyEquivalent'), 'unchanged detection must tolerate harmless rescale drift');
 
-const persistedInstall = lastBlock('function installPersistedEditFast(edit)');
+const persistedInstall = lastBlock('function installPersistedEditFast(edit,{markChanged=false}={})');
 expect(persistedInstall.includes('hotEdits.set(edit.path,rec)'), 'late-loaded persisted edits must populate hot edit cache');
 expect(persistedInstall.includes('setFastEditUrl(edit.path,edit.blob)'), 'late-loaded persisted edits must replace stale edited-thumbnail cache');
-expect(persistedInstall.includes('updateCardFast(edit.path,url)'), 'visible cards must refresh immediately when persisted edits load');
+expect(persistedInstall.includes('if(ref)ref.img.src=url'), 'visible cards must refresh immediately when persisted edits load');
+expect(persistedInstall.includes('pendingChangedPaths.add(edit.path)'), 'late-loaded records must start as unverified instead of being counted as changed');
 
 const bootstrap = lastBlock('async function bootstrapStorageInBackground()');
-expect(bootstrap.includes('installPersistedEditFast(e)'), 'background storage bootstrap must install persisted edits into thumbnail cache');
+expect(bootstrap.includes('installPersistedEditFast(e,{markChanged:false})'), 'background storage bootstrap must install persisted edits without pre-counting them as changed');
 
 const hydrate = lastBlock('async function hydrateChangedPathsFast(seedEdits=null)');
-expect(hydrate.includes("revoke(e.path)"), 'hydration must invalidate edited-thumbnail cache for records proven identical to original');
+expect(hydrate.includes('deletePersistedEditQuiet(e.path)'), 'verified-original stale edit records must be permanently cleaned from storage');
+expect(hydrate.includes('pendingChangedPaths.delete(e.path);changedPathsFast.add(e.path)'), 'only verified differences may enter the changed set');
+expect(hydrate.includes("{throwOnError:true}"), 'verification failures must remain pending rather than being counted as changed');
 
 
 const scriptBlocks = [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match=>match[1]);
