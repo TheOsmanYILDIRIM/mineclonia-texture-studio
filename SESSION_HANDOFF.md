@@ -683,3 +683,21 @@ Commit:
 - `78d596771c63dcce452b7a215b2dc94ee33a29aa` — add Variant Lab comparison page.
 
 Next check: runtime guard + Android UI spot-check, then merge/deploy.
+
+
+## Variant Lab UX refinement — 2026-10-05
+
+User feedback: the first Variant Lab was too tall and did not make seamless comparison fast enough.
+
+Refined behavior:
+- the three generation strategies are now horizontal tabs: Original / Yeni ref. / Görselsiz;
+- only the selected mode is open at a time instead of three stacked cards;
+- one large result stage is shown for the selected mode;
+- 1×1 / 3×3 / 6×6 buttons instantly switch the same result into tiled repeat view for seam inspection;
+- switching among the three generation methods is one tap while keeping the selected tile zoom mode;
+- prompt text is collapsed by default inside a minimal `Prompt ▾` disclosure;
+- reference/download/upload/activate controls stay compact under the stage;
+- active winner is marked in the selected mode.
+
+Commit:
+- `1593cfcb53f0c12d095b21ea15dd19c4612cd7a1` — tabbed Variant Lab + 1×1/3×3/6×6 seamless preview.
