@@ -334,13 +334,26 @@ Fallback kaldırıldı. Bu asset için özel prompt eklenmeden kullanma.`,source
 function defaultPromptFor(x){const ap=animatedAtlasPromptFor(x);if(ap)return ap;const p0=P0_PROMPT_LIBRARY[x.id];if(p0)return {label:p0.label,text:p0.prompt,source:'P0 özel'};const p1=P1_PROMPT_LIBRARY[x.id];if(p1)return {label:p1.label,text:p1.prompt,source:'P1 özel'};return missingPromptFor(x)}
 let animTimer=null, animPlaying=true;
 function stopAnim(){ if(animTimer){ clearInterval(animTimer); animTimer=null; } }
+function actualStripFrameInfo(src,spec){
+ const long=spec.vertical?src.height:src.width;
+ const cross=spec.vertical?src.width:src.height;
+ const along=Math.floor(long/spec.frames);
+ const frame=Math.max(1,Math.min(cross,along));
+ const trimCross=Math.max(0,Math.floor((cross-frame)/2));
+ const trimLong=Math.max(0,Math.floor((long-frame*spec.frames)/2));
+ return {frame,trimCross,trimLong};
+}
 async function stripBlobToAtlasBlob(blob, meta){
  const spec=animSpec(meta); if(!spec) throw Error('Animasyon strip değil');
- const src=await decodeBlobToCanvas(blob); const out=document.createElement('canvas'); out.width=spec.atlasW; out.height=spec.atlasH; const g=out.getContext('2d'); g.clearRect(0,0,out.width,out.height);
+ const src=await decodeBlobToCanvas(blob);
+ const actual=actualStripFrameInfo(src,spec);
+ const out=document.createElement('canvas'); out.width=spec.cols*actual.frame; out.height=spec.rows*actual.frame;
+ const g=out.getContext('2d'); g.clearRect(0,0,out.width,out.height);
  for(let i=0;i<spec.frames;i++){
-   const sx=spec.vertical?0:i*spec.frame, sy=spec.vertical?i*spec.frame:0;
-   const dx=(i%spec.cols)*spec.frame, dy=Math.floor(i/spec.cols)*spec.frame;
-   g.drawImage(src,sx,sy,spec.frame,spec.frame,dx,dy,spec.frame,spec.frame);
+   const sx=spec.vertical?actual.trimCross:actual.trimLong+i*actual.frame;
+   const sy=spec.vertical?actual.trimLong+i*actual.frame:actual.trimCross;
+   const dx=(i%spec.cols)*actual.frame, dy=Math.floor(i/spec.cols)*actual.frame;
+   g.drawImage(src,sx,sy,actual.frame,actual.frame,dx,dy,actual.frame,actual.frame);
  }
  return await canvasPngBlob(out);
 }
@@ -368,12 +381,23 @@ async function atlasBlobToStripBlob(blob, meta){
 async function refreshAnimPreview(){
  stopAnim();
  const box=$('animBox'); if(!active||!isAnimatedStrip(active)){ box.classList.remove('show'); return; }
- box.classList.add('show'); const spec=animSpec(active); $('animMeta').textContent=`${spec.frames} frame • ${spec.frame}×${spec.frame} • atlas ${spec.cols}×${spec.rows}`;
- $('animHint').textContent='Uzun stripi GPT için kare atlas olarak dışa aktar. Düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar orijinal strip düzenine çevirir. Atlas daha yüksek çözünürlüklü olsa bile hücreleri doğru oran üzerinden okuyup kare kare küçültür. Önizleme aşağıda canlı döner.';
- const c=$('animCanvas'), ctx=c.getContext('2d'); c.width=spec.frame; c.height=spec.frame; ctx.clearRect(0,0,c.width,c.height);
- const blob=await displayBlob(active.path); const src=await decodeBlobToCanvas(blob);
- let f=0; const draw=()=>{ const sx=spec.vertical?0:f*spec.frame, sy=spec.vertical?f*spec.frame:0; ctx.clearRect(0,0,c.width,c.height); ctx.drawImage(src,sx,sy,spec.frame,spec.frame,0,0,c.width,c.height); };
- draw(); animPlaying=true; $('animToggle').textContent='Durdur'; animTimer=setInterval(()=>{ if(!animPlaying) return; f=(f+1)%spec.frames; draw(); }, 140);
+ box.classList.add('show');
+ const spec=animSpec(active);
+ const blob=await displayBlob(active.path);
+ const src=await decodeBlobToCanvas(blob);
+ const actual=actualStripFrameInfo(src,spec);
+ $('animMeta').textContent=`${spec.frames} frame • ${actual.frame}×${actual.frame} • atlas ${spec.cols}×${spec.rows}`;
+ $('animHint').textContent='Uzun stripi GPT için kare atlas olarak dışa aktar. Düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı frame sırasına çevirir. Canlı önizleme kaydedilmiş stripin gerçek frame çözünürlüğünü otomatik algılar.';
+ const c=$('animCanvas'), ctx=c.getContext('2d'); c.width=actual.frame; c.height=actual.frame; ctx.clearRect(0,0,c.width,c.height);
+ let f=0;
+ const draw=()=>{
+   const sx=spec.vertical?actual.trimCross:actual.trimLong+f*actual.frame;
+   const sy=spec.vertical?actual.trimLong+f*actual.frame:actual.trimCross;
+   ctx.clearRect(0,0,c.width,c.height);
+   ctx.drawImage(src,sx,sy,actual.frame,actual.frame,0,0,c.width,c.height);
+ };
+ draw(); animPlaying=true; $('animToggle').textContent='Durdur';
+ animTimer=setInterval(()=>{ if(!animPlaying)return; f=(f+1)%spec.frames; draw(); },140);
 }
 
 const TRANSPARENCY_OUTPUT_MARKER='ALPHA / BACKGROUND LOCK:';
