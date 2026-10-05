@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_26b9e3bfec",
+  "label": "default_clay",
+  "texture_path": "ITEMS/mcl_core/default_clay.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for a dense natural clay deposit in a grounded dark-fantasy world. The clay is fine-grained, cohesive and slightly damp beneath a dull exposed skin. Compression creates soft folds and blunt fractures rather than sandy crumble; subtle mineral streaks, tiny inclusions and moisture-darkened pockets reveal that it came from layered earth. Use muted gray, taupe and faint cool blue-brown tones. Avoid pottery, sculpted fingerprints, glossy wet mud, cracked desert ground or smooth plastic surfaces. Make raw clay feel heavy, workable and geologically deposited, with understated depth and natural variation rather than decorative pattern."
+}
