@@ -198,13 +198,17 @@ const P0_PROMPT_LIBRARY={"tex_d079d9428d":{"label":"Acacia leaves","path":"ITEMS
 
 const P0_CREATIVE_BASE=`CREATIVE REINTERPRETATION MODE
 
-Rebuild this texture for the same gameplay role, but do not trace, upscale, or obediently imitate the original pixel pattern. Use the source as a structural reference and as evidence of what the asset is, then make a confident new material interpretation.
+This is NOT an HD remake and NOT a faithful reconstruction of the source texture.
 
-Keep only the hard technical constraints that make the asset work in-game: same canvas role and orientation, tileability when the source tiles, source transparency/occupied regions when alpha matters, and exact frame topology/order/loop continuity for animation assets.
+Keep the same gameplay material/object identity, but deliberately redesign the texture's internal composition. Do not preserve the source's large cracks, patches, blobs, knots, stains, veins, stone boundaries, grain groupings, light/dark islands, focal marks or other major spatial features just because they exist in the original. Their positions, sizes, shapes and rhythm may change completely.
 
-Within those limits, take creative ownership. You may shift local color balance, material rhythm, weathering, grain, scars, mineral/organic variation, age, contamination, moisture, erosion and microstructure if it makes the asset feel more authored and believable.
+Use the source only to understand what the asset is and which hard technical constraints matter. Do not trace it, upscale it, or match its macro-composition. A successful result should look like a different authored texture for the same gameplay material, not the old texture rendered at higher resolution.
 
-Art direction: grounded dark-fantasy realism with a strong sense of place and history. Prefer evocative natural irregularity, asymmetry and material storytelling over safe generic realism. The result may be more dramatic, strange, old, diseased, scorched, damp, mineral-rich or time-worn than the source, as long as it still instantly reads as the same gameplay material.
+Keep only the constraints required for game function: same asset role and face/orientation, tileability when needed, transparency/occupied regions only where alpha is functionally meaningful, and exact frame topology/order/loop continuity for animation assets.
+
+Within those limits, take strong creative ownership. Invent new natural structure at both large and small scales. You may change material rhythm, color balance, crack placement, mineral/organic distribution, grain flow, scars, weathering, age, contamination, moisture, erosion and microstructure if the result remains believable and recognizable as the intended material.
+
+Art direction: grounded dark-fantasy realism with a strong sense of place and history. Prefer bold but plausible material storytelling, natural irregularity and asymmetry over safe generic realism or source-matching.
 
 Do not turn the texture into a scene, illustration, object render or perspective view. Keep it game-ready and materially flat.`;
 
@@ -273,11 +277,14 @@ ${direction}`,
 }
 function applyCreativeOutputRequirements(text,x){
  let out=String(text||'').trimEnd();
+ const n=(x.name||'').toLowerCase();
+ const fullSquareMaterial=x.w===x.h&&!isAnimatedStrip(x)&&!/(leav|foliage|overlay|glass|plant|sapling|vine|grass_side)/.test(n);
  out+=`
 
 TECHNICAL LOCK:
-Preserve the source image dimensions and its functional transparency behavior. Do not add a separate background or scene outside the texture.
-${isAnimatedStrip(x)?'Preserve the exact animation frame count, frame order, cell boundaries and loop continuity.':''}`;
+Preserve the source image dimensions and the asset's gameplay function. Preserve transparency only where it is functionally meaningful. Do not add a separate background or scene outside the texture.
+${fullSquareMaterial?'MACRO-COMPOSITION RESET: This full-square material texture should NOT preserve the original large-scale spatial arrangement. Generate a new distribution of major forms, cracks, stains, grain masses, knots, stones, veins, tonal islands and focal features. Similarity should come from material identity and gameplay role, not from matching the old layout.':''}
+${isAnimatedStrip(x)?'Preserve the exact animation frame count, frame order, cell boundaries and loop continuity, but redesign the visual content within each frame rather than reproducing the source frame shapes.':''}`;
  return out;
 }
 
