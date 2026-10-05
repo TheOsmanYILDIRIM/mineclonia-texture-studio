@@ -560,3 +560,22 @@ For animated textures such as flowing/source lava and water:
 - Reference-image/video/Veo experiments did not outperform the structure-locked atlas workflow in the current tests; do not make video generation the default animated-texture workflow at this stage.
 
 In short: **static blocks may rebuild; animated textures must preserve Image A's animation structure and only reskin/material-transfer from Image B.**
+
+## Mobs / Entity two-pass workflow — 2026-10-05
+
+Entity UV textures use a separate ordered workflow under `prompts/mobs/`.
+
+The chosen fast workflow is intentionally **two-pass**, avoiding per-island generation:
+
+1. **Strict HQ UV pass** — original low-resolution entity atlas is processed with a structure-locked prompt. Exact UV layout, occupancy, anatomy and markings are preserved while the surface becomes a high-quality continuous material atlas.
+2. **HQ UV + creature reference pass** — the successful HQ atlas from pass 1 becomes Image A. A separately generated creature visual reference becomes Image B. Image A remains the strong structural/anatomical master; Image B refines material appearance only.
+3. The application's original alpha/occupancy-mask restoration remains the final structural safety guard.
+
+This workflow was selected because direct low-res UV + free reference transfer produced small but fatal UV-boundary errors and anatomical confusion (for example leg regions being interpreted as udder tissue), while using the earlier strict high-quality UV result as Image A gave substantially better behavior.
+
+Progress is tracked separately in `prompts/mobs/manifest.json`. Current inventory: **485 entity assets = 438 mob/variant UV + 47 auxiliary overlays/effects**. Auxiliary assets stay visible in the manifest but are explicitly labeled and must not be treated as complete creature skins.
+
+Shared prompts:
+- `prompts/mobs/PASS1_STRICT_HQ_UV.txt`
+- `prompts/mobs/PASS2_HQ_UV_PLUS_REF.txt`
+
