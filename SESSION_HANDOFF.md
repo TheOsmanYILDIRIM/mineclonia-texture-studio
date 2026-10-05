@@ -1,3 +1,27 @@
+## Armor UV reference completion — 2026-10-05
+
+- Authored deliberate Armor Reference prompts for all **32** worn player-armor UV atlases in `prompts/armor/batch_001_032.json`.
+- Coverage: **32 / 32 done; 0 pending; next_id=null; next_name=null**.
+- Scope remains frozen to the existing 32-entry Armor manifest: chain, copper, diamond, gold, iron, leather, leather_desat and netherite × boots/chestplate/helmet/leggings.
+- Inventory icons, `mcl_armor_inv_*`, trim/smithing-template item sprites, HUD/slot graphics and other flat item imagery were not added.
+- Verified all 32 manifest paths resolve in the app catalog as **64×32, non-animated** worn UV atlases.
+- HQ UV and Final UV remain shared/dynamic. Armor Reference is the only per-texture authored stage.
+- Armor UI now displays **2 · Armor Ref** while Mobs retains **2 · Creature Ref**.
+- Existing Mobs three-stage routing and Blocks 202/202 manifest remain untouched by this change.
+
+Commits:
+- Armor reference batch: `78550418b4a5bfb3fe4f05eb1d031290c87a53eb`
+- Armor manifest completion: `6dedbe5bc5ad26413b9e1d642b9dacd55438bffd`
+- Armor UI label/routing: `d14af24cd7df53f7eb0b42601877b316a6a4ba5e`
+
+Verification:
+- Armor manifest: 32/32 complete.
+- All 32 Armor paths: 64×32, non-animated.
+- Inventory/icon exclusion scan: clean.
+- Remaining runtime-guard workflow verification is pending against the final handoff commit.
+
+Next concrete work: none for the requested Armor UV queue. Continue with Mobs only when explicitly resumed.
+
 ## Armor UV workflow — 2026-10-05
 
 - Added a dedicated Armor UV queue containing **32 worn player-armor UV atlases**.
