@@ -501,15 +501,45 @@ The app also enforces this structurally on import: for Entity assets, the edited
 
 Entity seam-offset editing is disabled because offsetting the atlas would intentionally move the structural mask.
 
-## P0 reference-first workflow — 2026-10-05
+## P0 reference-first workflow — current
 
-P0 block/material textures now use two prompts:
+P0 material textures use two actions:
 
-1. **Reference prompt:** world- and art-direction-first. It names only the material/subject and intentionally leaves surface details to the image model so the reference can establish a strong authored visual language.
-2. **Standard Original+Ref production prompt:** Image A is the structural source texture; Image B is the dominant visual/style reference. The prompt does not redescribe the material. Only the literal outer canvas boundary is seam-critical; internal contours are not seam constraints.
+- **Ref prompt:** create a visual style/world reference for the material. Describe the grounded dark-fantasy world, material identity, age, depth and art direction; leave the exact surface details to the image model. Do not turn the reference prompt into a checklist.
+- **Üretim prompt:** use Image A as source structure/function and Image B as the dominant visual reference. Transfer Image B's material language without copying its composition.
 
-The former P0 creative-alternative mode is retired.
+For ordinary tile materials, only the literal outer canvas boundary is seam-critical. Internal cracks, joints, bark lines, leaf silhouettes and other internal contours are not seam boundaries.
 
-P1 entries already classified by the app as **Block** or **Functional Block** are promoted to P0 at runtime. This promotion uses the existing semantic asset classifier, not filename guessing.
+Semantic orientation matters. Examples:
+- tree/log side = trunk side/bark;
+- tree/log top = cut trunk cross-section/end-grain;
+- foliage = foliage;
+- grass top, side overlay and snowed side are different surfaces.
 
-In the texture detail UI, P0 prompt text is intentionally hidden. Two compact buttons copy the reference prompt and the standard production prompt directly.
+Do not infer ambiguous roles from filename alone. Use explicit P0 semantic mappings where known and Mineclonia runtime/source evidence for ambiguous assets.
+
+The former **Yaratıcı alternatif** workflow is retired. P0 prompt text is intentionally hidden in the detail UI: **Ref prompt** copies the reference prompt and **Üretim prompt** copies the standard Image A/Image B prompt.
+
+### Priority vs classification
+
+P0/P1/P2… are priority labels only; they must remain available independently from browsing categories.
+
+Browsing uses:
+- Mineclonia-style creative inventory groups such as Building Blocks, Decoration Blocks, Redstone, Transportation, Foodstuffs, Tools, Combat, Mobs, Brewing, Materials and Miscellaneous;
+- deeper technical/runtime classes for terrain, stone, wood, ores, plants, liquids, entities, UI/HUD, particles/VFX, overlays, workstations, containers, vehicles and similar roles.
+
+A texture may belong to multiple meaningful browsing classes. Runtime semantics win over filename/folder intuition.
+
+Only true material **Block** records should be promoted into the material-P0 workflow. Functional blocks, UI assets, sprites, system/debug textures and other non-material records are not promoted merely because they are block-related.
+
+### Variant Lab
+
+Variant Lab is only for visual comparison:
+- import any number of PNG variants at once;
+- show them as a horizontally scrolling thumbnail strip;
+- tap one to inspect it in 1×1 / 3×3 / 6×6 tiled view;
+- **Karışık** mode mixes enabled variants across the tile grid;
+- while mixed, tapping a thumbnail disables/enables that variant so weak variants can be eliminated quickly;
+- a selected single variant can be promoted to the active texture.
+
+Variant Lab contains no generation prompts.
