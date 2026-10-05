@@ -556,18 +556,24 @@ async function texturePixelsVisuallyEquivalent(a,b){
  const mean=count?total/count:0,pixelCount=ad.length/4,outlierRatio=pixelCount?outliers/pixelCount:0;
  return mean<=2.5&&outlierRatio<=0.02;
 }
-async function textureMatchesOriginal(blob,meta){
+async function textureMatchesOriginal(blob,meta,{throwOnError=false}={}){
  if(!blob||!meta)return false;
- const original=await originalBlob(meta.path);
- if(await texturePixelsEqual(blob,original))return true;
- const originalCanvas=await decodeBlobToCanvas(original);
- const nativeW=Math.max(1,Number(meta.w)||originalCanvas.width);
- const nativeH=Math.max(1,Number(meta.h)||originalCanvas.height);
- const [editedCanonical,originalCanonical]=await Promise.all([
-   resizeTextureBlobToDimensions(blob,nativeW,nativeH),
-   resizeTextureBlobToDimensions(original,nativeW,nativeH)
- ]);
- return await texturePixelsVisuallyEquivalent(editedCanonical,originalCanonical);
+ try{
+   const original=await originalBlob(meta.path);
+   if(await texturePixelsEqual(blob,original))return true;
+   const originalCanvas=await decodeBlobToCanvas(original);
+   const nativeW=Math.max(1,Number(meta.w)||originalCanvas.width);
+   const nativeH=Math.max(1,Number(meta.h)||originalCanvas.height);
+   const [editedCanonical,originalCanonical]=await Promise.all([
+     resizeTextureBlobToDimensions(blob,nativeW,nativeH),
+     resizeTextureBlobToDimensions(original,nativeW,nativeH)
+   ]);
+   return await texturePixelsVisuallyEquivalent(editedCanonical,originalCanonical);
+ }catch(err){
+   if(throwOnError)throw err;
+   console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);
+   return false;
+ }
 }
 async function meaningfulEdits(){
  const raw=await allEdits(), out=[];
@@ -1153,7 +1159,7 @@ async function hydrateChangedPathsFast(seedEdits=null){
   for(const e of edits){
     const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
     try{
-      if(await textureMatchesOriginal(e.blob,meta)){
+      if(await textureMatchesOriginal(e.blob,meta,{throwOnError:true})){
         same++;
         await deletePersistedEditQuiet(e.path);
         const ref=cardRefsFast.get(e.path);
