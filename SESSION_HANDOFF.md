@@ -1,3 +1,19 @@
+## Block prompt authoring 61–160 + dynamic production template — 2026-10-05
+
+- The standard Image A + Image B Block production prompt is now metadata-aware instead of a fixed literal string.
+- It dynamically injects the selected material subject, face/component role and whether the asset should use free four-edge material tiling or preserve component placement.
+- The core production philosophy is unchanged: Image A defines semantic/gameplay identity and orientation; Image B dominates actual material appearance; ordinary material blocks may rebuild internal composition; seamlessness is true physical continuation across the outer canvas edges.
+- Authored **100 deliberate Block reference prompts**, manifest orders **61–160**.
+- Progress: **160 / 202 done, 42 pending**.
+- The 100 prompts are stored in `prompts/blocks/batch_061_160.json`; the loader now supports prompt batches while preserving the existing individual-file format for earlier prompts.
+- Distinct treatment includes frosted-ice damage stages, stained-glass base vs detail components, sandstone top/side/bottom/carved/smooth roles, stripped-log side vs end-grain top, and individual deepslate ore/material variants.
+- Dynamic production prompt commit: `489828091e4a4c7c5665fe1df74c61956aa0d35c`.
+- 100-prompt batch: `f2aa2795d0e64079de3afa9e6d8f3e6831eda8a2`.
+- Batch loader: `55923dacd66cd43b455b411a32b87111d698ff38`.
+- Manifest progress: `fc7de1181e939195b3b76b9c4901557fad058382`.
+- Last completed: `mcl_deepslate_tiles.png`.
+- Next: `mcl_deepslate_tiles_cracked.png`.
+
 ## Mobs Creature Ref authoring — first 30 — 2026-10-05
 
 - Authored deliberate Creature Reference prompts for Mobs manifest entries **1–30**.
