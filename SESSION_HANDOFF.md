@@ -64,6 +64,17 @@ Commit:
 Commit:
 - `4b8b0668656c4db15923781fcc2bd213bf580a82`.
 
+## Deep texture classification — 2026-10-05
+
+- Expanded browsing beyond coarse creative inventory groups while retaining Mineclonia creative tabs.
+- Added technical/runtime classes for terrain, stone, wood, ores, plants, crops, liquids, animation, passive/hostile/boss/NPC entities, player, armor, vehicles, items, tools, weapons, food, materials, workstations, containers, doors, redstone, HUD, GUI, icons, overlays, particles, VFX, sky/weather, environment, maps, and system/debug assets.
+- A texture can belong to multiple meaningful classes. P0–P6 remains an independent priority axis.
+- Filtering now uses prefixed `inv:` and `tech:` categories to prevent collisions between game inventory and technical classifications.
+- Verified the updated blob contains the new classifier and all category filtering call sites use `categoryMatches`.
+
+Commit:
+- `5d6270ae4e2d0b7cc5b76afab6592ae7fc6d294b`.
+
 ## Project
 
 Repository:
