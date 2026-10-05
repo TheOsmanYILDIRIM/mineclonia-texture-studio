@@ -26,6 +26,18 @@ Updated: 2026-10-05
 Commit:
 - `07c9096bb439254872f309b81e09a86941205590` — multi-PNG comparison gallery.
 
+## P0 prompt interaction + tree-top ref fix — 2026-10-05
+
+- Fixed `default_acacia_tree_top.png`-style assets: `tree_top/log_top/wood_top` now map to a cut trunk cross-section/end-grain reference subject, not foliage.
+- Removed the obsolete **Yaratıcı alternatif** button and its UI handler.
+- Moved P0 copy behavior into the main authoritative handlers so async init can no longer overwrite it.
+- **Ref prompt** now copies the asset-specific reference-generation prompt.
+- **Üretim prompt** now copies the standard Image A / Image B production prompt; it no longer saves a prompt override or shows “bu texture ID’sine kaydedildi”.
+- Non-P0 prompt editing retains the existing save behavior.
+
+Commit:
+- `eb742e2e4ab118a915b8dab0412ac78651e38747`.
+
 ## Project
 
 Repository:
