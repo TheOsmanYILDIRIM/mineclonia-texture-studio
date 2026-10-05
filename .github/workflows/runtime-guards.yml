@@ -7,6 +7,41 @@ on:
       - main
 
 permissions:
+  contents: write
+
+jobs:
+  runtime-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply pending reference-first migration
+        if: github.event_name == 'push'
+        run: |
+          if [ -f scripts/one-shot-reference-first-prompts.mjs ]; then
+            node scripts/one-shot-reference-first-prompts.mjs
+          fi
+      - name: Check runtime-winning texture paths
+        run: node scripts/check-runtime-overrides.mjs
+      - name: Finalize one-shot migration
+        if: github.event_name == 'push' && hashFiles('scripts/one-shot-reference-first-prompts.mjs') != ''
+        run: |
+          rm -f scripts/one-shot-reference-first-prompts.mjs
+          rm -f .github/workflows/one-shot-reference-first-prompts.yml
+          cat > .github/workflows/runtime-guards.yml <<'YAML'
+name: Runtime texture guards
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
   contents: read
 
 jobs:
@@ -19,3 +54,9 @@ jobs:
           node-version: '22'
       - name: Check runtime-winning texture paths
         run: node scripts/check-runtime-overrides.mjs
+YAML
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: switch P0 to reference-first prompts"
+          git push
