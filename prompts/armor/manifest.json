@@ -3,16 +3,17 @@
   "kind": "armor_uv_prompt_manifest",
   "workflow": "three_stage_hq_uv_reference_transfer",
   "total": 32,
-  "done": 0,
-  "pending": 32,
-  "last_completed_id": null,
-  "last_completed_name": null,
-  "next_id": "tex_84a83caec5",
-  "next_name": "mcl_armor_boots_chain.png",
+  "done": 32,
+  "pending": 0,
+  "last_completed_id": "tex_c6278f24b0",
+  "last_completed_name": "mcl_armor_leggings_netherite.png",
+  "next_id": null,
+  "next_name": null,
   "notes": [
     "Only 64x32 worn player-armor UV atlases are included.",
     "Inventory icons (mcl_armor_inv_*), trim item sprites, smithing templates, HUD assets and other item images are explicitly excluded.",
-    "HQ UV and Final UV use shared dynamic templates; each armor UV can receive an authored material/reference prompt."
+    "HQ UV and Final UV use shared dynamic templates; each armor UV can receive an authored material/reference prompt.",
+    "Reference prompts are authored per worn armor texture in batch_001_032.json; HQ UV and Final UV remain shared dynamic templates."
   ],
   "entries": [
     {
@@ -22,8 +23,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_chain.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 2,
@@ -32,8 +33,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_copper.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 3,
@@ -42,8 +43,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_diamond.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 4,
@@ -52,8 +53,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_gold.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 5,
@@ -62,8 +63,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_iron.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 6,
@@ -72,8 +73,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_leather.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 7,
@@ -82,8 +83,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_leather_desat.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 8,
@@ -92,8 +93,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_boots_netherite.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 9,
@@ -102,8 +103,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_chain.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 10,
@@ -112,8 +113,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_copper.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 11,
@@ -122,8 +123,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_diamond.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 12,
@@ -132,8 +133,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_gold.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 13,
@@ -142,8 +143,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_iron.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 14,
@@ -152,8 +153,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_leather.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 15,
@@ -162,8 +163,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_leather_desat.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 16,
@@ -172,8 +173,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_chestplate_netherite.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 17,
@@ -182,8 +183,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_chain.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 18,
@@ -192,8 +193,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_copper.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 19,
@@ -202,8 +203,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_diamond.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 20,
@@ -212,8 +213,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_gold.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 21,
@@ -222,8 +223,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_iron.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 22,
@@ -232,8 +233,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_leather.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 23,
@@ -242,8 +243,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_leather_desat.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 24,
@@ -252,8 +253,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_helmet_netherite.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 25,
@@ -262,8 +263,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_chain.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 26,
@@ -272,8 +273,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_copper.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 27,
@@ -282,8 +283,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_diamond.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 28,
@@ -292,8 +293,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_gold.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 29,
@@ -302,8 +303,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_iron.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 30,
@@ -312,8 +313,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_leather.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 31,
@@ -322,8 +323,8 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_leather_desat.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
     },
     {
       "order": 32,
@@ -332,8 +333,16 @@
       "texture_path": "ITEMS/mcl_armor/mcl_armor_leggings_netherite.png",
       "priority": "P2",
       "workflow_role": "armor_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/armor/batch_001_032.json"
+    }
+  ],
+  "batches": [
+    {
+      "start": 1,
+      "end": 32,
+      "count": 32,
+      "file": "prompts/armor/batch_001_032.json"
     }
   ]
 }
