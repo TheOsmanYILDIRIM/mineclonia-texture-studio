@@ -579,3 +579,42 @@ Shared prompts:
 - `prompts/mobs/PASS1_STRICT_HQ_UV.txt`
 - `prompts/mobs/PASS2_HQ_UV_PLUS_REF.txt`
 
+
+## Entity / Mobs two-pass UV workflow — 2026-10-05
+
+The single-pass reference-image-to-original-UV experiment is **not** the preferred Entity workflow. Tests showed that even when material quality was strong, small UV regions could drift outside their intended boundaries or be semantically confused (for example, leg/hoof regions being interpreted as udder anatomy). Splitting every entity into many manually generated UV sub-parts was considered but rejected as too slow for the texture-pack workflow.
+
+### Chosen workflow
+
+Entity textures use a **two-pass whole-atlas workflow**:
+
+1. **Pass 1 — strict HQ UV reconstruction**
+   - Input A is the original low-resolution game UV atlas.
+   - Use the earlier strict structure-locking Entity prompt that previously produced reliable high-quality UV maps.
+   - Exact UV layout, island positions/sizes/orientation, occupied/transparent regions and anatomy placement remain locked.
+   - The goal is a high-resolution, structurally correct UV atlas whose anatomy is already visually legible to the next model pass.
+
+2. **Pass 2 — HQ UV + creature reference**
+   - Image A is the successful high-quality UV atlas from Pass 1, **not the original low-resolution atlas**.
+   - Image B is a separately generated visual reference for that specific creature/entity.
+   - Image A remains the strong guide for UV structure, anatomy, placement and already-correct surface interpretation.
+   - Image B supplies the final creature/material language: fur, skin, scales, pigmentation, color relationships, weathering, micro-detail and world art direction.
+   - Pass 2 must not freely reinterpret anatomy or UV topology the way static block interiors can be rebuilt.
+
+The original source atlas remains the final authority for alpha/occupancy masking in the application. Generated RGB/material detail may change, but output must still be forced back through the original structural mask where the app supports it.
+
+### Why two passes
+
+The first strict pass converts an ambiguous tiny pixel atlas into a semantically legible HQ UV map. The second model therefore does not need to rediscover which tiny region is a hoof, udder, face, body side, tail, etc. It performs a controlled appearance/material transfer on an already understood atlas. This keeps the workflow to two whole-image generations instead of many per-body-part generations.
+
+### Mobs work queue
+
+Entity prompt authoring and processing is tracked separately from material Blocks under a dedicated **Mobs** queue/category.
+
+- Mobs must have their own manifest/progress counter and ordered work list.
+- Do not mix Mobs completion state with the 202-block prompt manifest.
+- Work through Mobs sequentially, using the same explicit `done / pending / last completed / next` discipline used for Blocks.
+- Per-entity prompt/reference files should be separately editable rather than embedded as a large inline library in `index.html`.
+- A Mob is only marked done when its intended two-pass prompt/reference configuration has been deliberately authored; do not create placeholder files merely to advance the counter.
+
+In short: **Blocks = reference-first material rebuild. Animated = lock Image A motion/frame structure. Mobs = strict HQ UV first, then HQ UV + entity reference for controlled appearance transfer.**
