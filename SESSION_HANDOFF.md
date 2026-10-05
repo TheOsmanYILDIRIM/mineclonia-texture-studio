@@ -1,3 +1,11 @@
+## Armor authored-ref fallback fix — 2026-10-05
+
+- Fixed the remaining authored-reference wiring bug: `referencePromptFor()` no longer calls nonexistent `mobArmorRefPromptFor()`.
+- Precedence remains: authored Mob/Armor reference first; dynamic fallback second.
+- Added real `dynamicArmorRefPromptFor()` using the existing armor-aware metadata/material logic.
+- Verified no stale `mobArmorRefPromptFor` reference remains; Mob fallback still routes to `mobCreatureRefPromptFor()`; Armor/Mob button labels remain distinct.
+- Fix commit: `bd2ca019e37bd9f0b3a4eaf805686b89a440a127`.
+
 ## Armor authored-ref fallback repair — 2026-10-05
 
 - Fixed the authored-reference wiring fallback bug introduced after the authored-first loader.
