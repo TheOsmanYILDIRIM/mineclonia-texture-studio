@@ -1,0 +1,1629 @@
+{
+  "schema_version": 1,
+  "kind": "block_reference_manifest",
+  "total": 202,
+  "done": 10,
+  "pending": 192,
+  "last_completed_id": "tex_cba32439c1",
+  "last_completed_name": "default_jungletree.png",
+  "next_id": "tex_bc0f92b42b",
+  "next_name": "default_jungletree_top.png",
+  "entries": [
+    {
+      "order": 1,
+      "id": "tex_d079d9428d",
+      "name": "default_acacia_leaves.png",
+      "texture_path": "ITEMS/mcl_core/default_acacia_leaves.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_d079d9428d.json"
+    },
+    {
+      "order": 2,
+      "id": "tex_9419ba1c05",
+      "name": "default_acacia_tree.png",
+      "texture_path": "ITEMS/mcl_core/default_acacia_tree.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_9419ba1c05.json"
+    },
+    {
+      "order": 3,
+      "id": "tex_b4474f8b0c",
+      "name": "default_acacia_tree_top.png",
+      "texture_path": "ITEMS/mcl_core/default_acacia_tree_top.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_b4474f8b0c.json"
+    },
+    {
+      "order": 4,
+      "id": "tex_fe37489cde",
+      "name": "default_acacia_wood.png",
+      "texture_path": "ITEMS/mcl_core/default_acacia_wood.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_fe37489cde.json"
+    },
+    {
+      "order": 5,
+      "id": "tex_f1658faec1",
+      "name": "default_cobble.png",
+      "texture_path": "ITEMS/mcl_core/default_cobble.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_f1658faec1.json"
+    },
+    {
+      "order": 6,
+      "id": "tex_6f7e58e194",
+      "name": "default_dirt.png",
+      "texture_path": "ITEMS/mcl_core/default_dirt.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_6f7e58e194.json"
+    },
+    {
+      "order": 7,
+      "id": "tex_a73dd7c62f",
+      "name": "default_gravel.png",
+      "texture_path": "ITEMS/mcl_core/default_gravel.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_a73dd7c62f.json"
+    },
+    {
+      "order": 8,
+      "id": "tex_b0a193dba3",
+      "name": "default_ice.png",
+      "texture_path": "ITEMS/mcl_core/default_ice.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_b0a193dba3.json"
+    },
+    {
+      "order": 9,
+      "id": "tex_752fa564f0",
+      "name": "default_jungleleaves.png",
+      "texture_path": "ITEMS/mcl_core/default_jungleleaves.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_752fa564f0.json"
+    },
+    {
+      "order": 10,
+      "id": "tex_cba32439c1",
+      "name": "default_jungletree.png",
+      "texture_path": "ITEMS/mcl_core/default_jungletree.png",
+      "status": "done",
+      "file": "prompts/blocks/tex_cba32439c1.json"
+    },
+    {
+      "order": 11,
+      "id": "tex_bc0f92b42b",
+      "name": "default_jungletree_top.png",
+      "texture_path": "ITEMS/mcl_core/default_jungletree_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 12,
+      "id": "tex_2d824a5622",
+      "name": "default_junglewood.png",
+      "texture_path": "ITEMS/mcl_core/default_junglewood.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 13,
+      "id": "tex_16c5aadeaa",
+      "name": "default_leaves.png",
+      "texture_path": "ITEMS/mcl_core/default_leaves.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 14,
+      "id": "tex_b49486a55b",
+      "name": "default_sand.png",
+      "texture_path": "ITEMS/mcl_core/default_sand.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 15,
+      "id": "tex_ddef61e20b",
+      "name": "default_snow.png",
+      "texture_path": "ITEMS/mcl_core/default_snow.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 16,
+      "id": "tex_a46fdac083",
+      "name": "default_stone.png",
+      "texture_path": "ITEMS/mcl_core/default_stone.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 17,
+      "id": "tex_768ad40712",
+      "name": "default_tree.png",
+      "texture_path": "ITEMS/mcl_core/default_tree.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 18,
+      "id": "tex_7d70c8bd91",
+      "name": "default_tree_top.png",
+      "texture_path": "ITEMS/mcl_core/default_tree_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 19,
+      "id": "tex_37d73fb3d8",
+      "name": "default_wood.png",
+      "texture_path": "ITEMS/mcl_core/default_wood.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 20,
+      "id": "tex_dd1601b059",
+      "name": "mcl_core_bedrock.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_bedrock.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 21,
+      "id": "tex_c20e3e8f47",
+      "name": "mcl_core_grass_block_side_overlay.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_side_overlay.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 22,
+      "id": "tex_366c9eb9e3",
+      "name": "mcl_core_grass_block_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 23,
+      "id": "tex_4ef3514a50",
+      "name": "mcl_core_grass_side_snowed.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_grass_side_snowed.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 24,
+      "id": "tex_1c57c237f7",
+      "name": "mcl_core_leaves_big_oak.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_leaves_big_oak.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 25,
+      "id": "tex_7af24ce86e",
+      "name": "mcl_core_leaves_birch.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_leaves_birch.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 26,
+      "id": "tex_df11566c76",
+      "name": "mcl_core_leaves_spruce.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_leaves_spruce.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 27,
+      "id": "tex_f7a8b19fa7",
+      "name": "mcl_core_log_big_oak.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_big_oak.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 28,
+      "id": "tex_0a71c1d130",
+      "name": "mcl_core_log_big_oak_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_big_oak_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 29,
+      "id": "tex_a6cec65ac7",
+      "name": "mcl_core_log_birch.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_birch.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 30,
+      "id": "tex_2e6e4057af",
+      "name": "mcl_core_log_birch_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_birch_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 31,
+      "id": "tex_d1e3540813",
+      "name": "mcl_core_log_spruce.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_spruce.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 32,
+      "id": "tex_2850a57c42",
+      "name": "mcl_core_log_spruce_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_log_spruce_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 33,
+      "id": "tex_7d297eed87",
+      "name": "mcl_core_planks_big_oak.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_planks_big_oak.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 34,
+      "id": "tex_f7e052c1e7",
+      "name": "mcl_core_planks_birch.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_planks_birch.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 35,
+      "id": "tex_b8dabb36d1",
+      "name": "mcl_core_planks_spruce.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_planks_spruce.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 36,
+      "id": "tex_26b9e3bfec",
+      "name": "default_clay.png",
+      "texture_path": "ITEMS/mcl_core/default_clay.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 37,
+      "id": "tex_660eec246a",
+      "name": "default_coal_block.png",
+      "texture_path": "ITEMS/mcl_core/default_coal_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 38,
+      "id": "tex_54c6d05d30",
+      "name": "default_diamond_block.png",
+      "texture_path": "ITEMS/mcl_core/default_diamond_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 39,
+      "id": "tex_146ea7f2c7",
+      "name": "default_glass.png",
+      "texture_path": "ITEMS/mcl_core/default_glass.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 40,
+      "id": "tex_8b585615ed",
+      "name": "default_glass_detail.png",
+      "texture_path": "ITEMS/mcl_core/default_glass_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 41,
+      "id": "tex_cb654770dd",
+      "name": "default_gold_block.png",
+      "texture_path": "ITEMS/mcl_core/default_gold_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 42,
+      "id": "tex_7cb217a0c7",
+      "name": "default_mossycobble.png",
+      "texture_path": "ITEMS/mcl_core/default_mossycobble.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 43,
+      "id": "tex_38106e970f",
+      "name": "default_obsidian.png",
+      "texture_path": "ITEMS/mcl_core/default_obsidian.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 44,
+      "id": "tex_55d1a1f91e",
+      "name": "default_steel_block.png",
+      "texture_path": "ITEMS/mcl_core/default_steel_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 45,
+      "id": "tex_5d17172d3c",
+      "name": "default_stone_brick.png",
+      "texture_path": "ITEMS/mcl_core/default_stone_brick.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 46,
+      "id": "tex_5266cc7540",
+      "name": "mcl_core_andesite.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_andesite.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 47,
+      "id": "tex_a7f40fb9af",
+      "name": "mcl_core_andesite_smooth.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_andesite_smooth.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 48,
+      "id": "tex_806eaebfbd",
+      "name": "mcl_core_bone_block_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_bone_block_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 49,
+      "id": "tex_6dbb96a9cf",
+      "name": "mcl_core_bone_block_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_bone_block_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 50,
+      "id": "tex_a8df732631",
+      "name": "mcl_core_cactus_bottom.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_cactus_bottom.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 51,
+      "id": "tex_63cba932a9",
+      "name": "mcl_core_cactus_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_cactus_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 52,
+      "id": "tex_101dca4108",
+      "name": "mcl_core_cactus_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_cactus_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 53,
+      "id": "tex_2033f706ca",
+      "name": "mcl_core_coal_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_coal_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 54,
+      "id": "tex_6f99a18f0e",
+      "name": "mcl_core_coarse_dirt.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_coarse_dirt.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 55,
+      "id": "tex_7be609162d",
+      "name": "mcl_core_crying_obsidian.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 56,
+      "id": "tex_dcbe0c0c85",
+      "name": "mcl_core_crying_obsidian_tear.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian_tear.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 57,
+      "id": "tex_f1171fb29d",
+      "name": "mcl_core_diamond_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_diamond_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 58,
+      "id": "tex_875d6fcc70",
+      "name": "mcl_core_diorite.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_diorite.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 59,
+      "id": "tex_175f6ee8a5",
+      "name": "mcl_core_diorite_smooth.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_diorite_smooth.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 60,
+      "id": "tex_776d382769",
+      "name": "mcl_core_dirt_podzol_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_dirt_podzol_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 61,
+      "id": "tex_cc04d97fd0",
+      "name": "mcl_core_dirt_podzol_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_dirt_podzol_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 62,
+      "id": "tex_582dad7838",
+      "name": "mcl_core_emerald_block.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_emerald_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 63,
+      "id": "tex_2b48fe4b2f",
+      "name": "mcl_core_emerald_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_emerald_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 64,
+      "id": "tex_6f8775a783",
+      "name": "mcl_core_frosted_ice_0.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_frosted_ice_0.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 65,
+      "id": "tex_19870d6f6b",
+      "name": "mcl_core_frosted_ice_1.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_frosted_ice_1.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 66,
+      "id": "tex_9ab3930f45",
+      "name": "mcl_core_frosted_ice_2.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_frosted_ice_2.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 67,
+      "id": "tex_0be3faf0c4",
+      "name": "mcl_core_frosted_ice_3.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_frosted_ice_3.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 68,
+      "id": "tex_0ad5b44126",
+      "name": "mcl_core_glass_black.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_black.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 69,
+      "id": "tex_2a23481025",
+      "name": "mcl_core_glass_black_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_black_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 70,
+      "id": "tex_ccdff60625",
+      "name": "mcl_core_glass_blue.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_blue.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 71,
+      "id": "tex_c6fbf57802",
+      "name": "mcl_core_glass_blue_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_blue_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 72,
+      "id": "tex_5c49040f98",
+      "name": "mcl_core_glass_brown.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_brown.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 73,
+      "id": "tex_563e29a494",
+      "name": "mcl_core_glass_brown_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_brown_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 74,
+      "id": "tex_49aaa1ba5a",
+      "name": "mcl_core_glass_cyan.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_cyan.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 75,
+      "id": "tex_c345e6ab75",
+      "name": "mcl_core_glass_cyan_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_cyan_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 76,
+      "id": "tex_af49416fd2",
+      "name": "mcl_core_glass_gray.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_gray.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 77,
+      "id": "tex_63e84376f0",
+      "name": "mcl_core_glass_gray_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_gray_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 78,
+      "id": "tex_896996d185",
+      "name": "mcl_core_glass_green.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_green.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 79,
+      "id": "tex_d720838421",
+      "name": "mcl_core_glass_green_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_green_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 80,
+      "id": "tex_bcd7920314",
+      "name": "mcl_core_glass_light_blue.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_light_blue.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 81,
+      "id": "tex_8eb6720383",
+      "name": "mcl_core_glass_light_blue_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_light_blue_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 82,
+      "id": "tex_3d66b726f3",
+      "name": "mcl_core_glass_lime.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_lime.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 83,
+      "id": "tex_37f60ce525",
+      "name": "mcl_core_glass_lime_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_lime_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 84,
+      "id": "tex_991833db36",
+      "name": "mcl_core_glass_magenta.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_magenta.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 85,
+      "id": "tex_de65825e7b",
+      "name": "mcl_core_glass_magenta_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_magenta_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 86,
+      "id": "tex_acb2198712",
+      "name": "mcl_core_glass_orange.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_orange.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 87,
+      "id": "tex_f49e3e83a0",
+      "name": "mcl_core_glass_orange_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_orange_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 88,
+      "id": "tex_1069bf7a57",
+      "name": "mcl_core_glass_pink.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_pink.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 89,
+      "id": "tex_e932b25b4d",
+      "name": "mcl_core_glass_pink_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_pink_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 90,
+      "id": "tex_996d2f5da9",
+      "name": "mcl_core_glass_purple.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_purple.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 91,
+      "id": "tex_c22ebf97fa",
+      "name": "mcl_core_glass_purple_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_purple_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 92,
+      "id": "tex_787388586e",
+      "name": "mcl_core_glass_red.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_red.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 93,
+      "id": "tex_6945c61475",
+      "name": "mcl_core_glass_red_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_red_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 94,
+      "id": "tex_ef994468b8",
+      "name": "mcl_core_glass_silver.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_silver.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 95,
+      "id": "tex_65edfcf7b5",
+      "name": "mcl_core_glass_silver_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_silver_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 96,
+      "id": "tex_64e057c6a0",
+      "name": "mcl_core_glass_white.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_white.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 97,
+      "id": "tex_e035caf637",
+      "name": "mcl_core_glass_white_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_white_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 98,
+      "id": "tex_0c573230bc",
+      "name": "mcl_core_glass_yellow.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_yellow.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 99,
+      "id": "tex_dd6a585b72",
+      "name": "mcl_core_glass_yellow_detail.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_glass_yellow_detail.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 100,
+      "id": "tex_b909988d18",
+      "name": "mcl_core_gold_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_gold_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 101,
+      "id": "tex_e826825ec3",
+      "name": "mcl_core_granite.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_granite.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 102,
+      "id": "tex_252082bdc1",
+      "name": "mcl_core_granite_smooth.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_granite_smooth.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 103,
+      "id": "tex_0093f1fcb6",
+      "name": "mcl_core_grass_path_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_grass_path_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 104,
+      "id": "tex_403d3abcbb",
+      "name": "mcl_core_grass_path_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_grass_path_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 105,
+      "id": "tex_d3d1726ab1",
+      "name": "mcl_core_ice_blue.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_ice_blue.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 106,
+      "id": "tex_72692279b5",
+      "name": "mcl_core_ice_packed.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_ice_packed.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 107,
+      "id": "tex_75bd9bde2f",
+      "name": "mcl_core_iron_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_iron_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 108,
+      "id": "tex_bed2c5c7d9",
+      "name": "mcl_core_lapis_block.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_lapis_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 109,
+      "id": "tex_d87f5025bc",
+      "name": "mcl_core_lapis_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_lapis_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 110,
+      "id": "tex_ceba97323d",
+      "name": "mcl_core_mycelium_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_mycelium_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 111,
+      "id": "tex_d84c1d7cfd",
+      "name": "mcl_core_mycelium_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_mycelium_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 112,
+      "id": "tex_148372aab5",
+      "name": "mcl_core_red_sand.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sand.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 113,
+      "id": "tex_d18b550108",
+      "name": "mcl_core_red_sandstone_bottom.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sandstone_bottom.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 114,
+      "id": "tex_615d838417",
+      "name": "mcl_core_red_sandstone_carved.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sandstone_carved.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 115,
+      "id": "tex_84253e231c",
+      "name": "mcl_core_red_sandstone_normal.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sandstone_normal.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 116,
+      "id": "tex_73b8eea695",
+      "name": "mcl_core_red_sandstone_smooth.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sandstone_smooth.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 117,
+      "id": "tex_08e7565c1a",
+      "name": "mcl_core_red_sandstone_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_red_sandstone_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 118,
+      "id": "tex_3c7da94925",
+      "name": "mcl_core_redstone_ore.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_redstone_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 119,
+      "id": "tex_574aea6d22",
+      "name": "mcl_core_sandstone_bottom.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_sandstone_bottom.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 120,
+      "id": "tex_43fbf52cb5",
+      "name": "mcl_core_sandstone_carved.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_sandstone_carved.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 121,
+      "id": "tex_1cd5f26c23",
+      "name": "mcl_core_sandstone_normal.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_sandstone_normal.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 122,
+      "id": "tex_9ee28d63bb",
+      "name": "mcl_core_sandstone_smooth.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_sandstone_smooth.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 123,
+      "id": "tex_86ff657382",
+      "name": "mcl_core_sandstone_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_sandstone_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 124,
+      "id": "tex_7d22404ac8",
+      "name": "mcl_core_slime.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_slime.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 125,
+      "id": "tex_44508f256c",
+      "name": "mcl_core_stonebrick_carved.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stonebrick_carved.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 126,
+      "id": "tex_f0ed4bfa42",
+      "name": "mcl_core_stonebrick_cracked.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stonebrick_cracked.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 127,
+      "id": "tex_a7545d63ac",
+      "name": "mcl_core_stonebrick_mossy.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stonebrick_mossy.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 128,
+      "id": "tex_5538220eae",
+      "name": "mcl_core_stripped_acacia_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_acacia_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 129,
+      "id": "tex_a6663ed89f",
+      "name": "mcl_core_stripped_acacia_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_acacia_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 130,
+      "id": "tex_887f43cb50",
+      "name": "mcl_core_stripped_birch_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_birch_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 131,
+      "id": "tex_1895e76867",
+      "name": "mcl_core_stripped_birch_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_birch_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 132,
+      "id": "tex_dd643f1599",
+      "name": "mcl_core_stripped_dark_oak_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_dark_oak_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 133,
+      "id": "tex_48f97cf434",
+      "name": "mcl_core_stripped_dark_oak_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_dark_oak_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 134,
+      "id": "tex_230e4d80cf",
+      "name": "mcl_core_stripped_jungle_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_jungle_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 135,
+      "id": "tex_ab18276e2b",
+      "name": "mcl_core_stripped_jungle_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_jungle_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 136,
+      "id": "tex_31cc436f83",
+      "name": "mcl_core_stripped_oak_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_oak_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 137,
+      "id": "tex_51841ab16a",
+      "name": "mcl_core_stripped_oak_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_oak_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 138,
+      "id": "tex_7490ace1d5",
+      "name": "mcl_core_stripped_spruce_side.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_spruce_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 139,
+      "id": "tex_3b3c47a153",
+      "name": "mcl_core_stripped_spruce_top.png",
+      "texture_path": "ITEMS/mcl_core/mcl_core_stripped_spruce_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 140,
+      "id": "tex_57c5e3b79a",
+      "name": "mcl_stairs_andesite_smooth_slab.png",
+      "texture_path": "ITEMS/mcl_core/mcl_stairs_andesite_smooth_slab.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 141,
+      "id": "tex_a00232ce02",
+      "name": "mcl_stairs_diorite_smooth_slab.png",
+      "texture_path": "ITEMS/mcl_core/mcl_stairs_diorite_smooth_slab.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 142,
+      "id": "tex_5e1a0061f5",
+      "name": "mcl_stairs_granite_smooth_slab.png",
+      "texture_path": "ITEMS/mcl_core/mcl_stairs_granite_smooth_slab.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 143,
+      "id": "tex_54e904c8f0",
+      "name": "mcl_deepslate.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 144,
+      "id": "tex_13921f9e25",
+      "name": "mcl_deepslate_bricks.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_bricks.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 145,
+      "id": "tex_e65ea59120",
+      "name": "mcl_deepslate_bricks_cracked.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_bricks_cracked.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 146,
+      "id": "tex_bcc0500a47",
+      "name": "mcl_deepslate_chiseled.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_chiseled.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 147,
+      "id": "tex_8046c7f897",
+      "name": "mcl_deepslate_coal_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_coal_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 148,
+      "id": "tex_06350503a8",
+      "name": "mcl_deepslate_cobbled.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_cobbled.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 149,
+      "id": "tex_fa688f63f5",
+      "name": "mcl_deepslate_copper_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_copper_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 150,
+      "id": "tex_1318ea9311",
+      "name": "mcl_deepslate_diamond_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_diamond_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 151,
+      "id": "tex_9de7f6a103",
+      "name": "mcl_deepslate_emerald_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_emerald_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 152,
+      "id": "tex_6b6affc6e8",
+      "name": "mcl_deepslate_gold_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_gold_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 153,
+      "id": "tex_cafc65208a",
+      "name": "mcl_deepslate_iron_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_iron_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 154,
+      "id": "tex_0c7b339a7f",
+      "name": "mcl_deepslate_lapis_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_lapis_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 155,
+      "id": "tex_509cef8065",
+      "name": "mcl_deepslate_polished.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_polished.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 156,
+      "id": "tex_60ff978aa0",
+      "name": "mcl_deepslate_redstone_ore.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_redstone_ore.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 157,
+      "id": "tex_35018bc278",
+      "name": "mcl_deepslate_reinforced.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_reinforced.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 158,
+      "id": "tex_ea4e224e46",
+      "name": "mcl_deepslate_reinforced_bottom.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_reinforced_bottom.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 159,
+      "id": "tex_c8cdb27681",
+      "name": "mcl_deepslate_reinforced_top.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_reinforced_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 160,
+      "id": "tex_4d9b5e1439",
+      "name": "mcl_deepslate_tiles.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tiles.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 161,
+      "id": "tex_2fb0ecc3bd",
+      "name": "mcl_deepslate_tiles_cracked.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tiles_cracked.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 162,
+      "id": "tex_33c5bdc616",
+      "name": "mcl_deepslate_top.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 163,
+      "id": "tex_6cce6765d9",
+      "name": "mcl_deepslate_tuff.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 164,
+      "id": "tex_00776bee97",
+      "name": "mcl_deepslate_tuff_bricks.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_bricks.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 165,
+      "id": "tex_1115709556",
+      "name": "mcl_deepslate_tuff_chiseled.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 166,
+      "id": "tex_ebecab1eb0",
+      "name": "mcl_deepslate_tuff_chiseled_bricks.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_bricks.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 167,
+      "id": "tex_b09029f3d8",
+      "name": "mcl_deepslate_tuff_chiseled_bricks_top.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_bricks_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 168,
+      "id": "tex_913c6b6d38",
+      "name": "mcl_deepslate_tuff_chiseled_top.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_chiseled_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 169,
+      "id": "tex_a9a6f2de2a",
+      "name": "mcl_deepslate_tuff_polished.png",
+      "texture_path": "ITEMS/mcl_deepslate/mcl_deepslate_tuff_polished.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 170,
+      "id": "tex_6a9c70ed4f",
+      "name": "mcl_ocean_brain_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_brain_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 171,
+      "id": "tex_5bf78fd498",
+      "name": "mcl_ocean_bubble_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_bubble_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 172,
+      "id": "tex_10d1b9fa60",
+      "name": "mcl_ocean_dead_brain_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_brain_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 173,
+      "id": "tex_50ad7f9d25",
+      "name": "mcl_ocean_dead_bubble_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_bubble_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 174,
+      "id": "tex_6adc22ad77",
+      "name": "mcl_ocean_dead_fire_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_fire_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 175,
+      "id": "tex_b15c56fbfe",
+      "name": "mcl_ocean_dead_horn_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_horn_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 176,
+      "id": "tex_250ac4e03b",
+      "name": "mcl_ocean_dead_tube_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dead_tube_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 177,
+      "id": "tex_3f1dd05834",
+      "name": "mcl_ocean_dried_kelp.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 178,
+      "id": "tex_c07ab3fcdf",
+      "name": "mcl_ocean_dried_kelp_bottom.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_bottom.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 179,
+      "id": "tex_45870be672",
+      "name": "mcl_ocean_dried_kelp_side.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_side.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 180,
+      "id": "tex_7752607723",
+      "name": "mcl_ocean_dried_kelp_top.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_dried_kelp_top.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 181,
+      "id": "tex_ef17a750b9",
+      "name": "mcl_ocean_fire_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_fire_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 182,
+      "id": "tex_e7aa7ea0d7",
+      "name": "mcl_ocean_horn_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_horn_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 183,
+      "id": "tex_8726808ea1",
+      "name": "mcl_ocean_prismarine_bricks.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_prismarine_bricks.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 184,
+      "id": "tex_8493cae69e",
+      "name": "mcl_ocean_prismarine_dark.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_prismarine_dark.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 185,
+      "id": "tex_a1365c610d",
+      "name": "mcl_ocean_sea_lantern.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_sea_lantern.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 186,
+      "id": "tex_ed4b608a0a",
+      "name": "mcl_ocean_tube_coral_block.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_tube_coral_block.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 187,
+      "id": "tex_2285b455d8",
+      "name": "mcl_wool_light_blue.png",
+      "texture_path": "ITEMS/mcl_wool/mcl_wool_light_blue.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 188,
+      "id": "tex_4df792be5a",
+      "name": "mcl_wool_lime.png",
+      "texture_path": "ITEMS/mcl_wool/mcl_wool_lime.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 189,
+      "id": "tex_ec12f600e8",
+      "name": "wool_black.png",
+      "texture_path": "ITEMS/mcl_wool/wool_black.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 190,
+      "id": "tex_a94edf6fe8",
+      "name": "wool_blue.png",
+      "texture_path": "ITEMS/mcl_wool/wool_blue.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 191,
+      "id": "tex_6590faf2ef",
+      "name": "wool_brown.png",
+      "texture_path": "ITEMS/mcl_wool/wool_brown.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 192,
+      "id": "tex_de1d7187cb",
+      "name": "wool_cyan.png",
+      "texture_path": "ITEMS/mcl_wool/wool_cyan.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 193,
+      "id": "tex_d89e7873f8",
+      "name": "wool_dark_green.png",
+      "texture_path": "ITEMS/mcl_wool/wool_dark_green.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 194,
+      "id": "tex_e07d939a27",
+      "name": "wool_dark_grey.png",
+      "texture_path": "ITEMS/mcl_wool/wool_dark_grey.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 195,
+      "id": "tex_51dc269a04",
+      "name": "wool_grey.png",
+      "texture_path": "ITEMS/mcl_wool/wool_grey.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 196,
+      "id": "tex_e8f6fc210b",
+      "name": "wool_magenta.png",
+      "texture_path": "ITEMS/mcl_wool/wool_magenta.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 197,
+      "id": "tex_1edce0f737",
+      "name": "wool_orange.png",
+      "texture_path": "ITEMS/mcl_wool/wool_orange.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 198,
+      "id": "tex_e1272b26d7",
+      "name": "wool_pink.png",
+      "texture_path": "ITEMS/mcl_wool/wool_pink.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 199,
+      "id": "tex_b07d805aaf",
+      "name": "wool_red.png",
+      "texture_path": "ITEMS/mcl_wool/wool_red.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 200,
+      "id": "tex_508612efc8",
+      "name": "wool_violet.png",
+      "texture_path": "ITEMS/mcl_wool/wool_violet.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 201,
+      "id": "tex_96a21c08c7",
+      "name": "wool_white.png",
+      "texture_path": "ITEMS/mcl_wool/wool_white.png",
+      "status": "pending",
+      "file": null
+    },
+    {
+      "order": 202,
+      "id": "tex_92f3681369",
+      "name": "wool_yellow.png",
+      "texture_path": "ITEMS/mcl_wool/wool_yellow.png",
+      "status": "pending",
+      "file": null
+    }
+  ]
+}
