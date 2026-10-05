@@ -1059,7 +1059,20 @@ function p0ReferenceSubject(x){
  const clean=n.replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
  return 'the game-world block material represented by '+clean;
 }
+const BLOCK_PROMPT_MANIFEST_URL='prompts/blocks/manifest.json';
+const BLOCK_REFERENCE_PROMPTS=new Map();
+let blockPromptManifest=null;
+async function loadBlockReferencePrompts(){
+ try{
+  const r=await fetch(BLOCK_PROMPT_MANIFEST_URL,{cache:'no-store'});if(!r.ok)throw new Error('manifest '+r.status);
+  blockPromptManifest=await r.json();
+  const done=(blockPromptManifest.entries||[]).filter(e=>e.status==='done'&&e.file);
+  const rows=await Promise.all(done.map(async e=>{try{const q=await fetch(e.file,{cache:'no-store'});if(!q.ok)return null;return await q.json()}catch{return null}}));
+  for(const row of rows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
+ }catch(e){console.warn('Block prompt manifest unavailable; inline fallback active',e)}
+}
 function p0ReferencePromptFor(x){
+ if(x?.id&&BLOCK_REFERENCE_PROMPTS.has(x.id))return BLOCK_REFERENCE_PROMPTS.get(x.id);
  const subject=p0ReferenceSubject(x);
  return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
 
@@ -1836,6 +1849,7 @@ async function bootstrapStorageInBackground(){
 }
 
 async function init(){
+  await loadBlockReferencePrompts();
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
   setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn');
