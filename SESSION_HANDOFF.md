@@ -1,3 +1,45 @@
+## Technical-category catalog split — 2026-10-05
+
+- Replaced the single compact catalog with one JSON file per technical category under `js/data/catalog/`.
+- Uses the existing technical taxonomy (terrain, stone, wood, ores, mobs, armor, HUD, GUI, particles, effects, etc.).
+- Each texture is stored once under its first/primary technical classification; runtime multi-category filtering remains unchanged via `textureTechnicalCategoriesOf()`.
+- Added `js/data/catalog-loader.js`; it loads category files in parallel, reconstructs the original catalog objects, sorts by original rank, then starts the app.
+- All 3,248 records remain represented. Empty primary groups such as redstone-tech/environment/debug still have their own files for taxonomy completeness.
+- Main remains unchanged; work stays on `refactor/split-js-20261005`.
+
+## Catalog compression — 2026-10-05
+
+- Replaced the three expanded catalog shards (~681.6 KB total) with one compact `js/data/catalog.js` (~207.3 KB).
+- The compact format dictionary-encodes repeated category/mod/priority strings and reconstructs the original `CATALOG` objects synchronously at load.
+- All 3,248 texture records are preserved with path/name/category/mod/priority/w/h/animated/rank/id fields.
+- Saved ~474 KB before transfer compression.
+- `catalog.js` and `app.js` both parse successfully.
+- Branch remains `refactor/split-js-20261005`; main unchanged.
+
+## Legacy P1 prompt compression — 2026-10-05
+
+- Removed the six legacy `js/data/prompts-p1-*.js` shards (~1.59 MB total).
+- P1 fallback prompts are now generated from the existing compact `materialHints(x)` + `generatedPromptFor(x)` path.
+- Removed the redundant ~24 KB `p1SpecialPromptFor()`/ `p1Prompt()` chain.
+- New authored Block/Mobs/Armor reference prompt manifests remain unchanged and still take precedence in their dedicated workflows.
+- `js/app.js` parses successfully; no `P1_PROMPT_LIBRARY` or `p1SpecialPromptFor` references remain.
+- Branch remains `refactor/split-js-20261005`; main unchanged.
+
+## JavaScript split / HTML de-bloat — 2026-10-05
+
+- Refactor branch: `refactor/split-js-20261005` (main was not modified directly).
+- Reduced `index.html` from ~2.65 MB to ~19 KB by extracting all inline JavaScript.
+- Extracted bundled JSZip to `js/vendor/jszip.js`.
+- Split the 3,248-entry texture catalog across `js/data/catalog-01..03.js`.
+- Moved P0 prompt data to `js/data/prompts-p0.js`.
+- Split the 673-entry legacy P1 prompt library across `js/data/prompts-p1-01..06.js`.
+- Remaining runtime/application logic is now `js/app.js` (~164 KB), preserving its original statement order, including later persistence/performance overrides.
+- All 12 JS files parse successfully with `new Function`.
+- Reconstructed data check: catalog=3248, P0=41, P1=673; first/last catalog paths preserved.
+- `index.html` now contains zero inline script blocks and loads external scripts synchronously in dependency order.
+- No texture images were embedded in the HTML; the size was primarily catalog and prompt data.
+- Open verification: browser/mobile smoke test after PR merge/deployment. Do not further split `app.js` by arbitrary function groups unless initialization/override ordering is verified.
+
 ## Armor category + authored-prompt filter — 2026-10-05
 
 - Added dedicated `Armor UV · 32` category in the UI; it selects only the 32 worn 64×32 armor UV atlases.
