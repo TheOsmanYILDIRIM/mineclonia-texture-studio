@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_16c5aadeaa",
+  "label": "default_leaves",
+  "texture_path": "ITEMS/mcl_core/default_leaves.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for mature oak foliage in a grounded dark-fantasy temperate woodland. The canopy should feel sturdy, familiar and old: clusters of broad leaves with varied maturity, restrained deep greens, muted olive shadows, occasional weathered yellow-brown edges and small signs of wind, insects and seasonal stress. It is healthy woodland foliage, but never ornamental or freshly manicured. Give the mass believable layered depth while allowing gaps, irregular density and darker interior shadow. Avoid tropical lushness, hedge-like uniformity, neon green, oversized individual leaves or a clean botanical photograph. This reference should define the world's baseline deciduous foliage language—enduring, weather-shaped and quietly ancient—without imposing a tile pattern or copying the source silhouette."
+}
