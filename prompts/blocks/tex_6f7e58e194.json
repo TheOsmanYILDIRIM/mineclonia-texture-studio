@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_6f7e58e194",
+  "label": "default_dirt",
+  "texture_path": "ITEMS/mcl_core/default_dirt.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for compact natural soil in an old, harsh dark-fantasy landscape.\n\nThis is ordinary earth made visually convincing: a dense mixture of fine mineral soil, darker organic traces, tiny roots, grit and occasional minute stones compressed by weather and time. It should feel slightly dry at the exposed surface but capable of holding deeper moisture, with subtle clumping and irregular tonal pockets.\n\nUse subdued brown, umber and muted ochre variation. Avoid potting soil, freshly tilled farmland, obvious pebbled gravel, mud puddles, giant cracks or a noisy photographic macro.\n\nThe material must remain humble and foundational yet rich enough to anchor the whole world. Let believable layering, compression, erosion and natural imperfection establish its identity without designing a tile pattern."
+}
