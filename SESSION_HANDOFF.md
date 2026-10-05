@@ -1,3 +1,12 @@
+## Catalog compression — 2026-10-05
+
+- Replaced the three expanded catalog shards (~681.6 KB total) with one compact `js/data/catalog.js` (~207.3 KB).
+- The compact format dictionary-encodes repeated category/mod/priority strings and reconstructs the original `CATALOG` objects synchronously at load.
+- All 3,248 texture records are preserved with path/name/category/mod/priority/w/h/animated/rank/id fields.
+- Saved ~474 KB before transfer compression.
+- `catalog.js` and `app.js` both parse successfully.
+- Branch remains `refactor/split-js-20261005`; main unchanged.
+
 ## Legacy P1 prompt compression — 2026-10-05
 
 - Removed the six legacy `js/data/prompts-p1-*.js` shards (~1.59 MB total).
