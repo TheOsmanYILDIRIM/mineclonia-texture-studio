@@ -52,6 +52,18 @@ Fixes:
 Commit:
 - `b5307f347a27afefc7da93026f0c38ccac3e9519`.
 
+## Mineclonia creative-inventory classification — 2026-10-05
+
+- Replaced the old file-area / broad asset-type toolbar filters with Mineclonia-style creative inventory categories.
+- Category names follow `mods/HUD/mcl_inventory/creative.lua`: Building Blocks, Decoration Blocks, Redstone, Transportation, Foodstuffs, Tools, Combat, Mobs, Brewing, Materials, Miscellaneous, and Not in Creative Inventory.
+- P0/P1/P2… priority chips remain a separate filter axis, so users can combine e.g. Building Blocks + P0 or Building Blocks + P1.
+- Texture classification supports multiple inventory categories where appropriate, matching Mineclonia's behavior where registered items can be present in more than one creative tab.
+- Entity textures are mapped to the closest workflow tab (normally Mobs; boats/minecarts → Transportation) because they are texture assets rather than literal creative-inventory item stacks.
+- Existing runtime-role classification is preserved for detail semantics; the new creative category is a browsing/filter layer, not a replacement for runtime role.
+
+Commit:
+- `4b8b0668656c4db15923781fcc2bd213bf580a82`.
+
 ## Project
 
 Repository:
