@@ -596,3 +596,23 @@ Key commits:
 
 PR #5 was squash-merged to `main` as `ac312ef5295dbda0116cb497f6fdd6102168196f` (`fix: persist verified changes and scale by source density`). Main runtime guards and GitHub Pages deployment both completed successfully. Remaining checks are device-side: let the one-time legacy/unknown verification finish, confirm later reloads skip known changed records, use P2–P6 reset if desired, and spot-check density scaling on block/entity assets.
 
+
+
+## Mobile toolbar cleanup — 2026-10-05
+
+Branch: `fix/mobile-toolbar-layout`.
+
+Observed on Android: the search field collapsed to a tiny pill because six controls were squeezed into the legacy four-column toolbar grid. The recently added runtime-role select also read like a duplicate/invalid general filter on mobile.
+
+Changes:
+- search now owns a full-width first row on mobile;
+- remaining controls use a readable two-column grid;
+- desktop gets an explicit five-column layout;
+- the runtime-role select was removed from the top toolbar while runtime-role classification/detail metadata remains intact;
+- stale `runtimeRole` DOM/filter bindings were removed so the toolbar cannot throw after the select is gone.
+
+Commits:
+- `491ad01ef9ec636d1545db480dbf274b88196470` — responsive toolbar layout and remove duplicate role select
+- `cd88cf425c13bbbac462e8ce0b063741f9f879dd` — remove stale role-filter bindings
+
+Next check: run runtime guards on the PR, then verify Android search width and that category/type/resolution/changed filters remain functional.
