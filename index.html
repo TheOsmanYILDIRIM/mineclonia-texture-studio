@@ -1001,6 +1001,7 @@ window.addEventListener('pagehide',()=>{
 
 // --- V5.1 instant thumbnail + reliable background persistence ---
 const changedPathsFast = new Set();
+const pendingChangedPaths = new Set();
 const cardRefsFast = new Map();
 function revoke(path){
   for(const key of ['e:'+path]){
@@ -1023,16 +1024,21 @@ function updateCardFast(path,url){
     }
   }
 }
-function installPersistedEditFast(edit){
+function installPersistedEditFast(edit,{markChanged=false}={}){
   if(!edit?.path||!edit.blob)return;
   const rec={path:edit.path,blob:edit.blob,updatedAt:edit.updatedAt||Date.now()};
   hotEdits.set(edit.path,rec);
-  changedPathsFast.add(edit.path);
+  if(markChanged){changedPathsFast.add(edit.path);pendingChangedPaths.delete(edit.path)}
+  else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path);
   const url=setFastEditUrl(edit.path,edit.blob);
-  updateCardFast(edit.path,url);
+  const ref=cardRefsFast.get(edit.path);
+  if(ref)ref.img.src=url;
+  if(markChanged)updateCardFast(edit.path,url);
 }
 function updateStatFast(){
-  if($('stat')) $('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPathsFast.size} değişti • ${storageLabel()}`;
+  if(!$('stat'))return;
+  const pending=pendingChangedPaths.size;
+  $('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPathsFast.size} değişti${pending?` • ${pending} doğrulanıyor`:''} • ${storageLabel()}`;
 }
 async function persistBlobOnly(path,blob){
   setSaveState('Kaydediliyor…','warn');
@@ -1066,7 +1072,7 @@ function queuePersistFast(path,blob){
 }
 async function putEdit(path,blob){
   const rec={path,blob,updatedAt:Date.now()};
-  hotEdits.set(path,rec); changedPathsFast.add(path);
+  hotEdits.set(path,rec); changedPathsFast.add(path); pendingChangedPaths.delete(path);
   const u=setFastEditUrl(path,blob); updateCardFast(path,u); updateStatFast();
   queuePersistFast(path,blob);
   return rec;
@@ -1106,7 +1112,7 @@ async function importPng(file,seam=false){
     return;
   }
   const rec={path:target.path,blob:b,updatedAt:Date.now()};
-  hotEdits.set(target.path,rec); changedPathsFast.add(target.path);
+  hotEdits.set(target.path,rec); changedPathsFast.add(target.path); pendingChangedPaths.delete(target.path);
   const u=setFastEditUrl(target.path,b);
   updateCardFast(target.path,u); updateStatFast();
   if(active&&active.path===target.path){
@@ -1118,7 +1124,7 @@ async function importPng(file,seam=false){
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
 }
 async function delEdit(path){
-  hotEdits.delete(path); memoryEdits.delete(path); changedPathsFast.delete(path); revoke(path);
+  hotEdits.delete(path); memoryEdits.delete(path); changedPathsFast.delete(path); pendingChangedPaths.delete(path); revoke(path);
   editWriteQueue=editWriteQueue.catch(()=>{}).then(async()=>{
     setSaveState('Siliniyor…','warn');
     if(storageMode==='indexeddb'&&dbp){await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}
@@ -1130,43 +1136,50 @@ async function delEdit(path){
 }
 let changedHydrationPromise=Promise.resolve({complete:true,total:0,same:0});
 
+async function deletePersistedEditQuiet(path){
+  hotEdits.delete(path);memoryEdits.delete(path);changedPathsFast.delete(path);pendingChangedPaths.delete(path);revoke(path);
+  if(storageMode==='indexeddb'&&dbp){
+    try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}catch(err){console.warn('Eski edit kaydı silinemedi',path,err)}
+  }
+  try{localStorage.removeItem('mts:'+path)}catch(_){}
+  await delScaledPath(path);
+}
+
 async function hydrateChangedPathsFast(seedEdits=null){
   const edits=seedEdits||await allEdits();
-  for(const e of edits){
-    if(CATALOG.some(x=>x.path===e.path))changedPathsFast.add(e.path);
-  }
+  for(const e of edits){if(CATALOG.some(x=>x.path===e.path)&&!changedPathsFast.has(e.path))pendingChangedPaths.add(e.path)}
   updateStatFast();
-  let processed=0,same=0,failed=0;
+  let processed=0,same=0,changed=0,failed=0;
   for(const e of edits){
     const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
     try{
       if(await textureMatchesOriginal(e.blob,meta)){
-        changedPathsFast.delete(e.path);same++;
+        same++;
+        await deletePersistedEditQuiet(e.path);
         const ref=cardRefsFast.get(e.path);
         if(ref){
           ref.card.querySelector('.changed')?.remove();
-          revoke(e.path);
           try{ref.img.src=await blobUrl(e.path,false)}catch(loadErr){console.warn('Orijinal thumbnail yenilenemedi',e.path,loadErr)}
-        }else revoke(e.path);
+        }
       }else{
-        changedPathsFast.add(e.path);
-        if(!urlCache.has('e:'+e.path))installPersistedEditFast(e);
+        changed++;pendingChangedPaths.delete(e.path);changedPathsFast.add(e.path);
+        if(!urlCache.has('e:'+e.path))installPersistedEditFast(e,{markChanged:true});
+        else{
+          const ref=cardRefsFast.get(e.path);
+          if(ref&&!ref.card.querySelector('.changed')){const d=document.createElement('span');d.className='changed';ref.card.appendChild(d)}
+        }
       }
     }catch(err){
-      failed++;
-      changedPathsFast.add(e.path);
+      failed++;pendingChangedPaths.add(e.path);changedPathsFast.delete(e.path);
       console.warn('Değişiklik doğrulanamadı',e.path,err);
     }
     processed++;
-    if(processed===1||processed===edits.length||processed%10===0){
-      updateStatFast();
-      await new Promise(requestAnimationFrame);
-    }
+    if(processed===1||processed===edits.length||processed%10===0){updateStatFast();await new Promise(requestAnimationFrame)}
   }
-  if(same)console.info(`${same} kayıt orijinalle aynı olduğu için değişiklik sayılmadı`);
-  return {complete:failed===0,total:processed,same,failed};
+  updateStatFast();
+  if(same)console.info(`${same} sahte/eski edit kaydı temizlendi`);
+  return {complete:failed===0,total:processed,same,changed,failed};
 }
-
 async function bootstrapStorageInBackground(){
   try{
     await initStorage();
@@ -1175,7 +1188,7 @@ async function bootstrapStorageInBackground(){
     const edits=await allEdits();
     for(const e of edits){
       if(!CATALOG.some(x=>x.path===e.path))continue;
-      installPersistedEditFast(e);
+      installPersistedEditFast(e,{markChanged:false});
     }
     updateStatFast();
     await applyFilter();
