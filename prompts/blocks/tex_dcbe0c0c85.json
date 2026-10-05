@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_dcbe0c0c85",
+  "label": "mcl_core_crying_obsidian_tear",
+  "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian_tear.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference specifically for the violet tear-like exudation associated with ancient crying obsidian in a grounded dark-fantasy world. The substance should feel as though it has condensed and crept from microscopic fractures in volcanic glass: viscous mineral-rich streaks, small pooled beads, thin branching runs and darker dried margins. Its violet color may be unusually vivid but must retain material depth, translucency and tonal variation rather than becoming flat neon light. Avoid generic purple paint, glowing lightning, blood-like gore, glitter or a uniform emissive stripe. Establish a strange mineral fluid/residue whose shape follows gravity and fracture paths and can visually coexist with black obsidian."
+}
