@@ -543,3 +543,20 @@ Variant Lab is only for visual comparison:
 - a selected single variant can be promoted to the active texture.
 
 Variant Lab contains no generation prompts.
+
+## Animated texture production rule — 2026-10-05
+
+Animated textures must **not** use the same reconstruction strategy as ordinary static material blocks.
+
+For static material blocks, Image A mainly preserves semantic identity/function while Image B can drive a substantial interior material rebuild. That freedom is harmful for animated atlases because Image A already contains the temporal structure that makes the animation coherent.
+
+For animated textures such as flowing/source lava and water:
+
+- **Image A is the locked structural and motion master.** Preserve its frame layout, frame count/order, spatial organization, motion progression, flow direction, temporal relationships and loop behavior.
+- Do not freely reconstruct or independently reinterpret the individual frames. Doing so produces unrelated/random-looking frames and destroys animation continuity.
+- **Image B is a material/appearance reference only.** Transfer surface character, material richness, color relationships, weathering/thermal character and fine-detail language without replacing Image A's motion structure.
+- The preferred production behavior is therefore closer to the earlier structure-locking Image A + Image B prompt, not the newer free-reconstruction static-block prompt.
+- Spatial seamlessness is still required, but it must not come at the cost of destroying the source animation's temporal coherence.
+- Reference-image/video/Veo experiments did not outperform the structure-locked atlas workflow in the current tests; do not make video generation the default animated-texture workflow at this stage.
+
+In short: **static blocks may rebuild; animated textures must preserve Image A's animation structure and only reskin/material-transfer from Image B.**
