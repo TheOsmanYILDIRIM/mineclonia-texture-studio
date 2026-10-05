@@ -1,3 +1,12 @@
+## Armor authored-ref fallback repair — 2026-10-05
+
+- Fixed the authored-reference wiring fallback bug introduced after the authored-first loader.
+- Root cause: `referencePromptFor()` called nonexistent `mobArmorRefPromptFor()` when an Armor authored ref was unavailable.
+- Added real `dynamicArmorRefPromptFor()` using the existing armor-aware `mobPromptMeta()` material metadata.
+- Precedence remains: authored Mob/Armor reference first; dynamic fallback second.
+- Verified there are zero remaining references to the nonexistent helper and both Mob/Armor fallback branches remain defined.
+- Fix commit: `c33b95aa944dee19bcaccdf5590a30ea8aac32d4`.
+
 ## Authored UV reference runtime wiring — 2026-10-05
 
 - Fixed the three-stage UV reference path so authored prompts are actually consumed by the UI.
