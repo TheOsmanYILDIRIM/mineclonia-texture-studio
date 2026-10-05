@@ -843,27 +843,128 @@ The final result should clearly remain the same texture type as Image A, but vis
 Prioritize Image B for style.
 Prioritize Image A for structure and function.`;
 
+const P0_REFERENCE_SUBJECT_EXACT={
+ 'default_acacia_leaves':'natural acacia foliage',
+ 'default_acacia_tree':'the bark-covered side surface of an acacia tree trunk',
+ 'default_acacia_tree_top':'the cut cross-section and end-grain surface of an acacia tree trunk',
+ 'default_acacia_wood':'acacia wooden planks',
+ 'default_cobble':'an old cobblestone surface',
+ 'default_dirt':'a natural compact soil surface',
+ 'default_gravel':'a rough natural gravel surface',
+ 'default_ice':'a natural solid ice surface',
+ 'default_jungleleaves':'natural jungle-tree foliage',
+ 'default_jungletree':'the bark-covered side surface of a jungle tree trunk',
+ 'default_jungletree_top':'the cut cross-section and end-grain surface of a jungle tree trunk',
+ 'default_junglewood':'jungle wood planks',
+ 'default_lava_flowing_animated':'a flowing molten lava surface',
+ 'default_lava_source_animated':'a dense molten lava source surface',
+ 'default_leaves':'natural oak foliage',
+ 'default_sand':'a natural sand surface',
+ 'default_snow':'a natural settled snow surface',
+ 'default_stone':'a natural weathered stone surface',
+ 'default_tree':'the bark-covered side surface of an oak tree trunk',
+ 'default_tree_top':'the cut cross-section and end-grain surface of an oak tree trunk',
+ 'default_water_flowing_animated':'a flowing natural water surface',
+ 'default_water_source_animated':'a calm natural water source surface',
+ 'default_wood':'oak wooden planks',
+ 'mcl_core_bedrock':'an ancient extremely dense bedrock surface',
+ 'mcl_core_grass_block_side_overlay':'the grassy edge layer used along the side face of a grass-covered soil block',
+ 'mcl_core_grass_block_top':'the top surface of a natural grass-covered soil block',
+ 'mcl_core_grass_side_snowed':'the side face of a grass-and-soil block covered by snow',
+ 'mcl_core_leaves_big_oak':'natural big/dark oak foliage',
+ 'mcl_core_leaves_birch':'natural birch foliage',
+ 'mcl_core_leaves_spruce':'natural spruce foliage',
+ 'mcl_core_log_big_oak':'the bark-covered side surface of a big/dark oak tree trunk',
+ 'mcl_core_log_big_oak_top':'the cut cross-section and end-grain surface of a big/dark oak tree trunk',
+ 'mcl_core_log_birch':'the bark-covered side surface of a birch tree trunk',
+ 'mcl_core_log_birch_top':'the cut cross-section and end-grain surface of a birch tree trunk',
+ 'mcl_core_log_spruce':'the bark-covered side surface of a spruce tree trunk',
+ 'mcl_core_log_spruce_top':'the cut cross-section and end-grain surface of a spruce tree trunk',
+ 'mcl_core_planks_big_oak':'big/dark oak wooden planks',
+ 'mcl_core_planks_birch':'birch wooden planks',
+ 'mcl_core_planks_spruce':'spruce wooden planks',
+ 'default_river_water_flowing_animated':'a flowing natural river-water surface',
+ 'default_river_water_source_animated':'a calm natural river-water source surface'
+};
 function p0ReferenceSubject(x){
  const n=String(x?.name||'').toLowerCase().replace(/\.png$/,'');
- const species=(n.match(/(?:^|_)(acacia|birch|cherry|dark_oak|jungle|mangrove|oak|pale_oak|spruce)(?:_|$)/)||[])[1]||'';
- const wood=(n.match(/(?:log|wood|plank|leaves?)_(acacia|birch|cherry|dark_oak|jungle|mangrove|oak|pale_oak|spruce)/)||n.match(/(acacia|birch|cherry|dark_oak|jungle|mangrove|oak|pale_oak|spruce)_(?:log|wood|plank|leaves?)/))?.[1]||species;
- const prettyWood=wood?wood.replace(/_/g,' '):'';
- if(/tree_top|log_top|wood_top|top_log|top_wood/.test(n)) return prettyWood?'the cut cross-section and end-grain surface of a '+prettyWood+' tree trunk':'the cut cross-section and end-grain surface of an old tree trunk';
- if(/leaves?|foliage/.test(n)) return prettyWood?prettyWood+' foliage':'natural foliage';
- if(/(?:^|_)log(?:_|$)|tree_side|bark/.test(n)) return prettyWood?'the side surface of a '+prettyWood+' tree trunk':'the side surface of an old tree trunk';
- if(/planks?/.test(n)) return prettyWood?prettyWood+' wooden planks':'aged wooden planks';
- if(/cobble/.test(n)) return 'an old cobblestone surface';
- if(/brick/.test(n)) return 'aged masonry and brickwork';
- if(/stone/.test(n)) return 'an old weathered stone surface';
- if(/dirt|soil|mud/.test(n)) return 'a natural earth surface';
- if(/sand/.test(n)) return 'a weathered natural sand surface';
- if(/gravel/.test(n)) return 'a rough gravel surface';
- if(/ore/.test(n)) return 'a mineral-bearing stone surface';
- if(/grass/.test(n)) return 'a natural grass-covered ground surface';
- if(/glass/.test(n)) return 'aged game-world glass material';
- if(/wool/.test(n)) return 'a worn natural wool material';
- const clean=String(x?.name||'texture').replace(/\.png$/i,'').replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
- return 'the material represented by the source texture '+clean;
+ if(P0_REFERENCE_SUBJECT_EXACT[n])return P0_REFERENCE_SUBJECT_EXACT[n];
+
+ const speciesMatch=n.match(/(?:^|_)(acacia|birch|cherry|dark_oak|big_oak|jungle|oak|spruce|mangrove|pale_oak)(?:_|$)/);
+ const compactSpecies=n.includes('jungletree')||n.includes('junglewood')||n.includes('jungleleaves')?'jungle':n.includes('bigoak')?'big_oak':'';
+ const species=(speciesMatch?.[1]||compactSpecies).replace(/_/g,' ');
+ const pretty=species==='big oak'?'big/dark oak':species;
+
+ if(/stripped_/.test(n)&&/_top(?:_|$)/.test(n))return pretty?'the cut cross-section and end-grain surface of a stripped '+pretty+' tree trunk':'the cut cross-section and end-grain surface of a stripped tree trunk';
+ if(/stripped_/.test(n)&&/_side(?:_|$)/.test(n))return pretty?'the exposed stripped-wood side surface of a '+pretty+' tree trunk':'the exposed stripped-wood side surface of a tree trunk';
+ if(/tree_top|log_top|wood_top|top_log|top_wood/.test(n))return pretty?'the cut cross-section and end-grain surface of a '+pretty+' tree trunk':'the cut cross-section and end-grain surface of an old tree trunk';
+ if(/leaves?|foliage/.test(n))return pretty?pretty+' foliage':'natural foliage';
+ if(/(?:^|_)log(?:_|$)|tree_side|bark/.test(n))return pretty?'the bark-covered side surface of a '+pretty+' tree trunk':'the bark-covered side surface of an old tree trunk';
+ if(/planks?/.test(n))return pretty?pretty+' wooden planks':'aged wooden planks';
+
+ if(/bone_block_top/.test(n))return 'the end face of a dense bone block';
+ if(/bone_block_side/.test(n))return 'the side surface of a dense bone block';
+ if(/cactus_top/.test(n))return 'the top face of a cactus';
+ if(/cactus_bottom/.test(n))return 'the bottom face of a cactus';
+ if(/cactus_side/.test(n))return 'the side surface of a cactus';
+ if(/podzol_top/.test(n))return 'the organic top surface of podzol soil';
+ if(/podzol_side/.test(n))return 'the layered side face of a podzol soil block';
+ if(/mycelium_top/.test(n))return 'the fungal top surface of a mycelium-covered soil block';
+ if(/mycelium_side/.test(n))return 'the layered side face of a mycelium-covered soil block';
+ if(/grass_path_top/.test(n))return 'the worn top surface of a compacted grass path';
+ if(/grass_path_side/.test(n))return 'the exposed side face of a compacted grass path block';
+
+ if(/dried_kelp_top/.test(n))return 'the top face of a compressed dried-kelp block';
+ if(/dried_kelp_bottom/.test(n))return 'the bottom face of a compressed dried-kelp block';
+ if(/dried_kelp_side/.test(n))return 'the side surface of a compressed dried-kelp block';
+ if(/dried_kelp/.test(n))return 'a compressed dried-kelp block material';
+
+ if(/red_sandstone_top/.test(n))return 'the top face of red sandstone';
+ if(/red_sandstone_bottom/.test(n))return 'the bottom face of red sandstone';
+ if(/red_sandstone_carved/.test(n))return 'carved red sandstone masonry';
+ if(/red_sandstone_smooth/.test(n))return 'smooth finished red sandstone';
+ if(/red_sandstone/.test(n))return 'natural red sandstone masonry';
+ if(/sandstone_top/.test(n))return 'the top face of sandstone';
+ if(/sandstone_bottom/.test(n))return 'the bottom face of sandstone';
+ if(/sandstone_carved/.test(n))return 'carved sandstone masonry';
+ if(/sandstone_smooth/.test(n))return 'smooth finished sandstone';
+ if(/sandstone/.test(n))return 'natural sandstone masonry';
+
+ if(/deepslate.*(?:brick|tiles?)/.test(n))return 'deep dark deepslate masonry';
+ if(/deepslate.*cobbled/.test(n))return 'rough cobbled deepslate';
+ if(/deepslate.*polished/.test(n))return 'polished deepslate stone';
+ if(/deepslate.*chiseled/.test(n))return 'chiseled deepslate stonework';
+ if(/deepslate/.test(n)&&/_ore/.test(n))return 'a mineral-bearing deepslate stone surface';
+ if(/deepslate/.test(n))return 'a dense dark deepslate stone surface';
+
+ if(/coral_block/.test(n))return /dead_/.test(n)?'a dead weathered coral-block surface':'a living coral-block surface';
+ if(/prismarine_bricks/.test(n))return 'prismarine masonry blocks';
+ if(/prismarine_dark/.test(n))return 'dark prismarine stonework';
+ if(/sea_lantern/.test(n))return 'a luminous sea-lantern material surface';
+
+ if(/wool/.test(n))return 'a dense woven wool block surface';
+ if(/glass/.test(n))return 'a translucent game-world glass material';
+ if(/mossycobble/.test(n))return 'old moss-covered cobblestone';
+ if(/cobble/.test(n))return 'an old cobblestone surface';
+ if(/stonebrick|stone_brick/.test(n))return 'aged stone-brick masonry';
+ if(/brick/.test(n))return 'aged masonry and brickwork';
+ if(/_ore/.test(n)||/ore_/.test(n))return 'a mineral-bearing stone surface';
+ if(/obsidian/.test(n))return 'a dense volcanic obsidian surface';
+ if(/granite/.test(n))return /smooth/.test(n)?'smooth finished granite':'natural granite stone';
+ if(/diorite/.test(n))return /smooth/.test(n)?'smooth finished diorite':'natural diorite stone';
+ if(/andesite/.test(n))return /smooth/.test(n)?'smooth finished andesite':'natural andesite stone';
+ if(/stone/.test(n))return 'an old weathered stone surface';
+ if(/coarse_dirt/.test(n))return 'coarse compact soil mixed with small stones';
+ if(/dirt|soil|mud/.test(n))return 'a natural earth surface';
+ if(/red_sand/.test(n))return 'a natural red-sand surface';
+ if(/sand/.test(n))return 'a weathered natural sand surface';
+ if(/gravel/.test(n))return 'a rough gravel surface';
+ if(/ice/.test(n))return 'a natural solid ice surface';
+ if(/snow/.test(n))return 'a natural settled snow surface';
+ if(/slime/.test(n))return 'a translucent cohesive slime-block material';
+
+ const clean=n.replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
+ return 'the game-world block material represented by '+clean;
 }
 function p0ReferencePromptFor(x){
  const subject=p0ReferenceSubject(x);
@@ -912,12 +1013,21 @@ No text or interface elements.
 Focus purely on establishing the material language and artistic identity of this world through this material.`;
 }
 
-for(const x of CATALOG){
- if(x.priority==='P1'){
-   const t=assetTypeOf(x);
-   if(t==='Block'||t==='Functional Block')x.priority='P0';
- }
+function p0PromotableBlock(x){
+ if(assetTypeOf(x)!=='Block')return false;
+ const n=String(x?.name||'').toLowerCase();
+ if(/^mcl_core_light_\d+\.png$/.test(n))return false;
+ if(['mcl_core_barrier.png','mcl_core_void.png','mcl_core_sugar.png','mcl_core_vine.png','mcl_core_web.png','mcl_dirt_grass_shadow.png','default_ladder.png'].includes(n))return false;
+ if(/^mcl_ocean_sea_pickle_\d+_off\.png$/.test(n))return false;
+ return true;
 }
+for(const x of CATALOG){
+ if(x.priority==='P1'&&p0PromotableBlock(x))x.priority='P0';
+}
+const P0_REFERENCE_REQUIRED=[
+ 'default_acacia_leaves','default_acacia_tree','default_acacia_tree_top','default_acacia_wood','default_cobble','default_dirt','default_gravel','default_ice','default_jungleleaves','default_jungletree','default_jungletree_top','default_junglewood','default_lava_flowing_animated','default_lava_source_animated','default_leaves','default_sand','default_snow','default_stone','default_tree','default_tree_top','default_water_flowing_animated','default_water_source_animated','default_wood','mcl_core_bedrock','mcl_core_grass_block_side_overlay','mcl_core_grass_block_top','mcl_core_grass_side_snowed','mcl_core_leaves_big_oak','mcl_core_leaves_birch','mcl_core_leaves_spruce','mcl_core_log_big_oak','mcl_core_log_big_oak_top','mcl_core_log_birch','mcl_core_log_birch_top','mcl_core_log_spruce','mcl_core_log_spruce_top','mcl_core_planks_big_oak','mcl_core_planks_birch','mcl_core_planks_spruce','default_river_water_flowing_animated','default_river_water_source_animated'
+];
+if(P0_REFERENCE_REQUIRED.some(k=>!P0_REFERENCE_SUBJECT_EXACT[k]))console.error('P0 reference subject map incomplete');
 const __legacyPromptForP0Ref=promptFor;
 promptFor=function(x,mode='classic'){
  if(x&&x.priority==='P0')return {text:p0ReferencePromptFor(x),family:'P0 · Reference-first'};
