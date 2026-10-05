@@ -501,11 +501,15 @@ The app also enforces this structurally on import: for Entity assets, the edited
 
 Entity seam-offset editing is disabled because offsetting the atlas would intentionally move the structural mask.
 
+## P0 reference-first workflow — 2026-10-05
 
-## Creative alternative mode — composition reset rule
+P0 block/material textures now use two prompts:
 
-Creative alternatives are not HD remakes of the source texture. For full-square material textures, preserve the gameplay material/face role and technical behavior, but do **not** preserve the source macro-composition by default.
+1. **Reference prompt:** world- and art-direction-first. It names only the material/subject and intentionally leaves surface details to the image model so the reference can establish a strong authored visual language.
+2. **Standard Original+Ref production prompt:** Image A is the structural source texture; Image B is the dominant visual/style reference. The prompt does not redescribe the material. Only the literal outer canvas boundary is seam-critical; internal contours are not seam constraints.
 
-In creative mode, large cracks, patch boundaries, knots, stones, stains, veins, tonal islands, grain groupings, focal marks and other large spatial features may be redesigned from scratch. Similarity should come from material identity and gameplay role, not from matching the old texture's layout.
+The former P0 creative-alternative mode is retired.
 
-Only hard structural constraints remain locked where they are actually functional: tileability, meaningful alpha/mask behavior, UV layout for locked atlases, and frame topology/order for animations. The purpose of the creative set is to produce a genuinely different authored texture for the same game material, not a higher-resolution reconstruction.
+P1 entries already classified by the app as **Block** or **Functional Block** are promoted to P0 at runtime. This promotion uses the existing semantic asset classifier, not filename guessing.
+
+In the texture detail UI, P0 prompt text is intentionally hidden. Two compact buttons copy the reference prompt and the standard production prompt directly.
