@@ -495,7 +495,6 @@ Verification:
 - 64/128/256/512 options are all present.
 
 Workflow note:
-- User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
 
 ## High-resolution animation preview fix — 2026-10-05
 
