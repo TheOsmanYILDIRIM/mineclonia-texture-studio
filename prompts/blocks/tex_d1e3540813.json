@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_d1e3540813",
+  "label": "mcl_core_log_spruce",
+  "texture_path": "ITEMS/mcl_core/mcl_core_log_spruce.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for the bark-covered side of a mature spruce trunk in a cold, severe dark-fantasy forest. The bark is built from thin overlapping scales and narrow vertical plates, roughened by frost, wind and resin. Recesses are cool and dark while exposed flakes are dry gray-brown with restrained reddish undertones. Small scars and resin-darkened wounds hint at hard growth without becoming decorative. Avoid oak-like broad ridges, perfectly straight grooves, heavy moss, Christmas imagery or exaggerated peeling. Establish spruce bark as lean, cold-weather armor: layered, resinous, weather-scoured and distinctly coniferous, while leaving the final pattern to the source texture."
+}
