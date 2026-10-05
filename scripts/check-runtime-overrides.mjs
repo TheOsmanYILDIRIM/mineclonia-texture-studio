@@ -63,6 +63,18 @@ expect(originalBlob.includes('setTimeout(()=>controller.abort(),12000)'), 'upstr
 expect(exportPack.includes('await changedHydrationPromise.catch(()=>{})'), 'texturepack export must wait for background changed-state verification');
 expect(exportPack.includes('await editWriteQueue.catch(()=>{})'), 'texturepack export must wait for pending edit persistence');
 
+const persistedInstall = lastBlock('function installPersistedEditFast(edit)');
+expect(persistedInstall.includes('hotEdits.set(edit.path,rec)'), 'late-loaded persisted edits must populate hot edit cache');
+expect(persistedInstall.includes('setFastEditUrl(edit.path,edit.blob)'), 'late-loaded persisted edits must replace stale edited-thumbnail cache');
+expect(persistedInstall.includes('updateCardFast(edit.path,url)'), 'visible cards must refresh immediately when persisted edits load');
+
+const bootstrap = lastBlock('async function bootstrapStorageInBackground()');
+expect(bootstrap.includes('installPersistedEditFast(e)'), 'background storage bootstrap must install persisted edits into thumbnail cache');
+
+const hydrate = lastBlock('async function hydrateChangedPathsFast(seedEdits=null)');
+expect(hydrate.includes("revoke(e.path)"), 'hydration must invalidate edited-thumbnail cache for records proven identical to original');
+
+
 const scriptBlocks = [...source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(match=>match[1]);
 expect(scriptBlocks.length >= 2, 'expected inline script blocks');
 for (const [index, script] of scriptBlocks.entries()) {

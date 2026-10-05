@@ -496,6 +496,22 @@ Verification:
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
 
+## Late-loaded thumbnail refresh fix — 2026-10-05
+
+A startup race remained after storage hydration was moved off the critical path: the first render could cache the original texture under the edited-thumbnail cache key (`e:<path>`) before IndexedDB edits were available. When persisted edits arrived later, the cache key remained valid, so cards kept showing the default/original thumbnail even though the edit record had loaded.
+
+Branch fix:
+- `4e40959ca487a82a47bd576ef17f512172f0c783` — persisted edits now populate `hotEdits`, replace stale `e:` object URLs, and refresh visible cards immediately.
+- `ffe82597dd929ab0eb568655e6e863d4d58e0453` — runtime regression guard verifies late-loaded thumbnail installation and cache invalidation.
+
+Hydration behavior:
+- persisted edit blobs are installed locally without waiting for remote originals;
+- visible cards switch to the edited thumbnail immediately;
+- exact-original verification continues in the background;
+- if a persisted record is proven identical to the original, its changed badge is removed and the edited cache entry is invalidated.
+
+PR #4 runtime guard completed successfully. Merge PR #4 to `main`, then verify on Android after Pages deployment.
+
 ## Startup/storage hang fix — 2026-10-04
 
 The first-load “kayıt hazırlanıyor…” hang was traced to startup synchronously awaiting changed-state hydration. That hydration can fetch the original Mineclonia texture for every persisted edit and compare pixels, so slow/stalled upstream requests kept the UI in the preparing state indefinitely.

@@ -998,6 +998,14 @@ function updateCardFast(path,url){
     }
   }
 }
+function installPersistedEditFast(edit){
+  if(!edit?.path||!edit.blob)return;
+  const rec={path:edit.path,blob:edit.blob,updatedAt:edit.updatedAt||Date.now()};
+  hotEdits.set(edit.path,rec);
+  changedPathsFast.add(edit.path);
+  const url=setFastEditUrl(edit.path,edit.blob);
+  updateCardFast(edit.path,url);
+}
 function updateStatFast(){
   if($('stat')) $('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPathsFast.size} değişti • ${storageLabel()}`;
 }
@@ -1107,8 +1115,18 @@ async function hydrateChangedPathsFast(seedEdits=null){
   for(const e of edits){
     const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
     try{
-      if(await textureMatchesOriginal(e.blob,meta)){changedPathsFast.delete(e.path);same++}
-      else changedPathsFast.add(e.path);
+      if(await textureMatchesOriginal(e.blob,meta)){
+        changedPathsFast.delete(e.path);same++;
+        const ref=cardRefsFast.get(e.path);
+        if(ref){
+          ref.card.querySelector('.changed')?.remove();
+          revoke(e.path);
+          try{ref.img.src=await blobUrl(e.path,false)}catch(loadErr){console.warn('Orijinal thumbnail yenilenemedi',e.path,loadErr)}
+        }else revoke(e.path);
+      }else{
+        changedPathsFast.add(e.path);
+        if(!urlCache.has('e:'+e.path))installPersistedEditFast(e);
+      }
     }catch(err){
       failed++;
       changedPathsFast.add(e.path);
@@ -1130,7 +1148,11 @@ async function bootstrapStorageInBackground(){
     setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad');
     initScaledStorage().catch(err=>console.warn('scaled storage init',err));
     const edits=await allEdits();
-    for(const e of edits)if(CATALOG.some(x=>x.path===e.path))changedPathsFast.add(e.path);
+    for(const e of edits){
+      if(!CATALOG.some(x=>x.path===e.path))continue;
+      installPersistedEditFast(e);
+    }
+    updateStatFast();
     await applyFilter();
     changedHydrationPromise=hydrateChangedPathsFast(edits)
       .then(async result=>{await applyFilter();return result})
