@@ -1,3 +1,14 @@
+## Dynamic three-stage Mobs prompt UI — 2026-10-05
+
+- Mobs UV assets now use a compact three-button production UI: `1 · HQ UV`, `2 · Creature Ref`, `3 · Final UV`.
+- The app loads `prompts/mobs/manifest.json` at runtime, so only the corrected 241-entry UV queue receives this UI.
+- HQ UV and Final UV are shared dynamic templates rather than duplicated per-texture prompt files.
+- Templates auto-fill texture identity, runtime role, linked model when known, and a material-family description inferred from the entity/variant.
+- Creature Ref is also generated from the selected texture metadata as the starting reference-art prompt; future deliberate per-texture refinements can extend this without duplicating the two structural templates.
+- Existing Block/P0 prompt behavior remains separate.
+- Implementation commit: `0023c855c6625d4d929291f0857875646bec7bda`.
+- Next: verify the three buttons on Android with `extra_mobs_cod.png`, inspect the three copied prompts, then begin deliberate Creature Ref refinement in manifest order.
+
 ## Mobs UV queue correction — 2026-10-05
 
 - The first Mobs manifest over-counted assets because it treated broad `ENTITIES/**` inventory as mob UV work.
