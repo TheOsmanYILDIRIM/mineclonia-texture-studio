@@ -670,12 +670,13 @@ async function lockEntityAlphaToSource(blob,meta){
  return await canvasPngBlob(edited)
 }
 async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
- let out=await normalizeTextureBlob(blob,meta,targetRes);
+ let out=await autoRemoveBorderBlackBackground(blob,meta);
+ out=await normalizeTextureBlob(out,meta,targetRes);
  if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
  return out
 }
 async function prepareStoredEditBlob(blob,meta){
- let out=blob;
+ let out=await autoRemoveBorderBlackBackground(blob,meta);
  if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
  return out
 }
