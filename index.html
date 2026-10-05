@@ -1137,8 +1137,8 @@ async function putEdit(path,blob){
   return rec;
 }
 async function applyFilter(){
-  const q=$('search').value.trim().toLowerCase(),cat=$('category').value,t=$('assetType').value,role=$('runtimeRole').value,p=activePriority();
-  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&(!cat||x.category===cat)&&(!t||assetTypeOf(x)===t)&&(!role||runtimeRoleOf(x)===role)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path)));
+  const q=$('search').value.trim().toLowerCase(),cat=$('category').value,t=$('assetType').value,p=activePriority();
+  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&(!cat||x.category===cat)&&(!t||assetTypeOf(x)===t)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path)));
   page=0; render();
 }
 async function render(){
@@ -1289,7 +1289,7 @@ async function init(){
 
   $('resolution').value=String(TARGET_RESOLUTION);
   $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Temel 16px ölçeği → '+TARGET_RESOLUTION+'px')};
-  $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();$('runtimeRole').onchange=()=>applyFilter();
+  $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
