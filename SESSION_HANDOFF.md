@@ -2,33 +2,23 @@
 
 Updated: 2026-10-05
 
-## Current decisions
+## Current state
 
-- **P0/P1/P2… remain priority labels.** Classification/filtering is separate.
-- Browsing follows Mineclonia creative-inventory groups plus deeper technical/runtime classes; one texture may belong to multiple classes.
-- Material-P0 promotion is limited to true material **Block** assets. Functional blocks, UI, sprites and system/debug assets are not promoted automatically.
-- P0 material prompts are **reference-first**:
-  - **Ref prompt** = short world/art-direction + material identity; leave surface details creative.
-  - **Üretim prompt** = standard Image A (source structure/function) + Image B (dominant visual/style reference).
-- For normal tile materials, only the literal outer canvas boundary is seam-critical; internal material contours are not seam boundaries.
-- Semantic face/orientation must be respected. Tree/log top means cut trunk/end-grain; side means bark/trunk side; foliage remains foliage.
-- **Yaratıcı alternatif is retired.**
-- Variant Lab is a comparison gallery only: unlimited multi-PNG import, horizontal thumbnails, 1×1/3×3/6×6 preview, mixed mode, per-variant on/off, and promote selected variant to active.
-- Ambiguous entity/effect/overlay/animation roles must still be resolved from Mineclonia runtime/source code; runtime behavior wins over filenames.
-
-## Current implementation evidence
-
-- `eb742e2e4ab118a915b8dab0412ac78651e38747` — tree-top reference semantics + reliable Ref/Üretim copy actions.
-- `07c9096bb439254872f309b81e09a86941205590` — simplified multi-PNG Variant Lab.
-- `b5307f347a27afefc7da93026f0c38ccac3e9519` — explicit P0 semantic reference audit and true-Block promotion rule.
-- `4b8b0668656c4db15923781fcc2bd213bf580a82` — Mineclonia creative-inventory classification.
-- `5d6270ae4e2d0b7cc5b76afab6592ae7fc6d294b` — deeper technical/runtime classification.
+- **Priority stays separate:** P0–P6 is only work priority.
+- **Browsing classification:** filters use Mineclonia-style creative inventory groups (Building Blocks, Tools, Combat, Foodstuffs, Mobs, etc.) plus deeper technical/runtime classes. A texture may have multiple meaningful classes.
+- **P0 promotion:** suitable material Blocks may move from P1 to P0; Functional Blocks and technical/sprite-like assets are not promoted automatically.
+- **Prompt workflow:** P0 uses two buttons only. **Ref prompt** creates the artistic/material reference; **Üretim prompt** copies the standard Image A = structure/function, Image B = dominant style reference prompt. No creative-alternative mode.
+- **Reference style rule:** describe the grounded dark-fantasy world and material identity, but leave visual surface details to the image model. Do not over-specify the reference image.
+- **Orientation rule:** top/side/bottom semantics matter. Tree/log top = cut trunk cross-section/end-grain; side = bark/trunk side. Do not infer foliage or another material from loose name matching.
+- **Seam rule:** in the production prompt, only the literal outer canvas boundary is seam-critical; internal contours are not seam boundaries.
+- **Variant Lab:** comparison-only. Multi-select any number of PNGs, horizontal thumbnails, 1×1/3×3/6×6 tile preview, mixed mode, and per-variant enable/disable. No prompts in Variant Lab.
+- **Runtime semantics:** ambiguous entity/effect/overlay/animation assets must still be resolved from Mineclonia runtime code; runtime behavior wins over filename/folder intuition.
 
 ## Next concrete work
 
-1. Continue checking P0 reference subjects for semantic mistakes, especially oriented faces and legacy joined names.
-2. Validate creative-inventory + technical filters on Android while keeping P0/P1 independent.
-3. Continue prompt work only after the classification is trusted.
+1. Audit the remaining P0 reference subjects using the new orientation/material semantics.
+2. Spot-check inventory + technical filters on Android while keeping P0/P1 independent.
+3. Verify Ref prompt / Üretim prompt copy behavior and Variant Lab multi-PNG/mixed mode after Pages deployment.
 
 ## Project
 
