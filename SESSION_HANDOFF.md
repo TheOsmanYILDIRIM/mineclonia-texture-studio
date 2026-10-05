@@ -1,3 +1,15 @@
+## Automatic opaque-black background cleanup — 2026-10-05
+
+- Added `js/image-processing.js` and wired it into PNG and ZIP import preparation.
+- Cleanup runs only when the original Mineclonia asset expects transparency AND the uploaded image is fully opaque.
+- It flood-fills only exact opaque black (`#000000`, alpha 255) connected to the outer canvas boundary and sets only those pixels transparent.
+- Interior/closed black regions are preserved, so the algorithm does not walk into UV islands or erase legitimate internal black detail.
+- Already-transparent uploads are returned unchanged.
+- Assets whose original texture is opaque are returned unchanged, protecting real dark/black block materials.
+- Entity imports still finish with the existing source-alpha lock after cleanup/normalization.
+- Static parse and script-load-order checks pass.
+- Branch: `feat/auto-remove-black-bg-20261005`.
+
 ## Technical-category catalog split — 2026-10-05
 
 - Replaced the single compact catalog with one JSON file per technical category under `js/data/catalog/`.
