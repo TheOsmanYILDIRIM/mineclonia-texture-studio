@@ -5,12 +5,12 @@
   "total": 241,
   "mob_uv_total": 241,
   "auxiliary_total": 0,
-  "done": 0,
-  "pending": 241,
-  "last_completed_id": null,
-  "last_completed_name": null,
-  "next_id": "tex_4c96b854a2",
-  "next_name": "extra_mobs_cod.png",
+  "done": 30,
+  "pending": 211,
+  "last_completed_id": "tex_be7e0afdef",
+  "last_completed_name": "mobs_mc_horse_chestnut.png",
+  "next_id": "tex_e3963053d8",
+  "next_name": "mobs_mc_horse_creamy.png",
   "notes": [
     "This manifest contains only texture images that function as entity/model UV atlases or UV-aligned entity material/state/overlay layers.",
     "Non-UV assets are excluded from this queue: particles/effect sprites, HUD/formspec images, spawn icons/egg templates, projectiles, rails/boats/paintings and other flat sprites.",
@@ -27,8 +27,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_cod.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_4c96b854a2.txt"
     },
     {
       "order": 2,
@@ -37,8 +37,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_glow_squid.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_5118e747ee.txt"
     },
     {
       "order": 3,
@@ -47,8 +47,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_piglin.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_2ad993a962.txt"
     },
     {
       "order": 4,
@@ -57,8 +57,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_piglin_brute.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_3e9208c33b.txt"
     },
     {
       "order": 5,
@@ -67,8 +67,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_salmon.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_739f764dab.txt"
     },
     {
       "order": 6,
@@ -77,8 +77,8 @@
       "texture_path": "ENTITIES/mobs_mc/extra_mobs_zombified_piglin.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_050308d4cf.txt"
     },
     {
       "order": 7,
@@ -87,8 +87,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_bat.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_847bab2e9c.txt"
     },
     {
       "order": 8,
@@ -97,8 +97,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_all_black.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_703fd96869.txt"
     },
     {
       "order": 9,
@@ -107,8 +107,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_black.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_11b402716e.txt"
     },
     {
       "order": 10,
@@ -117,8 +117,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_british_shorthair.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_15f0c75051.txt"
     },
     {
       "order": 11,
@@ -127,8 +127,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_calico.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_42562c4b34.txt"
     },
     {
       "order": 12,
@@ -137,8 +137,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_collar.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_cbafc01c98.txt"
     },
     {
       "order": 13,
@@ -147,8 +147,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_jellie.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_bc77d74ff3.txt"
     },
     {
       "order": 14,
@@ -157,8 +157,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_ocelot.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_6a41d593d0.txt"
     },
     {
       "order": 15,
@@ -167,8 +167,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_persian.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_62e7985d98.txt"
     },
     {
       "order": 16,
@@ -177,8 +177,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_ragdoll.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_2b84c5cfc0.txt"
     },
     {
       "order": 17,
@@ -187,8 +187,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_red.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_643abbcad6.txt"
     },
     {
       "order": 18,
@@ -197,8 +197,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_siamese.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_e65a3afb50.txt"
     },
     {
       "order": 19,
@@ -207,8 +207,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_tabby.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_df599dc93f.txt"
     },
     {
       "order": 20,
@@ -217,8 +217,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cat_white.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_07c710c7a6.txt"
     },
     {
       "order": 21,
@@ -227,8 +227,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cave_spider.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_1569b9031b.txt"
     },
     {
       "order": 22,
@@ -237,8 +237,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_chicken.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_93dcbde84e.txt"
     },
     {
       "order": 23,
@@ -247,8 +247,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_cow.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_898ffa3d20.txt"
     },
     {
       "order": 24,
@@ -257,8 +257,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_creeper.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_e0e1d99044.txt"
     },
     {
       "order": 25,
@@ -267,8 +267,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_creeper_charge.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_52a67cca9e.txt"
     },
     {
       "order": 26,
@@ -277,8 +277,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_enderman.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_87ac7bc43e.txt"
     },
     {
       "order": 27,
@@ -287,8 +287,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_enderman_eyes.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_6f4c0e47af.txt"
     },
     {
       "order": 28,
@@ -297,8 +297,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_black.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_16f4879c00.txt"
     },
     {
       "order": 29,
@@ -307,8 +307,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_brown.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_157ac6ba23.txt"
     },
     {
       "order": 30,
@@ -317,8 +317,8 @@
       "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_chestnut.png",
       "priority": "P1",
       "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/mobs/tex_be7e0afdef.txt"
     },
     {
       "order": 31,
