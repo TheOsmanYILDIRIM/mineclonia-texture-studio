@@ -17,7 +17,7 @@
 .variantFooter{display:flex;gap:7px;max-width:720px;margin:8px auto 0}.variantFooter .btn{flex:1}.variantStatus{font-size:11px;color:var(--muted);text-align:center;min-height:18px;margin-top:6px}
 @media(min-width:700px){.grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;padding:12px}.controls{grid-template-columns:minmax(240px,1fr) 190px 160px 120px auto}.controls .search{grid-column:auto}.drawer{max-width:720px;margin:0 auto}.bottom{left:50%;transform:translateX(-50%);max-width:720px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
 </style></head><body><div class="app">
-<header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
+<header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <main><div class="grid" id="grid"></div><div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div></main>
 <div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP içe aktar</button><button class="btn" id="promptJson">Prompt JSON</button><button class="btn" id="openVariantLab">Varyant Lab</button><button class="btn primary" id="exportPack">Texturepack ZIP</button></div>
 </div>
@@ -210,13 +210,13 @@ function textureTechnicalCategoriesOf(x){
 function minecloniaInventoryCategoryLabels(x){const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id)}
 async function buildFilters(){
  const sel=$('category');
- sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
+ sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
  const vals=['ALL','P0','P1','P2','P3','P4','P5','P6'];
  const counts=Object.fromEntries(vals.map(v=>[v,v==='ALL'?CATALOG.length:CATALOG.filter(x=>x.priority===v).length]));
  $('filters').innerHTML=vals.map(v=>`<button class="chip ${v==='P0'?'active':''}" data-p="${v}">${v==='ALL'?'Tümü':v} · ${counts[v]}</button>`).join('');
  $('filters').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const p=b.dataset.p;$('stat').textContent=(p==='ALL'?'Liste':p)+' hazırlanıyor…';applyFilter()}
 }
-function categoryMatches(x,cat){if(!cat)return true;const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
+function categoryMatches(x,cat){if(!cat)return true;if(cat==='special:armor_uv')return isArmorUvTexture(x);const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
 function activePriority(){return document.querySelector('.chip.active')?.dataset.p||'P0'}
 function assetTypeOf(x){
  const p=x.path||'', n=(x.name||'').toLowerCase(), parts=p.split('/'), top=parts[0]||'', mod=parts[1]||'';
@@ -301,7 +301,8 @@ function runtimeRoleInfo(x){
  return info(broad||'Unresolved','','');
 }
 function runtimeRoleOf(x){return runtimeRoleInfo(x).role}
-async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path)));page=0;return render()}
+function hasAuthoredPrompt(x){return !!(x&&(BLOCK_REFERENCE_PROMPTS.has(x.id)||AUTHORED_UV_REFS.has(x.id)||PROMPT_OVERRIDES.has(x.id)))}
+async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)));page=0;return render()}
 async function render(){
  const token=++renderToken,start=page*PAGE_SIZE,arr=filtered.slice(start,start+PAGE_SIZE);$('grid').innerHTML='';$('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPaths.size} değişti • ${storageLabel()}`;$('pageInfo').textContent=`${Math.min(page+1,Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)))} / ${Math.max(1,Math.ceil(filtered.length/PAGE_SIZE))}`;
  if(!arr.length){$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Bu filtrede texture yok.</div>';return}
@@ -553,7 +554,7 @@ function p1SpecialPromptFor(x){
 }
 
 
-function isAnimatedStrip(x){return !!(x&&assetTypeOf(x)!=='Entity'&&x.w&&x.h&&((x.h>x.w&&x.h%x.w===0)||(x.w>x.h&&x.w%x.h===0)))}
+function isAnimatedStrip(x){return !!(x&&!isArmorUvTexture(x)&&assetTypeOf(x)!=='Entity'&&x.w&&x.h&&((x.h>x.w&&x.h%x.w===0)||(x.w>x.h&&x.w%x.h===0)))}
 function animSpec(x){
  if(!isAnimatedStrip(x)) return null;
  const vertical=x.h>=x.w, frame=vertical?x.w:x.h, frames=vertical?Math.round(x.h/x.w):Math.round(x.w/x.h);
@@ -2005,6 +2006,7 @@ async function init(){
   $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Temel 16px ölçeği → '+TARGET_RESOLUTION+'px')};
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
+  $('promptedOnly').onclick=()=>{promptedOnly=!promptedOnly;$('promptedOnly').classList.toggle('primary',promptedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
   $('compare').oninput=updateCompare;
