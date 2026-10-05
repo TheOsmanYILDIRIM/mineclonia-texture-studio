@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_101dca4108",
+  "label": "mcl_core_cactus_top",
+  "texture_path": "ITEMS/mcl_core/mcl_core_cactus_top.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for the top face of a thick cactus in a grounded dark-fantasy desert. The surface should reveal radial succulent growth: dense waxy green tissue arranged around a subtly recessed growing center, with pale fibrous ribs, small spine bases and signs of sun stress. Moisture is stored inside but the exterior remains matte-waxy rather than wet. Use subdued sage and olive green with dusty yellow-green highlights. Avoid a flower, sliced fruit, perfect mandala symmetry, glossy cucumber flesh or dramatic spikes. Make the top clearly belong to the same drought-hardened cactus while expressing its radial growth direction."
+}
