@@ -1,3 +1,16 @@
+## Runtime animation classification + atlas workflow — 2026-10-05
+
+- Animation classification no longer uses rectangle/aspect-ratio inference. A runtime/source-verified animation classifier identifies 44 catalog records (43 unique texture names): P0 6, P1 11, P2 19, P3 4, P4 4.
+- False positives such as armor UV/sprite atlases, sign glyphs, moon phases, HUD bars, and other rectangular sheets are no longer treated as animation strips merely because their dimensions divide evenly.
+- The technical filter now exposes **Animation Atlas / Animated** as its own class, and detail runtime role reports `Animated Texture · Strip ↔ Atlas`.
+- Animation prompt now describes the actual Studio workflow: runtime strip → compact atlas → AI edit → same ordered strip. It locks frame count/order/grid, distinguishes unused padding cells, requires incremental temporal change and loop closure, and explicitly forbids painting across atlas-cell boundaries.
+- P0 animations now receive the animation-atlas prompt before the P0 reference-material prompt, fixing water/lava prompt routing.
+- Atlas conversion now supports non-square runtime frame ratios. Campfire textures use their real 2:1 (32×16) frame shape instead of being incorrectly split as square frames.
+- Atlas grid selection minimizes output aspect while avoiding unnecessary padding; high-resolution edited atlas cells still reconstruct at edited resolution.
+- Static verification: both inline JavaScript blocks parse successfully. Classification sanity checks confirm armor/sign false positives are rejected while sea lantern/campfire runtime animations are included.
+- Implementation commits: `19bd8b8773b1244f5a0b66ce6c2c73242bb0745c`, `243bef0aae81618d72a21c60e67d22f18f23c462`.
+- Open verification: deploy on Android and test at least lava/water, prismarine (22 frames), campfire (2:1 frames), candle atlas padding, and particle animation round-trip.
+
 ## Editor performance / preview cache — 2026-10-05
 
 - Full-resolution imported edits are now preserved in storage. Target resolution is applied for export/scaled derivatives instead of destructively shrinking the saved master edit.
