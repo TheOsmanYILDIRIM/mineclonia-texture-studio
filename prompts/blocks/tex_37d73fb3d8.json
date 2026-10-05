@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_37d73fb3d8",
+  "label": "default_wood",
+  "texture_path": "ITEMS/mcl_core/default_wood.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for old oak planks used throughout a grounded dark-fantasy settlement. The timber is practical, durable and repeatedly handled. Show strong oak grain, occasional restrained knots, hand-sawn or hand-planed irregularity, worn fibers along exposed areas and dirt-darkened seams. Age should mute the original warmth rather than turning every board rotten or gray. Use subdued medium brown, warm umber and slightly desaturated honey tones. Avoid modern laminate flooring, glossy varnish, perfectly parallel machine grain, exaggerated nail holes or theatrical medieval distressing. This should define the world's baseline worked wood: honest, heavy oak shaped by tools, weather and years of use. Keep the reference material-focused rather than arranging a final plank texture."
+}
