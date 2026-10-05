@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_b49486a55b",
+  "label": "default_sand",
+  "texture_path": "ITEMS/mcl_core/default_sand.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for natural sand from a severe, old dark-fantasy landscape. The surface is made from countless weathered mineral grains accumulated by wind and water over a long time. It should feel fine but not sterile: subtle grain-size variation, faint darker mineral flecks, soft compacted patches and shallow natural disturbance where dry material has shifted and settled. Use restrained warm beige, dusty ochre and muted gray-tan variation. Avoid tropical beach imagery, pristine white sand, dramatic dunes, large pebbles, rippled scene composition or noisy macro photography. Make ordinary sand feel physically present through softness, dryness, mineral variation and accumulated age. The reference is for material language only, not for designing the final repeating texture."
+}
