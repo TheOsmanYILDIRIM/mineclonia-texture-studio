@@ -11,7 +11,7 @@
 </div>
 <div class="sheet" id="sheet"><div class="drawer"><div class="handle"></div><div class="meta"><div><h2 id="detailName"></h2><div class="path" id="detailPath"></div><div class="path" id="detailRole"></div></div><button class="btn" id="close" type="button" aria-label="Detay görünümünü kapat">✕</button></div><div class="preview" id="preview"><img id="origImg"><img id="editImg" class="editedClip"></div><div class="compareCtl"><span class="stat">Orijinal</span><input id="compare" type="range" min="0" max="100" value="50"><span class="stat">Yeni</span></div><div class="tileTools"><span class="stat">Tile</span><button class="btn mini active" data-tile="1">1×1</button><button class="btn mini" data-tile="3">3×3</button><button class="btn mini" data-tile="6">6×6</button><button class="btn mini" data-tile="9">9×9</button><button class="btn mini" id="tileSource">Yeni</button></div><div class="tilePreview" id="tilePreview"></div><div class="actions"><button class="btn" id="downloadOriginal">Orijinali indir</button><button class="btn" id="downloadEdited">Yeniyi indir</button><button class="btn primary" id="uploadEdited">Düzenlenmiş PNG yükle</button><button class="btn warn" id="seamExport">50% Offset PNG</button><button class="btn warn wide" id="seamImport">Offset düzenlemeyi geri yükle</button><button class="btn danger wide" id="revert">Değişikliği sil / orijinale dön</button></div><div class="animBox" id="animBox"><div class="animHead"><div><div class="promptTitle">Animasyon araçları</div><div class="animMeta" id="animMeta"></div></div><button class="btn" id="animToggle">Durdur</button></div><div class="animCanvasWrap"><canvas id="animCanvas" width="256" height="256"></canvas></div><div class="animBtns"><button class="btn" id="exportAtlas">Strip → Kare atlas</button><button class="btn primary" id="importAtlas">Atlası geri yükle</button></div><div class="hint" id="animHint"></div></div><div class="promptBox"><div class="promptHead"><div><div class="promptTitle">AI düzenleme promptu</div><div class="promptFamily" id="promptFamily"></div><div class="textureId" id="textureId"></div></div><button class="btn" id="copyPrompt">Kopyala</button></div><textarea id="promptText" spellcheck="false"></textarea><div class="promptBtns"><button class="btn primary" id="savePrompt">Promptu kaydet</button><button class="btn" id="singlePromptJson">Bu prompt JSON</button></div></div><div class="hint" id="hint"></div></div></div>
 <input id="fileEdited" type="file" accept="image/png" hidden><input id="fileSeam" type="file" accept="image/png" hidden><input id="fileAnimAtlas" type="file" accept="image/png" hidden><input id="fileZip" type="file" accept=".zip,application/zip" hidden><input id="filePromptJson" type="file" accept="application/json,.json" hidden><input id="fileProjectBackup" type="file" accept=".zip,application/zip" hidden>
-<div class="promptManager" id="promptManager"><div class="promptMgrDrawer"><div class="handle"></div><div class="meta"><div><h2>Prompt JSON yöneticisi</h2><div class="path">Tekil: {"id":"tex_…","prompt":"…"} veya {"path":"ITEMS/…png","prompt":"…"} · Çoklu: {"prompts":[…]}</div></div><button class="btn" id="closePromptMgr">✕</button></div><div class="promptBtns" style="margin:12px 0"><button class="btn primary" id="importPromptJson">JSON içe aktar</button><button class="btn" id="exportAllPrompts">Tüm promptları indir</button><button class="btn" id="exportP0Prompts">P0 promptlarını indir</button><button class="btn danger" id="clearPromptOverrides">Özel promptları sıfırla</button><button class="btn primary" id="exportProjectBackup">Proje yedeği indir</button><button class="btn" id="importProjectBackup">Proje yedeği yükle</button></div><textarea id="promptJsonPreview" spellcheck="false" placeholder="JSON buraya yapıştırıp ‘Uygula’ diyebilirsin…"></textarea><div class="promptBtns"><button class="btn primary" id="applyPromptJsonText">JSON metnini uygula</button><button class="btn" id="copyPromptSchema">Şema örneğini kopyala</button></div><div class="hint">JSON kayıtları id veya tam texture path ile eşleşebilir. Aynı texture için yeni prompt mevcut özel promptu değiştirir. Tek kayıt veya yüzlerce kayıt bir kerede içe aktarılabilir.</div></div></div><div class="toast" id="toast"></div>
+<div class="promptManager" id="promptManager"><div class="promptMgrDrawer"><div class="handle"></div><div class="meta"><div><h2>Prompt JSON yöneticisi</h2><div class="path">Tekil: {"id":"tex_…","prompt":"…"} veya {"path":"ITEMS/…png","prompt":"…"} · Çoklu: {"prompts":[…]}</div></div><button class="btn" id="closePromptMgr">✕</button></div><div class="promptBtns" style="margin:12px 0"><button class="btn primary" id="importPromptJson">JSON içe aktar</button><button class="btn" id="exportAllPrompts">Tüm promptları indir</button><button class="btn" id="exportP0Prompts">P0 promptlarını indir</button><button class="btn danger" id="clearPromptOverrides">Özel promptları sıfırla</button><button class="btn primary" id="exportProjectBackup">Proje yedeği indir</button><button class="btn" id="importProjectBackup">Proje yedeği yükle</button></div><div class="hint"><b>Kayıtlı texture temizleme</b><br>Yalnız seçilen priority\u0027nin PNG/edit kayıtlarını ve ölçek cache\u0027ini siler; promptlara dokunmaz.</div><div class="promptBtns" id="priorityResetBtns" style="margin:8px 0"><button class="btn danger" data-reset-priority="P0">P0 sıfırla</button><button class="btn danger" data-reset-priority="P1">P1 sıfırla</button><button class="btn danger" data-reset-priority="P2">P2 sıfırla</button><button class="btn danger" data-reset-priority="P3">P3 sıfırla</button><button class="btn danger" data-reset-priority="P4">P4 sıfırla</button><button class="btn danger" data-reset-priority="P5">P5 sıfırla</button><button class="btn danger" data-reset-priority="P6">P6 sıfırla</button><button class="btn danger" id="resetFuturePriorities">P2–P6 sıfırla</button></div><textarea id="promptJsonPreview" spellcheck="false" placeholder="JSON buraya yapıştırıp ‘Uygula’ diyebilirsin…"></textarea><div class="promptBtns"><button class="btn primary" id="applyPromptJsonText">JSON metnini uygula</button><button class="btn" id="copyPromptSchema">Şema örneğini kopyala</button></div><div class="hint">JSON kayıtları id veya tam texture path ile eşleşebilir. Aynı texture için yeni prompt mevcut özel promptu değiştirir. Tek kayıt veya yüzlerce kayıt bir kerede içe aktarılabilir.</div></div></div><div class="toast" id="toast"></div>
 <script>/*!
 
 JSZip v3.10.1 - A JavaScript class for generating and reading zip files
@@ -540,20 +540,40 @@ async function texturePixelsEqual(a,b){
  for(let i=0;i<ad.length;i++)if(ad[i]!==bd[i])return false;
  return true
 }
-async function textureMatchesOriginal(blob,meta){
+async function texturePixelsVisuallyEquivalent(a,b){
+ if(await texturePixelsEqual(a,b))return true;
+ const [ca,cb]=await Promise.all([decodeBlobToCanvas(a),decodeBlobToCanvas(b)]);
+ if(ca.width!==cb.width||ca.height!==cb.height)return false;
+ const ad=ca.getContext('2d',{willReadFrequently:true}).getImageData(0,0,ca.width,ca.height).data;
+ const bd=cb.getContext('2d',{willReadFrequently:true}).getImageData(0,0,cb.width,cb.height).data;
+ let total=0,count=0,outliers=0;
+ for(let i=0;i<ad.length;i+=4){
+   const aa=ad[i+3],ba=bd[i+3],alphaDelta=Math.abs(aa-ba);
+   total+=alphaDelta;count++;let maxDelta=alphaDelta;
+   if(aa>2||ba>2){for(let c=0;c<3;c++){const d=Math.abs(ad[i+c]-bd[i+c]);total+=d;count++;if(d>maxDelta)maxDelta=d}}
+   if(maxDelta>12)outliers++;
+ }
+ const mean=count?total/count:0,pixelCount=ad.length/4,outlierRatio=pixelCount?outliers/pixelCount:0;
+ return mean<=2.5&&outlierRatio<=0.02;
+}
+async function textureMatchesOriginal(blob,meta,{throwOnError=false}={}){
  if(!blob||!meta)return false;
  try{
    const original=await originalBlob(meta.path);
    if(await texturePixelsEqual(blob,original))return true;
-   const [editedCanvas,originalCanvas]=await Promise.all([decodeBlobToCanvas(blob),decodeBlobToCanvas(original)]);
-   const commonWidth=Math.min(editedCanvas.width,originalCanvas.width);
-   if(commonWidth<1)return false;
+   const originalCanvas=await decodeBlobToCanvas(original);
+   const nativeW=Math.max(1,Number(meta.w)||originalCanvas.width);
+   const nativeH=Math.max(1,Number(meta.h)||originalCanvas.height);
    const [editedCanonical,originalCanonical]=await Promise.all([
-     normalizeTextureBlobTo(blob,meta,commonWidth),
-     normalizeTextureBlobTo(original,meta,commonWidth)
+     resizeTextureBlobToDimensions(blob,nativeW,nativeH),
+     resizeTextureBlobToDimensions(original,nativeW,nativeH)
    ]);
-   return await texturePixelsEqual(editedCanonical,originalCanonical);
- }catch(err){console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);return false}
+   return await texturePixelsVisuallyEquivalent(editedCanonical,originalCanonical);
+ }catch(err){
+   if(throwOnError)throw err;
+   console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);
+   return false;
+ }
 }
 async function meaningfulEdits(){
  const raw=await allEdits(), out=[];
@@ -639,6 +659,29 @@ $('applyPromptJsonText').onclick=()=>{try{applyPromptJsonObject(JSON.parse($('pr
 $('exportAllPrompts').onclick=()=>downloadJson({version:1,generated_at:new Date().toISOString(),prompts:CATALOG.map(promptEntry)},'mineclonia_all_prompts.json');
 $('exportP0Prompts').onclick=()=>downloadJson({version:1,priority:'P0',prompts:CATALOG.filter(x=>x.priority==='P0').map(promptEntry)},'mineclonia_P0_prompts.json');
 $('clearPromptOverrides').onclick=()=>{if(!confirm('JSON/manuel prompt değişiklikleri sıfırlansın mı?'))return;PROMPT_OVERRIDES.clear();savePromptOverrides();toast('Özel promptlar sıfırlandı');if(active)openDetail(active)};
+async function resetStoredEditsByPriorities(priorities){
+ const wanted=new Set(priorities),paths=CATALOG.filter(x=>wanted.has(x.priority)).map(x=>x.path);
+ if(!paths.length)return;
+ if(!confirm(`${priorities.join(', ')} için kayıtlı texture değişiklikleri silinsin mi? Promptlar korunacak.`))return;
+ setSaveState(`${priorities.join(', ')} kayıtları temizleniyor…`,'warn');
+ try{
+   if(storageMode==='indexeddb'&&dbp){
+     await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite'),st=tx.objectStore(STORE);for(const path of paths)st.delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)});
+   }
+   if(scaledDbp){
+     await new Promise((res,rej)=>{const tx=scaledDbp.transaction(SCALED_STORE,'readwrite'),st=tx.objectStore(SCALED_STORE);for(const path of paths)for(const size of [64,128,256,512])st.delete(scaledMemKey(path,size));tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)}).catch(err=>console.warn('Scaled cache toplu silinemedi',err));
+   }
+   for(const path of paths){
+     hotEdits.delete(path);memoryEdits.delete(path);changedPathsFast.delete(path);pendingChangedPaths.delete(path);revoke(path);
+     try{localStorage.removeItem('mts:'+path)}catch(_){}
+     for(const size of [64,128,256,512])memoryScaled.delete(scaledMemKey(path,size));
+   }
+   await applyFilter();updateStatFast();
+   setSaveState('Kayıt temizliği tamamlandı','ok');toast(`${priorities.join(', ')} temizlendi`);
+ }catch(err){console.error('priority reset',err);setSaveState('Kayıt temizliği hatası','bad');alert('Kayıtlar temizlenemedi: '+(err?.message||err))}
+}
+$('priorityResetBtns').onclick=e=>{const b=e.target.closest('[data-reset-priority]');if(b)resetStoredEditsByPriorities([b.dataset.resetPriority])};
+$('resetFuturePriorities').onclick=()=>resetStoredEditsByPriorities(['P2','P3','P4','P5','P6']);
 $('copyPromptSchema').onclick=async()=>{const sample={prompts:[{path:CATALOG[0].path,prompt:'Yeni prompt metni'},{id:CATALOG[1].id,prompt:'İkinci prompt'}]};const t=JSON.stringify(sample,null,2);try{await navigator.clipboard.writeText(t);toast('JSON şeması kopyalandı')}catch{$('promptJsonPreview').value=t}};
 
 
@@ -706,18 +749,35 @@ async function delScaledPath(path){
   }
   keys.forEach(k=>memoryScaled.delete(k));
 }
-async function normalizeTextureBlobTo(blob,meta,targetRes){
- const c=await decodeBlobToCanvas(blob), sw=c.width, sh=c.height;
- const baseW=(meta&&meta.w)||sw, baseH=(meta&&meta.h)||sh;
- const dw=targetRes, dh=Math.max(1,Math.round(targetRes*(baseH/baseW)));
- if(sw<=dw && sh<=dh)return blob;
+const SOURCE_TEXEL_BASE=16;
+function targetTextureDimensions(meta,targetRes){
+ const baseW=Math.max(1,Number(meta?.w)||SOURCE_TEXEL_BASE);
+ const baseH=Math.max(1,Number(meta?.h)||SOURCE_TEXEL_BASE);
+ const scale=Math.max(1,targetRes)/SOURCE_TEXEL_BASE;
+ return {width:Math.max(1,Math.round(baseW*scale)),height:Math.max(1,Math.round(baseH*scale))};
+}
+async function resizeTextureBlobToDimensions(blob,dw,dh){
+ const c=await decodeBlobToCanvas(blob),sw=c.width,sh=c.height;
+ if(sw===dw&&sh===dh)return blob;
  const src=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,sw,sh);
  const resized=lanczosResizeImageData(src,sw,sh,dw,dh);
  const out=document.createElement('canvas');out.width=dw;out.height=dh;out.getContext('2d').putImageData(resized,0,0);
  return await canvasPngBlob(out)
 }
+async function normalizeTextureBlobTo(blob,meta,targetRes){
+ const c=await decodeBlobToCanvas(blob),sw=c.width,sh=c.height;
+ const target=targetTextureDimensions(meta,targetRes);
+ const baseW=Math.max(1,Number(meta?.w)||sw),baseH=Math.max(1,Number(meta?.h)||sh);
+ const ratio=baseW/baseH;
+ const maxW=Math.min(sw,target.width),maxH=Math.min(sh,target.height);
+ let dw=Math.max(1,Math.floor(Math.min(maxW,maxH*ratio)));
+ let dh=Math.max(1,Math.round(dw/ratio));
+ if(dh>maxH){dh=Math.max(1,Math.floor(maxH));dw=Math.max(1,Math.round(dh*ratio))}
+ if(sw===dw&&sh===dh)return blob;
+ return await resizeTextureBlobToDimensions(blob,dw,dh)
+}
 async function normalizeTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
-  return await normalizeTextureBlobTo(blob,meta,targetRes)
+ return await normalizeTextureBlobTo(blob,meta,targetRes)
 }
 function queueScaled(path, blob, meta, res=BACKGROUND_RESOLUTION){
   const qk=scaledMemKey(path,res);
@@ -832,7 +892,7 @@ async function exportPack(){
        await new Promise(requestAnimationFrame);
      }
    }
-   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,scaledToTargetCount:scaledCount,nativeOrAlreadyWithinTargetCount:nativeCount,paths:edits.map(e=>e.path)};
+   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,resolutionModel:'16px-source-density',scaleFactor:TARGET_RESOLUTION/SOURCE_TEXEL_BASE,scaledToTargetCount:scaledCount,nativeOrAlreadyWithinTargetCount:nativeCount,paths:edits.map(e=>e.path)};
    root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
    btn.textContent='ZIP %70';
    setSaveState('ZIP oluşturuluyor…','warn');
@@ -866,11 +926,11 @@ function setSaveState(msg,kind=''){
   el.textContent=msg;
   el.style.color=kind==='ok'?'#8ee39a':kind==='bad'?'#ff8a8a':kind==='warn'?'#ffd479':'';
 }
-async function durableDbPut(path,blob){
+async function durableDbPut(path,blob,verification='changed'){
   if(storageMode!=='indexeddb'||!dbp) throw new Error('IndexedDB kullanılamıyor');
   await new Promise((res,rej)=>{
     const tx=dbp.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).put({path,blob,updatedAt:Date.now()});
+    tx.objectStore(STORE).put({path,blob,updatedAt:Date.now(),verification});
     tx.oncomplete=()=>res();
     tx.onabort=()=>rej(tx.error||new Error('Kayıt transaction iptal edildi'));
     tx.onerror=()=>rej(tx.error||new Error('Kayıt transaction hatası'));
@@ -885,12 +945,12 @@ async function durableDbGet(path){
     r.onerror=()=>rej(r.error||new Error('Kayıt doğrulanamadı'));
   });
 }
-async function robustPersist(path,blob){
+async function robustPersist(path,blob,verification='changed'){
   hotEdits.set(path,{path,blob,updatedAt:Date.now()});
   revoke(path);
   setSaveState('Kaydediliyor…','warn');
   if(storageMode==='indexeddb'&&dbp){
-    await durableDbPut(path,blob);
+    await durableDbPut(path,blob,verification);
     const check=await durableDbGet(path);
     if(!check || !check.blob || check.blob.size!==blob.size) throw new Error('Kayıt geri okuma doğrulaması başarısız');
     hotEdits.set(path,check);
@@ -901,7 +961,7 @@ async function robustPersist(path,blob){
   if(storageMode==='local'){
     try{
       const data=await blobToDataURL(blob);
-      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now()}));
+      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
       const raw=localStorage.getItem('mts:'+path);
       if(!raw) throw new Error('localStorage geri okuma başarısız');
       setSaveState('Kaydedildi • yerel fallback','warn');
@@ -911,7 +971,7 @@ async function robustPersist(path,blob){
       storageMode='memory';
     }
   }
-  memoryEdits.set(path,{path,blob,updatedAt:Date.now()});
+  memoryEdits.set(path,{path,blob,updatedAt:Date.now(),verification});
   setSaveState('Sadece oturumda • yedek al','bad');
 }
 async function putEdit(path,blob){
@@ -924,7 +984,7 @@ async function getEdit(path){
     try{const v=await durableDbGet(path); if(v){hotEdits.set(path,v); return v}}catch(e){console.warn(e)}
   }
   if(storageMode==='local'){
-    try{const s=localStorage.getItem('mts:'+path); if(s){const o=JSON.parse(s);const v={path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt};hotEdits.set(path,v);return v}}catch(e){console.warn(e)}
+    try{const s=localStorage.getItem('mts:'+path); if(s){const o=JSON.parse(s);const v={path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'};hotEdits.set(path,v);return v}}catch(e){console.warn(e)}
   }
   return memoryEdits.get(path)||null;
 }
@@ -949,7 +1009,7 @@ async function allEdits(){
       for(const v of arr) outByPath.set(v.path,v);
     }catch(e){console.warn('allEdits db',e)}
   } else if(storageMode==='local'){
-    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('mts:')){const o=JSON.parse(localStorage.getItem(k));outByPath.set(k.slice(4),{path:k.slice(4),blob:dataURLToBlob(o.data),updatedAt:o.updatedAt})}}}catch(e){console.warn(e)}
+    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('mts:')){const o=JSON.parse(localStorage.getItem(k));outByPath.set(k.slice(4),{path:k.slice(4),blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'})}}}catch(e){console.warn(e)}
   }
   for(const [k,v] of memoryEdits) if(!outByPath.has(k)) outByPath.set(k,v);
   for(const [k,v] of hotEdits) outByPath.set(k,v);
@@ -976,6 +1036,7 @@ window.addEventListener('pagehide',()=>{
 
 // --- V5.1 instant thumbnail + reliable background persistence ---
 const changedPathsFast = new Set();
+const pendingChangedPaths = new Set();
 const cardRefsFast = new Map();
 function revoke(path){
   for(const key of ['e:'+path]){
@@ -998,22 +1059,27 @@ function updateCardFast(path,url){
     }
   }
 }
-function installPersistedEditFast(edit){
+function installPersistedEditFast(edit,{markChanged=false}={}){
   if(!edit?.path||!edit.blob)return;
-  const rec={path:edit.path,blob:edit.blob,updatedAt:edit.updatedAt||Date.now()};
+  const rec={path:edit.path,blob:edit.blob,updatedAt:edit.updatedAt||Date.now(),verification:edit.verification||'unknown'};
   hotEdits.set(edit.path,rec);
-  changedPathsFast.add(edit.path);
+  if(markChanged){changedPathsFast.add(edit.path);pendingChangedPaths.delete(edit.path)}
+  else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path);
   const url=setFastEditUrl(edit.path,edit.blob);
-  updateCardFast(edit.path,url);
+  const ref=cardRefsFast.get(edit.path);
+  if(ref)ref.img.src=url;
+  if(markChanged)updateCardFast(edit.path,url);
 }
 function updateStatFast(){
-  if($('stat')) $('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPathsFast.size} değişti • ${storageLabel()}`;
+  if(!$('stat'))return;
+  const pending=pendingChangedPaths.size;
+  $('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPathsFast.size} değişti${pending?` • ${pending} doğrulanıyor`:''} • ${storageLabel()}`;
 }
-async function persistBlobOnly(path,blob){
+async function persistBlobOnly(path,blob,verification='changed'){
   setSaveState('Kaydediliyor…','warn');
   if(storageMode==='indexeddb'&&dbp){
     try{
-      await durableDbPut(path,blob);
+      await durableDbPut(path,blob,verification);
       const check=await durableDbGet(path);
       if(!check||!check.blob||check.blob.size!==blob.size) throw new Error('Kayıt doğrulaması başarısız');
       hotEdits.set(path,check);
@@ -1024,26 +1090,26 @@ async function persistBlobOnly(path,blob){
   if(storageMode==='local'){
     try{
       const data=await blobToDataURL(blob);
-      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now()}));
+      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
       if(!localStorage.getItem('mts:'+path)) throw new Error('localStorage doğrulama başarısız');
       setSaveState('Kaydedildi • yerel fallback','warn');
       return;
     }catch(e){ console.warn('local save failed',e); storageMode='memory'; }
   }
-  memoryEdits.set(path,{path,blob,updatedAt:Date.now()});
+  memoryEdits.set(path,{path,blob,updatedAt:Date.now(),verification});
   setSaveState('Sadece oturumda • yedek al','bad');
 }
-function queuePersistFast(path,blob){
-  editWriteQueue=editWriteQueue.catch(()=>{}).then(()=>persistBlobOnly(path,blob)).catch(e=>{
+function queuePersistFast(path,blob,verification='changed'){
+  editWriteQueue=editWriteQueue.catch(()=>{}).then(()=>persistBlobOnly(path,blob,verification)).catch(e=>{
     console.error('save queue',e); setSaveState('Kayıt hatası • yedek al','bad');
   });
   return editWriteQueue;
 }
 async function putEdit(path,blob){
   const rec={path,blob,updatedAt:Date.now()};
-  hotEdits.set(path,rec); changedPathsFast.add(path);
+  hotEdits.set(path,rec); changedPathsFast.add(path); pendingChangedPaths.delete(path);
   const u=setFastEditUrl(path,blob); updateCardFast(path,u); updateStatFast();
-  queuePersistFast(path,blob);
+  queuePersistFast(path,blob,'changed');
   return rec;
 }
 async function applyFilter(){
@@ -1072,7 +1138,7 @@ async function render(){
 async function importPng(file,seam=false){
   if(!active||!file)return;
   const target={...active};
-  setSaveState(`Dosya hazırlanıyor • ${TARGET_RESOLUTION}px…`,'warn');
+  setSaveState(`Dosya hazırlanıyor • 16px→${TARGET_RESOLUTION}px ölçek…`,'warn');
   let b=await prepareImportedTextureBlob(file,target);
   if(seam)b=await imageBlobTransform(b,true);
   if(await textureMatchesOriginal(b,target)){
@@ -1081,19 +1147,19 @@ async function importPng(file,seam=false){
     return;
   }
   const rec={path:target.path,blob:b,updatedAt:Date.now()};
-  hotEdits.set(target.path,rec); changedPathsFast.add(target.path);
+  hotEdits.set(target.path,rec); changedPathsFast.add(target.path); pendingChangedPaths.delete(target.path);
   const u=setFastEditUrl(target.path,b);
   updateCardFast(target.path,u); updateStatFast();
   if(active&&active.path===target.path){
     $('editImg').src=u; $('editImg').style.opacity=1; $('compare').value=50; updateCompare(); tileEdited=true; $('tileSource').textContent='Yeni';
   }
-  toast((seam?'Seam dönüşü':'Yeni texture')+` • ${TARGET_RESOLUTION}px hedef`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
-  queuePersistFast(target.path,b);
+  toast((seam?'Seam dönüşü':'Yeni texture')+` • 16px→${TARGET_RESOLUTION}px ölçek`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
+  queuePersistFast(target.path,b,'changed');
   queueScaled(target.path,b,target,BACKGROUND_RESOLUTION);
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
 }
 async function delEdit(path){
-  hotEdits.delete(path); memoryEdits.delete(path); changedPathsFast.delete(path); revoke(path);
+  hotEdits.delete(path); memoryEdits.delete(path); changedPathsFast.delete(path); pendingChangedPaths.delete(path); revoke(path);
   editWriteQueue=editWriteQueue.catch(()=>{}).then(async()=>{
     setSaveState('Siliniyor…','warn');
     if(storageMode==='indexeddb'&&dbp){await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}
@@ -1105,43 +1171,68 @@ async function delEdit(path){
 }
 let changedHydrationPromise=Promise.resolve({complete:true,total:0,same:0});
 
-async function hydrateChangedPathsFast(seedEdits=null){
-  const edits=seedEdits||await allEdits();
-  for(const e of edits){
-    if(CATALOG.some(x=>x.path===e.path))changedPathsFast.add(e.path);
-  }
-  updateStatFast();
-  let processed=0,same=0,failed=0;
-  for(const e of edits){
-    const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
+async function markPersistedVerification(path,verification){
+  const current=hotEdits.get(path)||await getEdit(path);
+  if(!current?.blob)return;
+  const rec={...current,verification,updatedAt:current.updatedAt||Date.now()};
+  hotEdits.set(path,rec);
+  if(storageMode==='indexeddb'&&dbp){
+    try{await durableDbPut(path,rec.blob,verification)}catch(err){console.warn('Doğrulama durumu kaydedilemedi',path,err)}
+  }else if(storageMode==='local'){
     try{
-      if(await textureMatchesOriginal(e.blob,meta)){
-        changedPathsFast.delete(e.path);same++;
-        const ref=cardRefsFast.get(e.path);
-        if(ref){
-          ref.card.querySelector('.changed')?.remove();
-          revoke(e.path);
-          try{ref.img.src=await blobUrl(e.path,false)}catch(loadErr){console.warn('Orijinal thumbnail yenilenemedi',e.path,loadErr)}
-        }else revoke(e.path);
-      }else{
-        changedPathsFast.add(e.path);
-        if(!urlCache.has('e:'+e.path))installPersistedEditFast(e);
-      }
-    }catch(err){
-      failed++;
-      changedPathsFast.add(e.path);
-      console.warn('Değişiklik doğrulanamadı',e.path,err);
-    }
-    processed++;
-    if(processed===1||processed===edits.length||processed%10===0){
-      updateStatFast();
-      await new Promise(requestAnimationFrame);
-    }
-  }
-  if(same)console.info(`${same} kayıt orijinalle aynı olduğu için değişiklik sayılmadı`);
-  return {complete:failed===0,total:processed,same,failed};
+      const key='mts:'+path,raw=localStorage.getItem(key);
+      if(raw){const o=JSON.parse(raw);o.verification=verification;localStorage.setItem(key,JSON.stringify(o))}
+    }catch(err){console.warn('Yerel doğrulama durumu kaydedilemedi',path,err)}
+  }else{memoryEdits.set(path,rec)}
 }
 
+async function deletePersistedEditQuiet(path){
+  hotEdits.delete(path);memoryEdits.delete(path);changedPathsFast.delete(path);pendingChangedPaths.delete(path);revoke(path);
+  if(storageMode==='indexeddb'&&dbp){
+    try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}catch(err){console.warn('Eski edit kaydı silinemedi',path,err)}
+  }
+  try{localStorage.removeItem('mts:'+path)}catch(_){}
+  await delScaledPath(path);
+}
+
+const VERIFY_CONCURRENCY=8;
+async function hydrateChangedPathsFast(seedEdits=null){
+  const edits=(seedEdits||await allEdits()).filter(e=>CATALOG.some(x=>x.path===e.path));
+  const unknown=edits.filter(e=>(e.verification||'unknown')!=='changed');
+  for(const e of edits){
+    if((e.verification||'unknown')==='changed'){changedPathsFast.add(e.path);pendingChangedPaths.delete(e.path)}
+    else if(!changedPathsFast.has(e.path))pendingChangedPaths.add(e.path);
+  }
+  updateStatFast();
+  let cursor=0,processed=0,same=0,changed=0,failed=0;
+  async function worker(){
+    while(true){
+      const index=cursor++;if(index>=unknown.length)return;
+      const e=unknown[index],meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
+      try{
+        if(await textureMatchesOriginal(e.blob,meta,{throwOnError:true})){
+          same++;await deletePersistedEditQuiet(e.path);
+          const ref=cardRefsFast.get(e.path);
+          if(ref){ref.card.querySelector('.changed')?.remove();try{ref.img.src=await blobUrl(e.path,false)}catch(loadErr){console.warn('Orijinal thumbnail yenilenemedi',e.path,loadErr)}}
+        }else{
+          changed++;pendingChangedPaths.delete(e.path);changedPathsFast.add(e.path);
+          await markPersistedVerification(e.path,'changed');
+          const ref=cardRefsFast.get(e.path);
+          if(ref&&!ref.card.querySelector('.changed')){const d=document.createElement('span');d.className='changed';ref.card.appendChild(d)}
+        }
+      }catch(err){
+        failed++;pendingChangedPaths.add(e.path);changedPathsFast.delete(e.path);
+        console.warn('Değişiklik doğrulanamadı',e.path,err);
+      }
+      processed++;
+      if(processed===1||processed===unknown.length||processed%20===0){updateStatFast();await new Promise(requestAnimationFrame)}
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(VERIFY_CONCURRENCY,Math.max(1,unknown.length))},()=>worker()));
+  updateStatFast();
+  if(same)console.info(`${same} sahte/eski edit kaydı temizlendi`);
+  return {complete:failed===0,total:unknown.length,same,changed,failed,skippedKnown:edits.length-unknown.length};
+}
 async function bootstrapStorageInBackground(){
   try{
     await initStorage();
@@ -1150,7 +1241,7 @@ async function bootstrapStorageInBackground(){
     const edits=await allEdits();
     for(const e of edits){
       if(!CATALOG.some(x=>x.path===e.path))continue;
-      installPersistedEditFast(e);
+      installPersistedEditFast(e,{markChanged:(e.verification||'unknown')==='changed'});
     }
     updateStatFast();
     await applyFilter();
@@ -1173,7 +1264,7 @@ async function init(){
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
 
   $('resolution').value=String(TARGET_RESOLUTION);
-  $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Ana çözünürlük '+TARGET_RESOLUTION+'px')};
+  $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Temel 16px ölçeği → '+TARGET_RESOLUTION+'px')};
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();$('runtimeRole').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
