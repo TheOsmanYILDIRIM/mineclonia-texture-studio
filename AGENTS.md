@@ -63,9 +63,14 @@ For particle/effect textures, determine the trigger/context and relevant runtime
 
 Key non-negotiables:
 
-- P0 block/material work uses a reference-first two-step system: an asset-specific world/style reference prompt plus one controlled standard Original+Ref production prompt. This is deliberate workflow, not a generic fallback.
-- The former P0 “creative alternative” UI is retired; do not reintroduce it unless explicitly requested.
-- Production prompts are asset-specific or deliberately controlled variants.
+- P0 material work is reference-first: **Ref prompt** creates a style/world reference; **Üretim prompt** is the shared Image A (source structure/function) + Image B (dominant style) production prompt.
+- Reference prompts describe the world/art direction and material identity, but avoid checklists of visual details; the reference image should carry the style.
+- Only the literal outer canvas boundary is seam-critical for ordinary tile materials; internal cracks, stone edges, bark lines, leaf contours, etc. are not seam constraints.
+- Tree/log top textures are end-grain/cut-trunk surfaces, not foliage. Oriented faces must be semantically distinguished.
+- The former P0 “creative alternative” workflow is retired; do not reintroduce it unless explicitly requested.
+- P0/P1/P2… are priority only. Browsing/classification is a separate axis based on Mineclonia creative-inventory groups plus deeper technical/runtime classes.
+- Promote only true material **Block** records into material-P0; do not automatically promote Functional Block/UI/sprite/system records.
+- Production prompts outside the P0 material flow remain asset-specific or deliberately controlled variants.
 - Locked UV/entity atlases must preserve their exact islands/masks.
 - Entity dimensions alone must never trigger animation-strip treatment.
 - Animated textures preserve frame topology while edited resolution may increase.
@@ -77,6 +82,7 @@ Key non-negotiables:
 - High-resolution edited animation atlases must reconstruct at the edited cell resolution, not be forced back to the original low resolution.
 - Main Original/New comparison preview supports mobile pinch zoom/pan without modifying texture data.
 - Runtime-role classification exists because directory names are not semantically sufficient.
+- Variant Lab is a comparison gallery, not a prompt/generation page: unlimited multi-PNG import, horizontal thumbnails, 1×1/3×3/6×6 tile preview, mixed mode, and per-variant enable/disable.
 
 ## Session / handoff protocol
 
