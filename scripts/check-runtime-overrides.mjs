@@ -69,6 +69,27 @@ expect(originalBlob.includes('setTimeout(()=>controller.abort(),12000)'), 'upstr
 
 expect(exportPack.includes('await changedHydrationPromise.catch(()=>{})'), 'texturepack export must wait for background changed-state verification');
 expect(exportPack.includes('await editWriteQueue.catch(()=>{})'), 'texturepack export must wait for pending edit persistence');
+const densityScale = lastBlock('function targetTextureDimensions(meta,targetRes)');
+expect(densityScale.includes('const scale=Math.max(1,targetRes)/SOURCE_TEXEL_BASE'), 'target resolution must represent 16px source-density scaling');
+expect(densityScale.includes('baseW*scale') && densityScale.includes('baseH*scale'), 'target dimensions must preserve source atlas proportions');
+expect(source.includes('const SOURCE_TEXEL_BASE=16;'), '16px source-density baseline must be explicit');
+
+const verificationHydrate = lastBlock('async function hydrateChangedPathsFast(seedEdits=null)');
+expect(source.includes('const VERIFY_CONCURRENCY=8;'), 'unknown edit verification must run with bounded concurrency');
+expect(verificationHydrate.includes("filter(e=>(e.verification||'unknown')!=='changed')"), 'known changed records must not be recomputed on every startup');
+expect(verificationHydrate.includes("await markPersistedVerification(e.path,'changed')"), 'newly verified changes must be persisted');
+expect(verificationHydrate.includes('await deletePersistedEditQuiet(e.path)'), 'records proven original must be permanently removed');
+
+const persistedWriter = lastBlock('async function persistBlobOnly(path,blob');
+expect(persistedWriter.includes("verification='changed'"), 'new PNG edits must persist as verified changed');
+expect(source.includes("async function durableDbPut(path,blob,verification='changed')"), 'IndexedDB edit records must carry persistent verification state');
+
+const priorityReset = lastBlock('async function resetStoredEditsByPriorities(priorities)');
+expect(priorityReset.includes("wanted.has(x.priority)"), 'priority reset must select catalog records by P0-P6 priority');
+expect(priorityReset.includes("dbp.transaction(STORE,'readwrite')"), 'priority reset must batch-delete persisted edits');
+expect(priorityReset.includes('pendingChangedPaths.delete(path)') && priorityReset.includes('changedPathsFast.delete(path)'), 'priority reset must clear runtime count state');
+expect(source.includes('data-reset-priority="P0"') && source.includes('data-reset-priority="P6"'), 'settings must expose P0 through P6 reset controls');
+expect(source.includes('id="resetFuturePriorities"'), 'settings must expose fast P2-P6 cleanup');
 expect(source.includes("resolutionModel:'16px-source-density'"), 'export manifest must record density-based resolution semantics');
 expect(source.includes('texturePixelsVisuallyEquivalent'), 'unchanged detection must tolerate harmless rescale drift');
 
