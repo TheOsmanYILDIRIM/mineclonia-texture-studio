@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_2e6e4057af",
+  "label": "mcl_core_log_birch_top",
+  "texture_path": "ITEMS/mcl_core/mcl_core_log_birch_top.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for the cut end-grain of a mature birch trunk in a cool grounded dark-fantasy woodland. The wood should be pale and fine-grained, with subtle irregular growth rings, a creamy muted interior, faint warm beige variation and occasional darker growth stress or small radial checks. Compared with oak, the contrast between heartwood and sapwood is restrained; its identity comes from fine dense fibers and quiet ring structure. Avoid a blank white disk, dramatic dark heartwood, perfect concentric circles, polished plywood appearance or giant cracks. Slight weather exposure may gray the outermost cut fibers without making them rotten. Establish birch end-grain as pale, compact and understated but still materially deep. Leave final cross-section composition entirely to the structural source texture."
+}
