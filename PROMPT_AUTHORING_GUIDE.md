@@ -500,3 +500,12 @@ Do not stack a second long generic transparency block onto Entity prompts.
 The app also enforces this structurally on import: for Entity assets, the edited image keeps its generated RGB/material detail but its alpha channel is replaced with the original source texture's alpha mask, scaled with nearest-neighbor semantics to the imported output dimensions. This makes alpha/UV boundary preservation an application invariant instead of relying only on prompt compliance.
 
 Entity seam-offset editing is disabled because offsetting the atlas would intentionally move the structural mask.
+
+
+## Creative alternative mode — composition reset rule
+
+Creative alternatives are not HD remakes of the source texture. For full-square material textures, preserve the gameplay material/face role and technical behavior, but do **not** preserve the source macro-composition by default.
+
+In creative mode, large cracks, patch boundaries, knots, stones, stains, veins, tonal islands, grain groupings, focal marks and other large spatial features may be redesigned from scratch. Similarity should come from material identity and gameplay role, not from matching the old texture's layout.
+
+Only hard structural constraints remain locked where they are actually functional: tileability, meaningful alpha/mask behavior, UV layout for locked atlases, and frame topology/order for animations. The purpose of the creative set is to produce a genuinely different authored texture for the same game material, not a higher-resolution reconstruction.
