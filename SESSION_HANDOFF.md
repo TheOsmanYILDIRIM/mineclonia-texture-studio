@@ -655,3 +655,31 @@ Fix:
 Commits:
 - `114015de7ee591aa4068f276a190a370fee53dcb` — reset macro composition in creative prompts
 - `f247cfc7bf196c265a191bb7e0f98851cefd4158` — document creative composition reset
+
+
+## Variant Lab — source-strategy comparison — 2026-10-05
+
+Branch: `feat/variant-lab`.
+
+Purpose: compare three generation strategies for the same texture before choosing the version that becomes active in the main app.
+
+Modes:
+1. Original PNG reference — source image is provided for identity/seam behavior, but prompt explicitly rejects source macro-composition copying.
+2. Current generated PNG reference — the app's currently edited texture is provided as the second-pass seed; prompt asks to preserve its new composition while pushing style/material quality.
+3. No image reference — prompt-only generation from scratch; maximum freedom with explicit seamless/tile warning.
+
+UI:
+- new `Varyant Lab` entry in the bottom bar and texture detail actions;
+- texture selector inside the lab;
+- reference preview/download where applicable;
+- per-mode prompt copy;
+- per-mode PNG result upload;
+- fast visual comparison in three cards;
+- `Aktif yap` marks a winner and writes that blob through the normal texture-edit persistence path, so the main grid/export uses the selected result.
+
+Non-winners remain temporary comparison drafts for the current page session; the chosen winner is persisted as the normal active edit.
+
+Commit:
+- `78d596771c63dcce452b7a215b2dc94ee33a29aa` — add Variant Lab comparison page.
+
+Next check: runtime guard + Android UI spot-check, then merge/deploy.
