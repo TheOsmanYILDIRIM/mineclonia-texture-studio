@@ -2,78 +2,33 @@
 
 Updated: 2026-10-05
 
-## Current continuation — reference-first P0 prompts — 2026-10-05
+## Current decisions
 
-- P0 now uses two compact copy actions: **Ref prompt** and **Üretim prompt**; prompt text is hidden for P0.
-- Reference prompts carry the grounded dark-fantasy world/art direction and identify only the material subject, leaving surface detail creative.
-- The production prompt is one standard Original+Ref template: Image A = structure/function, Image B = dominant style/material language; only literal outer-canvas boundaries are seam-critical.
-- The former P0 creative alternative is retired from the visible workflow/export path.
-- Existing semantic classification promotes P1 **Block** and **Functional Block** textures (including brick-like block assets) into P0; filename guessing is not used for that promotion.
-- Non-P0 prompt behavior stays asset-specific/legacy.
-- Next: runtime guard + Pages deploy, then Android spot-check birch log, acacia/cobblestone, and one promoted P1 block.
+- **P0/P1/P2… remain priority labels.** Classification/filtering is separate.
+- Browsing follows Mineclonia creative-inventory groups plus deeper technical/runtime classes; one texture may belong to multiple classes.
+- Material-P0 promotion is limited to true material **Block** assets. Functional blocks, UI, sprites and system/debug assets are not promoted automatically.
+- P0 material prompts are **reference-first**:
+  - **Ref prompt** = short world/art-direction + material identity; leave surface details creative.
+  - **Üretim prompt** = standard Image A (source structure/function) + Image B (dominant visual/style reference).
+- For normal tile materials, only the literal outer canvas boundary is seam-critical; internal material contours are not seam boundaries.
+- Semantic face/orientation must be respected. Tree/log top means cut trunk/end-grain; side means bark/trunk side; foliage remains foliage.
+- **Yaratıcı alternatif is retired.**
+- Variant Lab is a comparison gallery only: unlimited multi-PNG import, horizontal thumbnails, 1×1/3×3/6×6 preview, mixed mode, per-variant on/off, and promote selected variant to active.
+- Ambiguous entity/effect/overlay/animation roles must still be resolved from Mineclonia runtime/source code; runtime behavior wins over filenames.
 
-## Variant Lab simplified to comparison gallery — 2026-10-05
+## Current implementation evidence
 
-- Removed Variant Lab generation modes and all Variant Lab prompt UI.
-- Variant Lab now accepts any number of PNGs from one multi-select file picker.
-- Variants appear as a horizontally scrolling thumbnail strip.
-- Clicking a thumbnail selects it for fast 1×1 / 3×3 / 6×6 tile inspection.
-- Added **Karışık** mode: all enabled variants are mixed across the tile grid.
-- While Karışık is active, tapping a thumbnail toggles that variant out/in; disabled variants are visibly dimmed and crossed out.
-- Kept **Seçileni aktif yap** for writing the chosen single variant back to the main texture.
-- Variant drafts remain per-texture for the current browser session.
+- `eb742e2e4ab118a915b8dab0412ac78651e38747` — tree-top reference semantics + reliable Ref/Üretim copy actions.
+- `07c9096bb439254872f309b81e09a86941205590` — simplified multi-PNG Variant Lab.
+- `b5307f347a27afefc7da93026f0c38ccac3e9519` — explicit P0 semantic reference audit and true-Block promotion rule.
+- `4b8b0668656c4db15923781fcc2bd213bf580a82` — Mineclonia creative-inventory classification.
+- `5d6270ae4e2d0b7cc5b76afab6592ae7fc6d294b` — deeper technical/runtime classification.
 
-Commit:
-- `07c9096bb439254872f309b81e09a86941205590` — multi-PNG comparison gallery.
+## Next concrete work
 
-## P0 prompt interaction + tree-top ref fix — 2026-10-05
-
-- Fixed `default_acacia_tree_top.png`-style assets: `tree_top/log_top/wood_top` now map to a cut trunk cross-section/end-grain reference subject, not foliage.
-- Removed the obsolete **Yaratıcı alternatif** button and its UI handler.
-- Moved P0 copy behavior into the main authoritative handlers so async init can no longer overwrite it.
-- **Ref prompt** now copies the asset-specific reference-generation prompt.
-- **Üretim prompt** now copies the standard Image A / Image B production prompt; it no longer saves a prompt override or shows “bu texture ID’sine kaydedildi”.
-- Non-P0 prompt editing retains the existing save behavior.
-
-Commit:
-- `eb742e2e4ab118a915b8dab0412ac78651e38747`.
-
-## P0 reference semantics audit — 2026-10-05
-
-A broader audit found the acacia-top issue was part of a larger naming/semantics risk.
-
-Fixes:
-- all 41 original/core P0 textures now have an explicit semantic reference subject instead of relying on filename regex guessing;
-- tree side vs trunk end-grain, planks, foliage, flowing/source fluids, grass top/side-overlay/snowed-side, and oak/jungle/birch/spruce variants are explicitly distinguished;
-- promoted P1 assets now require the existing classifier to return exactly **Block**; **Functional Block** assets such as beds, doors, chests, furnaces, fences, etc. are no longer promoted into P0;
-- technical/sprite-like block records such as light placeholders, barrier/void, vine/web, sea-pickle-off sprites, sugar, grass shadow and ladder are excluded from material-P0 promotion;
-- generalized semantic rules cover oriented block faces (top/side/bottom), stripped logs, podzol/mycelium/path, sandstone/red sandstone, deepslate, coral/prismarine, ores, glass, wool and other promoted material blocks.
-
-Commit:
-- `b5307f347a27afefc7da93026f0c38ccac3e9519`.
-
-## Mineclonia creative-inventory classification — 2026-10-05
-
-- Replaced the old file-area / broad asset-type toolbar filters with Mineclonia-style creative inventory categories.
-- Category names follow `mods/HUD/mcl_inventory/creative.lua`: Building Blocks, Decoration Blocks, Redstone, Transportation, Foodstuffs, Tools, Combat, Mobs, Brewing, Materials, Miscellaneous, and Not in Creative Inventory.
-- P0/P1/P2… priority chips remain a separate filter axis, so users can combine e.g. Building Blocks + P0 or Building Blocks + P1.
-- Texture classification supports multiple inventory categories where appropriate, matching Mineclonia's behavior where registered items can be present in more than one creative tab.
-- Entity textures are mapped to the closest workflow tab (normally Mobs; boats/minecarts → Transportation) because they are texture assets rather than literal creative-inventory item stacks.
-- Existing runtime-role classification is preserved for detail semantics; the new creative category is a browsing/filter layer, not a replacement for runtime role.
-
-Commit:
-- `4b8b0668656c4db15923781fcc2bd213bf580a82`.
-
-## Deep texture classification — 2026-10-05
-
-- Expanded browsing beyond coarse creative inventory groups while retaining Mineclonia creative tabs.
-- Added technical/runtime classes for terrain, stone, wood, ores, plants, crops, liquids, animation, passive/hostile/boss/NPC entities, player, armor, vehicles, items, tools, weapons, food, materials, workstations, containers, doors, redstone, HUD, GUI, icons, overlays, particles, VFX, sky/weather, environment, maps, and system/debug assets.
-- A texture can belong to multiple meaningful classes. P0–P6 remains an independent priority axis.
-- Filtering now uses prefixed `inv:` and `tech:` categories to prevent collisions between game inventory and technical classifications.
-- Verified the updated blob contains the new classifier and all category filtering call sites use `categoryMatches`.
-
-Commit:
-- `5d6270ae4e2d0b7cc5b76afab6592ae7fc6d294b`.
+1. Continue checking P0 reference subjects for semantic mistakes, especially oriented faces and legacy joined names.
+2. Validate creative-inventory + technical filters on Android while keeping P0/P1 independent.
+3. Continue prompt work only after the classification is trusted.
 
 ## Project
 
