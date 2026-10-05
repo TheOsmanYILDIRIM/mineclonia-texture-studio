@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_f1658faec1",
+  "label": "default_cobble",
+  "texture_path": "ITEMS/mcl_core/default_cobble.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for old cobblestone masonry from a grounded dark-fantasy world.\n\nThe stones were gathered locally, laid by hand, repaired many times and worn by generations of feet, rain, grit and cold. They should vary naturally in mineral character, size and wear: rounded fractured stone faces, compressed dark joints, chipped high points, embedded dirt and faint damp staining. The construction feels durable but imperfect, with no modern precision.\n\nKeep the stone palette restrained and earthy, allowing subtle cool and warm mineral differences without becoming colorful. Avoid a neat repeating paving pattern, giant mortar gaps, castle-wall clichés, wet gloss or extreme moss coverage.\n\nFocus on the tactile language of ancient utilitarian cobble. The reference should inspire material richness and age, not prescribe the source texture's arrangement."
+}
