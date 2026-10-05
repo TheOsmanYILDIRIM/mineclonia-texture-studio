@@ -1,3 +1,15 @@
+## Armor UV workflow — 2026-10-05
+
+- Added a dedicated Armor UV queue containing **32 worn player-armor UV atlases**.
+- Inclusion rule: the actual 64×32 armor textures mapped onto the worn player armor model.
+- Explicitly excluded inventory/UI assets: all `mcl_armor_inv_*` 16×16 icons, smithing-template icons, trim item sprites, HUD armor graphics and other flat inventory imagery.
+- Current included materials: chain, copper, diamond, gold, iron, leather, leather_desat and netherite × boots/chestplate/helmet/leggings.
+- Manifest: `prompts/armor/manifest.json`.
+- Armor uses the same compact three-stage UV UI as Mobs: HQ UV → reference → Final UV, with armor-specific dynamic material descriptions.
+- Manifest commit: `0cc1e659da7c93072da3d1e5ef874986569b768d`.
+- UI routing commit: `1f6d8f45499b77da492f61a85fa720ddc977a954`.
+- Elytra was not added to this armor queue: the intact texture is 64×32 but is a separate wearable wing/model case; broken Elytra is a 16×16 item texture. Handle Elytra separately if desired.
+
 ## Blocks prompt queue COMPLETE — 2026-10-05
 
 - Authored the final Block reference prompts, manifest orders **161–202**.
