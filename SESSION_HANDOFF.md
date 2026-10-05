@@ -615,3 +615,27 @@ Commits:
 - `cd88cf425c13bbbac462e8ce0b063741f9f879dd` — remove stale role-filter bindings
 
 Next check: run runtime guards on the PR, then verify Android search width and that category/type/resolution/changed filters remain functional.
+
+
+## P0 creative prompt alternatives — 2026-10-05
+
+Branch: `feat/p0-creative-prompts`.
+
+User feedback: the existing texture prompts over-constrained the image model and reduced creative variation. Existing P0 prompts must remain intact.
+
+Implemented:
+- kept the original 41-entry `P0_PROMPT_LIBRARY` unchanged;
+- added a separate 41/41 `P0_CREATIVE_DIRECTIONS` set with shorter, art-direction-first prompts;
+- creative prompts preserve only hard runtime constraints (gameplay role, tile/alpha behavior, animation topology) and deliberately leave more room for material reinterpretation, weathering, color nuance, age and environmental storytelling;
+- detail view now has a `Yaratıcı alternatif` / `Mevcut prompt` toggle for P0 assets;
+- creative mode is read-only in the UI so it cannot overwrite the existing saved/classic prompt;
+- Prompt JSON manager can export `mineclonia_P0_creative_prompts.json` separately;
+- normal all-prompts and P0 exports continue to use the classic prompt set.
+
+Coverage verification: 41 classic P0 IDs, 41 unique creative P0 IDs, no missing or extra IDs.
+
+Commits:
+- `4c5f9e2f42dec573e9c7edcf10314e3593b449e5` — creative P0 library, toggle and export
+- `4e636891c2c5eb3dcb264ecb408e390f406e6b75` — insertion cleanup
+
+Next check: runtime guards, then Android spot-check of one leaf, one wood/stone and one animation asset in both classic and creative prompt modes.
