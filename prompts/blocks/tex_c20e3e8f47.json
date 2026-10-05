@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_c20e3e8f47",
+  "label": "mcl_core_grass_block_side_overlay",
+  "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_side_overlay.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for the thin living grass edge that hangs over the exposed side of a soil block in a grounded dark-fantasy landscape. Focus on the transition zone: short tough blades, fibrous roots and small clumps of turf gripping the upper lip while soil remains visible beneath. The vegetation should feel naturally uneven, wind-worn and locally dense, with some roots and dry organic matter binding the edge together. Use restrained temperate greens mixed with muted olive and dry straw tones. Avoid a full grassy field, long ornamental blades, thick moss, perfectly straight turf, or turning the whole study into soil. This is specifically the living side-edge layer, not the top lawn and not the dirt body. Establish how grass physically meets and holds exposed earth while leaving the source texture to determine its exact silhouette."
+}
