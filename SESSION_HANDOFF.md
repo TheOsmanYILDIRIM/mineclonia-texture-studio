@@ -1,3 +1,18 @@
+## JavaScript split / HTML de-bloat — 2026-10-05
+
+- Refactor branch: `refactor/split-js-20261005` (main was not modified directly).
+- Reduced `index.html` from ~2.65 MB to ~19 KB by extracting all inline JavaScript.
+- Extracted bundled JSZip to `js/vendor/jszip.js`.
+- Split the 3,248-entry texture catalog across `js/data/catalog-01..03.js`.
+- Moved P0 prompt data to `js/data/prompts-p0.js`.
+- Split the 673-entry legacy P1 prompt library across `js/data/prompts-p1-01..06.js`.
+- Remaining runtime/application logic is now `js/app.js` (~164 KB), preserving its original statement order, including later persistence/performance overrides.
+- All 12 JS files parse successfully with `new Function`.
+- Reconstructed data check: catalog=3248, P0=41, P1=673; first/last catalog paths preserved.
+- `index.html` now contains zero inline script blocks and loads external scripts synchronously in dependency order.
+- No texture images were embedded in the HTML; the size was primarily catalog and prompt data.
+- Open verification: browser/mobile smoke test after PR merge/deployment. Do not further split `app.js` by arbitrary function groups unless initialization/override ordering is verified.
+
 ## Armor category + authored-prompt filter — 2026-10-05
 
 - Added dedicated `Armor UV · 32` category in the UI; it selects only the 32 worn 64×32 armor UV atlases.
