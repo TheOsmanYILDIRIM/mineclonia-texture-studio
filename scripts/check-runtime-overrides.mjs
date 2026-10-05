@@ -41,11 +41,14 @@ const targetDims = lastBlock('function targetTextureDimensions(meta,targetRes)')
 expect(targetDims.includes('SOURCE_TEXEL_BASE=16') || source.includes('const SOURCE_TEXEL_BASE=16;'), 'density scaling must use 16px as the source texel baseline');
 expect(targetDims.includes('baseW*scale') && targetDims.includes('baseH*scale'), 'target dimensions must scale both native axes by source density');
 const normalize = lastBlock('async function normalizeTextureBlobTo(blob,meta,targetRes)');
-expect(normalize.includes('sw<=target.width&&sh<=target.height'), 'normalization must remain a downscale ceiling and never upscale smaller imports');
+expect(normalize.includes('const maxW=Math.min(sw,target.width),maxH=Math.min(sh,target.height);'), 'normalization must cap each axis by both input size and density target so it never upscales');
+expect(normalize.includes('Math.min(maxW,maxH*ratio)'), 'normalization must restore source aspect ratio within the no-upscale ceiling');
 const densityProbe = (w,h,target)=>({width:Math.round(w*(target/16)),height:Math.round(h*(target/16))});
 expect(JSON.stringify(densityProbe(16,16,128))===JSON.stringify({width:128,height:128}), '16x16 at 128 target must become 128x128');
 expect(JSON.stringify(densityProbe(64,32,128))===JSON.stringify({width:512,height:256}), '64x32 entity at 128 target must become 512x256');
 expect(JSON.stringify(densityProbe(32,64,128))===JSON.stringify({width:256,height:512}), '32x64 atlas at 128 target must become 256x512');
+const fitProbe=(sw,sh,bw,bh,target)=>{const tw=bw*(target/16),th=bh*(target/16),ratio=bw/bh,maxW=Math.min(sw,tw),maxH=Math.min(sh,th);let dw=Math.max(1,Math.floor(Math.min(maxW,maxH*ratio))),dh=Math.max(1,Math.round(dw/ratio));if(dh>maxH){dh=Math.max(1,Math.floor(maxH));dw=Math.max(1,Math.round(dh*ratio))}return {width:dw,height:dh}};
+expect(JSON.stringify(fitProbe(256,256,64,32,128))===JSON.stringify({width:256,height:128}), 'square 256px entity output must downscale to 256x128 rather than upscale to 512x256');
 expect(source.includes('<option value="64">64px</option>') && source.includes('<option value="128">128px</option>') && source.includes('<option value="256">256px</option>') && source.includes('<option value="512">512px</option>'), 'all four target-resolution controls must exist');
 
 
