@@ -1,3 +1,14 @@
+## Armor category + authored-prompt filter — 2026-10-05
+
+- Added dedicated `Armor UV · 32` category in the UI; it selects only the 32 worn 64×32 armor UV atlases.
+- Armor UV textures are explicitly excluded from rectangular-strip animation detection, so 64×32 armor no longer appears as a 2-frame animation.
+- Added independent `Promptlu` filter beside `Değişenler`.
+- `Promptlu` means a real authored prompt exists: Block authored refs, authored Mob/Armor refs, or a manual prompt override. Generic dynamic fallback alone does not count.
+- Filters can combine (for example Armor UV + Promptlu, or Promptlu + Değişenler).
+- Also fixed the Armor authored-reference fallback bug: authored first; real dynamic armor fallback second.
+- Category/filter commit: `d6b78e3e4ddfe63bb56fbd11a9bc6b2e6117d6ba`.
+- Filter state initialization fix: `bceb9a449ca549474670d72473007a4ac0efd5e6`.
+
 ## Armor authored-ref fallback fix — 2026-10-05
 
 - Fixed the remaining authored-reference wiring bug: `referencePromptFor()` no longer calls nonexistent `mobArmorRefPromptFor()`.
