@@ -1,3 +1,15 @@
+## Blocks prompt queue COMPLETE — 2026-10-05
+
+- Authored the final Block reference prompts, manifest orders **161–202**.
+- Block reference-prompt coverage is now **202 / 202 complete; 0 pending**.
+- Final batch: `prompts/blocks/batch_161_202.json`.
+- Final set deliberately distinguishes cracked/top/tuff Deepslate roles, live vs dead coral materials, dried-kelp general/bottom/side/top faces, prismarine/sea-lantern, and each wool dye identity.
+- Last completed: `wool_yellow.png` (`tex_92f3681369`).
+- Block manifest has `next_id=null` and `next_name=null`; there is no remaining Block authoring queue.
+- Final 42 prompt commit: `6e281a63748cc3f71d46ceaf3136eac56b31127d`.
+- Completion manifest commit: `ffae642f87879e214f962a6b455c98b102bf9080`.
+- The dynamic shared Block production prompt remains the production path; per-texture authored files/batches are reference prompts only.
+
 ## Block prompt authoring 61–160 + dynamic production template — 2026-10-05
 
 - The standard Image A + Image B Block production prompt is now metadata-aware instead of a fixed literal string.
