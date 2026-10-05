@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_dd1601b059",
+  "label": "mcl_core_bedrock",
+  "texture_path": "ITEMS/mcl_core/mcl_core_bedrock.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close visual reference for bedrock as the primordial foundation of a grounded dark-fantasy world. This material should feel far denser and older than ordinary stone: a compressed, nearly indestructible geological mass formed under impossible pressure. Its surface carries tightly fused dark mineral phases, blunt fractured facets, subtle pressure veining and deep tonal pockets, as if many kinds of ancient rock were metamorphically welded together. Keep the palette extremely restrained—charcoal, cold dark gray, muted iron-gray—with depth coming from mineral structure rather than black noise. Avoid lava, obsidian glass, glowing cracks, skull imagery or dramatic fantasy crystal. The result should communicate finality, weight and geological age. It is the world's physical boundary made material, not simply a darker cobblestone."
+}
