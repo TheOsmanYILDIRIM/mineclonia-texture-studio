@@ -119,6 +119,16 @@ for (const [index, script] of scriptBlocks.entries()) {
   catch (error) { fail(`inline script ${index + 1} has a syntax error: ${error.message}`); }
 }
 
+
+
+const animInfo = lastBlock('function actualStripFrameInfo(src,spec)');
+expect(animInfo.includes('Math.floor(long/spec.frames)'), 'animation preview must infer frame size from the saved strip');
+const animExport = lastBlock('async function stripBlobToAtlasBlob(blob, meta)');
+expect(animExport.includes('actualStripFrameInfo(src,spec)'), 'strip-to-atlas export must use actual edited frame resolution');
+const animPreview = lastBlock('async function refreshAnimPreview()');
+expect(animPreview.includes('actualStripFrameInfo(src,spec)'), 'live animation preview must use actual edited frame resolution');
+expect(animPreview.includes('ctx.drawImage(src,sx,sy,actual.frame,actual.frame'), 'live animation preview must crop frames at the actual saved frame size');
+
 expect(!source.includes('<<<<<<<') && !source.includes('>>>>>>>'), 'merge-conflict markers must not be present');
 
 if (process.exitCode) process.exit(process.exitCode);
