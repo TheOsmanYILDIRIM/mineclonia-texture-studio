@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_a46fdac083",
+  "label": "default_stone",
+  "texture_path": "ITEMS/mcl_core/default_stone.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for the ordinary native stone that forms the geological backbone of an old grounded dark-fantasy world. It is neither decorative marble nor dramatic volcanic rock. The stone should feel dense, fine-to-medium grained and naturally fractured, with subdued mineral mottling, faint bedding or pressure traces, tiny inclusions and softened weathering. Its interest comes from believable geology and age rather than obvious motifs. Use restrained neutral gray with subtle cool, warm and earthy mineral shifts. Avoid huge cracks, cobblestone joints, polished slabs, high-contrast speckles, wet gloss or generic photographic granite. This should become the visual baseline from which ores and worked masonry can plausibly derive. Give it quiet geological depth, solidity and ancient pressure without prescribing a tile layout."
+}
