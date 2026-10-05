@@ -24,9 +24,9 @@
 <main><div class="grid" id="grid"></div><div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div></main>
 <div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP içe aktar</button><button class="btn" id="promptJson">Prompt JSON</button><button class="btn" id="openVariantLab">Varyant Lab</button><button class="btn primary" id="exportPack">Texturepack ZIP</button></div>
 </div>
-<div class="sheet" id="sheet"><div class="drawer"><div class="handle"></div><div class="meta"><div><h2 id="detailName"></h2><div class="path" id="detailPath"></div><div class="path" id="detailRole"></div></div><button class="btn" id="close" type="button" aria-label="Detay görünümünü kapat">✕</button></div><div class="preview" id="preview"><img id="origImg"><img id="editImg" class="editedClip"></div><div class="compareCtl"><span class="stat">Orijinal</span><input id="compare" type="range" min="0" max="100" value="50"><span class="stat">Yeni</span></div><div class="tileTools"><span class="stat">Tile</span><button class="btn mini active" data-tile="1">1×1</button><button class="btn mini" data-tile="3">3×3</button><button class="btn mini" data-tile="6">6×6</button><button class="btn mini" data-tile="9">9×9</button><button class="btn mini" id="tileSource">Yeni</button></div><div class="tilePreview" id="tilePreview"></div><div class="actions"><button class="btn" id="downloadOriginal">Orijinali indir</button><button class="btn" id="downloadEdited">Yeniyi indir</button><button class="btn primary" id="uploadEdited">Düzenlenmiş PNG yükle</button><button class="btn warn" id="seamExport">50% Offset PNG</button><button class="btn warn wide" id="seamImport">Offset düzenlemeyi geri yükle</button><button class="btn" id="detailVariantLab">Varyant Lab</button><button class="btn danger" id="revert">Değişikliği sil / orijinale dön</button></div><div class="animBox" id="animBox"><div class="animHead"><div><div class="promptTitle">Animasyon araçları</div><div class="animMeta" id="animMeta"></div></div><button class="btn" id="animToggle">Durdur</button></div><div class="animCanvasWrap"><canvas id="animCanvas" width="256" height="256"></canvas></div><div class="animBtns"><button class="btn" id="exportAtlas">Strip → Kare atlas</button><button class="btn primary" id="importAtlas">Atlası geri yükle</button></div><div class="hint" id="animHint"></div></div><div class="promptBox"><div class="promptHead"><div><div class="promptTitle">AI düzenleme promptu</div><div class="promptFamily" id="promptFamily"></div><div class="textureId" id="textureId"></div></div><button class="btn" id="copyPrompt">Kopyala</button></div><textarea id="promptText" spellcheck="false"></textarea><div class="promptBtns"><button class="btn" id="creativePromptToggle" style="display:none">Yaratıcı alternatif</button><button class="btn primary" id="savePrompt">Promptu kaydet</button><button class="btn" id="singlePromptJson">Bu prompt JSON</button></div></div><div class="hint" id="hint"></div></div></div>
+<div class="sheet" id="sheet"><div class="drawer"><div class="handle"></div><div class="meta"><div><h2 id="detailName"></h2><div class="path" id="detailPath"></div><div class="path" id="detailRole"></div></div><button class="btn" id="close" type="button" aria-label="Detay görünümünü kapat">✕</button></div><div class="preview" id="preview"><img id="origImg"><img id="editImg" class="editedClip"></div><div class="compareCtl"><span class="stat">Orijinal</span><input id="compare" type="range" min="0" max="100" value="50"><span class="stat">Yeni</span></div><div class="tileTools"><span class="stat">Tile</span><button class="btn mini active" data-tile="1">1×1</button><button class="btn mini" data-tile="3">3×3</button><button class="btn mini" data-tile="6">6×6</button><button class="btn mini" data-tile="9">9×9</button><button class="btn mini" id="tileSource">Yeni</button></div><div class="tilePreview" id="tilePreview"></div><div class="actions"><button class="btn" id="downloadOriginal">Orijinali indir</button><button class="btn" id="downloadEdited">Yeniyi indir</button><button class="btn primary" id="uploadEdited">Düzenlenmiş PNG yükle</button><button class="btn warn" id="seamExport">50% Offset PNG</button><button class="btn warn wide" id="seamImport">Offset düzenlemeyi geri yükle</button><button class="btn" id="detailVariantLab">Varyant Lab</button><button class="btn danger" id="revert">Değişikliği sil / orijinale dön</button></div><div class="animBox" id="animBox"><div class="animHead"><div><div class="promptTitle">Animasyon araçları</div><div class="animMeta" id="animMeta"></div></div><button class="btn" id="animToggle">Durdur</button></div><div class="animCanvasWrap"><canvas id="animCanvas" width="256" height="256"></canvas></div><div class="animBtns"><button class="btn" id="exportAtlas">Strip → Kare atlas</button><button class="btn primary" id="importAtlas">Atlası geri yükle</button></div><div class="hint" id="animHint"></div></div><div class="promptBox"><div class="promptHead"><div><div class="promptTitle">AI üretim</div><div class="promptFamily" id="promptFamily"></div><div class="textureId" id="textureId"></div></div></div><div class="promptBtns"><button class="btn" id="copyPrompt">Ref prompt</button><button class="btn primary" id="savePrompt">Üretim prompt</button><button class="btn" id="creativePromptToggle" style="display:none">Yaratıcı alternatif</button><button class="btn" id="singlePromptJson" style="display:none">Bu prompt JSON</button></div><textarea id="promptText" spellcheck="false" style="display:none"></textarea></div><div class="hint" id="hint"></div></div></div>
 <input id="fileEdited" type="file" accept="image/png" hidden><input id="fileSeam" type="file" accept="image/png" hidden><input id="fileAnimAtlas" type="file" accept="image/png" hidden><input id="fileZip" type="file" accept=".zip,application/zip" hidden><input id="filePromptJson" type="file" accept="application/json,.json" hidden><input id="fileProjectBackup" type="file" accept=".zip,application/zip" hidden>
-<div class="promptManager" id="promptManager"><div class="promptMgrDrawer"><div class="handle"></div><div class="meta"><div><h2>Prompt JSON yöneticisi</h2><div class="path">Tekil: {"id":"tex_…","prompt":"…"} veya {"path":"ITEMS/…png","prompt":"…"} · Çoklu: {"prompts":[…]}</div></div><button class="btn" id="closePromptMgr">✕</button></div><div class="promptBtns" style="margin:12px 0"><button class="btn primary" id="importPromptJson">JSON içe aktar</button><button class="btn" id="exportAllPrompts">Tüm promptları indir</button><button class="btn" id="exportP0Prompts">P0 promptlarını indir</button><button class="btn" id="exportP0CreativePrompts">P0 yaratıcı promptları indir</button><button class="btn danger" id="clearPromptOverrides">Özel promptları sıfırla</button><button class="btn primary" id="exportProjectBackup">Proje yedeği indir</button><button class="btn" id="importProjectBackup">Proje yedeği yükle</button></div><div class="hint"><b>Kayıtlı texture temizleme</b><br>Yalnız seçilen priority\u0027nin PNG/edit kayıtlarını ve ölçek cache\u0027ini siler; promptlara dokunmaz.</div><div class="promptBtns" id="priorityResetBtns" style="margin:8px 0"><button class="btn danger" data-reset-priority="P0">P0 sıfırla</button><button class="btn danger" data-reset-priority="P1">P1 sıfırla</button><button class="btn danger" data-reset-priority="P2">P2 sıfırla</button><button class="btn danger" data-reset-priority="P3">P3 sıfırla</button><button class="btn danger" data-reset-priority="P4">P4 sıfırla</button><button class="btn danger" data-reset-priority="P5">P5 sıfırla</button><button class="btn danger" data-reset-priority="P6">P6 sıfırla</button><button class="btn danger" id="resetFuturePriorities">P2–P6 sıfırla</button></div><textarea id="promptJsonPreview" spellcheck="false" placeholder="JSON buraya yapıştırıp ‘Uygula’ diyebilirsin…"></textarea><div class="promptBtns"><button class="btn primary" id="applyPromptJsonText">JSON metnini uygula</button><button class="btn" id="copyPromptSchema">Şema örneğini kopyala</button></div><div class="hint">JSON kayıtları id veya tam texture path ile eşleşebilir. Aynı texture için yeni prompt mevcut özel promptu değiştirir. Tek kayıt veya yüzlerce kayıt bir kerede içe aktarılabilir.</div></div></div><div class="variantLab" id="variantLab">
+<div class="promptManager" id="promptManager"><div class="promptMgrDrawer"><div class="handle"></div><div class="meta"><div><h2>Prompt JSON yöneticisi</h2><div class="path">Tekil: {"id":"tex_…","prompt":"…"} veya {"path":"ITEMS/…png","prompt":"…"} · Çoklu: {"prompts":[…]}</div></div><button class="btn" id="closePromptMgr">✕</button></div><div class="promptBtns" style="margin:12px 0"><button class="btn primary" id="importPromptJson">JSON içe aktar</button><button class="btn" id="exportAllPrompts">Tüm promptları indir</button><button class="btn" id="exportP0Prompts">P0 promptlarını indir</button><button class="btn" id="exportP0CreativePrompts" style="display:none">P0 yaratıcı promptları indir</button><button class="btn danger" id="clearPromptOverrides">Özel promptları sıfırla</button><button class="btn primary" id="exportProjectBackup">Proje yedeği indir</button><button class="btn" id="importProjectBackup">Proje yedeği yükle</button></div><div class="hint"><b>Kayıtlı texture temizleme</b><br>Yalnız seçilen priority\u0027nin PNG/edit kayıtlarını ve ölçek cache\u0027ini siler; promptlara dokunmaz.</div><div class="promptBtns" id="priorityResetBtns" style="margin:8px 0"><button class="btn danger" data-reset-priority="P0">P0 sıfırla</button><button class="btn danger" data-reset-priority="P1">P1 sıfırla</button><button class="btn danger" data-reset-priority="P2">P2 sıfırla</button><button class="btn danger" data-reset-priority="P3">P3 sıfırla</button><button class="btn danger" data-reset-priority="P4">P4 sıfırla</button><button class="btn danger" data-reset-priority="P5">P5 sıfırla</button><button class="btn danger" data-reset-priority="P6">P6 sıfırla</button><button class="btn danger" id="resetFuturePriorities">P2–P6 sıfırla</button></div><textarea id="promptJsonPreview" spellcheck="false" placeholder="JSON buraya yapıştırıp ‘Uygula’ diyebilirsin…"></textarea><div class="promptBtns"><button class="btn primary" id="applyPromptJsonText">JSON metnini uygula</button><button class="btn" id="copyPromptSchema">Şema örneğini kopyala</button></div><div class="hint">JSON kayıtları id veya tam texture path ile eşleşebilir. Aynı texture için yeni prompt mevcut özel promptu değiştirir. Tek kayıt veya yüzlerce kayıt bir kerede içe aktarılabilir.</div></div></div><div class="variantLab" id="variantLab">
   <div class="variantTop">
     <div class="variantTopRow"><button class="btn" id="closeVariantLab">← Geri</button><select class="select" id="variantTexture"></select></div>
     <div class="stat" id="variantMeta" style="margin-top:7px"></div>
@@ -840,6 +840,109 @@ async function importProjectBackup(file){
 }
 
 
+/* P0 REFERENCE-FIRST PROMPT SYSTEM — 2026-10-05 */
+const P0_STANDARD_ORIGINAL_REF_PROMPT=`Use Image A as the structural source texture.
+
+Use Image B as the dominant visual reference.
+
+Rebuild Image A using the visual language, material richness, depth, contrast, irregularity, weathering, and overall artistic character of Image B.
+
+Do not copy the composition or exact forms of Image B.
+Transfer its visual character only.
+
+Preserve Image A's function as a game texture and its overall structural logic.
+
+SEAM RULE:
+Only the literal outermost canvas boundaries of Image A are seam-critical.
+Do not treat internal lines, shapes, contours, cracks, or material boundaries as seam constraints.
+
+Keep the interior creatively free.
+
+The final result should clearly remain the same texture type as Image A, but visually belong to the world and material language established by Image B.
+
+Prioritize Image B for style.
+Prioritize Image A for structure and function.`;
+
+function p0ReferenceSubject(x){
+ const n=String(x?.name||'').toLowerCase().replace(/\.png$/,'');
+ const wood=(n.match(/(?:log|wood|plank|leaves?)_(acacia|birch|cherry|dark_oak|jungle|mangrove|oak|pale_oak|spruce)/)||n.match(/(acacia|birch|cherry|dark_oak|jungle|mangrove|oak|pale_oak|spruce)_(?:log|wood|plank|leaves?)/))?.[1];
+ const prettyWood=wood?wood.replace(/_/g,' '):'';
+ if(/leaves?|foliage/.test(n)) return prettyWood?prettyWood+' foliage':'natural foliage';
+ if(/(?:^|_)log(?:_|$)|tree_side|bark/.test(n)) return prettyWood?'the side surface of a '+prettyWood+' tree':'the side surface of an old tree';
+ if(/planks?/.test(n)) return prettyWood?prettyWood+' wooden planks':'aged wooden planks';
+ if(/cobble/.test(n)) return 'an old cobblestone surface';
+ if(/brick/.test(n)) return 'aged masonry and brickwork';
+ if(/stone/.test(n)) return 'an old weathered stone surface';
+ if(/dirt|soil|mud/.test(n)) return 'a natural earth surface';
+ if(/sand/.test(n)) return 'a weathered natural sand surface';
+ if(/gravel/.test(n)) return 'a rough gravel surface';
+ if(/ore/.test(n)) return 'a mineral-bearing stone surface';
+ if(/grass/.test(n)) return 'a natural grass-covered ground surface';
+ if(/glass/.test(n)) return 'aged game-world glass material';
+ if(/wool/.test(n)) return 'a worn natural wool material';
+ const clean=String(x?.name||'texture').replace(/\.png$/i,'').replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
+ return 'the material represented by the source texture '+clean;
+}
+function p0ReferencePromptFor(x){
+ const subject=p0ReferenceSubject(x);
+ return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
+
+This world is old, harsh, and deeply shaped by climate, time, decay, growth, use, and survival.
+
+The visual language should feel:
+rich in material depth,
+organic,
+restrained in color,
+irregular,
+weathered,
+and visually distinctive without becoming exaggerated or theatrical.
+
+Nothing should feel sterile, polished, procedural, plastic, or generically realistic.
+
+The style should sit between realism and authored game art:
+believable enough to feel physical,
+but expressive enough that the material carries a strong artistic identity.
+
+Create a close visual study centered on ${subject} from this world.
+
+Do not follow a checklist of surface details.
+Do not mechanically reproduce a real-world photograph.
+
+Interpret freely how this material would naturally exist within this setting.
+
+Let its structure, age, tonal variation, wear, imperfections, layering, and visual character emerge naturally from the world and art direction.
+
+Prioritize:
+material presence,
+surface depth,
+natural variation,
+age,
+visual richness,
+and a cohesive artistic identity.
+
+The result should feel like a definitive visual reference that other materials from the same game world could follow.
+
+No scene narrative is needed.
+No characters.
+No props.
+No text or interface elements.
+
+Focus purely on establishing the material language and artistic identity of this world through this material.`;
+}
+
+for(const x of CATALOG){
+ if(x.priority==='P1'){
+   const t=assetTypeOf(x);
+   if(t==='Block'||t==='Functional Block')x.priority='P0';
+ }
+}
+const __legacyPromptForP0Ref=promptFor;
+promptFor=function(x,mode='classic'){
+ if(x&&x.priority==='P0')return {text:p0ReferencePromptFor(x),family:'P0 · Reference-first'};
+ return __legacyPromptForP0Ref(x,mode);
+};
+try{creativeP0PromptFor=()=>null}catch{}
+
 const VARIANT_MODES=['original','current','none'];
 const variantDrafts=new Map();
 let variantTextureId=null,variantMode='original',variantTileN=1;
@@ -1590,4 +1693,36 @@ async function init(){
   setTimeout(()=>bootstrapStorageInBackground(),0);
 }
 init().catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
+(function installP0ReferenceFirstUi(){
+ const copyBtn=$('copyPrompt'),buildBtn=$('savePrompt'),creativeBtn=$('creativePromptToggle'),singleBtn=$('singlePromptJson'),preview=$('promptText'),creativeExport=$('exportP0CreativePrompts');
+ const legacyCopy=copyBtn?.onclick,legacySave=buildBtn?.onclick,legacySingle=singleBtn?.onclick;
+ function sync(){
+   const isP0=!!active&&active.priority==='P0';
+   if(copyBtn)copyBtn.textContent=isP0?'Ref prompt':'Kopyala';
+   if(buildBtn)buildBtn.textContent=isP0?'Üretim prompt':'Promptu kaydet';
+   if(preview)preview.style.display=isP0?'none':'';
+   if(creativeBtn)creativeBtn.style.display='none';
+   if(singleBtn)singleBtn.style.display=isP0?'none':'';
+   if(creativeExport)creativeExport.style.display='none';
+ }
+ if(copyBtn)copyBtn.onclick=async function(e){
+   if(active?.priority==='P0'){
+     const t=p0ReferencePromptFor(active);
+     try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+     toast('Ref prompt kopyalandı');return;
+   }
+   return legacyCopy?.call(this,e);
+ };
+ if(buildBtn)buildBtn.onclick=async function(e){
+   if(active?.priority==='P0'){
+     try{await navigator.clipboard.writeText(P0_STANDARD_ORIGINAL_REF_PROMPT)}catch{const ta=document.createElement('textarea');ta.value=P0_STANDARD_ORIGINAL_REF_PROMPT;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+     toast('Üretim promptu kopyalandı');return;
+   }
+   return legacySave?.call(this,e);
+ };
+ if(singleBtn)singleBtn.onclick=function(e){if(active?.priority==='P0')return;return legacySingle?.call(this,e)};
+ const oldRender=typeof renderActivePrompt==='function'?renderActivePrompt:null;
+ if(oldRender)renderActivePrompt=function(...args){const r=oldRender.apply(this,args);sync();return r};
+ sync();
+})();
 </script></body></html>
