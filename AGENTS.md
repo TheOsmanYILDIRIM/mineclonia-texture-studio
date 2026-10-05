@@ -82,6 +82,7 @@ Key non-negotiables:
 - High-resolution edited animation atlases must reconstruct at the edited cell resolution, not be forced back to the original low resolution.
 - Main Original/New comparison preview supports mobile pinch zoom/pan without modifying texture data.
 - Runtime-role classification exists because directory names are not semantically sufficient.
+- P0–P6 is only the priority axis. Browsing/classification is separate and follows Mineclonia creative-inventory categories plus deeper technical/runtime classes; do not overload P0/P1 as asset categories.
 - Variant Lab is a comparison gallery, not a prompt/generation page: unlimited multi-PNG import, horizontal thumbnails, 1×1/3×3/6×6 tile preview, mixed mode, and per-variant enable/disable.
 
 ## Session / handoff protocol
