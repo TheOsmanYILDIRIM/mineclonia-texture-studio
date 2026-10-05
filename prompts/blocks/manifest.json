@@ -2,12 +2,12 @@
   "schema_version": 1,
   "kind": "block_reference_manifest",
   "total": 202,
-  "done": 30,
-  "pending": 172,
-  "last_completed_id": "tex_2e6e4057af",
-  "last_completed_name": "mcl_core_log_birch_top.png",
-  "next_id": "tex_d1e3540813",
-  "next_name": "mcl_core_log_spruce.png",
+  "done": 60,
+  "pending": 142,
+  "last_completed_id": "tex_776d382769",
+  "last_completed_name": "mcl_core_dirt_podzol_side.png",
+  "next_id": "tex_cc04d97fd0",
+  "next_name": "mcl_core_dirt_podzol_top.png",
   "entries": [
     {
       "order": 1,
@@ -254,240 +254,240 @@
       "id": "tex_d1e3540813",
       "name": "mcl_core_log_spruce.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_spruce.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_d1e3540813.json"
     },
     {
       "order": 32,
       "id": "tex_2850a57c42",
       "name": "mcl_core_log_spruce_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_spruce_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_2850a57c42.json"
     },
     {
       "order": 33,
       "id": "tex_7d297eed87",
       "name": "mcl_core_planks_big_oak.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_planks_big_oak.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_7d297eed87.json"
     },
     {
       "order": 34,
       "id": "tex_f7e052c1e7",
       "name": "mcl_core_planks_birch.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_planks_birch.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_f7e052c1e7.json"
     },
     {
       "order": 35,
       "id": "tex_b8dabb36d1",
       "name": "mcl_core_planks_spruce.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_planks_spruce.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_b8dabb36d1.json"
     },
     {
       "order": 36,
       "id": "tex_26b9e3bfec",
       "name": "default_clay.png",
       "texture_path": "ITEMS/mcl_core/default_clay.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_26b9e3bfec.json"
     },
     {
       "order": 37,
       "id": "tex_660eec246a",
       "name": "default_coal_block.png",
       "texture_path": "ITEMS/mcl_core/default_coal_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_660eec246a.json"
     },
     {
       "order": 38,
       "id": "tex_54c6d05d30",
       "name": "default_diamond_block.png",
       "texture_path": "ITEMS/mcl_core/default_diamond_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_54c6d05d30.json"
     },
     {
       "order": 39,
       "id": "tex_146ea7f2c7",
       "name": "default_glass.png",
       "texture_path": "ITEMS/mcl_core/default_glass.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_146ea7f2c7.json"
     },
     {
       "order": 40,
       "id": "tex_8b585615ed",
       "name": "default_glass_detail.png",
       "texture_path": "ITEMS/mcl_core/default_glass_detail.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_8b585615ed.json"
     },
     {
       "order": 41,
       "id": "tex_cb654770dd",
       "name": "default_gold_block.png",
       "texture_path": "ITEMS/mcl_core/default_gold_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_cb654770dd.json"
     },
     {
       "order": 42,
       "id": "tex_7cb217a0c7",
       "name": "default_mossycobble.png",
       "texture_path": "ITEMS/mcl_core/default_mossycobble.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_7cb217a0c7.json"
     },
     {
       "order": 43,
       "id": "tex_38106e970f",
       "name": "default_obsidian.png",
       "texture_path": "ITEMS/mcl_core/default_obsidian.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_38106e970f.json"
     },
     {
       "order": 44,
       "id": "tex_55d1a1f91e",
       "name": "default_steel_block.png",
       "texture_path": "ITEMS/mcl_core/default_steel_block.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_55d1a1f91e.json"
     },
     {
       "order": 45,
       "id": "tex_5d17172d3c",
       "name": "default_stone_brick.png",
       "texture_path": "ITEMS/mcl_core/default_stone_brick.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_5d17172d3c.json"
     },
     {
       "order": 46,
       "id": "tex_5266cc7540",
       "name": "mcl_core_andesite.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_andesite.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_5266cc7540.json"
     },
     {
       "order": 47,
       "id": "tex_a7f40fb9af",
       "name": "mcl_core_andesite_smooth.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_andesite_smooth.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_a7f40fb9af.json"
     },
     {
       "order": 48,
       "id": "tex_806eaebfbd",
       "name": "mcl_core_bone_block_side.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_bone_block_side.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_806eaebfbd.json"
     },
     {
       "order": 49,
       "id": "tex_6dbb96a9cf",
       "name": "mcl_core_bone_block_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_bone_block_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_6dbb96a9cf.json"
     },
     {
       "order": 50,
       "id": "tex_a8df732631",
       "name": "mcl_core_cactus_bottom.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_cactus_bottom.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_a8df732631.json"
     },
     {
       "order": 51,
       "id": "tex_63cba932a9",
       "name": "mcl_core_cactus_side.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_cactus_side.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_63cba932a9.json"
     },
     {
       "order": 52,
       "id": "tex_101dca4108",
       "name": "mcl_core_cactus_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_cactus_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_101dca4108.json"
     },
     {
       "order": 53,
       "id": "tex_2033f706ca",
       "name": "mcl_core_coal_ore.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_coal_ore.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_2033f706ca.json"
     },
     {
       "order": 54,
       "id": "tex_6f99a18f0e",
       "name": "mcl_core_coarse_dirt.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_coarse_dirt.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_6f99a18f0e.json"
     },
     {
       "order": 55,
       "id": "tex_7be609162d",
       "name": "mcl_core_crying_obsidian.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_7be609162d.json"
     },
     {
       "order": 56,
       "id": "tex_dcbe0c0c85",
       "name": "mcl_core_crying_obsidian_tear.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian_tear.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_dcbe0c0c85.json"
     },
     {
       "order": 57,
       "id": "tex_f1171fb29d",
       "name": "mcl_core_diamond_ore.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_diamond_ore.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_f1171fb29d.json"
     },
     {
       "order": 58,
       "id": "tex_875d6fcc70",
       "name": "mcl_core_diorite.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_diorite.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_875d6fcc70.json"
     },
     {
       "order": 59,
       "id": "tex_175f6ee8a5",
       "name": "mcl_core_diorite_smooth.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_diorite_smooth.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_175f6ee8a5.json"
     },
     {
       "order": 60,
       "id": "tex_776d382769",
       "name": "mcl_core_dirt_podzol_side.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_dirt_podzol_side.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_776d382769.json"
     },
     {
       "order": 61,
