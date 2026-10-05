@@ -2,12 +2,12 @@
   "schema_version": 1,
   "kind": "block_reference_manifest",
   "total": 202,
-  "done": 10,
-  "pending": 192,
-  "last_completed_id": "tex_cba32439c1",
-  "last_completed_name": "default_jungletree.png",
-  "next_id": "tex_bc0f92b42b",
-  "next_name": "default_jungletree_top.png",
+  "done": 30,
+  "pending": 172,
+  "last_completed_id": "tex_2e6e4057af",
+  "last_completed_name": "mcl_core_log_birch_top.png",
+  "next_id": "tex_d1e3540813",
+  "next_name": "mcl_core_log_spruce.png",
   "entries": [
     {
       "order": 1,
@@ -94,160 +94,160 @@
       "id": "tex_bc0f92b42b",
       "name": "default_jungletree_top.png",
       "texture_path": "ITEMS/mcl_core/default_jungletree_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_bc0f92b42b.json"
     },
     {
       "order": 12,
       "id": "tex_2d824a5622",
       "name": "default_junglewood.png",
       "texture_path": "ITEMS/mcl_core/default_junglewood.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_2d824a5622.json"
     },
     {
       "order": 13,
       "id": "tex_16c5aadeaa",
       "name": "default_leaves.png",
       "texture_path": "ITEMS/mcl_core/default_leaves.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_16c5aadeaa.json"
     },
     {
       "order": 14,
       "id": "tex_b49486a55b",
       "name": "default_sand.png",
       "texture_path": "ITEMS/mcl_core/default_sand.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_b49486a55b.json"
     },
     {
       "order": 15,
       "id": "tex_ddef61e20b",
       "name": "default_snow.png",
       "texture_path": "ITEMS/mcl_core/default_snow.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_ddef61e20b.json"
     },
     {
       "order": 16,
       "id": "tex_a46fdac083",
       "name": "default_stone.png",
       "texture_path": "ITEMS/mcl_core/default_stone.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_a46fdac083.json"
     },
     {
       "order": 17,
       "id": "tex_768ad40712",
       "name": "default_tree.png",
       "texture_path": "ITEMS/mcl_core/default_tree.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_768ad40712.json"
     },
     {
       "order": 18,
       "id": "tex_7d70c8bd91",
       "name": "default_tree_top.png",
       "texture_path": "ITEMS/mcl_core/default_tree_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_7d70c8bd91.json"
     },
     {
       "order": 19,
       "id": "tex_37d73fb3d8",
       "name": "default_wood.png",
       "texture_path": "ITEMS/mcl_core/default_wood.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_37d73fb3d8.json"
     },
     {
       "order": 20,
       "id": "tex_dd1601b059",
       "name": "mcl_core_bedrock.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_bedrock.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_dd1601b059.json"
     },
     {
       "order": 21,
       "id": "tex_c20e3e8f47",
       "name": "mcl_core_grass_block_side_overlay.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_side_overlay.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_c20e3e8f47.json"
     },
     {
       "order": 22,
       "id": "tex_366c9eb9e3",
       "name": "mcl_core_grass_block_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_366c9eb9e3.json"
     },
     {
       "order": 23,
       "id": "tex_4ef3514a50",
       "name": "mcl_core_grass_side_snowed.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_grass_side_snowed.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_4ef3514a50.json"
     },
     {
       "order": 24,
       "id": "tex_1c57c237f7",
       "name": "mcl_core_leaves_big_oak.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_leaves_big_oak.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_1c57c237f7.json"
     },
     {
       "order": 25,
       "id": "tex_7af24ce86e",
       "name": "mcl_core_leaves_birch.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_leaves_birch.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_7af24ce86e.json"
     },
     {
       "order": 26,
       "id": "tex_df11566c76",
       "name": "mcl_core_leaves_spruce.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_leaves_spruce.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_df11566c76.json"
     },
     {
       "order": 27,
       "id": "tex_f7a8b19fa7",
       "name": "mcl_core_log_big_oak.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_big_oak.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_f7a8b19fa7.json"
     },
     {
       "order": 28,
       "id": "tex_0a71c1d130",
       "name": "mcl_core_log_big_oak_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_big_oak_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_0a71c1d130.json"
     },
     {
       "order": 29,
       "id": "tex_a6cec65ac7",
       "name": "mcl_core_log_birch.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_birch.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_a6cec65ac7.json"
     },
     {
       "order": 30,
       "id": "tex_2e6e4057af",
       "name": "mcl_core_log_birch_top.png",
       "texture_path": "ITEMS/mcl_core/mcl_core_log_birch_top.png",
-      "status": "pending",
-      "file": null
+      "status": "done",
+      "file": "prompts/blocks/tex_2e6e4057af.json"
     },
     {
       "order": 31,
