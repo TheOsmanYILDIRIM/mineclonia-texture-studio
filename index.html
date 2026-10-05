@@ -1152,7 +1152,9 @@ async function loadBlockReferencePrompts(){
   const r=await fetch(BLOCK_PROMPT_MANIFEST_URL,{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
   blockPromptManifest=await r.json();
   const done=(blockPromptManifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  const rows=await Promise.all(done.map(async e=>{try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}catch{return null}}));
+  const batchRows=[];for(const batch of (blockPromptManifest.batches||[])){try{const q=await fetch(batch.file,{cache:'force-cache'});if(!q.ok)continue;const j=await q.json();batchRows.push(...Object.values(j.prompts||{}))}catch{}}
+  for(const row of batchRows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
+  const rows=await Promise.all(done.filter(e=>e.file&&!String(e.file).includes('batch_')).map(async e=>{try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}catch{return null}}));
   for(const row of rows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
  }catch(e){console.warn('Block prompt manifest unavailable; inline fallback active',e)}
 }
