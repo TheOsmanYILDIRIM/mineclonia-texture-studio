@@ -63,7 +63,8 @@ For particle/effect textures, determine the trigger/context and relevant runtime
 
 Key non-negotiables:
 
-- No generic fallback prompt.
+- P0 block/material work uses a reference-first two-step system: an asset-specific world/style reference prompt plus one controlled standard Original+Ref production prompt. This is deliberate workflow, not a generic fallback.
+- The former P0 “creative alternative” UI is retired; do not reintroduce it unless explicitly requested.
 - Production prompts are asset-specific or deliberately controlled variants.
 - Locked UV/entity atlases must preserve their exact islands/masks.
 - Entity dimensions alone must never trigger animation-strip treatment.
