@@ -1,3 +1,14 @@
+## Mobs UV queue correction — 2026-10-05
+
+- The first Mobs manifest over-counted assets because it treated broad `ENTITIES/**` inventory as mob UV work.
+- The production queue is now restricted to **actual entity/model UV atlases and UV-aligned entity material/state/overlay layers**.
+- Variant/state/layer textures remain separate when they occupy model UV coordinates; they are not collapsed into one entry per creature.
+- Removed from this queue: particles/effect sprites, HUD/formspec assets, spawn icons/egg templates, projectiles, rails, boats, paintings, potion/UI sprites and other non-UV images.
+- Corrected queue: **241 UV textures, 0 done, 241 pending**.
+- First/next: `extra_mobs_cod.png` (`tex_4c96b854a2`).
+- Manifest correction commit: `59171b75016e3342bb0cfa92463c187deb9b1fd6`.
+- Continue sequentially with the two-pass Mobs workflow: strict HQ UV first, then HQ UV as Image A + creature reference as Image B.
+
 ## Editor performance / preview cache — 2026-10-05
 
 - Full-resolution imported edits are now preserved in storage. Target resolution is applied for export/scaled derivatives instead of destructively shrinking the saved master edit.
