@@ -72,6 +72,7 @@ expect(exportPack.includes('await editWriteQueue.catch(()=>{})'), 'texturepack e
 const densityScale = lastBlock('function targetTextureDimensions(meta,targetRes)');
 expect(densityScale.includes('const scale=Math.max(1,targetRes)/SOURCE_TEXEL_BASE'), 'target resolution must represent 16px source-density scaling');
 expect(densityScale.includes('baseW*scale') && densityScale.includes('baseH*scale'), 'target dimensions must preserve source atlas proportions');
+expect(source.includes('const ratio=baseW/baseH;') && source.includes('maxH*ratio'), 'normalization must restore source aspect ratio without forcing upscale');
 expect(source.includes('const SOURCE_TEXEL_BASE=16;'), '16px source-density baseline must be explicit');
 
 const verificationHydrate = lastBlock('async function hydrateChangedPathsFast(seedEdits=null)');
@@ -97,10 +98,10 @@ const persistedInstall = lastBlock('function installPersistedEditFast(edit,{mark
 expect(persistedInstall.includes('hotEdits.set(edit.path,rec)'), 'late-loaded persisted edits must populate hot edit cache');
 expect(persistedInstall.includes('setFastEditUrl(edit.path,edit.blob)'), 'late-loaded persisted edits must replace stale edited-thumbnail cache');
 expect(persistedInstall.includes('if(ref)ref.img.src=url'), 'visible cards must refresh immediately when persisted edits load');
-expect(persistedInstall.includes('pendingChangedPaths.add(edit.path)'), 'late-loaded records must start as unverified instead of being counted as changed');
+expect(persistedInstall.includes('else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path)'), 'unknown late-loaded records must stay pending while verified changed records may be counted immediately');
 
 const bootstrap = lastBlock('async function bootstrapStorageInBackground()');
-expect(bootstrap.includes('installPersistedEditFast(e,{markChanged:false})'), 'background storage bootstrap must install persisted edits without pre-counting them as changed');
+expect(bootstrap.includes("installPersistedEditFast(e,{markChanged:(e.verification||'unknown')==='changed'})"), 'background storage bootstrap must trust only persistently verified changed records and keep unknown records pending');
 
 const hydrate = lastBlock('async function hydrateChangedPathsFast(seedEdits=null)');
 expect(hydrate.includes('deletePersistedEditQuiet(e.path)'), 'verified-original stale edit records must be permanently cleaned from storage');
