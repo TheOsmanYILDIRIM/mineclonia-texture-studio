@@ -1,3 +1,12 @@
+## Technical-category catalog split — 2026-10-05
+
+- Replaced the single compact catalog with one JSON file per technical category under `js/data/catalog/`.
+- Uses the existing technical taxonomy (terrain, stone, wood, ores, mobs, armor, HUD, GUI, particles, effects, etc.).
+- Each texture is stored once under its first/primary technical classification; runtime multi-category filtering remains unchanged via `textureTechnicalCategoriesOf()`.
+- Added `js/data/catalog-loader.js`; it loads category files in parallel, reconstructs the original catalog objects, sorts by original rank, then starts the app.
+- All 3,248 records remain represented. Empty primary groups such as redstone-tech/environment/debug still have their own files for taxonomy completeness.
+- Main remains unchanged; work stays on `refactor/split-js-20261005`.
+
 ## Catalog compression — 2026-10-05
 
 - Replaced the three expanded catalog shards (~681.6 KB total) with one compact `js/data/catalog.js` (~207.3 KB).
