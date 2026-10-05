@@ -74,6 +74,7 @@ Key non-negotiables:
 - Locked UV/entity atlases must preserve their exact islands/masks.
 - Entity dimensions alone must never trigger animation-strip treatment.
 - Animated textures preserve frame topology while edited resolution may increase.
+- Animation classification must use runtime/source-verified animation semantics, never rectangular dimensions alone. Preserve runtime frame aspect ratio (including non-square frames) through strip ↔ atlas round-trips.
 - Runtime role and gameplay function outrank decorative realism.
 
 ## Existing decisions that must not silently regress
