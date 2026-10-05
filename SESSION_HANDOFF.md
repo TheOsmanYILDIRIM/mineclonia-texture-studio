@@ -12,6 +12,20 @@ Updated: 2026-10-05
 - Non-P0 prompt behavior stays asset-specific/legacy.
 - Next: runtime guard + Pages deploy, then Android spot-check birch log, acacia/cobblestone, and one promoted P1 block.
 
+## Variant Lab simplified to comparison gallery — 2026-10-05
+
+- Removed Variant Lab generation modes and all Variant Lab prompt UI.
+- Variant Lab now accepts any number of PNGs from one multi-select file picker.
+- Variants appear as a horizontally scrolling thumbnail strip.
+- Clicking a thumbnail selects it for fast 1×1 / 3×3 / 6×6 tile inspection.
+- Added **Karışık** mode: all enabled variants are mixed across the tile grid.
+- While Karışık is active, tapping a thumbnail toggles that variant out/in; disabled variants are visibly dimmed and crossed out.
+- Kept **Seçileni aktif yap** for writing the chosen single variant back to the main texture.
+- Variant drafts remain per-texture for the current browser session.
+
+Commit:
+- `07c9096bb439254872f309b81e09a86941205590` — multi-PNG comparison gallery.
+
 ## Project
 
 Repository:
