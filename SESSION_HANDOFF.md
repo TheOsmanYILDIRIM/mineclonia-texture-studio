@@ -497,6 +497,20 @@ Verification:
 Workflow note:
 - User explicitly objected to direct-main development. Future implementation changes should be made on a branch and merged only when requested; keep main as canonical released state.
 
+## High-resolution animation preview fix — 2026-10-05
+
+Restored high-resolution animation atlases could look correct in the main Original/New preview while the live animation canvas below rendered black/incorrect frames.
+
+Root cause:
+- animation preview and strip-to-atlas export used the catalog/original frame size (for example 16px) even after the saved strip had 128px or 256px frames;
+- frame cropping therefore sampled the wrong regions of the high-resolution strip.
+
+Branch fix:
+- `164f02f52597eba6b71699ea82f7cf288af31c60` — derive frame size and strip trims from the actual saved strip dimensions for both live preview and strip-to-atlas export.
+- `915ac13f2042cbacc9686a36f2b56f82836c53c4` — add runtime regression guards for high-resolution animation frame geometry.
+
+Runtime guard run #23 passed. After merge/deploy, verify one edited high-resolution animation atlas on Android: upper comparison preview and lower live animation should show the same edited frames.
+
 ## Late-loaded thumbnail refresh fix — 2026-10-05
 
 A startup race remained after storage hydration was moved off the critical path: the first render could cache the original texture under the edited-thumbnail cache key (`e:<path>`) before IndexedDB edits were available. When persisted edits arrived later, the cache key remained valid, so cards kept showing the default/original thumbnail even though the edit record had loaded.
