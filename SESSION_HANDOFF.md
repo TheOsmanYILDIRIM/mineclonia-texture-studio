@@ -1,3 +1,14 @@
+## Editor performance / preview cache — 2026-10-05
+
+- Full-resolution imported edits are now preserved in storage. Target resolution is applied for export/scaled derivatives instead of destructively shrinking the saved master edit.
+- Main gallery thumbnails are generated at a maximum 192px edge and cached as lightweight object URLs; visible card images use lazy loading + async decoding.
+- Detail editor comparison previews are capped at 1024px per edge while downloads/exports continue to use the full stored edit.
+- Cached edited-preview URLs are invalidated when an edit changes so stale thumbnails are not reused.
+- P0 block prompt manifest/files no longer block first paint; they load after the UI is usable and use browser cache.
+- Static verification: both inline JavaScript blocks parse successfully after the change.
+- Implementation commit: `925956c4172919d7206931b0a7e2fdd6910fb9f0`.
+- Open verification: Android/Pages cold-start and scrolling should be checked after deployment; if memory pressure remains, Variant Lab thumbnails should get the same capped-preview path.
+
 ## Production prompt seam correction — 2026-10-05
 
 - Replaced the shared P0 Image A + Image B production prompt. Image A now explicitly defines semantic identity/function/scale rather than exact internal geometry; Image B controls actual material appearance.
