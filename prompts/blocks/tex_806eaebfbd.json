@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "tex_806eaebfbd",
+  "label": "mcl_core_bone_block_side",
+  "texture_path": "ITEMS/mcl_core/mcl_core_bone_block_side.png",
+  "kind": "block_reference",
+  "status": "done",
+  "reference_prompt": "Create a close material reference for the longitudinal side of a dense block made from bone in a grounded dark-fantasy world. The surface should express bone's fibrous structural direction: compact ivory mineral tissue, faint lengthwise channels, subtle porous traces, old yellow-gray staining and dry hairline weathering. It should feel biological but long dead, clean enough to be a material rather than gore. Avoid teeth, skull imagery, exposed marrow, blood, polished ivory luxury or chalky plaster. Establish a hard dry organic-mineral surface with directional grain that unmistakably differs from stone."
+}
