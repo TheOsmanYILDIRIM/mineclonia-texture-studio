@@ -1850,6 +1850,6 @@ async function init(){
   setTimeout(()=>Promise.allSettled([loadBlockReferencePrompts(),AUTHORED_UV_REF_PROMISES.mobs,AUTHORED_UV_REF_PROMISES.armor]).then(()=>{if(active?.priority==='P0')renderActivePrompt()}).catch(console.warn),0);
   setTimeout(()=>bootstrapStorageInBackground(),0);
 }
-init().catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
+CATALOG_READY.then(()=>init()).catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
 
 
