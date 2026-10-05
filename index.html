@@ -706,18 +706,29 @@ async function delScaledPath(path){
   }
   keys.forEach(k=>memoryScaled.delete(k));
 }
-async function normalizeTextureBlobTo(blob,meta,targetRes){
- const c=await decodeBlobToCanvas(blob), sw=c.width, sh=c.height;
- const baseW=(meta&&meta.w)||sw, baseH=(meta&&meta.h)||sh;
- const dw=targetRes, dh=Math.max(1,Math.round(targetRes*(baseH/baseW)));
- if(sw<=dw && sh<=dh)return blob;
+const SOURCE_TEXEL_BASE=16;
+function targetTextureDimensions(meta,targetRes){
+ const baseW=Math.max(1,Number(meta?.w)||SOURCE_TEXEL_BASE);
+ const baseH=Math.max(1,Number(meta?.h)||SOURCE_TEXEL_BASE);
+ const scale=Math.max(1,targetRes)/SOURCE_TEXEL_BASE;
+ return {width:Math.max(1,Math.round(baseW*scale)),height:Math.max(1,Math.round(baseH*scale))};
+}
+async function resizeTextureBlobToDimensions(blob,dw,dh){
+ const c=await decodeBlobToCanvas(blob),sw=c.width,sh=c.height;
+ if(sw===dw&&sh===dh)return blob;
  const src=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,sw,sh);
  const resized=lanczosResizeImageData(src,sw,sh,dw,dh);
  const out=document.createElement('canvas');out.width=dw;out.height=dh;out.getContext('2d').putImageData(resized,0,0);
  return await canvasPngBlob(out)
 }
+async function normalizeTextureBlobTo(blob,meta,targetRes){
+ const c=await decodeBlobToCanvas(blob),sw=c.width,sh=c.height;
+ const target=targetTextureDimensions(meta,targetRes);
+ if(sw<=target.width&&sh<=target.height)return blob;
+ return await resizeTextureBlobToDimensions(blob,target.width,target.height)
+}
 async function normalizeTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
-  return await normalizeTextureBlobTo(blob,meta,targetRes)
+ return await normalizeTextureBlobTo(blob,meta,targetRes)
 }
 function queueScaled(path, blob, meta, res=BACKGROUND_RESOLUTION){
   const qk=scaledMemKey(path,res);
@@ -832,7 +843,7 @@ async function exportPack(){
        await new Promise(requestAnimationFrame);
      }
    }
-   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,scaledToTargetCount:scaledCount,nativeOrAlreadyWithinTargetCount:nativeCount,paths:edits.map(e=>e.path)};
+   const manifest={format:'mineclonia-dark-realism-delta',version:4,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,resolutionModel:'16px-source-density',scaleFactor:TARGET_RESOLUTION/SOURCE_TEXEL_BASE,scaledToTargetCount:scaledCount,nativeOrAlreadyWithinTargetCount:nativeCount,paths:edits.map(e=>e.path)};
    root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
    btn.textContent='ZIP %70';
    setSaveState('ZIP oluşturuluyor…','warn');
@@ -1072,7 +1083,7 @@ async function render(){
 async function importPng(file,seam=false){
   if(!active||!file)return;
   const target={...active};
-  setSaveState(`Dosya hazırlanıyor • ${TARGET_RESOLUTION}px…`,'warn');
+  setSaveState(`Dosya hazırlanıyor • 16px→${TARGET_RESOLUTION}px ölçek…`,'warn');
   let b=await prepareImportedTextureBlob(file,target);
   if(seam)b=await imageBlobTransform(b,true);
   if(await textureMatchesOriginal(b,target)){
@@ -1087,7 +1098,7 @@ async function importPng(file,seam=false){
   if(active&&active.path===target.path){
     $('editImg').src=u; $('editImg').style.opacity=1; $('compare').value=50; updateCompare(); tileEdited=true; $('tileSource').textContent='Yeni';
   }
-  toast((seam?'Seam dönüşü':'Yeni texture')+` • ${TARGET_RESOLUTION}px hedef`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
+  toast((seam?'Seam dönüşü':'Yeni texture')+` • 16px→${TARGET_RESOLUTION}px ölçek`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
   queuePersistFast(target.path,b);
   queueScaled(target.path,b,target,BACKGROUND_RESOLUTION);
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
@@ -1173,7 +1184,7 @@ async function init(){
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
 
   $('resolution').value=String(TARGET_RESOLUTION);
-  $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Ana çözünürlük '+TARGET_RESOLUTION+'px')};
+  $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Temel 16px ölçeği → '+TARGET_RESOLUTION+'px')};
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();$('assetType').onchange=()=>applyFilter();$('runtimeRole').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
