@@ -1882,6 +1882,18 @@ async function bootstrapStorageInBackground(){
   }
 }
 
+let preview3dLoadPromise=null;
+function open3dPreviewLazy(){
+ if(!active)return;
+ if(window.MTSPreview3D)return window.MTSPreview3D.open(active);
+ if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{
+  const s=document.createElement('script');s.src='js/preview3d.js';s.async=true;
+  s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)
+ });
+ toast('3D önizleme hazırlanıyor…');
+ return preview3dLoadPromise.then(()=>window.MTSPreview3D?.open(active)).catch(err=>{console.error(err);toast(err.message)})
+}
+
 async function init(){
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
@@ -1897,6 +1909,7 @@ async function init(){
   $('promptedOnly').onclick=()=>{promptedOnly=!promptedOnly;$('promptedOnly').classList.toggle('primary',promptedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
+  $('open3dPreview').onclick=open3dPreviewLazy;
   $('compare').oninput=updateCompare;
   $('preview').onclick=()=>{const v=Number($('compare').value);$('compare').value=v<50?100:0;updateCompare()};
   $('downloadOriginal').onclick=async()=>dl(await originalBlob(active.path),active.name);
