@@ -79,6 +79,37 @@
   }
   const a={im:source,w,h,mask,bg:{mode:'reference-alpha'}};a.components=components(a);return a
  }
+ function analyzeSourceWithinReference(canvas,maskCanvas,opts={}){
+  const src=img(canvas),ref=img(maskCanvas),w=canvas.width,h=canvas.height,mask=new Uint8Array(w*h);
+  // Restrict detection to legal UV footprint, but infer the generated content edge independently.
+  // Estimate "empty" from pixels outside the reference footprint; if unavailable, use border samples.
+  const bgSamples=[];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const mx=Math.min(maskCanvas.width-1,Math.floor(x*maskCanvas.width/w)),my=Math.min(maskCanvas.height-1,Math.floor(y*maskCanvas.height/h));
+    if(ref.data[(my*maskCanvas.width+mx)*4+3]<16){const i=(y*w+x)*4;bgSamples.push([src.data[i],src.data[i+1],src.data[i+2],src.data[i+3]])}
+  }
+  let br=0,bg=0,bb=0;
+  if(bgSamples.length){const rs=bgSamples.map(p=>p[0]),gs=bgSamples.map(p=>p[1]),bs=bgSamples.map(p=>p[2]);br=median(rs);bg=median(gs);bb=median(bs)}
+  const bgc=[br,bg,bb],thr=opts.bgMode==='black'?62:Math.max(26,Math.min(78,opts.threshold||42));
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const mx=Math.min(maskCanvas.width-1,Math.floor(x*maskCanvas.width/w)),my=Math.min(maskCanvas.height-1,Math.floor(y*maskCanvas.height/h)),ri=(my*maskCanvas.width+mx)*4;
+    if(ref.data[ri+3]<16){mask[y*w+x]=0;continue}
+    const i=(y*w+x)*4;
+    if(src.data[i+3]<16){mask[y*w+x]=0;continue}
+    // Within the legal UV region, pixels sufficiently different from the learned empty background are generated content.
+    const delta=dist(src.data,i,bgc);
+    mask[y*w+x]=delta>thr?1:0;
+  }
+  // If contrast segmentation becomes too sparse, use alpha inside the legal footprint, never the whole rectangle.
+  let count=0;for(const v of mask)count+=v;
+  if(count<Math.max(4,w*h*.002)){
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const mx=Math.min(maskCanvas.width-1,Math.floor(x*maskCanvas.width/w)),my=Math.min(maskCanvas.height-1,Math.floor(y*maskCanvas.height/h)),ri=(my*maskCanvas.width+mx)*4,i=(y*w+x)*4;
+      mask[y*w+x]=(ref.data[ri+3]>=16&&src.data[i+3]>=16)?1:0;
+    }
+  }
+  const a={im:src,w,h,mask,bg:{mode:'reference-constrained-content',color:bgc,threshold:thr}};a.components=components(a);return a
+ }
  function score(a,b,aw,ah,bw,bh){
   const ax=a.cx/aw,ay=a.cy/ah,bx=b.cx/bw,by=b.cy/bh,pos=Math.hypot(ax-bx,ay-by);
   const arA=a.bbox.w/a.bbox.h,arB=b.bbox.w/b.bbox.h,asp=Math.abs(Math.log((arA||1)/(arB||1)));
@@ -164,5 +195,5 @@
  function nearest(analysis,x,y){
   let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
  }
- window.MTSUvWarp={analyze,analyzeWithMask,match,warp,smoothWarp,draw,nearest};
+ window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,draw,nearest};
 })();
