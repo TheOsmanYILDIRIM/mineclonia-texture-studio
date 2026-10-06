@@ -118,8 +118,9 @@
   if(style.tint){f.style.backgroundImage=`linear-gradient(rgba(112,166,90,.68),rgba(112,166,90,.68)),${style.backgroundImage}`;f.style.backgroundBlendMode='multiply';}
   if(style.overlayTint&&style.overlayUrl){
    const ov=document.createElement('div');ov.style.cssText='position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;pointer-events:none';
-   ov.style.backgroundImage=`linear-gradient(rgba(112,166,90,.72),rgba(112,166,90,.72)),url("${style.overlayUrl}")`;
-   ov.style.backgroundBlendMode='multiply';f.appendChild(ov);
+   ov.style.backgroundImage=`url("${style.overlayUrl}")`;
+   ov.style.filter='sepia(1) saturate(1.35) hue-rotate(42deg) brightness(.88)';
+   f.appendChild(ov);
   }
   const sh=document.createElement('div');sh.className='preview3dShade';sh.style.opacity=String(shade);f.appendChild(sh);
   cube.appendChild(f);
