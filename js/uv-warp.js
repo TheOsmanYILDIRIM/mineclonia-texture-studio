@@ -123,10 +123,12 @@
   const area=Math.abs(Math.log((a.area/(aw*ah)+1e-6)/(b.area/(bw*bh)+1e-6)));
   return pos*5+asp*1.3+size*1.7+area*.8
  }
- function match(target,source){
-  const used=new Set(),pairs=[];
-  for(const t of target.components){let best=null,bestS=Infinity;for(const s of source.components){if(used.has(s.id))continue;const sc=score(t,s,target.w,target.h,source.w,source.h);if(sc<bestS){bestS=sc;best=s}}
-   if(best&&bestS<6){used.add(best.id);pairs.push({target:t,source:best,score:bestS})}
+ function match(target,source,opts={}){
+  const used=new Set(opts.usedSource||[]),blockedT=opts.excludedTarget||new Set(),blockedS=opts.excludedSource||new Set(),pairs=[];
+  for(const t of target.components){if(blockedT.has(t.id))continue;let best=null,bestS=Infinity,second=Infinity;
+   for(const s of source.components){if(used.has(s.id)||blockedS.has(s.id))continue;const sc=score(t,s,target.w,target.h,source.w,source.h);if(sc<bestS){second=bestS;bestS=sc;best=s}else if(sc<second)second=sc}
+   const confident=best&&bestS<2.6&&(second===Infinity||second-bestS>.45);
+   if(confident){used.add(best.id);pairs.push({target:t,source:best,score:bestS,auto:true})}
   }
   return pairs
  }
@@ -198,8 +200,10 @@
   ctx.lineWidth=2;ctx.strokeStyle='rgba(70,160,255,.95)';
   let n=1;for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='rgba(70,160,255,.98)';ctx.font='bold 11px system-ui';ctx.fillText(String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
  }
- function nearest(analysis,x,y){
-  let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
+ function nearest(analysis,x,y,excluded=null,maxDistance=Infinity){
+  let best=null,bd=maxDistance*maxDistance;
+  for(const c of analysis.components){if(excluded?.has?.(c.id))continue;for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}
+  return best
  }
  window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,draw,nearest};
 })();
