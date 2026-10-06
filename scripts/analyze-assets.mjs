@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+// IMPORTANT: This file generates STATIC ASSET FACTS only.
+// Never add user/browser state here: prompt authored/saved status, edited/changed status,
+// variant winner, verification state, timestamps, or any IndexedDB/localStorage-derived value.
+// Those remain runtime state so old browser records stay compatible.
+
 
 const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..');
 const dataDir=path.join(root,'js','data');
