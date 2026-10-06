@@ -1178,7 +1178,7 @@ promptFor=function(x,mode='classic'){
 try{creativeP0PromptFor=()=>null}catch{}
 
 // Variant Lab is isolated in js/variant-lab.js.
-window.MTSVariantBridge={catalog:()=>CATALOG,active:()=>active,toast,originalBlob,getEdit,putEdit,assetTypeOf,runtimeRoleInfo,prepareVariantTextureBlob,lockEntityAlphaToSource,applyFilter};
+window.MTSVariantBridge={catalog:()=>CATALOG,active:()=>active,toast,originalBlob,getEdit,putEdit,assetTypeOf,runtimeRoleInfo,prepareVariantTextureBlob,lockEntityAlphaToSource,applyFilter,markChanged:path=>changedPathsFast?.add?.(path)};
 // Island Studio is isolated in js/island-studio.js so failures cannot block the catalog.
 window.MTSIslandBridge={
  catalog:()=>CATALOG,
