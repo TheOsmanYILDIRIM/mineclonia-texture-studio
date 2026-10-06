@@ -221,6 +221,37 @@
   out.getContext('2d').putImageData(dst,0,0);return out
  }
 
+ function edgeError(targetAnalysis,sourceAnalysis,segmentPairs=[]){
+  let total=0,count=0,max=0;
+  for(const pair of segmentPairs||[]){
+    const ta=orderedSegmentPoints(pair.targetSegment),sa=orderedSegmentPoints(pair.sourceSegment);if(!ta.length||!sa.length)continue;
+    const n=Math.max(8,Math.min(64,Math.max(ta.length,sa.length)));
+    for(let i=0;i<n;i++){const t=i/Math.max(1,n-1),a=sampleOrdered(ta,t),b=sampleOrdered(sa,t),d=Math.hypot(a.x-b.x,a.y-b.y);total+=d;count++;max=Math.max(max,d)}
+  }
+  return {mean:count?total/count:0,max,count}
+ }
+ function snapAlphaToTarget(canvas,targetAnalysis,segmentPairs=[]){
+  // Final exact alpha raster constraint around manually paired edges.
+  // For every paired edge, move the source alpha transition to the target edge at pixel precision,
+  // while preserving RGB produced by the subpixel warp.
+  const g=canvas.getContext('2d',{willReadFrequently:true}),im=g.getImageData(0,0,canvas.width,canvas.height),d=im.data,w=canvas.width,h=canvas.height;
+  const sx=w/targetAnalysis.w,sy=h/targetAnalysis.h;
+  for(const pair of segmentPairs||[]){
+    const ta=orderedSegmentPoints(pair.targetSegment),sa=orderedSegmentPoints(pair.sourceSegment);if(!ta.length||!sa.length)continue;
+    const n=Math.max(8,Math.min(96,Math.max(ta.length,sa.length)*2));
+    for(let i=0;i<n;i++){const u=i/Math.max(1,n-1),t=sampleOrdered(ta,u),s=sampleOrdered(sa,u),vx=t.x-s.x,vy=t.y-s.y,mag=Math.hypot(vx,vy);if(mag<.05)continue;
+      const nx=vx/mag,ny=vy/mag,tx=Math.round(t.x*sx),ty=Math.round(t.y*sy),rad=Math.ceil(Math.min(8,mag+2)*Math.max(sx,sy));
+      for(let yy=Math.max(0,ty-rad);yy<=Math.min(h-1,ty+rad);yy++)for(let xx=Math.max(0,tx-rad);xx<=Math.min(w-1,tx+rad);xx++){
+        const px=(xx+.5)/sx,py=(yy+.5)/sy,along=(px-t.x)*nx+(py-t.y)*ny,perp=Math.abs((px-t.x)*(-ny)+(py-t.y)*nx);
+        if(perp>1.15)continue;const idx=(yy*w+xx)*4;
+        // Target side toward source is inside generated content; opposite side becomes transparent.
+        if(along<=0&&along>=-Math.max(1,mag+1))d[idx+3]=Math.max(d[idx+3],255);
+        else if(along>0&&along<=Math.max(1,mag+1))d[idx+3]=0;
+      }
+    }
+  }
+  g.putImageData(im,0,0);return canvas
+ }
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true,excludedTarget=new Set(),excludedSource=new Set(),segmentPairs=[],selectedTargetSegment=null,selectedSourceSegment=null}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
   const edge=(a,c,fill)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=Math.max(3,Math.min(6,Math.min(sx,sy)*1.35));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz)};
@@ -235,5 +266,5 @@
   for(const c of analysis.components){if(excluded?.has?.(c.id))continue;for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}
   return best
  }
- window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,draw,nearest,contourSegments,nearestSegment};
+ window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,edgeError,snapAlphaToTarget,draw,nearest,contourSegments,nearestSegment};
 })();
