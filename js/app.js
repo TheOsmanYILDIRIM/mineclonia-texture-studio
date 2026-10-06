@@ -1298,9 +1298,9 @@ function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
  try{
   uvMap.autoTarget=window.MTSUvWarp.analyzeWithMask?window.MTSUvWarp.analyzeWithMask(uvMap.orig,uvMap.orig):window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'auto',role:'target'});
-  uvMap.autoSource=window.MTSUvWarp.analyzeWithMask?window.MTSUvWarp.analyzeWithMask(uvMap.work,uvMap.orig):window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode,role:'source'});
+  uvMap.autoSource=window.MTSUvWarp.analyzeSourceWithinReference?window.MTSUvWarp.analyzeSourceWithinReference(uvMap.work,uvMap.orig,{bgMode:uvMap.bgMode}):window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode,role:'source'});
   uvMap.autoPairs=[];
-  $('uvAutoMeta').textContent='UV maskesi: orijinal alpha · '+uvMap.autoTarget.components.length+' ada';
+  $('uvAutoMeta').textContent='Hedef '+uvMap.autoTarget.components.length+' ada · Üretilen '+uvMap.autoSource.components.length+' içerik sınırı';
   uvRefreshContours();return true;
  }catch(err){console.error('UV analyze',err);toast('Sınır analizi başarısız');return false}
 }
