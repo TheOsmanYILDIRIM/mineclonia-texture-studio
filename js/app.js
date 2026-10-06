@@ -1177,94 +1177,8 @@ promptFor=function(x,mode='classic'){
 };
 try{creativeP0PromptFor=()=>null}catch{}
 
-const variantSets=new Map();
-let variantTextureId=null,variantSelectedIndex=0,variantTileN=6,variantMixMode=false,variantSources=[];
-function variantSelectedMeta(){return CATALOG.find(x=>x.id===variantTextureId)||null}
-function variantUserList(){if(!variantTextureId)return[];if(!variantSets.has(variantTextureId))variantSets.set(variantTextureId,[]);return variantSets.get(variantTextureId)}
-function variantList(){return [...variantSources,...variantUserList()]}
-async function refreshVariantSources(){
- const x=variantSelectedMeta();variantSources=[];if(!x)return;
- const orig=await originalBlob(x.path),edit=await getEdit(x.path);
- variantSources.push({blob:orig,name:'Orijinal',enabled:true,url:null,system:true,kind:'original'});
- variantSources.push({blob:edit?.blob||orig,name:'Aktif',enabled:true,url:null,system:true,kind:'active'});
-}
-function variantUrl(rec){if(!rec.url)rec.url=URL.createObjectURL(rec.blob);return rec.url}
-function variantEnabled(){return variantList().filter(v=>v.enabled!==false)}
-function variantMixIndex(i,n){let x=(i+1)*1103515245+12345;x=(x^(x>>>16))>>>0;return n?x%n:0}
-function renderVariantThumbs(){
- const strip=$('variantThumbStrip'),list=variantList();
- strip.innerHTML='';
- if(!list.length){strip.innerHTML='<div class="stat" style="padding:12px 2px">Galeriden birden fazla PNG seçebilirsin.</div>';return}
- list.forEach((rec,i)=>{
-   const b=document.createElement('button');b.className='variantThumb'+(!variantMixMode&&i===variantSelectedIndex?' selected':'')+(rec.enabled===false?' off':'');b.dataset.variantIndex=String(i);b.title=rec.name;
-   const im=document.createElement('img');im.src=variantUrl(rec);im.alt=rec.name;
-   const nm=document.createElement('span');nm.className='variantThumbName';nm.textContent=rec.name.replace(/\.png$/i,'');
-   b.append(im,nm);strip.appendChild(b);
- });
-}
-function renderVariantStage(){
- const stage=$('variantStage'),list=variantList(),enabled=variantEnabled();
- stage.innerHTML='';stage.style.backgroundImage='none';stage.style.backgroundSize='auto';stage.style.gridTemplateColumns='';stage.style.gridTemplateRows='';stage.classList.remove('single');
- document.querySelectorAll('[data-vtile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.vtile)===variantTileN));
- $('variantMixToggle').classList.toggle('active',variantMixMode);
- const selected=list[variantSelectedIndex]||null;
- $('activateSelectedVariant').disabled=!selected||variantMixMode||!!selected.system;
- if(!list.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">PNG ekleyerek varyantları karşılaştır.</div>';$('variantStatus').textContent='';return}
- if(variantMixMode){
-   if(!enabled.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">Tüm varyantlar kapalı. Üstteki thumbnail’lere dokunup geri açabilirsin.</div>';$('variantStatus').textContent='0 aktif varyant';return}
-   const n=Math.max(variantTileN,1),cells=n*n;stage.style.gridTemplateColumns=`repeat(${n},1fr)`;stage.style.gridTemplateRows=`repeat(${n},1fr)`;
-   for(let i=0;i<cells;i++){const rec=enabled[variantMixIndex(i,enabled.length)],cell=document.createElement('div');cell.className='variantMixCell';cell.style.backgroundImage=`url("${variantUrl(rec)}")`;cell.title=rec.name;stage.appendChild(cell)}
-   $('variantStatus').textContent=`Karışık · ${enabled.length}/${list.length} aktif · thumbnail’e dokunarak ele/geri ekle`;
- }else{
-   stage.classList.add('single');
-   if(!selected){stage.innerHTML='<div class="variantNone">Bir varyant seç.</div>';return}
-   const u=variantUrl(selected);
-   if(variantTileN===1){const im=document.createElement('img');im.src=u;im.alt=selected.name;stage.appendChild(im)}
-   else{stage.style.backgroundImage=`url("${u}")`;stage.style.backgroundSize=`${100/variantTileN}% ${100/variantTileN}%`}
-   $('variantStatus').textContent=`${variantSelectedIndex+1}/${list.length} · ${selected.name}`;
- }
-}
-async function ensurePreview3dLoaded(){
- if(window.MTSPreview3D)return window.MTSPreview3D;
- if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-joystick1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
- await preview3dLoadPromise;return window.MTSPreview3D;
-}
-function updateVariant3dButton(){
- const x=variantSelectedMeta(),b=$('variant3dToggle');if(!b)return;
- const entity=assetTypeOf(x)==='Entity',hasModel=!!String(runtimeRoleInfo?.(x)?.model||'').match(/\.b3d/i);
- const eligible=entity&&hasModel;b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];const ub=$('variantUvManual'),rec=variantList()[variantSelectedIndex];if(ub){ub.style.display=entity?'':'none';ub.disabled=!entity||variantMixMode||!rec;}
-}
-function renderVariantLab(){
- const x=variantSelectedMeta();if(!x)return;
- const list=variantList(),enabled=variantEnabled(),user=variantUserList();
- $('variantMeta').textContent=`${x.name} · ${user.length} varyant${variantMixMode?` · ${enabled.length} aktif`:''}`;
- renderVariantThumbs();renderVariantStage();updateVariant3dButton();
-}
-async function populateVariantTextureSelect(){
- const sel=$('variantTexture');if(sel.dataset.ready)return;
- sel.innerHTML=CATALOG.map(x=>`<option value="${x.id}">${x.priority} · ${x.name}</option>`).join('');
- sel.dataset.ready='1';sel.onchange=async()=>{variantTextureId=sel.value;variantSelectedIndex=0;variantMixMode=false;await refreshVariantSources();renderVariantLab()};
-}
-async function openVariantLabFor(meta){
- await populateVariantTextureSelect();
- const chosen=meta||active||CATALOG[0];variantTextureId=chosen.id;$('variantTexture').value=chosen.id;
- await refreshVariantSources();$('variantLab').classList.add('open');renderVariantLab();
-}
-async function addVariantFiles(files){
- const x=variantSelectedMeta();if(!x||!files?.length)return;
- const list=variantUserList();let added=0;
- for(const file of files){
-   if(!file.type.includes('png')&&!/\.png$/i.test(file.name))continue;
-   try{const blob=await prepareVariantTextureBlob(file,x);list.push({blob,name:file.name,enabled:true,url:null,addedAt:Date.now(),rawAlpha:true});added++}catch(err){console.warn('Varyant PNG alınamadı',file.name,err)}
- }
- if(added){variantSelectedIndex=variantSources.length+Math.max(0,list.length-added);renderVariantLab();toast(`${added} varyant eklendi`)}
-}
-async function activateSelectedVariant(){
- const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
-}
-
-
+// Variant Lab is isolated in js/variant-lab.js.
+window.MTSVariantBridge={catalog:()=>CATALOG,active:()=>active,toast,originalBlob,getEdit,putEdit,assetTypeOf,runtimeRoleInfo,prepareVariantTextureBlob,lockEntityAlphaToSource,applyFilter};
 // Island Studio is isolated in js/island-studio.js so failures cannot block the catalog.
 window.MTSIslandBridge={
  catalog:()=>CATALOG,
@@ -1278,82 +1192,6 @@ window.MTSIslandBridge={
 };
 const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target',islands:[],islandIndex:-1,islandTemplate:null,islandTemplateMap:null,islandMode:false};
 
-function uvIslandKey(){return 'mts_uv_islands_v1:'+(uvMap.meta?.path||uvMap.meta?.id||'unknown')}
-function uvIslandLoad(){
- try{const x=JSON.parse(localStorage.getItem(uvIslandKey())||'null');uvMap.islands=Array.isArray(x?.islands)?x.islands:[];uvMap.islandIndex=uvMap.islands.length?0:-1}catch(_){uvMap.islands=[];uvMap.islandIndex=-1}
- uvIslandStatus()
-}
-function uvIslandSave(){try{localStorage.setItem(uvIslandKey(),JSON.stringify({v:1,islands:uvMap.islands,updatedAt:Date.now()}))}catch(_){}uvIslandStatus()}
-function uvIslandStatus(){
- const el=$('uvIslandMeta');if(!el)return;const i=uvMap.islandIndex,n=uvMap.islands.length,a=i>=0?uvMap.islands[i]:null;
- el.textContent=n?(('Ada '+(i+1)+'/'+n)+' · '+(a?.rects?.length||0)+' alan'):'Ada yok'
-}
-function uvIslandNew(){uvMap.islands.push({id:'island_'+Date.now().toString(36),rects:[]});uvMap.islandIndex=uvMap.islands.length-1;uvIslandSave();uvIslandSelectionMode();toast('Yeni ada oluşturuldu · orijinal üzerinde alan seç')}
-function uvIslandSelectionMode(){
- uvMap.islandMode=true;uvMap.target='orig';uvMap.handle='move';uvMap.panMode=false;
- const canvas=$('uvOrigCanvas'),o=$('uvOrigSel'),g=$('uvGenSel'),wrap=$('uvLiveWrap');
- // Give island mode a visible, useful starting selector instead of the tiny default 1/8 box.
- if(canvas){
-   const sw=Math.max(4,Math.round(canvas.width*.28)),sh=Math.max(4,Math.round(canvas.height*.28));
-   if(!uvMap.origSel||uvMap.origSel.w<2||uvMap.origSel.h<2)uvMap.origSel={x:Math.max(0,Math.floor((canvas.width-sw)/2)),y:Math.max(0,Math.floor((canvas.height-sh)/2)),w:sw,h:sh};
- }
- if(o){o.style.display='block';o.style.visibility='visible';o.style.opacity='1';o.style.zIndex='30'}
- if(g)g.style.display='none';
- const islandGroup=$('uvIslandTools'),manual=$('uvManualTools'),finalGroup=document.querySelector('.uvFinalGroup');
- if(islandGroup)islandGroup.open=true;if(manual)manual.open=true;if(finalGroup)finalGroup.open=true;
- uvSetView('orig');uvSetHandle('orig','move');$('uvPanToggle')?.classList.remove('primary');
- requestAnimationFrame(()=>{if(o)o.style.display='block';uvDrawSelection('orig');o?.scrollIntoView?.({block:'nearest'});});
- uvIslandStatus()
-}
-function uvIslandAddSelection(){
- if(uvMap.islandIndex<0)uvIslandNew();uvIslandSelectionMode();const s=uvMap.origSel;if(!s)return toast('Önce orijinalde alan seç');
- const a=uvMap.islands[uvMap.islandIndex];a.rects.push({x:Math.round(s.x),y:Math.round(s.y),w:Math.round(s.w),h:Math.round(s.h)});uvIslandSave();toast('Seçim Ada '+(uvMap.islandIndex+1)+' içine eklendi')
-}
-function uvIslandCycle(d){if(!uvMap.islands.length)return;uvMap.islandIndex=(uvMap.islandIndex+d+uvMap.islands.length)%uvMap.islands.length;uvIslandStatus()}
-function uvIslandDelete(){if(uvMap.islandIndex<0)return;uvMap.islands.splice(uvMap.islandIndex,1);uvMap.islandIndex=Math.min(uvMap.islands.length-1,uvMap.islandIndex);uvIslandSave();toast('Ada silindi')}
-function uvIslandMaskFor(island,w,h){
- const m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#fff';
- for(const r of island.rects||[])g.fillRect(r.x,r.y,r.w,r.h);return m
-}
-async function uvIslandBuildTemplate(download=true){
- if(!uvMap.orig||!uvMap.islands.length)return toast('Önce en az bir ada tanımla');
- const src=uvMap.orig,w=src.width,h=src.height,gap=Math.max(8,Math.round(Math.max(w,h)*.06)),pad=gap;
- const parts=[];
- for(let ai=0;ai<uvMap.islands.length;ai++){
-  const a=uvMap.islands[ai],rs=a.rects||[];if(!rs.length)continue;
-  const x0=Math.min(...rs.map(r=>r.x)),y0=Math.min(...rs.map(r=>r.y)),x1=Math.max(...rs.map(r=>r.x+r.w)),y1=Math.max(...rs.map(r=>r.y+r.h));
-  parts.push({ai,a,x0,y0,x1,y1,w:x1-x0,h:y1-y0})
- }
- if(!parts.length)return toast('Adalarda seçim yok');
- const maxW=Math.max(...parts.map(p=>p.w)),sheetW=Math.max(w*2,maxW+pad*2);let x=pad,y=pad,rowH=0;
- for(const p of parts){if(x+p.w+pad>sheetW){x=pad;y+=rowH+gap;rowH=0}p.tx=x;p.ty=y;x+=p.w+gap;rowH=Math.max(rowH,p.h)}
- const sheetH=y+rowH+pad,out=document.createElement('canvas');out.width=sheetW;out.height=sheetH;const og=out.getContext('2d');
- for(const p of parts){
-  const temp=document.createElement('canvas');temp.width=p.w;temp.height=p.h;const tg=temp.getContext('2d');
-  for(const r of p.a.rects||[])tg.drawImage(src,r.x,r.y,r.w,r.h,r.x-p.x0,r.y-p.y0,r.w,r.h);
-  og.drawImage(temp,p.tx,p.ty)
- }
- uvMap.islandTemplate=out;uvMap.islandTemplateMap={sheetW,sheetH,parts:parts.map(p=>({ai:p.ai,src:{x:p.x0,y:p.y0,w:p.w,h:p.h},dst:{x:p.tx,y:p.ty,w:p.w,h:p.h},rects:p.a.rects}))};
- try{localStorage.setItem(uvIslandKey()+':template',JSON.stringify(uvMap.islandTemplateMap))}catch(_){}
- if(download){const blob=await canvasPngBlob(out),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(uvMap.meta?.id||'texture')+'_ISLAND_TEMPLATE.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Ada şablonu indirildi')}
- return out
-}
-async function uvIslandImportFile(file){
- if(!file)return;try{uvMap.islandTemplate=await decodeBlobToCanvas(file);toast('AI ada şablonu yüklendi')}catch(e){toast('PNG yüklenemedi')}
-}
-async function uvIslandRestore(){
- if(!uvMap.islandTemplate)return toast('Önce AI şablonunu yükle');
- let map=uvMap.islandTemplateMap;try{if(!map)map=JSON.parse(localStorage.getItem(uvIslandKey()+':template')||'null')}catch(_){}
- if(!map?.parts?.length)return toast('Şablon eşleme bilgisi yok');
- const src=uvMap.islandTemplate,out=document.createElement('canvas');out.width=uvMap.orig.width;out.height=uvMap.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- for(const p of map.parts){
-  // Scale AI output back to the original island bbox, then mask to the user's saved rectangles.
-  const temp=document.createElement('canvas');temp.width=p.src.w;temp.height=p.src.h;const tg=temp.getContext('2d');tg.drawImage(src,p.dst.x,p.dst.y,p.dst.w,p.dst.h,0,0,p.src.w,p.src.h);
-  const island=uvMap.islands[p.ai];if(!island)continue;
-  for(const r of island.rects||[])g.drawImage(temp,r.x-p.src.x,r.y-p.src.y,r.w,r.h,r.x,r.y,r.w,r.h)
- }
- uvMap.work.width=out.width;uvMap.work.height=out.height;uvMap.work.getContext('2d').drawImage(out,0,0);uvRenderWork();toast('Adalar orijinal UV konumlarına oturtuldu')
-}
 function uvClampSel(s,w,h){s.x=Math.max(0,Math.min(w-1,s.x));s.y=Math.max(0,Math.min(h-1,s.y));s.w=Math.max(1,Math.min(w-s.x,s.w));s.h=Math.max(1,Math.min(h-s.y,s.h));return s}
 function uvDrawSelection(kind){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),el=$(kind==='orig'?'uvOrigSel':'uvGenSel'),s=uvMap[kind+'Sel'];if(!canvas||!s)return;const wrap=$('uvLiveWrap'),rx=wrap.clientWidth/canvas.width*uvMap.zoom,ry=wrap.clientHeight/canvas.height*uvMap.zoom;el.style.left=(uvMap.panX+s.x*rx)+'px';el.style.top=(uvMap.panY+s.y*ry)+'px';el.style.width=(s.w*rx)+'px';el.style.height=(s.h*ry)+'px'}
 function uvStatus(){const a=uvMap.origSel,b=uvMap.genSel;$('uvMapStatus').textContent=uvMap.history.length+' canlı düzeltme · O:'+(a?(a.x+','+a.y+' '+a.w+'×'+a.h):'-')+' · Ü:'+(b?(b.x+','+b.y+' '+b.w+'×'+b.h):'-')}
@@ -1493,7 +1331,7 @@ function bindIslandStudioUi(){
  const st=$('islandStudioStage');if(st){let pid=null,start=null;st.addEventListener('pointerdown',e=>{if(islandStudio.tab!=='edit'||e.target.closest('[data-ih]'))return;pid=e.pointerId;st.setPointerCapture?.(pid);start=islandStudioPoint(e);islandStudio.sel={x:start.x,y:start.y,w:1,h:1};islandStudioDrawSel();e.preventDefault()});st.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=islandStudioPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);islandStudio.sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};islandStudioDrawSel();e.preventDefault()});const finish=e=>{if(e.pointerId===pid){pid=null;start=null}};st.addEventListener('pointerup',finish);st.addEventListener('pointercancel',finish)}
 }
 bindIslandStudioUi();
-$('uvApplyFix').onclick=async()=>{if(!uvMap.meta||!uvMap.rec)return;const blob=await canvasPngBlob(uvMap.work),list=variantUserList();list.push({blob,name:(uvMap.rec.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;$('uvMapper').classList.remove('open');renderVariantLab();toast('Düzeltilmiş UV varyanta kaydedildi')};
+$('uvApplyFix').onclick=async()=>{if(!uvMap.meta||!uvMap.rec)return;const blob=await canvasPngBlob(uvMap.work),list=variantUserList();list.push({blob,name:(uvMap.rec.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;$('uvMapper').classList.remove('open');window.MTSVariantLab?.render?.();toast('Düzeltilmiş UV varyanta kaydedildi')};
 const manualTools=$('uvManualTools');
 if(manualTools)manualTools.addEventListener('toggle',()=>{const show=manualTools.open;$('uvOrigSel').style.display=show?'block':'none';$('uvGenSel').style.display=show?'block':'none';if(show){uvDrawSelection('orig');uvDrawSelection('gen')}});
 bindUvWorkspace();
@@ -1502,27 +1340,9 @@ bindUvPanGestures();
 document.querySelectorAll('#uvOrigSel [data-corner],#uvGenSel [data-corner]').forEach(h=>{let pid=null,last=null;h.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();pid=e.pointerId;last={x:e.clientX,y:e.clientY};h.setPointerCapture?.(pid);uvSetHandle(h.closest('#uvOrigSel')?'orig':'gen',h.dataset.corner)});h.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!last)return;e.preventDefault();e.stopPropagation();const kind=uvMap.target,canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),r=canvas.getBoundingClientRect(),dx=Math.round((e.clientX-last.x)*canvas.width/r.width),dy=Math.round((e.clientY-last.y)*canvas.height/r.height);if(dx||dy){uvMoveTarget(dx,dy);last={x:e.clientX,y:e.clientY}}});const end=e=>{if(e.pointerId===pid){pid=null;last=null;e.stopPropagation()}};h.addEventListener('pointerup',end);h.addEventListener('pointercancel',end)});
 {const joy=$('uvJoystick'),stick=$('uvStick');let pid=null,jx=0,jy=0,timer=0,last=0;const move=e=>{if(e.pointerId!==pid)return;const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,lim=r.width*.32,dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,k=Math.min(1,lim/d),px=dx*k,py=dy*k;jx=px/lim;jy=py/lim;stick.style.transform='translate('+px+'px,'+py+'px)';e.preventDefault();e.stopPropagation()};const loop=t=>{if(pid===null){timer=0;return}if(t-last>85){const dx=Math.abs(jx)>.28?Math.sign(jx):0,dy=Math.abs(jy)>.28?Math.sign(jy):0;if(dx||dy){if(uvMap.globalMode)uvShiftGlobal(dx,dy);else uvMoveTarget(dx,dy)}last=t}timer=requestAnimationFrame(loop)};joy.addEventListener('pointerdown',e=>{pid=e.pointerId;joy.setPointerCapture?.(pid);move(e);if(!timer)timer=requestAnimationFrame(loop)});joy.addEventListener('pointermove',move);const end=e=>{if(e.pointerId!==pid)return;pid=null;jx=jy=0;stick.style.transform='translate(0,0)';if(timer){cancelAnimationFrame(timer);timer=0}};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end)}
 
-$('openVariantLab').onclick=()=>openVariantLabFor(active||null);
-$('detailVariantLab').onclick=()=>openVariantLabFor(active);
-const islandBtn=$('detailIslandStudio');if(islandBtn)islandBtn.onclick=()=>{if(!active||assetTypeOf(active)!=='Entity')return toast('Ada yalnız Entity için');const path=active.path;closeDetailSheet();if(window.MTSIslandStudio)window.MTSIslandStudio.open(path);else toast('Ada modülü yüklenemedi')};
-$('closeVariantLab').onclick=()=>$('variantLab').classList.remove('open');
-$('addVariantPngs').onclick=()=>$('variantFiles').click();
-$('variantFiles').onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
-$('activateSelectedVariant').onclick=activateSelectedVariant;
-$('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
-$('variantUvManual').onclick=openUvMapper;
-$('variant3dToggle').onclick=async()=>{
- const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
-};
-$('variantLab').addEventListener('click',e=>{
- const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
- const thumb=e.target.closest('[data-variant-index]');if(!thumb)return;
- const i=Number(thumb.dataset.variantIndex),list=variantList();if(!list[i])return;
- if(variantMixMode){if(!list[i].system)list[i].enabled=list[i].enabled===false;}
- else variantSelectedIndex=i;
- renderVariantLab();
-});
+const openVariant=(meta)=>window.MTSVariantLab?window.MTSVariantLab.open(meta):toast('Varyant Lab modülü yüklenemedi');
+$('openVariantLab').onclick=()=>openVariant(active||null);$('detailVariantLab').onclick=()=>openVariant(active);
+
 
 document.querySelector('.tileTools').addEventListener('click',async e=>{const b=e.target.closest('[data-tile]');if(b){tileN=Number(b.dataset.tile);if(active&&active.w!==active.h&&tileN>1){toast('Tile görünümü kare texture için');tileN=1}await updateTilePreview();return}if(e.target.id==='tileSource'){if(!active)return;const edit=await getEdit(active.path);if(!edit){tileEdited=false;toast('Bu texture henüz düzenlenmedi')}else tileEdited=!tileEdited;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';await updateTilePreview()}});
 $('mobHqPrompt').onclick=()=>copyMobPrompt('hq');
