@@ -1,3 +1,15 @@
+## Lightweight 3D preview — 2026-10-06
+
+- Added an on-demand CSS 3D preview with no Three.js/WebGL dependency and no render loop.
+- 3D code is inactive until the user opens the preview and the scene DOM is destroyed on close.
+- Object mode: one rotatable/zoomable block/object using inferred Mineclonia top/side/bottom/front/back siblings.
+- World mode: small 5×5 block patch for true Block assets; disabled for Functional Blocks such as furnaces.
+- Grass is special-cased from Mineclonia runtime structure: top uses grass top, sides use dirt + separately biome-tinted grass overlay, bottom uses dirt.
+- Edited sibling textures are used automatically through the existing display/edit cache, so cross-face consistency can be inspected before export.
+- Touch drag rotates; pinch/wheel zooms; Reset restores view.
+- Current scope is cube/block-like nodes only; entity/model UV preview remains out of scope unless explicitly added later.
+- Changes were made directly on main.
+
 ## Mineclonia material dependency map — 2026-10-06
 
 - Added a source-verified material reference dependency system directly on main.
