@@ -1,3 +1,12 @@
+## Automatic 3D face-family binding — 2026-10-06
+
+- Replaced repeated per-family face lookup with one compact catalog index keyed by mod + normalized texture family.
+- Automatically recognizes top, bottom, side, side1-side4, front/on/off/active/horizontal/vertical and back/back-lit suffix families.
+- All current and future Block/Functional Block catalog entries following these Mineclonia naming families are automatically assembled in 3D; no per-texture wiring is required.
+- State-aware front selection prefers the active/on/off sibling matching the texture currently opened.
+- Numbered sides map to distinct left/right/back faces where present.
+- Grass remains the small explicit runtime-composite override because Mineclonia builds its side from dirt + tintable overlay rather than a normal standalone side texture.
+- Resolver index is built only when 3D preview is opened because the whole 3D module is lazy-loaded.
 ## Lightweight 3D preview — 2026-10-06
 
 - Completed the existing lightweight CSS-3D preview without adding a WebGL/game-engine dependency.
