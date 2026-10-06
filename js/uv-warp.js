@@ -53,7 +53,10 @@
    if(area>w*h*.94&&touches>=3)continue;
    const rowL=new Int32Array(maxY-minY+1);rowL.fill(2147483647);const rowR=new Int32Array(maxY-minY+1);rowR.fill(-1);const boundary=[];
    for(const p of pix){const x=p%w,y=(p/w)|0,ry=y-minY;if(x<rowL[ry])rowL[ry]=x;if(x>rowR[ry])rowR[ry]=x;
-    if(x===0||x===w-1||y===0||y===h-1||!mask[p-1]||!mask[p+1]||!mask[p-w]||!mask[p+w])boundary.push({x,y})
+    if(x===0||!mask[p-1])boundary.push({x:x,y:y+.5});
+    if(x===w-1||!mask[p+1])boundary.push({x:x+1,y:y+.5});
+    if(y===0||!mask[p-w])boundary.push({x:x+.5,y:y});
+    if(y===h-1||!mask[p+w])boundary.push({x:x+.5,y:y+1})
    }
    const step=Math.max(1,Math.ceil(boundary.length/700));
    out.push({id:out.length,bbox:{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1},area,cx:sumX/area,cy:sumY/area,rowL,rowR,boundary:boundary.filter((_,i)=>i%step===0)})
@@ -67,6 +70,14 @@
     a=foregroundMask(canvas,{...opts,bgMode:'auto'});a.components=components(a);a.bg.fallbackFrom='alpha';
   }
   return a
+ }
+ function analyzeWithMask(canvas,maskCanvas){
+  const source=img(canvas),m=img(maskCanvas),w=canvas.width,h=canvas.height,mask=new Uint8Array(w*h);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const mx=Math.min(maskCanvas.width-1,Math.floor(x*maskCanvas.width/w)),my=Math.min(maskCanvas.height-1,Math.floor(y*maskCanvas.height/h));
+    mask[y*w+x]=m.data[(my*maskCanvas.width+mx)*4+3]>=16?1:0;
+  }
+  const a={im:source,w,h,mask,bg:{mode:'reference-alpha'}};a.components=components(a);return a
  }
  function score(a,b,aw,ah,bw,bh){
   const ax=a.cx/aw,ay=a.cy/ah,bx=b.cx/bw,by=b.cy/bh,pos=Math.hypot(ax-bx,ay-by);
@@ -144,14 +155,14 @@
 
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
-  const dot=(a,c,fill,label)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h,sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)));ctx.fillStyle=fill;for(const p of c.boundary)ctx.fillRect(p.x*sx,p.y*sy,sz,sz);ctx.strokeStyle=fill;ctx.lineWidth=1.5;ctx.strokeRect(c.bbox.x*sx,c.bbox.y*sy,c.bbox.w*sx,c.bbox.h*sy);ctx.font='bold 10px system-ui';ctx.fillText(label+(c.id+1),c.bbox.x*sx+2,c.bbox.y*sy+11)};
-  if(showTarget)for(const c of target.components)dot(target,c,'rgba(92,255,120,.98)','O');
-  if(showSource)for(const c of source.components)dot(source,c,'rgba(255,170,50,.98)','Ü');
-  ctx.lineWidth=2;ctx.strokeStyle='rgba(80,170,255,.95)';
-  let n=1;for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='rgba(80,170,255,.98)';ctx.font='bold 11px system-ui';ctx.fillText(String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
+  const edge=(a,c,fill,label)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)*.7));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz);ctx.font='bold 10px system-ui';ctx.fillText(label+(c.id+1),c.cx*sx+2,c.cy*sy-2)};
+  if(showTarget)for(const c of target.components)edge(target,c,'rgba(70,255,105,.98)','O');
+  if(showSource)for(const c of source.components)edge(source,c,'rgba(255,160,40,.98)','Ü');
+  ctx.lineWidth=2;ctx.strokeStyle='rgba(70,160,255,.95)';
+  let n=1;for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='rgba(70,160,255,.98)';ctx.font='bold 11px system-ui';ctx.fillText(String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
  }
  function nearest(analysis,x,y){
   let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
  }
- window.MTSUvWarp={analyze,match,warp,smoothWarp,draw,nearest};
+ window.MTSUvWarp={analyze,analyzeWithMask,match,warp,smoothWarp,draw,nearest};
 })();
