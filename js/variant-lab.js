@@ -102,5 +102,24 @@ async function activateSelectedVariant(){
 
 
 
+
+function bindVariantLabUi(){
+ const close=$('closeVariantLab'),add=$('addVariantPngs'),files=$('variantFiles'),activate=$('activateSelectedVariant'),mix=$('variantMixToggle'),uv=$('variantUvManual'),v3=$('variant3dToggle'),lab=$('variantLab');
+ if(close)close.onclick=()=>lab?.classList.remove('open');
+ if(add) add.onclick=()=>files?.click();
+ if(files)files.onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
+ if(activate)activate.onclick=activateSelectedVariant;
+ if(mix)mix.onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
+ if(uv)uv.onclick=()=>window.MTSUvMapper?.open?.();
+ if(v3)v3.onclick=async()=>{const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}};
+ if(lab)lab.addEventListener('click',e=>{
+   const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
+   const th=e.target.closest('[data-variant-index]');if(!th)return;const idx=Number(th.dataset.variantIndex);
+   if(variantMixMode){const rec=variantList()[idx];if(rec&&!rec.system){rec.enabled=rec.enabled===false;renderVariantLab()}}
+   else{variantSelectedIndex=idx;renderVariantLab()}
+ });
+ if(lab)lab.dataset.bound='1'
+}
 window.MTSVariantLab={open:openVariantLabFor,selectedMeta:variantSelectedMeta,list:variantList,render:renderVariantLab,selectedIndex:()=>variantSelectedIndex,userList:variantUserList,sourcesLength:()=>variantSources.length,saveUvVariant:async(meta,rec,blob)=>{const list=variantUserList();list.push({blob,name:(rec?.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;renderVariantLab()}};
+try{bindVariantLabUi()}catch(e){console.error('Variant Lab bind',e)}
 })();
