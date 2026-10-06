@@ -1225,7 +1225,7 @@ async function ensurePreview3dLoaded(){
 function updateVariant3dButton(){
  const x=variantSelectedMeta(),b=$('variant3dToggle');if(!b)return;
  const entity=assetTypeOf(x)==='Entity',hasModel=!!String(runtimeRoleInfo?.(x)?.model||'').match(/\.b3d/i);
- const eligible=entity&&hasModel;b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];
+ const eligible=entity&&hasModel;b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];const ub=$('variantUvManual'),rec=variantList()[variantSelectedIndex];if(ub){ub.style.display=entity?'':'none';ub.disabled=!entity||variantMixMode||!rec||!!rec.system;}
 }
 function renderVariantLab(){
  const x=variantSelectedMeta();if(!x)return;
@@ -1256,6 +1256,23 @@ async function activateSelectedVariant(){
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
  await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
+
+const uvMap={meta:null,rec:null,orig:null,gen:null,origSel:null,genSel:null,pairs:[],target:'gen'};
+function uvClampSel(s,w,h){s.x=Math.max(0,Math.min(w-1,s.x));s.y=Math.max(0,Math.min(h-1,s.y));s.w=Math.max(1,Math.min(w-s.x,s.w));s.h=Math.max(1,Math.min(h-s.y,s.h));return s}
+function uvDrawSelection(kind){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),el=$(kind==='orig'?'uvOrigSel':'uvGenSel'),s=uvMap[kind+'Sel'];if(!canvas||!s)return;const wrap=canvas.parentElement,rx=wrap.clientWidth/canvas.width,ry=wrap.clientHeight/canvas.height;el.style.left=(s.x*rx)+'px';el.style.top=(s.y*ry)+'px';el.style.width=(s.w*rx)+'px';el.style.height=(s.h*ry)+'px'}
+function uvStatus(){const a=uvMap.origSel,b=uvMap.genSel;$('uvMapStatus').textContent=uvMap.pairs.length+' eşleme · O:'+(a?(a.x+','+a.y+' '+a.w+'×'+a.h):'-')+' · Ü:'+(b?(b.x+','+b.y+' '+b.w+'×'+b.h):'-')}
+function uvPoint(kind,e){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),r=canvas.getBoundingClientRect();return{x:Math.max(0,Math.min(canvas.width-1,Math.floor((e.clientX-r.left)*canvas.width/r.width))),y:Math.max(0,Math.min(canvas.height-1,Math.floor((e.clientY-r.top)*canvas.height/r.height)))}}
+function bindUvPane(kind){const wrap=$(kind==='orig'?'uvOrigWrap':'uvGenWrap');let start=null,pid=null;wrap.addEventListener('pointerdown',e=>{pid=e.pointerId;wrap.setPointerCapture?.(pid);start=uvPoint(kind,e);uvMap.target=kind;$('uvTargetToggle').textContent='Joystick: '+(kind==='orig'?'Orijinal':'Üretilen');uvMap[kind+'Sel']={x:start.x,y:start.y,w:1,h:1};uvDrawSelection(kind);e.preventDefault()});wrap.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=uvPoint(kind,e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);uvMap[kind+'Sel']={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};uvDrawSelection(kind);uvStatus();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null;uvStatus()}};wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end)}
+async function openUvMapper(){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||rec.system)return;const ob=await originalBlob(x.path),oc=await decodeBlobToCanvas(ob),gc=await decodeBlobToCanvas(rec.blob);uvMap.meta=x;uvMap.rec=rec;uvMap.orig=oc;uvMap.gen=gc;uvMap.pairs=[];uvMap.target='gen';for(const row of [[oc,'uvOrigCanvas'],[gc,'uvGenCanvas']]){const d=$(row[1]);d.width=row[0].width;d.height=row[0].height;d.getContext('2d').drawImage(row[0],0,0)}const base={x:0,y:0,w:Math.max(1,Math.floor(oc.width/8)),h:Math.max(1,Math.floor(oc.height/8))};uvMap.origSel={...base};uvMap.genSel={...base};$('uvMapMeta').textContent=x.name;$('uvMapper').classList.add('open');requestAnimationFrame(()=>{uvDrawSelection('orig');uvDrawSelection('gen');uvStatus()})}
+function uvMoveTarget(dx,dy){const kind=uvMap.target,s=uvMap[kind+'Sel'],canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas');if(!s||!canvas)return;s.x+=dx;s.y+=dy;uvClampSel(s,canvas.width,canvas.height);uvDrawSelection(kind);uvStatus()}
+$('uvMapClose').onclick=()=>$('uvMapper').classList.remove('open');
+$('uvAddPair').onclick=()=>{if(!uvMap.origSel||!uvMap.genSel)return;uvMap.pairs.push({orig:{...uvMap.origSel},gen:{...uvMap.genSel}});uvStatus();toast('UV alanı eşleştirildi')};
+$('uvUndoPair').onclick=()=>{uvMap.pairs.pop();uvStatus()};
+$('uvTargetToggle').onclick=()=>{uvMap.target=uvMap.target==='gen'?'orig':'gen';$('uvTargetToggle').textContent='Joystick: '+(uvMap.target==='orig'?'Orijinal':'Üretilen')};
+$('uvApplyFix').onclick=async()=>{if(!uvMap.meta||!uvMap.rec||!uvMap.pairs.length)return toast('Önce en az bir alan eşleştir');const out=document.createElement('canvas');out.width=uvMap.gen.width;out.height=uvMap.gen.height;const g=out.getContext('2d');g.drawImage(uvMap.gen,0,0);for(const p of uvMap.pairs){g.clearRect(p.orig.x,p.orig.y,p.orig.w,p.orig.h);g.drawImage(uvMap.gen,p.gen.x,p.gen.y,p.gen.w,p.gen.h,p.orig.x,p.orig.y,p.orig.w,p.orig.h)}const src=uvMap.orig.getContext('2d').getImageData(0,0,uvMap.orig.width,uvMap.orig.height),dst=g.getImageData(0,0,out.width,out.height),sx=src.width/out.width,sy=src.height/out.height;for(let y=0;y<out.height;y++)for(let x=0;x<out.width;x++){const si=(Math.min(src.height-1,Math.floor(y*sy))*src.width+Math.min(src.width-1,Math.floor(x*sx)))*4,di=(y*out.width+x)*4;if(src.data[si+3]===0)dst.data[di+3]=0}g.putImageData(dst,0,0);const blob=await canvasPngBlob(out),list=variantUserList();list.push({blob,name:(uvMap.rec.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now()});variantSelectedIndex=variantSources.length+list.length-1;$('uvMapper').classList.remove('open');renderVariantLab();toast('UV düzeltmesi yeni varyant olarak eklendi')};
+bindUvPane('orig');bindUvPane('gen');
+{const joy=$('uvJoystick'),stick=$('uvStick');let pid=null,jx=0,jy=0,timer=0,last=0;const move=e=>{if(e.pointerId!==pid)return;const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,lim=r.width*.32,dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,k=Math.min(1,lim/d),px=dx*k,py=dy*k;jx=px/lim;jy=py/lim;stick.style.transform='translate('+px+'px,'+py+'px)';e.preventDefault();e.stopPropagation()};const loop=t=>{if(pid===null){timer=0;return}if(t-last>85){const dx=Math.abs(jx)>.28?Math.sign(jx):0,dy=Math.abs(jy)>.28?Math.sign(jy):0;if(dx||dy)uvMoveTarget(dx,dy);last=t}timer=requestAnimationFrame(loop)};joy.addEventListener('pointerdown',e=>{pid=e.pointerId;joy.setPointerCapture?.(pid);move(e);if(!timer)timer=requestAnimationFrame(loop)});joy.addEventListener('pointermove',move);const end=e=>{if(e.pointerId!==pid)return;pid=null;jx=jy=0;stick.style.transform='translate(0,0)';if(timer){cancelAnimationFrame(timer);timer=0}};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end)}
+
 $('openVariantLab').onclick=()=>openVariantLabFor(active||null);
 $('detailVariantLab').onclick=()=>openVariantLabFor(active);
 $('closeVariantLab').onclick=()=>$('variantLab').classList.remove('open');
@@ -1263,6 +1280,7 @@ $('addVariantPngs').onclick=()=>$('variantFiles').click();
 $('variantFiles').onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
 $('activateSelectedVariant').onclick=activateSelectedVariant;
 $('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
+$('variantUvManual').onclick=openUvMapper;
 $('variant3dToggle').onclick=async()=>{
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
  try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
