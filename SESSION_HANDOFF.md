@@ -1,3 +1,12 @@
+## Runtime-tinted texture detection — 2026-10-06
+
+- Added a dedicated technical filter: `Runtime Tint / Color Masks`.
+- Detection covers Mineclonia runtime-colorized families verified from upstream source: biome grass top/side overlay, grass-palette papyrus, palette-driven leaves, gourd stem masks, redstone power masks, candle/banner/dye masks, leather armor tint assets, selected entity/player color masks.
+- Production prompts now append a runtime-tint lock: preserve neutral/grayscale luminance/material structure and do not bake final biome/dye/state colors into the image.
+- The lock is applied to normal generated prompts, P0 reference-first prompts, and P0 Image-A/Image-B production prompts.
+- Upstream evidence used: Mineclonia node definitions use grass/leaves palettes and explicit `^[colorize]` modifiers; the list should be extended when new runtime-tinted families are discovered.
+- Changes were made directly on `main` per project workflow.
+
 ## Automatic opaque-black background cleanup — 2026-10-05
 
 - Added `js/image-processing.js` and wired it into PNG and ZIP import preparation.
