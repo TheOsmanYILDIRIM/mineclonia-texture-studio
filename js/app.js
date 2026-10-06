@@ -1277,7 +1277,22 @@ function uvIslandStatus(){
  el.textContent=n?(('Ada '+(i+1)+'/'+n)+' · '+(a?.rects?.length||0)+' alan'):'Ada yok'
 }
 function uvIslandNew(){uvMap.islands.push({id:'island_'+Date.now().toString(36),rects:[]});uvMap.islandIndex=uvMap.islands.length-1;uvIslandSave();uvIslandSelectionMode();toast('Yeni ada oluşturuldu · orijinal üzerinde alan seç')}
-function uvIslandSelectionMode(){uvMap.islandMode=true;uvMap.target='orig';uvMap.handle='move';uvMap.panMode=false;const o=$('uvOrigSel'),g=$('uvGenSel');if(o)o.style.display='block';if(g)g.style.display='none';uvSetView('orig');uvDrawSelection('orig');uvSetHandle('orig','move');$('uvPanToggle')?.classList.remove('primary');uvIslandStatus()}
+function uvIslandSelectionMode(){
+ uvMap.islandMode=true;uvMap.target='orig';uvMap.handle='move';uvMap.panMode=false;
+ const canvas=$('uvOrigCanvas'),o=$('uvOrigSel'),g=$('uvGenSel'),wrap=$('uvLiveWrap');
+ // Give island mode a visible, useful starting selector instead of the tiny default 1/8 box.
+ if(canvas){
+   const sw=Math.max(4,Math.round(canvas.width*.28)),sh=Math.max(4,Math.round(canvas.height*.28));
+   if(!uvMap.origSel||uvMap.origSel.w<2||uvMap.origSel.h<2)uvMap.origSel={x:Math.max(0,Math.floor((canvas.width-sw)/2)),y:Math.max(0,Math.floor((canvas.height-sh)/2)),w:sw,h:sh};
+ }
+ if(o){o.style.display='block';o.style.visibility='visible';o.style.opacity='1';o.style.zIndex='30'}
+ if(g)g.style.display='none';
+ const islandGroup=$('uvIslandTools'),manual=$('uvManualTools'),finalGroup=document.querySelector('.uvFinalGroup');
+ if(islandGroup)islandGroup.open=true;if(manual)manual.open=true;if(finalGroup)finalGroup.open=true;
+ uvSetView('orig');uvSetHandle('orig','move');$('uvPanToggle')?.classList.remove('primary');
+ requestAnimationFrame(()=>{if(o)o.style.display='block';uvDrawSelection('orig');o?.scrollIntoView?.({block:'nearest'});});
+ uvIslandStatus()
+}
 function uvIslandAddSelection(){
  if(uvMap.islandIndex<0)uvIslandNew();uvIslandSelectionMode();const s=uvMap.origSel;if(!s)return toast('Önce orijinalde alan seç');
  const a=uvMap.islands[uvMap.islandIndex];a.rects.push({x:Math.round(s.x),y:Math.round(s.y),w:Math.round(s.w),h:Math.round(s.h)});uvIslandSave();toast('Seçim Ada '+(uvMap.islandIndex+1)+' içine eklendi')
