@@ -1298,14 +1298,15 @@ function islandStudioSetTab(tab){
  islandStudio.tab=tab;document.querySelectorAll('[data-islandtab]').forEach(b=>b.classList.toggle('primary',b.dataset.islandtab===tab));
  if(tab==='edit')islandStudioDraw(islandStudio.orig);
  else if(tab==='template'){if(islandStudio.template)islandStudioDraw(islandStudio.template);else islandStudioBuildTemplate(false).then(x=>x&&islandStudioDraw(x))}
+ else if(tab==='imported'){if(islandStudio.imported)islandStudioDraw(islandStudio.imported);else islandStudioStatus('Henüz AI PNG import edilmedi.')}
  else if(tab==='restored'){if(islandStudio.restored)islandStudioDraw(islandStudio.restored);else islandStudioStatus('Henüz geri toplanmış UV yok.')}
  islandStudioDrawSel()
 }
-async function islandStudioOpen(){
+async function islandStudioOpen(preselect=null){
  const sel=$('islandStudioTexture');sel.innerHTML='';
  const entities=CATALOG.filter(x=>assetTypeOf(x)==='Entity');
  for(const x of entities){const o=document.createElement('option');o.value=x.path;o.textContent=x.name||x.id||x.path.split('/').pop();sel.appendChild(o)}
- $('islandStudio').classList.add('open');if(sel.value)await islandStudioChoose(sel.value)
+ if(preselect&&entities.some(x=>x.path===preselect))sel.value=preselect;$('islandStudio').classList.add('open');if(sel.value)await islandStudioChoose(sel.value)
 }
 async function islandStudioChoose(path){
  const x=CATALOG.find(a=>a.path===path);if(!x)return;
@@ -1313,9 +1314,9 @@ async function islandStudioChoose(path){
  islandStudioLoadMap();islandStudioSetTab('edit')
 }
 function islandStudioNew(){islandStudio.islands.push({id:'island_'+Date.now().toString(36),rects:[]});islandStudio.index=islandStudio.islands.length-1;islandStudioSave()}
-function islandStudioAdd(){if(islandStudio.index<0)islandStudioNew();if(!islandStudio.sel)return;islandStudio.islands[islandStudio.index].rects.push({...islandStudio.sel});islandStudioSave();islandStudioBuildTemplate(false)}
+async function islandStudioAdd(){if(islandStudio.index<0)islandStudioNew();if(!islandStudio.sel)return;islandStudio.islands[islandStudio.index].rects.push({...islandStudio.sel});islandStudioSave();await islandStudioBuildTemplate(false);islandStudioSetTab('template')}
 function islandStudioCycle(d){if(!islandStudio.islands.length)return;islandStudio.index=(islandStudio.index+d+islandStudio.islands.length)%islandStudio.islands.length;islandStudioStatus()}
-function islandStudioDelete(){if(islandStudio.index<0)return;islandStudio.islands.splice(islandStudio.index,1);islandStudio.index=Math.min(islandStudio.islands.length-1,islandStudio.index);islandStudioSave();islandStudioBuildTemplate(false)}
+async function islandStudioDelete(){if(islandStudio.index<0)return;islandStudio.islands.splice(islandStudio.index,1);islandStudio.index=Math.min(islandStudio.islands.length-1,islandStudio.index);islandStudioSave();await islandStudioBuildTemplate(false);if(islandStudio.template)islandStudioSetTab('template')}
 async function islandStudioBuildTemplate(download=false){
  if(!islandStudio.orig||!islandStudio.islands.length){islandStudioStatus('Önce ada tanımla.');return null}
  const src=islandStudio.orig,w=src.width,h=src.height,parts=[];
@@ -1366,7 +1367,7 @@ async function islandStudioImport(file){
   islandStudio.imported=c;islandStudio.template=c;islandStudio.map=m;
   const expected=m?(m.sheetW+'×'+m.sheetH):'mapping yok',actual=c.width+'×'+c.height,ok=!!m&&c.width===m.sheetW&&c.height===m.sheetH;
   islandStudioStatus('Import: '+file.name+' · '+actual+' · beklenen '+expected+' · '+(ok?'UYUMLU':'BOYUT FARKLI'));
-  islandStudioSetTab('template')
+  islandStudioSetTab('imported')
  }catch(e){console.error(e);islandStudioStatus('Import başarısız: '+(e?.message||e));toast('AI PNG import edilemedi')}
 }
 async function islandStudioRestore(){
@@ -1579,8 +1580,7 @@ $('uvGlobalApply').onclick=()=>{if(!uvMap.work||(!uvMap.globalX&&!uvMap.globalY)
 $('uvAddPair').onclick=()=>uvApplyCurrentTransform(false);
 $('uvUndoPair').onclick=()=>{const prev=uvMap.history.pop();if(!prev)return;uvMap.work.getContext('2d').putImageData(prev,0,0);uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;uvRenderWork();uvRefreshContours();uvStatus()};
 $('uvTargetToggle').onclick=()=>{if(!uvMap.globalMode){uvMap.globalMode=true;$('uvTargetToggle').textContent='Joystick: Tüm resim'}else{uvMap.globalMode=false;uvSetHandle('gen','move')}};
-$('openIslandStudio').onclick=islandStudioOpen;$('islandStudioClose').onclick=()=>$('islandStudio').classList.remove('open');$('islandStudioTexture').onchange=e=>islandStudioChoose(e.target.value);document.querySelectorAll('[data-islandtab]').forEach(b=>b.onclick=()=>islandStudioSetTab(b.dataset.islandtab));$('islandStudioNew').onclick=islandStudioNew;$('islandStudioAdd').onclick=islandStudioAdd;$('islandStudioPrev').onclick=()=>islandStudioCycle(-1);$('islandStudioNext').onclick=()=>islandStudioCycle(1);$('islandStudioDelete').onclick=islandStudioDelete;$('islandStudioExport').onclick=()=>islandStudioBuildTemplate(true);$('islandStudioImport').onclick=()=>$('islandStudioFile').click();$('islandStudioFile').onchange=e=>islandStudioImport(e.target.files?.[0]);$('islandStudioRestore').onclick=islandStudioRestore;(()=>{const st=$('islandStudioStage');let pid=null,start=null;st.addEventListener('pointerdown',e=>{if(islandStudio.tab!=='edit')return;pid=e.pointerId;st.setPointerCapture?.(pid);start=islandStudioPoint(e);islandStudio.sel={x:start.x,y:start.y,w:1,h:1};islandStudioDrawSel();e.preventDefault()});st.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=islandStudioPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);islandStudio.sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};islandStudioDrawSel();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end)})();
-$('uvIslandNew').onclick=uvIslandNew;$('uvIslandAdd').onclick=uvIslandAddSelection;$('uvIslandPrev').onclick=()=>uvIslandCycle(-1);$('uvIslandNext').onclick=()=>uvIslandCycle(1);$('uvIslandDelete').onclick=uvIslandDelete;$('uvIslandTemplate').onclick=()=>uvIslandBuildTemplate(true);$('uvIslandImport').onclick=()=>$('uvIslandFile').click();$('uvIslandFile').onchange=e=>uvIslandImportFile(e.target.files?.[0]);$('uvIslandRestore').onclick=uvIslandRestore;
+$('openIslandStudio').onclick=()=>islandStudioOpen();$('detailIslandStudio').onclick=()=>{if(active&&assetTypeOf(active)==='Entity'){closeDetailSheet();islandStudioOpen(active.path)}else toast('Ada Editörü entity modelleri için')};$('islandStudioClose').onclick=()=>$('islandStudio').classList.remove('open');$('islandStudioTexture').onchange=e=>islandStudioChoose(e.target.value);document.querySelectorAll('[data-islandtab]').forEach(b=>b.onclick=()=>islandStudioSetTab(b.dataset.islandtab));$('islandStudioNew').onclick=islandStudioNew;$('islandStudioAdd').onclick=islandStudioAdd;$('islandStudioPrev').onclick=()=>islandStudioCycle(-1);$('islandStudioNext').onclick=()=>islandStudioCycle(1);$('islandStudioDelete').onclick=islandStudioDelete;$('islandStudioExport').onclick=()=>islandStudioBuildTemplate(true);$('islandStudioImport').onclick=()=>$('islandStudioFile').click();$('islandStudioFile').onchange=e=>islandStudioImport(e.target.files?.[0]);$('islandStudioRestore').onclick=islandStudioRestore;(()=>{const st=$('islandStudioStage');let pid=null,start=null;st.addEventListener('pointerdown',e=>{if(islandStudio.tab!=='edit')return;pid=e.pointerId;st.setPointerCapture?.(pid);start=islandStudioPoint(e);islandStudio.sel={x:start.x,y:start.y,w:1,h:1};islandStudioDrawSel();e.preventDefault()});st.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=islandStudioPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);islandStudio.sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};islandStudioDrawSel();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end)})();
 $('uvApplyFix').onclick=async()=>{if(!uvMap.meta||!uvMap.rec)return;const blob=await canvasPngBlob(uvMap.work),list=variantUserList();list.push({blob,name:(uvMap.rec.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;$('uvMapper').classList.remove('open');renderVariantLab();toast('Düzeltilmiş UV varyanta kaydedildi')};
 const manualTools=$('uvManualTools');
 if(manualTools)manualTools.addEventListener('toggle',()=>{const show=manualTools.open;$('uvOrigSel').style.display=show?'block':'none';$('uvGenSel').style.display=show?'block':'none';if(show){uvDrawSelection('orig');uvDrawSelection('gen')}});
