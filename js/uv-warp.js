@@ -120,11 +120,11 @@
 
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
-  const dot=(a,c,fill)=>{ctx.fillStyle=fill;const sx=canvas.width/a.w,sy=canvas.height/a.h,sz=Math.max(1,Math.min(2,Math.min(sx,sy)));for(const p of c.boundary)ctx.fillRect(p.x*sx,p.y*sy,sz,sz)};
-  if(showTarget)for(const c of target.components)dot(target,c,'rgba(80,220,120,.95)');
-  if(showSource)for(const c of source.components)dot(source,c,'rgba(255,170,70,.95)');
-  ctx.lineWidth=1.2;ctx.strokeStyle='rgba(110,170,255,.85)';
-  for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke()}
+  const dot=(a,c,fill,label)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h,sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)));ctx.fillStyle=fill;for(const p of c.boundary)ctx.fillRect(p.x*sx,p.y*sy,sz,sz);ctx.strokeStyle=fill;ctx.lineWidth=1.5;ctx.strokeRect(c.bbox.x*sx,c.bbox.y*sy,c.bbox.w*sx,c.bbox.h*sy);ctx.font='bold 10px system-ui';ctx.fillText(label+(c.id+1),c.bbox.x*sx+2,c.bbox.y*sy+11)};
+  if(showTarget)for(const c of target.components)dot(target,c,'rgba(92,255,120,.98)','O');
+  if(showSource)for(const c of source.components)dot(source,c,'rgba(255,170,50,.98)','Ü');
+  ctx.lineWidth=2;ctx.strokeStyle='rgba(80,170,255,.95)';
+  let n=1;for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='rgba(80,170,255,.98)';ctx.font='bold 11px system-ui';ctx.fillText(String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
  }
  function nearest(analysis,x,y){
   let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
