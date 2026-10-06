@@ -5,15 +5,22 @@
  function luminance(r,g,b){return .2126*r+.7152*g+.0722*b}
  function isBackgroundDark(r,g,b,lumThr=34,spreadThr=28){const lum=luminance(r,g,b),spread=Math.max(r,g,b)-Math.min(r,g,b);return lum<=lumThr&&spread<=spreadThr}
  function estimateBackground(im,w,h,opts={}){
-  const mode=opts.bgMode||'auto',d=im.data,alphas=[];for(let i=3;i<d.length;i+=4)alphas.push(d[i]);
-  const transparent=alphas.filter(a=>a<16).length/alphas.length;
-  if(mode==='alpha')return {mode:'alpha',color:[0,0,0],threshold:0};
-  if(transparent>.002&&mode!=='black')return {mode:'alpha',color:[0,0,0],threshold:0};
-  if(mode==='black')return {mode:'forced-black',color:[0,0,0],threshold:34};
-  let darkHits=0,total=0;
-  const probe=(x,y)=>{const i=(y*w+x)*4;total++;if(isBackgroundDark(d[i],d[i+1],d[i+2]))darkHits++};
-  for(let x=0;x<w;x++){probe(x,0);probe(x,h-1)}for(let y=0;y<h;y++){probe(0,y);probe(w-1,y)}
-  if(total&&darkHits/total>.55)return {mode:'forced-black',color:[0,0,0],threshold:34};
+  const mode=opts.bgMode||'auto',role=opts.role||'source',d=im.data,alphas=[];for(let i=3;i<d.length;i+=4)alphas.push(d[i]);
+  const transparent=alphas.filter(a=>a<16).length/alphas.length,opaque=alphas.filter(a=>a>245).length/alphas.length;
+  const alphaUseful=transparent>.002&&transparent<.985;
+  if(role==='target'&&alphaUseful&&mode!=='black')return {mode:'alpha',color:[0,0,0],threshold:0};
+  if(mode==='alpha'&&alphaUseful)return {mode:'alpha',color:[0,0,0],threshold:0};
+  if(mode==='black')return {mode:'forced-black',color:[0,0,0],threshold:52};
+
+  let darkHits=0,total=0;const borderR=[],borderG=[],borderB=[],borderDist=[];
+  const probe=(x,y)=>{const i=(y*w+x)*4;total++;borderR.push(d[i]);borderG.push(d[i+1]);borderB.push(d[i+2]);if(isBackgroundDark(d[i],d[i+1],d[i+2],52,42))darkHits++};
+  for(let x=0;x<w;x++){probe(x,0);probe(x,h-1)}for(let y=1;y<h-1;y++){probe(0,y);probe(w-1,y)}
+  if(total&&darkHits/total>.38)return {mode:'forced-black',color:[0,0,0],threshold:58};
+  const borderColor=[median(borderR),median(borderG),median(borderB)];
+  for(let x=0;x<w;x++){borderDist.push(dist(d,x*4,borderColor));borderDist.push(dist(d,((h-1)*w+x)*4,borderColor))}
+  for(let y=1;y<h-1;y++){borderDist.push(dist(d,(y*w)*4,borderColor));borderDist.push(dist(d,(y*w+w-1)*4,borderColor))}
+  const sorted=[...borderDist].sort((a,b)=>a-b),q75=sorted[Math.floor(sorted.length*.75)]||0;
+  if(role==='source'&&opaque>.98)return {mode:'edge-fill',color:borderColor,threshold:Math.max(28,Math.min(96,q75+22))};
   const rs=[],gs=[],bs=[],edge=[];
   const sample=(x,y)=>{const i=(y*w+x)*4;rs.push(d[i]);gs.push(d[i+1]);bs.push(d[i+2])};
   const k=Math.max(2,Math.min(8,Math.floor(Math.min(w,h)/8)));
@@ -42,6 +49,8 @@
     const ns=[p-1,p+1,p-w,p+w];for(const n of ns){if(n<0||n>=mask.length||seen[n]||!mask[n])continue;const nx=n%w,ny=(n/w)|0;if(Math.abs(nx-x)+Math.abs(ny-y)!==1)continue;seen[n]=1;q[tail++]=n}
    }
    if(area<minArea)continue;
+   const bw=maxX-minX+1,bh=maxY-minY+1,touches=(minX===0)+(minY===0)+(maxX===w-1)+(maxY===h-1);
+   if(area>w*h*.94&&touches>=3)continue;
    const rowL=new Int32Array(maxY-minY+1);rowL.fill(2147483647);const rowR=new Int32Array(maxY-minY+1);rowR.fill(-1);const boundary=[];
    for(const p of pix){const x=p%w,y=(p/w)|0,ry=y-minY;if(x<rowL[ry])rowL[ry]=x;if(x>rowR[ry])rowR[ry]=x;
     if(x===0||x===w-1||y===0||y===h-1||!mask[p-1]||!mask[p+1]||!mask[p-w]||!mask[p+w])boundary.push({x,y})
@@ -51,7 +60,14 @@
   }
   return out.sort((x,y)=>y.area-x.area)
  }
- function analyze(canvas,opts={}){const a=foregroundMask(canvas,opts);a.components=components(a);return a}
+ function analyze(canvas,opts={}){
+  let a=foregroundMask(canvas,opts);a.components=components(a);
+  const bad=!a.components.length||a.components.some(c=>c.area>a.w*a.h*.9&&c.bbox.w>=a.w*.98&&c.bbox.h>=a.h*.98);
+  if(bad&&opts.role==='source'&&opts.bgMode==='alpha'){
+    a=foregroundMask(canvas,{...opts,bgMode:'auto'});a.components=components(a);a.bg.fallbackFrom='alpha';
+  }
+  return a
+ }
  function score(a,b,aw,ah,bw,bh){
   const ax=a.cx/aw,ay=a.cy/ah,bx=b.cx/bw,by=b.cy/bh,pos=Math.hypot(ax-bx,ay-by);
   const arA=a.bbox.w/a.bbox.h,arB=b.bbox.w/b.bbox.h,asp=Math.abs(Math.log((arA||1)/(arB||1)));
