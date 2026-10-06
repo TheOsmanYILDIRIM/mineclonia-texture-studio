@@ -842,6 +842,32 @@ async function importProjectBackup(file){
 
 
 /* P0 REFERENCE-FIRST PROMPT SYSTEM — 2026-10-05 */
+const MATERIAL_REFERENCE_DEPENDENCIES=[
+ {test:n=>n==='mcl_core_grass_block_side_overlay.png',refs:['mcl_core_grass_block_top.png'],kind:'runtime-composite',note:'Mineclonia overlays this tintable grass edge over default_dirt; top grass is the material-continuity reference.'},
+ {test:n=>/^mcl_core_(coal|iron|gold|diamond|lapis|emerald|redstone)_ore\.png$/.test(n),refs:['default_stone.png'],kind:'host-material',note:'Mineclonia registers these as stone-with-ore nodes; use the finished Mineclonia stone as the authoritative host-rock appearance.'},
+ {test:n=>n==='mcl_copper_ore.png',refs:['default_stone.png'],kind:'runtime-composite',note:'Mineclonia explicitly renders Copper Ore as default_stone.png ^ mcl_copper_ore.png.'},
+ {test:n=>/^mcl_deepslate_(coal|iron|gold|copper|diamond|lapis|emerald|redstone)_ore\.png$/.test(n),refs:['mcl_deepslate_deepslate.png'],kind:'host-material',note:'Mineclonia creates these through register_deepslate_ore; use finished deepslate as the host-rock reference.'},
+ {test:n=>n==='mcl_nether_quartz_ore.png'||n==='mcl_nether_gold_ore.png',refs:['mcl_nether_netherrack.png'],kind:'host-material',note:'Mineclonia defines these as ores occurring in netherrack; use the finished Mineclonia netherrack material when available.'}
+];
+function materialReferenceDependency(x){
+ const n=String(x?.name||'').toLowerCase();
+ const d=MATERIAL_REFERENCE_DEPENDENCIES.find(v=>v.test(n));if(!d)return null;
+ const refs=d.refs.map(name=>CATALOG.find(v=>String(v.name||'').toLowerCase()===name)).filter(Boolean);
+ return {...d,refs};
+}
+function materialDependencyPromptBlock(x){
+ const d=materialReferenceDependency(x);if(!d||!d.refs.length)return '';
+ const names=d.refs.map(v=>v.name).join(', ');
+ return `MINECLONIA MATERIAL CONTINUITY:
+This asset has a verified Mineclonia material dependency.
+Reference texture(s): ${names}.
+Use the finished/generated version of the referenced Mineclonia texture as the authoritative material-family reference when creating this asset's visual reference.
+Preserve this target asset's own gameplay role and geometry; inherit only the physically shared host/base material identity, scale, microstructure, weathering, roughness and value behavior.
+Do not treat the reference as a generic Minecraft assumption. This relationship is specific to Mineclonia.
+Dependency type: ${d.kind}.
+${d.note}`;
+}
+
 function p0ProductionMeta(x){
  const subject=p0ReferenceSubject(x),n=String(x?.name||'').toLowerCase();
  let face='general material surface';
@@ -855,7 +881,7 @@ function p0ProductionMeta(x){
 function p0ProductionPromptFor(x){
  const m=p0ProductionMeta(x);
  return tintPromptText(`Use Image A to understand WHAT the texture is and how it functions in the game.
-Use Image B to determine HOW the final material should actually look.
+Use Image B to determine HOW the final material should actually look.${materialReferenceDependency(x)?' Image B should be the dependency-aware reference generated using the verified Mineclonia base/host texture listed below.':''}
 
 SELECTED MATERIAL: ${m.subject}
 FACE / COMPONENT ROLE: ${m.face}
@@ -885,7 +911,7 @@ FINAL PRIORITY:
 3. ${m.tileable?'Create true physical continuity across opposite canvas edges.':'Preserve the functional placement/role defined by Image A.'}
 4. Preserve Image B's detail and visual energy without copying its composition.
 
-Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.${isRuntimeTintTexture(x)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:''}`,x);
+Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.${materialReferenceDependency(x)?'\n\n'+materialDependencyPromptBlock(x):''}${isRuntimeTintTexture(x)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:''}`,x);
 }
 
 
@@ -1074,7 +1100,8 @@ async function loadBlockReferencePrompts(){
  }catch(e){console.warn('Block prompt manifest unavailable; inline fallback active',e)}
 }
 function p0ReferencePromptFor(x){
- if(x?.id&&BLOCK_REFERENCE_PROMPTS.has(x.id))return BLOCK_REFERENCE_PROMPTS.get(x.id);
+ const dependency=materialDependencyPromptBlock(x);
+ if(x?.id&&BLOCK_REFERENCE_PROMPTS.has(x.id)){const authored=BLOCK_REFERENCE_PROMPTS.get(x.id);return dependency?authored+'\n\n'+dependency:authored;}
  const subject=p0ReferenceSubject(x);
  return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
 
@@ -1118,7 +1145,7 @@ No characters.
 No props.
 No text or interface elements.
 
-Focus purely on establishing the material language and artistic identity of this world through this material.`;
+Focus purely on establishing the material language and artistic identity of this world through this material.${dependency?'\n\n'+dependency:''}`;
 }
 
 function p0PromotableBlock(x){
