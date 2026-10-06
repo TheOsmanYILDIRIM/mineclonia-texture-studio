@@ -82,6 +82,13 @@ Variant Lab exposes `UV Eşle` for Entity textures. The mapper now has Orijinal 
 - Keep 3D lazy; normal browsing should pay no entity/WebGL rendering cost.
 - Preserve fallback behavior when Lua/source metadata is incomplete.
 
+## Voxel Model Studio sidecar
+
+- Added a deliberately isolated `model-studio/` prototype for fast cuboid creature editing.
+- It starts with a Komodo draft derived from a cat-like quadruped body plan and also offers a simpler cat template.
+- Mobile-first controls: select a box, resize/move/rotate on XYZ, choose 1/4, 1/2 or 1-voxel steps, duplicate/delete/add boxes, and save/load a standalone JSON project.
+- This first prototype does **not** rewrite Mineclonia B3D files, preserve skeleton animation, or export a game-ready mesh yet. Its purpose is to validate the fast shape-editing interaction before adding a verified model exporter.
+
 ## Next concrete step
 
 Open the deployed app after the latest Pages build and spot-check classic and modern door families (including edited upper/lower parts), then one simple entity skin (cow/cat), one multi-material entity (zombie/skeleton), grass/dirt block separation, and one ordinary top/side block. Fix incorrect mappings at the source-family/Lua/B3D interpretation layer before expanding multipart coverage to beds and other source-verified multipart objects.

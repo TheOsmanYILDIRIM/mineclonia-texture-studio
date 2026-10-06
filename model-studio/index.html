@@ -1,0 +1,9 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Voxel Model Studio</title><link rel="stylesheet" href="style.css"></head><body>
+<header><div><b>Voxel Model Studio</b><small>Mineclonia · basit cuboid model editörü</small></div><div class="headBtns"><button id="reset">Kedi şablonu</button><button id="komodo">Komodo taslağı</button></div></header>
+<main><section class="stageWrap"><canvas id="view"></canvas><div class="hint">Sürükle: döndür · İki parmak / teker: zoom · Parçaya dokun: seç</div></section>
+<aside><div class="selected"><small>SEÇİLİ PARÇA</small><strong id="selName">Gövde</strong><input id="name" aria-label="Parça adı"></div>
+<div class="tabs"><button class="active" data-tab="size">Boyut</button><button data-tab="pos">Konum</button><button data-tab="rot">Döndür</button></div><div id="controls"></div>
+<div class="stepRow"><span>Adım</span><button data-step=".25">¼</button><button class="active" data-step=".5">½</button><button data-step="1">1 voxel</button></div>
+<div class="actions"><button id="add">+ Kutu</button><button id="dup">Kopyala</button><button id="del" class="danger">Sil</button></div>
+<div class="partsHead"><b>Parçalar</b><span id="count"></span></div><div id="parts"></div>
+<div class="export"><button id="save">Projeyi indir</button><label>Projeyi aç<input id="load" type="file" accept=".json,application/json"></label></div></aside></main><script src="app.js"></script></body></html>

@@ -119,3 +119,11 @@ When changing deployment-sensitive files, verify the GitHub Pages workflow/resul
 ## Default continuation point
 
 Unless newer repository state says otherwise, use the `Next concrete work` section in `SESSION_HANDOFF.md` as the continuation queue.
+
+
+## Voxel Model Studio
+
+- `model-studio/` is intentionally isolated from the Texture Studio runtime. It is a tiny cuboid/voxel-style model editor for rapidly deriving new Mineclonia-shaped creatures from simple box proportions.
+- Keep this editor deliberately simple and mobile-first: select part, resize X/Y/Z, move, rotate, duplicate, delete, add box, save/load project.
+- Do not couple its project JSON or UI state to Texture Studio IndexedDB/localStorage.
+- The current cuboid template is an editable approximation, not yet a lossless B3D rig/animation editor. Do not claim B3D export or animation preservation until implemented and verified.
