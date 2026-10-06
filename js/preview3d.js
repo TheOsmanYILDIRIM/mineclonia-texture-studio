@@ -433,14 +433,6 @@
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
  document.getElementById('preview3dWorld').addEventListener('click',async()=>{if(!canWorld(active))return;mode='world';await render()});
 
- const joystick=document.getElementById('preview3dJoystick'),stick=document.getElementById('preview3dStick');
- let joyPointer=null,joyX=0,joyY=0,joyFrame=0;
- function joyLoop(){if(joyPointer===null){joyFrame=0;return}const dead=.12,mag=Math.hypot(joyX,joyY);if(mag>dead){ry-=joyX*2.2;rx-=joyY*1.7;rx=Math.max(-85,Math.min(85,rx));applyView()}joyFrame=requestAnimationFrame(joyLoop)}
- function joyMove(e){if(e.pointerId!==joyPointer)return;const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,lim=r.width*.34,dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy)||1,k=Math.min(1,lim/d);const px=dx*k,py=dy*k;joyX=px/lim;joyY=py/lim;stick.style.transform=`translate(${px}px,${py}px)`;e.preventDefault();e.stopPropagation()}
- joystick?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();joyPointer=e.pointerId;joystick.setPointerCapture?.(e.pointerId);joyMove(e);if(!joyFrame)joyFrame=requestAnimationFrame(joyLoop)});
- joystick?.addEventListener('pointermove',joyMove);
- const joyEnd=e=>{if(e.pointerId!==joyPointer)return;e.preventDefault();e.stopPropagation();joyPointer=null;joyX=joyY=0;stick.style.transform='translate(0,0)';if(joyFrame){cancelAnimationFrame(joyFrame);joyFrame=0}};
- joystick?.addEventListener('pointerup',joyEnd);joystick?.addEventListener('pointercancel',joyEnd);
  stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
  stage.addEventListener('pointermove',e=>{
   const prev=pointers.get(e.pointerId);if(!prev)return;
