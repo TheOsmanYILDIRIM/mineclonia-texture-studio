@@ -59,6 +59,34 @@
   if(state){const same=list.find(x=>String(x.name||'').toLowerCase().includes('_'+state+'.png'));if(same)return same}
   return list[0];
  }
+ let LUA_FACE_MANIFEST=null,LUA_FACE_INDEX=null;
+ async function loadLuaFaceManifest(){
+  if(LUA_FACE_MANIFEST)return LUA_FACE_MANIFEST;
+  try{const r=await fetch('js/data/node-faces.json',{cache:'force-cache'});LUA_FACE_MANIFEST=r.ok?await r.json():{nodes:{}}}catch{LUA_FACE_MANIFEST={nodes:{}}}
+  LUA_FACE_INDEX=new Map();
+  for(const [node,def] of Object.entries(LUA_FACE_MANIFEST.nodes||{})){
+   const refs=[...(def.textures||[]),...(def.overlays||[])].flatMap(v=>String(v||'').match(/[A-Za-z0-9_./-]+\.png/g)||[]);
+   for(const name of refs){const key=name.toLowerCase();if(!LUA_FACE_INDEX.has(key))LUA_FACE_INDEX.set(key,[]);LUA_FACE_INDEX.get(key).push([node,def])}
+  }
+  return LUA_FACE_MANIFEST;
+ }
+ function expandLuaFaces(list){
+  const a=(list||[]).filter(Boolean);if(!a.length)return null;
+  if(a.length===1)return [a[0],a[0],a[0],a[0],a[0],a[0]];
+  if(a.length===2)return [a[0],a[1],a[1],a[1],a[1],a[1]];
+  if(a.length===3)return [a[0],a[1],a[2],a[2],a[2],a[2]];
+  return [a[0],a[1],a[2]||a[0],a[3]||a[2]||a[0],a[4]||a[2]||a[0],a[5]||a[2]||a[0]];
+ }
+ function luaFaceDef(meta){
+  if(!LUA_FACE_INDEX)return null;
+  const rows=LUA_FACE_INDEX.get(String(meta?.name||'').toLowerCase());if(!rows?.length)return null;
+  const [node,def]=rows[0],faces=expandLuaFaces(def.textures);if(!faces)return null;
+  return {node,def,faces};
+ }
+ function catalogTextureFromExpr(expr){
+  const names=String(expr||'').match(/[A-Za-z0-9_./-]+\.png/g)||[];
+  return names.map(name=>byName(name)).filter(Boolean);
+ }
  function faceFamily(meta){
   const name=String(meta?.name||'').toLowerCase();
   if(['mcl_core_grass_block_top.png','mcl_core_grass_block_side_overlay.png','default_dirt.png'].includes(name)){
@@ -96,7 +124,29 @@
   const sh=document.createElement('div');sh.className='preview3dShade';sh.style.opacity=String(shade);f.appendChild(sh);
   cube.appendChild(f);
  }
+ async function makeLuaCube(meta,size=S){
+  const hit=luaFaceDef(meta);if(!hit)return null;
+  const {def,faces}=hit,overlays=expandLuaFaces(def.overlays||[]);
+  const styles=[];
+  for(let i=0;i<6;i++){
+   const parts=catalogTextureFromExpr(faces[i]),base=parts[0]||meta,extra=parts[1]||null;
+   const overlay=overlays?catalogTextureFromExpr(overlays[i])[0]:null;
+   const tint=!!def.palette&&i===0;
+   let st=await faceStyle(base,{overlay:overlay||extra,tint});
+   if(tint)st.tint=true;styles.push(st);
+  }
+  const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
+  addFace(c,'top',`rotateX(90deg) translateZ(${z}px)`,styles[0],0);
+  addFace(c,'bottom',`rotateX(-90deg) translateZ(${z}px)`,styles[1],.30);
+  addFace(c,'right',`rotateY(90deg) translateZ(${z}px)`,styles[2],.16);
+  addFace(c,'left',`rotateY(-90deg) translateZ(${z}px)`,styles[3],.12);
+  addFace(c,'back',`rotateY(180deg) translateZ(${z}px)`,styles[4],.22);
+  addFace(c,'front',`translateZ(${z}px)`,styles[5],.08);
+  return c;
+ }
  async function makeCube(meta,size=S){
+  await loadLuaFaceManifest();
+  const fromLua=await makeLuaCube(meta,size);if(fromLua)return fromLua;
   const fam=faceFamily(meta);
   const grass=fam.special==='grass';
   const styles={
