@@ -61,7 +61,7 @@ The 3D module is lazy-loaded only when opened.
 
 ## Manual UV fallback
 
-Variant Lab now exposes `UV Eşle` for non-system Entity variants. It opens a mobile-first manual mapper with original/source canvases, drag-created rectangular selections, pair history, target switching, and a compact joystick that nudges the selected rectangle one source pixel at a time. Applying the repair copies each generated source rectangle into its paired original destination rectangle, reapplies the original alpha footprint, and returns the result to Variant Lab as a new temporary `_UV_FIXED` variant rather than overwriting the active texture.
+Variant Lab exposes `UV Eşle` for Entity textures. The mapper now has Orijinal / Üretilen / Düzeltilmiş / Üst üste views, fixed-viewport pan/pinch zoom, pixel-grid snapping, global X/Y alignment, live rectangular correction, sizing/fit tools, joystick nudging, and live 3D comparison. It also includes a contour-based smart repair engine: source/target UV islands are extracted from alpha when available, otherwise opaque black/dark backgrounds are identified by edge-connected background flood-fill so interior dark texture detail is preserved. Green target and orange source boundaries can be auto-matched or manually linked; blue links visualize correspondences. `Oto Bük` applies a row-contour-guided local warp into the live corrected atlas and is undoable. Only `Bitti → Varyant` exports one temporary `_UV_FIXED` candidate back to Variant Lab.
 
 ## Open work
 
