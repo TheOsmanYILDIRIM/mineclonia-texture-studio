@@ -68,7 +68,7 @@
     const im=img(canvas),w=canvas.width,h=canvas.height,d=im.data,mask=new Uint8Array(w*h);
     let transparent=0,opaque=0,partial=0;
     for(let p=0,i=3;p<mask.length;p++,i+=4){const a=d[i];mask[p]=a>0?1:0;if(a===0)transparent++;else if(a===255)opaque++;else partial++}
-    const out={im,w,h,mask,bg:{mode:'strict-alpha',transparent,opaque,partial}};out.components=components(out);return out
+    const out={im,w,h,mask,bg:{mode:'strict-alpha',transparent,opaque,partial}};out.components=components(out);out.segments=contourSegments(out);return out
   }
   let a=foregroundMask(canvas,opts);a.components=components(a);
   const bad=!a.components.length||a.components.some(c=>c.area>a.w*a.h*.9&&c.bbox.w>=a.w*.98&&c.bbox.h>=a.h*.98);
@@ -116,6 +116,31 @@
   }
   const a={im:src,w,h,mask,bg:{mode:'reference-constrained-content',color:bgc,threshold:thr}};a.components=components(a);return a
  }
+ function contourSegments(analysis){
+  const out=[];let id=0;
+  for(const comp of analysis.components){
+    // Alpha boundary points are edge midpoints. Group them into short spatial edge segments.
+    const pts=[...comp.boundary],used=new Uint8Array(pts.length);
+    for(let i=0;i<pts.length;i++){
+      if(used[i])continue;const group=[],q=[i];used[i]=1;
+      while(q.length){const k=q.pop(),p=pts[k];group.push(p);
+        for(let j=0;j<pts.length;j++){if(used[j])continue;const z=pts[j],dx=Math.abs(z.x-p.x),dy=Math.abs(z.y-p.y);
+          if(dx<=1.01&&dy<=1.01&&(dx+dy)<=1.51){used[j]=1;q.push(j)}
+        }
+      }
+      if(group.length<2)continue;
+      let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity,sx=0,sy=0;
+      for(const p of group){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);sx+=p.x;sy+=p.y}
+      out.push({id:id++,componentId:comp.id,points:group,cx:sx/group.length,cy:sy/group.length,bbox:{x:minX,y:minY,w:maxX-minX,h:maxY-minY}});
+    }
+  }
+  return out
+ }
+ function nearestSegment(analysis,x,y,excluded=null,maxDistance=Infinity){
+  const segs=analysis.segments||(analysis.segments=contourSegments(analysis));let best=null,bd=maxDistance*maxDistance;
+  for(const s of segs){if(excluded?.has?.(s.id))continue;for(const p of s.points){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=s}}}
+  return best
+ }
  function score(a,b,aw,ah,bw,bh){
   const ax=a.cx/aw,ay=a.cy/ah,bx=b.cx/bw,by=b.cy/bh,pos=Math.hypot(ax-bx,ay-by);
   const arA=a.bbox.w/a.bbox.h,arB=b.bbox.w/b.bbox.h,asp=Math.abs(Math.log((arA||1)/(arB||1)));
@@ -155,7 +180,7 @@
   ctx.putImageData(dst,0,0);return out
  }
 
- function controlsFromPairs(target,source,pairs){
+ function controlsFromPairs(target,source,pairs,segmentPairs=[]){
   const out=[];
   for(const pair of pairs){
    const t=pair.target.bbox,s=pair.source.bbox;
@@ -166,14 +191,19 @@
     radius:Math.max(t.w,t.h,s.w,s.h)*2.2
    });
   }
+  for(const pair of segmentPairs||[]){
+   const a=pair.targetSegment.points,b=pair.sourceSegment.points,n=Math.max(3,Math.min(18,Math.max(a.length,b.length)));
+   const sample=(arr,i)=>arr[Math.min(arr.length-1,Math.round(i*(arr.length-1)/Math.max(1,n-1)))];
+   for(let i=0;i<n;i++){const t=sample(a,i),s=sample(b,i);out.push({src:{x:s.x,y:s.y},dst:{x:t.x,y:t.y},radius:Math.max(3,Math.hypot(pair.targetSegment.bbox.w,pair.targetSegment.bbox.h)*2.5)})}
+  }
   const w=target.w,h=target.h;
   for(const p of [{x:0,y:0},{x:w-1,y:0},{x:0,y:h-1},{x:w-1,y:h-1},{x:w/2,y:0},{x:w/2,y:h-1},{x:0,y:h/2},{x:w-1,y:h/2}])
    out.push({src:{...p},dst:{...p},radius:Math.max(w,h)*.55,anchor:true});
   return out;
  }
- function smoothWarp(sourceCanvas,targetAnalysis,sourceAnalysis,pairs){
+ function smoothWarp(sourceCanvas,targetAnalysis,sourceAnalysis,pairs,segmentPairs=[]){
   const out=document.createElement('canvas');out.width=sourceCanvas.width;out.height=sourceCanvas.height;
-  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=controlsFromPairs(targetAnalysis,sourceAnalysis,pairs);
+  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=controlsFromPairs(targetAnalysis,sourceAnalysis,pairs,segmentPairs);
   const sxScale=sourceAnalysis.w/out.width,syScale=sourceAnalysis.h/out.height,txScale=targetAnalysis.w/out.width,tyScale=targetAnalysis.h/out.height;
   for(let oy=0;oy<out.height;oy++){
    const ty=oy*tyScale;
@@ -192,17 +222,19 @@
   out.getContext('2d').putImageData(dst,0,0);return out
  }
 
- function draw(canvas,target,source,pairs,{showTarget=true,showSource=true,excludedTarget=new Set(),excludedSource=new Set()}={}){
+ function draw(canvas,target,source,pairs,{showTarget=true,showSource=true,excludedTarget=new Set(),excludedSource=new Set(),segmentPairs=[],selectedTargetSegment=null,selectedSourceSegment=null}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
-  const edge=(a,c,fill,label,excluded)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=excluded?'rgba(255,75,75,.78)':fill;const sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)*.7));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz);ctx.font='bold 10px system-ui';ctx.fillText((excluded?'×':label)+(c.id+1),c.cx*sx+2,c.cy*sy-2)};
-  if(showTarget)for(const c of target.components)edge(target,c,'rgba(70,255,105,.98)','O',excludedTarget.has(c.id));
-  if(showSource)for(const c of source.components)edge(source,c,'rgba(255,160,40,.98)','Ü',excludedSource.has(c.id));
-  let n=1;for(const p of pairs||[]){ctx.lineWidth=p.manual?3.5:1.5;ctx.strokeStyle=p.manual?'rgba(50,145,255,1)':'rgba(110,185,255,.72)';ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.font='bold 11px system-ui';ctx.fillText((p.manual?'M':'')+String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
+  const edge=(a,c,fill)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=Math.max(3,Math.min(6,Math.min(sx,sy)*1.35));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz)};
+  if(showTarget)for(const c of target.components)edge(target,c,'rgba(65,255,100,.98)');
+  if(showSource)for(const c of source.components)edge(source,c,'rgba(255,145,30,.98)');
+  const seg=(a,s,fill,width=6)=>{if(!s)return;const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=width;for(const p of s.points)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz)};
+  let n=1;for(const p of segmentPairs||[]){seg(target,p.targetSegment,'rgba(70,160,255,1)',5);seg(source,p.sourceSegment,'rgba(70,160,255,1)',5);ctx.strokeStyle='rgba(70,160,255,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.targetSegment.cx/target.w*canvas.width,p.targetSegment.cy/target.h*canvas.height);ctx.lineTo(p.sourceSegment.cx/source.w*canvas.width,p.sourceSegment.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 11px system-ui';ctx.fillText('K'+n++,p.targetSegment.cx/target.w*canvas.width+3,p.targetSegment.cy/target.h*canvas.height-3)}
+  seg(target,selectedTargetSegment,'rgba(255,255,255,1)',8);seg(source,selectedSourceSegment,'rgba(255,255,255,1)',8);
  }
  function nearest(analysis,x,y,excluded=null,maxDistance=Infinity){
   let best=null,bd=maxDistance*maxDistance;
   for(const c of analysis.components){if(excluded?.has?.(c.id))continue;for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}
   return best
  }
- window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,draw,nearest};
+ window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,draw,nearest,contourSegments,nearestSegment};
 })();
