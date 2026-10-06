@@ -20,7 +20,7 @@ Important current decisions:
 - Tint-aware prompt rewriting removes contradictory color-language rather than relying only on a final warning.
 - Material dependencies are Mineclonia-source verified, not inferred from Minecraft. Examples include grass continuity and ore host-rock references.
 - Entity UV atlases keep source UV/alpha geometry locked. Entity imports reapply the source alpha mask.
-- Variant Lab drafts are temporary; only the activated winner is persisted as the normal edit. For entity UV maps with a real `.b3d` mapping, Variant Lab exposes a 3D button that opens the real mesh with the whole temporary variant gallery. The 3D view keeps the same camera/zoom while its thumbnail strip hot-swaps PNGs directly on the existing WebGL texture, so UV variants can be compared rapidly without persisting them.
+- Variant Lab drafts are temporary; only the activated winner is persisted as the normal edit. For entity UV maps with a real `.b3d` mapping, Variant Lab exposes a 3D button that opens the real mesh with the whole temporary variant gallery. The 2D Variant Lab and the in-place 3D UV strip both prepend two fixed comparison sources: `Orijinal` (pack source PNG) and `Aktif` (current persisted edit, or original when no edit exists). These are comparison-only system entries, not user variants. The 3D view keeps the same camera/zoom while its thumbnail strip hot-swaps all sources/variants directly on the existing WebGL texture.
 
 ## 3D preview
 
