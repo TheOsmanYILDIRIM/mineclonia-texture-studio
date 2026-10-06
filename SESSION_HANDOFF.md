@@ -1,3 +1,11 @@
+## Mineclonia material dependency map — 2026-10-06
+
+- Added a source-verified material reference dependency system directly on main.
+- Current dependencies: grass side overlay → grass top; standard stone ores → default_stone; copper ore overlay → default_stone; deepslate ores → Mineclonia deepslate; Nether quartz/gold ore → netherrack when catalog-resolvable.
+- Reference prompts now explicitly ask for the finished dependency texture as the material-family reference before final Image A + Image B production.
+- Dependencies are Mineclonia-specific; Minecraft-only assumptions are forbidden.
+- `PROMPT_AUTHORING_GUIDE.md` records this workflow permanently.
+
 ## Tint-aware prompt conflict cleanup — 2026-10-06
 
 - Runtime-tint prompts no longer depend only on a final lock to contradict earlier color instructions.
