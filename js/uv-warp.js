@@ -88,5 +88,8 @@
   ctx.lineWidth=1.2;ctx.strokeStyle='rgba(110,170,255,.85)';
   for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke()}
  }
- window.MTSUvWarp={analyze,match,warp,draw};
+ function nearest(analysis,x,y){
+  let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
+ }
+ window.MTSUvWarp={analyze,match,warp,draw,nearest};
 })();
