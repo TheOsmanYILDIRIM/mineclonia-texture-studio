@@ -706,6 +706,13 @@ async function lockEntityAlphaToSource(blob,meta){
  eg.putImageData(ed,0,0);
  return await canvasPngBlob(edited)
 }
+async function prepareVariantTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
+ let out=blob;
+ // Variant Lab must preserve the uploaded PNG's own alpha so UV repair can compare
+ // generated alpha geometry against the original alpha geometry.
+ out=await normalizeTextureBlob(out,meta,targetRes);
+ return out
+}
 async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
  let out=await autoRemoveBorderBlackBackground(blob,meta);
  out=await normalizeTextureBlob(out,meta,targetRes);
@@ -1248,13 +1255,13 @@ async function addVariantFiles(files){
  const list=variantUserList();let added=0;
  for(const file of files){
    if(!file.type.includes('png')&&!/\.png$/i.test(file.name))continue;
-   try{const blob=await prepareImportedTextureBlob(file,x);list.push({blob,name:file.name,enabled:true,url:null,addedAt:Date.now()});added++}catch(err){console.warn('Varyant PNG alınamadı',file.name,err)}
+   try{const blob=await prepareVariantTextureBlob(file,x);list.push({blob,name:file.name,enabled:true,url:null,addedAt:Date.now(),rawAlpha:true});added++}catch(err){console.warn('Varyant PNG alınamadı',file.name,err)}
  }
  if(added){variantSelectedIndex=variantSources.length+Math.max(0,list.length-added);renderVariantLab();toast(`${added} varyant eklendi`)}
 }
 async function activateSelectedVariant(){
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
+ const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 
 const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto'};
@@ -1297,10 +1304,10 @@ function uvManualLinkPick(e){
 function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
  try{
-  uvMap.autoTarget=window.MTSUvWarp.analyzeWithMask?window.MTSUvWarp.analyzeWithMask(uvMap.orig,uvMap.orig):window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'auto',role:'target'});
-  uvMap.autoSource=window.MTSUvWarp.analyzeSourceWithinReference?window.MTSUvWarp.analyzeSourceWithinReference(uvMap.work,uvMap.orig,{bgMode:uvMap.bgMode}):window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode,role:'source'});
+  uvMap.autoTarget=window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'alpha',role:'target',strictAlpha:true});
+  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:'alpha',role:'source',strictAlpha:true});
   uvMap.autoPairs=[];
-  $('uvAutoMeta').textContent='Hedef '+uvMap.autoTarget.components.length+' ada · Üretilen '+uvMap.autoSource.components.length+' içerik sınırı';
+  $('uvAutoMeta').textContent='Alpha: Orijinal '+uvMap.autoTarget.components.length+' ada · Üretilen '+uvMap.autoSource.components.length+' ada';
   uvRefreshContours();return true;
  }catch(err){console.error('UV analyze',err);toast('Sınır analizi başarısız');return false}
 }
