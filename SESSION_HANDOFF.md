@@ -85,7 +85,7 @@ Variant Lab exposes `UV Eşle` for Entity textures. The mapper now has Orijinal 
 ## Voxel Model Studio sidecar
 
 - Added a deliberately isolated `model-studio/` prototype for fast cuboid creature editing.
-- It starts with a Komodo draft derived from a cat-like quadruped body plan and also offers a simpler cat template.
+- It starts with a Komodo draft and now loads Mineclonia upstream's actual `mobs_mc_cat.b3d` at runtime as a geometry reference using the same lightweight B3D vertex/triangle parser approach as the main 3D preview. The real mesh can be toggled behind the editable cuboids; the old hand-authored cat cuboids are not presented as the authoritative Mineclonia model.
 - Mobile-first controls: select a box, resize/move/rotate on XYZ, choose 1/4, 1/2 or 1-voxel steps, duplicate/delete/add boxes, and save/load a standalone JSON project.
 - The editor now has a higher-quality Model/Animation workspace, orthographic view shortcuts, improved mobile UI, and procedural Komodo animation previews for idle/breathing, walk, attack and tail motion. Animation is role/name driven so proportion edits continue to animate, and the current procedural pose can be baked into the cuboid model.\n- This remains a cuboid project editor: it does **not** rewrite Mineclonia B3D files, preserve/import the original B3D skeleton, or export a game-ready animated mesh yet. Procedural animation is an authoring preview until a verified Luanti exporter is added.
 
