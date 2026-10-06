@@ -102,5 +102,5 @@ async function activateSelectedVariant(){
 
 
 
-window.MTSVariantLab={open:openVariantLabFor,selectedMeta:variantSelectedMeta,list:variantList,render:renderVariantLab};
+window.MTSVariantLab={open:openVariantLabFor,selectedMeta:variantSelectedMeta,list:variantList,render:renderVariantLab,selectedIndex:()=>variantSelectedIndex,userList:variantUserList,sourcesLength:()=>variantSources.length,saveUvVariant:async(meta,rec,blob)=>{const list=variantUserList();list.push({blob,name:(rec?.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;renderVariantLab()}};
 })();
