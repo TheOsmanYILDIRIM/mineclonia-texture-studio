@@ -96,7 +96,9 @@
    if(all===name)n+=15;if((def.overlays||[]).some(Boolean))n-=5;
    return n;
   };
-  const [node,def]=[...rows].sort((a,b)=>score(b)-score(a))[0],faces=expandLuaFaces(def.textures);if(!faces)return null;
+  const ranked=[...rows].sort((a,b)=>score(b)-score(a)),best=ranked[0];
+  if(score(best)<60)return null;
+  const [node,def]=best,faces=expandLuaFaces(def.textures);if(!faces)return null;
   return {node,def,faces};
  }
  function catalogTextureFromExpr(expr){
