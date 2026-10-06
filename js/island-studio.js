@@ -63,7 +63,7 @@ function islandStudioSetTab(tab){
  islandStudioDrawSel()
 }
 async function islandStudioOpen(preselect=null){
- const sel=$('islandStudioTexture');sel.innerHTML='';
+ bindIslandStudioUi();const sel=$('islandStudioTexture');sel.innerHTML='';
  const entities=CATALOG.filter(x=>assetTypeOf(x)==='Entity');
  for(const x of entities){const o=document.createElement('option');o.value=x.path;o.textContent=x.name||x.id||x.path.split('/').pop();sel.appendChild(o)}
  if(preselect&&entities.some(x=>x.path===preselect))sel.value=preselect;$('islandStudio').classList.add('open');if(sel.value)await islandStudioChoose(sel.value)
@@ -139,5 +139,5 @@ async function islandStudioRestore(){
 }
 
 window.MTSIslandStudio={open:async(path)=>islandStudioOpen(path),choose:islandStudioChoose};
-try{bindIslandStudioUi()}catch(e){console.error('Island Studio bind',e)}
+const __bindIsland=()=>{try{bindIslandStudioUi()}catch(e){console.error('Island Studio bind',e)}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__bindIsland,{once:true});else __bindIsland();
 })();
