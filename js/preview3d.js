@@ -200,7 +200,7 @@
   const n=String(meta?.name||'').toLowerCase().replace(/\.png$/,'');
   let m=n.match(/^mcl_doors_door_(acacia|birch|dark_oak|jungle|spruce|crimson|warped)(?:_(lower|upper|side_lower|side_upper))?$/);
   if(m)return {key:m[1],scheme:'classic'};
-  m=n.match(/^mcl_(cherry_blossom|mangrove|pale_oak)_door_(bottom|top|bottom_side|top_side|bottom_bottompart|top_toppart)$/);
+  m=n.match(/^mcl_(cherry_blossom|mangrove|pale_oak|bamboo)_door_(bottom|top|bottom_side|top_side|bottom_bottompart|top_toppart|bottom_alt|top_alt)$/);
   if(m)return {key:m[1],scheme:'modern'};
   m=n.match(/^mcl_crimson_(crimson|warped)_door_(bottom|top)$/);
   if(m)return {key:m[1],scheme:'nether'};
