@@ -1297,10 +1297,10 @@ function uvManualLinkPick(e){
 function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
  try{
-  uvMap.autoTarget=window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'auto',role:'target'});
-  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode,role:'source'});
+  uvMap.autoTarget=window.MTSUvWarp.analyzeWithMask?window.MTSUvWarp.analyzeWithMask(uvMap.orig,uvMap.orig):window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'auto',role:'target'});
+  uvMap.autoSource=window.MTSUvWarp.analyzeWithMask?window.MTSUvWarp.analyzeWithMask(uvMap.work,uvMap.orig):window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode,role:'source'});
   uvMap.autoPairs=[];
-  $('uvAutoMeta').textContent='O '+uvMap.autoTarget.components.length+' ada · Ü '+uvMap.autoSource.components.length+' ada · kaynak '+uvMap.bgMode+' → '+uvMap.autoSource.bg.mode+(uvMap.autoSource.bg.fallbackFrom?' (fallback '+uvMap.autoSource.bg.fallbackFrom+')':'');
+  $('uvAutoMeta').textContent='UV maskesi: orijinal alpha · '+uvMap.autoTarget.components.length+' ada';
   uvRefreshContours();return true;
  }catch(err){console.error('UV analyze',err);toast('Sınır analizi başarısız');return false}
 }
