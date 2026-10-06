@@ -10,26 +10,51 @@
  const canObject=x=>!!x&&['Block','Functional Block'].includes(assetTypeOf(x));
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
 
+ const FACE_SUFFIX_RULES=[
+  ['front',/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front)\.png$/],
+  ['back',/_(?:back_lit|back)\.png$/],
+  ['top',/_top(?:_damaged_\d+)?\.png$/],
+  ['bottom',/_bottom\.png$/],
+  ['side',/_side\.png$/],
+  ['side1',/_side1\.png$/],['side2',/_side2\.png$/],['side3',/_side3\.png$/],['side4',/_side4\.png$/]
+ ];
+ function faceRole(name){const n=String(name||'').toLowerCase();for(const [role,re] of FACE_SUFFIX_RULES)if(re.test(n))return role;return'plain'}
  function familyKey(name){
-  return String(name||'').toLowerCase().replace(/\.png$/,'')
-   .replace(/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front|back_lit|back|top_damaged_\d+|top|bottom|side\d*|lit|unlit)$/,'');
+  let n=String(name||'').toLowerCase();
+  for(const [,re] of FACE_SUFFIX_RULES)if(re.test(n))return n.replace(re,'.png').replace(/\.png$/,'');
+  return n.replace(/\.png$/,'');
+ }
+ const FACE_FAMILY_INDEX=new Map();
+ function buildFaceFamilyIndex(){
+  FACE_FAMILY_INDEX.clear();
+  for(const x of CATALOG){
+   if(!canObject(x))continue;
+   const key=x.mod+'|'+familyKey(x.name),role=faceRole(x.name);
+   let f=FACE_FAMILY_INDEX.get(key);if(!f){f={plain:[],front:[],back:[],top:[],bottom:[],side:[],side1:[],side2:[],side3:[],side4:[]};FACE_FAMILY_INDEX.set(key,f)}
+   f[role].push(x);
+  }
+ }
+ function best(list,meta){
+  if(!list?.length)return null;
+  const n=String(meta?.name||'').toLowerCase();
+  const state=n.match(/_(active|on|off|lit)\.png$/)?.[1];
+  if(state){const same=list.find(x=>String(x.name||'').toLowerCase().includes('_'+state+'.png'));if(same)return same}
+  return list[0];
  }
  function faceFamily(meta){
   const name=String(meta?.name||'').toLowerCase();
   if(['mcl_core_grass_block_top.png','mcl_core_grass_block_side_overlay.png','default_dirt.png'].includes(name)){
-   const top=byName('mcl_core_grass_block_top.png'), dirt=byName('default_dirt.png'), overlay=byName('mcl_core_grass_block_side_overlay.png');
+   const top=byName('mcl_core_grass_block_top.png'),dirt=byName('default_dirt.png'),overlay=byName('mcl_core_grass_block_side_overlay.png');
    return {special:'grass',top,bottom:dirt,side:dirt,front:dirt,back:dirt,left:dirt,right:dirt,overlay};
   }
-  const key=familyKey(name),siblings=CATALOG.filter(x=>x.mod===meta.mod&&familyKey(x.name)===key);
-  const role=n=>{n=String(n||'').toLowerCase();if(/_front_(?:active|on|off)\.png$|_front_(?:horizontal|vertical)\.png$|_front\.png$/.test(n))return'front';if(/_back(?:_lit)?\.png$/.test(n))return'back';if(/_top(?:_damaged_\d+)?\.png$/.test(n))return'top';if(/_bottom\.png$/.test(n))return'bottom';if(/_side\d*\.png$/.test(n))return'side';return'plain'};
-  const plain=siblings.find(x=>role(x.name)==='plain')||null;
-  const pick=re=>siblings.find(x=>re.test(String(x.name||'').toLowerCase()))||null;
-  const top=pick(/_top(?:_damaged_\d+)?\.png$/)||plain||meta;
-  const bottom=pick(/_bottom\.png$/)||plain||top||meta;
-  const side=pick(/_side\.png$/)||pick(/_side1\.png$/)||plain||meta;
-  const front=role(name)==='front'?meta:(pick(/_front\.png$/)||pick(/_front_(?:active|on|off)\.png$/)||pick(/_front_(?:horizontal|vertical)\.png$/)||side);
-  const back=pick(/_back(?:_lit)?\.png$/)||pick(/_side3\.png$/)||side;
-  const left=pick(/_side4\.png$/)||side,right=pick(/_side2\.png$/)||side;
+  if(!FACE_FAMILY_INDEX.size)buildFaceFamilyIndex();
+  const f=FACE_FAMILY_INDEX.get(meta.mod+'|'+familyKey(meta.name));
+  if(!f)return {top:meta,bottom:meta,side:meta,front:meta,back:meta,left:meta,right:meta,overlay:null};
+  const plain=best(f.plain,meta),side=best(f.side,meta)||best(f.side1,meta)||plain||meta;
+  const top=best(f.top,meta)||plain||meta,bottom=best(f.bottom,meta)||plain||top;
+  const front=faceRole(meta.name)==='front'?meta:(best(f.front,meta)||side);
+  const back=best(f.back,meta)||best(f.side3,meta)||side;
+  const left=best(f.side4,meta)||side,right=best(f.side2,meta)||side;
   return {top,bottom,side,front,back,left,right,overlay:null};
  }
  async function texUrl(meta){return meta?await blobUrl(meta.path,true):''}
