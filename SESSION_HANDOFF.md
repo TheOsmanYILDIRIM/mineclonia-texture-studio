@@ -1,3 +1,13 @@
+## Real B3D entity 3D preview — 2026-10-06
+
+- Added lazy entity preview to the existing 3D panel using Mineclonia's real `.b3d` meshes and the currently active/edited entity texture.
+- No Three.js or external engine was added; preview3d.js contains a minimal B3D static-mesh parser + lightweight WebGL renderer and is still lazy-loaded only when 3D preview opens.
+- Parser was validated against real Mineclonia zombie, cow, pig and cat B3D files; vertex/UV/triangle data parsed successfully.
+- Multi-TRIS B3D meshes are supported. Known skin material slots from Mineclonia Lua are mapped for zombie (1), skeleton (2), wither skeleton (1), horse (1 with fallback when model material layout differs); ordinary simple skins default to slot 0.
+- Entity preview is restricted to full/base/variant/coat skin roles. Collar, eye, marking, equipment and other standalone overlay/layer textures are deliberately excluded rather than rendered misleadingly.
+- Blocks keep the existing Lua-derived CSS-3D renderer unchanged. Entity mode hides World mode and uses drag/pinch/wheel for rotation/zoom.
+- B3D preview shows bind/static pose only; animation playback is not implemented.
+- Cache key bumped to `preview3d.js?v=20261006-entity1`.
 ## Lua-derived 3D node-face architecture — 2026-10-06
 
 - 3D face mapping now prefers a normalized Lua-derived node manifest over filename heuristics.
