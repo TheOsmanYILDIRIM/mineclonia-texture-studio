@@ -14,6 +14,7 @@ const lockEntityAlphaToSource=(b,x)=>api().lockEntityAlphaToSource(b,x);
 const applyFilter=()=>api().applyFilter();
 const activeMeta=()=>api().active?.()||null;
 const variantSets=new Map();
+let preview3dLoadPromise=null;
 let variantTextureId=null,variantSelectedIndex=0,variantTileN=6,variantMixMode=false,variantSources=[];
 function variantSelectedMeta(){return CATALOG.find(x=>x.id===variantTextureId)||null}
 function variantUserList(){if(!variantTextureId)return[];if(!variantSets.has(variantTextureId))variantSets.set(variantTextureId,[]);return variantSets.get(variantTextureId)}
@@ -82,7 +83,7 @@ async function populateVariantTextureSelect(){
  sel.dataset.ready='1';sel.onchange=async()=>{variantTextureId=sel.value;variantSelectedIndex=0;variantMixMode=false;await refreshVariantSources();renderVariantLab()};
 }
 async function openVariantLabFor(meta){
- await populateVariantTextureSelect();
+ bindVariantLabUi();await populateVariantTextureSelect();
  const chosen=meta||activeMeta()||CATALOG[0];variantTextureId=chosen.id;$('variantTexture').value=chosen.id;
  await refreshVariantSources();$('variantLab').classList.add('open');renderVariantLab();
 }
@@ -97,13 +98,14 @@ async function addVariantFiles(files){
 }
 async function activateSelectedVariant(){
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
+ const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);api().markChanged?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 
 
 
 
 function bindVariantLabUi(){
+ const root=$('variantLab');if(!root||root.dataset.bound==='1')return;
  const close=$('closeVariantLab'),add=$('addVariantPngs'),files=$('variantFiles'),activate=$('activateSelectedVariant'),mix=$('variantMixToggle'),uv=$('variantUvManual'),v3=$('variant3dToggle'),lab=$('variantLab');
  if(close)close.onclick=()=>lab?.classList.remove('open');
  if(add) add.onclick=()=>files?.click();
@@ -121,5 +123,5 @@ function bindVariantLabUi(){
  if(lab)lab.dataset.bound='1'
 }
 window.MTSVariantLab={open:openVariantLabFor,selectedMeta:variantSelectedMeta,list:variantList,render:renderVariantLab,selectedIndex:()=>variantSelectedIndex,userList:variantUserList,sourcesLength:()=>variantSources.length,saveUvVariant:async(meta,rec,blob)=>{const list=variantUserList();list.push({blob,name:(rec?.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;renderVariantLab()}};
-try{bindVariantLabUi()}catch(e){console.error('Variant Lab bind',e)}
+const __bindVariant=()=>{try{bindVariantLabUi()}catch(e){console.error('Variant Lab bind',e)}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__bindVariant,{once:true});else __bindVariant();
 })();
