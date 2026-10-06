@@ -12,7 +12,7 @@
 
  function familyKey(name){
   return String(name||'').toLowerCase().replace(/\.png$/,'')
-   .replace(/_(?:front_(?:on|off)|front|back|top|bottom|side|lit|unlit)$/,'');
+   .replace(/_(?:front_(?:on|off|active)|front|back|top|bottom|side|lit|unlit)$/,'');
  }
  function faceFamily(meta){
   const name=String(meta?.name||'').toLowerCase();
@@ -22,7 +22,7 @@
   }
   const key=familyKey(name),siblings=CATALOG.filter(x=>x.mod===meta.mod&&familyKey(x.name)===key);
   const pick=(...tokens)=>siblings.find(x=>tokens.some(t=>new RegExp('_'+t+'(?:_|\\.)').test(String(x.name).toLowerCase())))||null;
-  const top=pick('top')||meta,bottom=pick('bottom')||pick('top')||meta,side=pick('side')||meta,front=pick('front_on','front','side')||side,back=pick('back','side')||side;
+  const top=pick('top')||meta,bottom=pick('bottom')||pick('top')||meta,side=pick('side')||meta,front=pick('front_on','front_active','front','side')||side,back=pick('back','side')||side;
   return {top,bottom,side,front,back,overlay:null};
  }
  async function texUrl(meta){return meta?await blobUrl(meta.path,true):''}
