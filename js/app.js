@@ -1276,9 +1276,10 @@ function uvIslandStatus(){
  const el=$('uvIslandMeta');if(!el)return;const i=uvMap.islandIndex,n=uvMap.islands.length,a=i>=0?uvMap.islands[i]:null;
  el.textContent=n?(('Ada '+(i+1)+'/'+n)+' · '+(a?.rects?.length||0)+' alan'):'Ada yok'
 }
-function uvIslandNew(){uvMap.islands.push({id:'island_'+Date.now().toString(36),rects:[]});uvMap.islandIndex=uvMap.islands.length-1;uvIslandSave();toast('Yeni ada oluşturuldu')}
+function uvIslandNew(){uvMap.islands.push({id:'island_'+Date.now().toString(36),rects:[]});uvMap.islandIndex=uvMap.islands.length-1;uvIslandSave();uvIslandSelectionMode();toast('Yeni ada oluşturuldu · orijinal üzerinde alan seç')}
+function uvIslandSelectionMode(){uvMap.target='orig';uvMap.handle='move';uvMap.panMode=false;const o=$('uvOrigSel'),g=$('uvGenSel');if(o)o.style.display='block';if(g)g.style.display='none';uvSetView('orig');uvDrawSelection('orig');uvSetHandle('orig','move');$('uvPanToggle')?.classList.remove('primary');uvIslandStatus()}
 function uvIslandAddSelection(){
- if(uvMap.islandIndex<0)uvIslandNew();const s=uvMap.origSel;if(!s)return toast('Önce orijinalde alan seç');
+ if(uvMap.islandIndex<0)uvIslandNew();uvIslandSelectionMode();const s=uvMap.origSel;if(!s)return toast('Önce orijinalde alan seç');
  const a=uvMap.islands[uvMap.islandIndex];a.rects.push({x:Math.round(s.x),y:Math.round(s.y),w:Math.round(s.w),h:Math.round(s.h)});uvIslandSave();toast('Seçim Ada '+(uvMap.islandIndex+1)+' içine eklendi')
 }
 function uvIslandCycle(d){if(!uvMap.islands.length)return;uvMap.islandIndex=(uvMap.islandIndex+d+uvMap.islands.length)%uvMap.islands.length;uvIslandStatus()}
