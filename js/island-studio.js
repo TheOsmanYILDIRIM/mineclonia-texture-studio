@@ -138,6 +138,6 @@ async function islandStudioRestore(){
  islandStudio.restored=out;islandStudioStatus('Geri toplandı · '+m.parts.length+' ada · '+out.width+'×'+out.height);islandStudioSetTab('restored')
 }
 
-window.MTSIslandStudio={open:async(path)=>{active=api().active?.()||null;return islandStudioOpen(path)},choose:islandStudioChoose};
+window.MTSIslandStudio={open:async(path)=>islandStudioOpen(path),choose:islandStudioChoose};
 try{bindIslandStudioUi()}catch(e){console.error('Island Studio bind',e)}
 })();
