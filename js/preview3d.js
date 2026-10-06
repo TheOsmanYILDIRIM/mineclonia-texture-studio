@@ -86,8 +86,17 @@
  }
  function luaFaceDef(meta){
   if(!LUA_FACE_INDEX)return null;
-  const rows=LUA_FACE_INDEX.get(String(meta?.name||'').toLowerCase());if(!rows?.length)return null;
-  const [node,def]=rows[0],faces=expandLuaFaces(def.textures);if(!faces)return null;
+  const name=String(meta?.name||'').toLowerCase(),rows=LUA_FACE_INDEX.get(name);if(!rows?.length)return null;
+  const score=([node,def])=>{
+   const tex=def.textures||[],first=String(tex[0]||'').toLowerCase(),all=tex.join(' ').toLowerCase();
+   let n=0;if(first===name)n+=100;if(first.includes(name))n+=60;
+   const nodeTail=String(node||'').split(':').pop().replace(/_/g,'');
+   const fileStem=name.replace(/\.png$/,'').replace(/^(?:mcl_|default_)/,'').replace(/_/g,'');
+   if(nodeTail&&fileStem&&(nodeTail.includes(fileStem)||fileStem.includes(nodeTail)))n+=25;
+   if(all===name)n+=15;if((def.overlays||[]).some(Boolean))n-=5;
+   return n;
+  };
+  const [node,def]=[...rows].sort((a,b)=>score(b)-score(a))[0],faces=expandLuaFaces(def.textures);if(!faces)return null;
   return {node,def,faces};
  }
  function catalogTextureFromExpr(expr){
@@ -111,8 +120,16 @@
   return {top,bottom,side,front,back,left,right,overlay:null};
  }
  async function texUrl(meta){return meta?await blobUrl(meta.path,true):''}
+ async function tintedTextureUrl(meta,color='#8EB971'){
+  if(!meta)return '';
+  const src=await decodeBlobToCanvas(await displayBlob(meta.path)),g=src.getContext('2d',{willReadFrequently:true});
+  const im=g.getImageData(0,0,src.width,src.height),d=im.data;
+  const rgb=(String(color).match(/[0-9a-f]{2}/gi)||['8e','b9','71']).map(x=>parseInt(x,16));
+  for(let i=0;i<d.length;i+=4){if(!d[i+3])continue;d[i]=Math.round(d[i]*rgb[0]/255);d[i+1]=Math.round(d[i+1]*rgb[1]/255);d[i+2]=Math.round(d[i+2]*rgb[2]/255)}
+  g.putImageData(im,0,0);const b=await canvasPngBlob(src);return URL.createObjectURL(b);
+ }
  async function faceStyle(meta,{overlay=null,tint=false}={}){
-  const base=await texUrl(meta);
+  const base=tint?await tintedTextureUrl(meta):await texUrl(meta);
   const ov=overlay?await texUrl(overlay):'';
   if(ov){
    return {backgroundImage:base?`url("${base}")`:'none',backgroundSize:'100% 100%',overlayTint:true,overlayUrl:ov};
@@ -122,7 +139,7 @@
  function addFace(cube,cls,transform,style,shade=.08){
   const f=document.createElement('div');f.className='preview3dFace '+cls;f.style.transform=transform;
   f.style.backgroundImage=style.backgroundImage;f.style.backgroundSize=style.backgroundSize||'100% 100%';
-  if(style.tint){f.style.backgroundImage=`linear-gradient(rgba(112,166,90,.68),rgba(112,166,90,.68)),${style.backgroundImage}`;f.style.backgroundBlendMode='multiply';}
+
   if(style.overlayTint&&style.overlayUrl){
    const ov=document.createElement('div');ov.style.cssText='position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;pointer-events:none';
    ov.style.backgroundImage=`url("${style.overlayUrl}")`;
