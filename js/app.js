@@ -1303,13 +1303,12 @@ function uvManualLinkPick(e){
  if(!uvMap.manualSource){
   if(view!=='gen'&&view!=='work'){uvSetView('gen');$('uvAutoMeta').textContent='Önce Üretilen sınırı seç';return true}
   const p=uvAnalysisPoint(uvMap.autoSource,e),hit=window.MTSUvWarp.nearest(uvMap.autoSource,p.x,p.y,uvMap.excludedSource,Math.max(3,Math.min(uvMap.autoSource.w,uvMap.autoSource.h)*.12));if(!hit)return true;
-  uvMap.manualSource=hit;uvSetView('orig');$('uvAutoMeta').textContent='Şimdi karşılık gelen Orijinal sınırı seç';toast('Üretilen sınır seçildi');return true;
+  uvMap.manualSource=hit;$('uvAutoMeta').textContent='Turuncu seçildi · şimdi yeşil Orijinal sınırı seç';toast('Üretilen sınır seçildi');return true;
  }
- if(view!=='orig'){uvSetView('orig');return true}
  const p=uvAnalysisPoint(uvMap.autoTarget,e),hit=window.MTSUvWarp.nearest(uvMap.autoTarget,p.x,p.y,uvMap.excludedTarget,Math.max(3,Math.min(uvMap.autoTarget.w,uvMap.autoTarget.h)*.12));if(!hit)return true;
  uvMap.autoPairs=(uvMap.autoPairs||[]).filter(x=>x.source.id!==uvMap.manualSource.id&&x.target.id!==hit.id);
  uvMap.autoPairs.push({target:hit,source:uvMap.manualSource,score:-1,manual:true});
- uvMap.manualSource=null;uvSetView('overlay');uvRefreshContours();$('uvAutoMeta').textContent='Manuel eşleşme '+uvMap.autoPairs.filter(x=>x.manual).length+' · devam etmek için Üretilen sınırı seç';toast('Sınırlar manuel eşlendi');uvSetView('gen');return true
+ uvMap.manualSource=null;uvRefreshContours();$('uvAutoMeta').textContent='Manuel eşleşme '+uvMap.autoPairs.filter(x=>x.manual).length+' · sonraki turuncu sınırı seç';toast('Sınırlar manuel eşlendi');return true
 }
 function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
