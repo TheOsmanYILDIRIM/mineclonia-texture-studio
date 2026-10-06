@@ -234,7 +234,47 @@
   const bottom=top.cloneNode(true);bottom.className='preview3dFace bottom';bottom.style.transform=`translateY(${size/2}px) rotateX(-90deg)`;c.appendChild(bottom);
   return c;
  }
+ function tallPlantFamily(meta){
+  const n=String(meta?.name||'').toLowerCase().replace(/\.png$/,'');
+  let m=n.match(/^(mcl_flowers_double_plant_(?:fern|grass|paeonia|rose|syringa))_(bottom|top)$/);
+  if(m)return {base:m[1],bottom:byName(m[1]+'_bottom.png'),top:byName(m[1]+'_top.png')};
+  return null;
+ }
+ async function makeCrossPlantPart(meta,size){
+  const g=document.createElement('div');g.className='preview3dMultipart preview3dPlantPart';g.style.transformStyle='preserve-3d';
+  const st=await faceStyle(meta);
+  for(const rot of [45,-45]){
+   const p=document.createElement('div');p.className='preview3dFace';p.style.width=size+'px';p.style.height=size+'px';p.style.marginLeft=(-size/2)+'px';p.style.marginTop=(-size/2)+'px';p.style.backgroundImage=st.backgroundImage;p.style.backgroundSize='100% 100%';p.style.backgroundRepeat='no-repeat';p.style.backfaceVisibility='visible';p.style.transform=`rotateY(${rot}deg)`;g.appendChild(p);
+  }
+  return g;
+ }
+ async function makeTallPlant(meta,size=S){
+  const f=tallPlantFamily(meta);if(!f?.bottom||!f?.top)return null;
+  const g=document.createElement('div');g.className='preview3dMultipart preview3dTallPlant';g.style.transformStyle='preserve-3d';
+  const lo=await makeCrossPlantPart(f.bottom,size),hi=await makeCrossPlantPart(f.top,size);
+  lo.style.transform=`translateY(${size/2}px)`;hi.style.transform=`translateY(${-size/2}px)`;g.append(lo,hi);return g;
+ }
+ function doubleChestFamily(meta){
+  const n=String(meta?.name||'').toLowerCase();
+  if(!/^mcl_chests_(?:normal|trapped)(?:_double)?(?:_present)?\.png$/.test(n))return null;
+  const type=n.includes('trapped')?'trapped':'normal',present=n.includes('_present')?'_present':'';
+  return {single:byName(`mcl_chests_${type}${present}.png`),double:byName(`mcl_chests_${type}_double${present}.png`)};
+ }
+ async function makeChestBox(meta,w,h,d){
+  const st=await faceStyle(meta),g=document.createElement('div');g.className='preview3dMultipart preview3dChest';g.style.transformStyle='preserve-3d';
+  const face=(W,H,tr,shade=0)=>{const e=document.createElement('div');e.className='preview3dFace';e.style.width=W+'px';e.style.height=H+'px';e.style.marginLeft=(-W/2)+'px';e.style.marginTop=(-H/2)+'px';e.style.backgroundImage=st.backgroundImage;e.style.backgroundSize='100% 100%';e.style.transform=tr;if(shade)e.style.filter=`brightness(${1-shade})`;g.appendChild(e)};
+  face(w,h,`translateZ(${d/2}px)`);face(w,h,`rotateY(180deg) translateZ(${d/2}px)`,.14);
+  face(d,h,`translateX(${-w/2}px) rotateY(-90deg)`,.08);face(d,h,`translateX(${w/2}px) rotateY(90deg)`,.12);
+  face(w,d,`translateY(${-h/2}px) rotateX(90deg)`);face(w,d,`translateY(${h/2}px) rotateX(-90deg)`,.2);return g;
+ }
+ async function makeDoubleChest(meta,size=S){
+  const f=doubleChestFamily(meta);if(!f)return null;
+  const tex=f.double||f.single||meta,w=f.double?size*1.7:size,h=size*.82,d=size*.82;
+  return makeChestBox(tex,w,h,d);
+ }
  async function makeMultipart(meta,size=S){
+  const plant=await makeTallPlant(meta,size);if(plant)return plant;
+  const chest=await makeDoubleChest(meta,size);if(chest)return chest;
   const f=doorFamily(meta);if(!f)return null;
   const lower=doorPart(f,'lower'),upper=doorPart(f,'upper');if(!lower||!upper)return null;
   const sideLower=doorPart(f,'sideLower')||lower,sideUpper=doorPart(f,'sideUpper')||upper;
