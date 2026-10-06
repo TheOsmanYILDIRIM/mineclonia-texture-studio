@@ -1331,10 +1331,12 @@ function uvAutoWarpSmart(){
  if(!uvMap.autoApplied)uvMap.history.push(g.getImageData(0,0,uvMap.work.width,uvMap.work.height));
  const base=document.createElement('canvas');base.width=uvMap.work.width;base.height=uvMap.work.height;base.getContext('2d').putImageData(uvMap.autoBase,0,0);
  const sourceAnalysis=window.MTSUvWarp.analyze(base);
- const warped=window.MTSUvWarp.smoothWarp?window.MTSUvWarp.smoothWarp(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs,uvMap.edgePairs):(window.MTSUvWarp.warp)(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs);
+ let warped=window.MTSUvWarp.smoothWarp?window.MTSUvWarp.smoothWarp(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs,uvMap.edgePairs):(window.MTSUvWarp.warp)(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs);
+ if(uvMap.edgePairs.length&&window.MTSUvWarp.snapAlphaToTarget)warped=window.MTSUvWarp.snapAlphaToTarget(warped,uvMap.autoTarget,uvMap.edgePairs);
  uvMap.work.width=warped.width;uvMap.work.height=warped.height;uvMap.work.getContext('2d').drawImage(warped,0,0);uvMap.autoApplied=true;
- uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work);
- uvRenderWork();uvRefreshContours();uvStatus();if($('uvSaveHint'))$('uvSaveHint').textContent='Düzeltme hazır · 3D kontrol et veya kaydet';toast('Eşlenen kenarlar üst üste bindirildi');
+ uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:'alpha',role:'source',strictAlpha:true});
+ const err=window.MTSUvWarp.edgeError?.(uvMap.autoTarget,uvMap.autoSource,uvMap.edgePairs)||{mean:0,max:0};
+ uvRenderWork();uvRefreshContours();uvStatus();if($('uvSaveHint'))$('uvSaveHint').textContent='Kenar hatası: ort '+err.mean.toFixed(2)+' px · max '+err.max.toFixed(2)+' px';toast(err.mean<=.75?'Kenarlar piksel hassasiyetinde hizalandı':'Kenar hatası '+err.mean.toFixed(2)+' px');
 }
 
 function uvSetView(mode){uvMap.view=mode;const o=$('uvOrigCanvas'),g=$('uvGenCanvas'),wrap=$('uvLiveWrap'),range=$('uvOverlayRange'),v=Number(range.value)/100;wrap.classList.toggle('linesOnly',mode==='lines');document.querySelectorAll('[data-uvview]').forEach(b=>b.classList.toggle('primary',b.dataset.uvview===mode));if(mode==='orig'){o.style.opacity='1';g.style.opacity='0'}else if(mode==='gen'){o.style.opacity='0';g.style.opacity='1';const ctx=g.getContext('2d');g.width=uvMap.gen.width;g.height=uvMap.gen.height;ctx.drawImage(uvMap.gen,0,0)}else if(mode==='work'){o.style.opacity='0';g.style.opacity='1';uvRenderWorkCanvasOnly()}else if(mode==='lines'){o.style.opacity='0';g.style.opacity='0'}else{o.style.opacity='1';g.style.opacity=String(v);uvRenderWorkCanvasOnly()}requestAnimationFrame(()=>{uvRenderGlobal();uvDrawSelection('orig');uvDrawSelection('gen');uvRefreshContours()})}
