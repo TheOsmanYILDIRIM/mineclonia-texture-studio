@@ -1,3 +1,11 @@
+## Tint-aware prompt conflict cleanup — 2026-10-06
+
+- Runtime-tint prompts no longer depend only on a final lock to contradict earlier color instructions.
+- Added `tintPromptText()` to rewrite conflicting color language across generated/authored output: color family → neutral grayscale/value structure, color relationships/variation → value/luminance relationships/variation, pigmentation → neutral value patterning, etc.
+- Applied at normal prompt output, P0 reference-first, P0 Image A + Image B production, and multi-stage UV copy boundaries.
+- `PROMPT_AUTHORING_GUIDE.md` now permanently documents the runtime-tint/grayscale-mask rule and conflict-rewrite standard.
+- Direct-main project workflow preserved.
+
 ## Runtime-tinted texture detection — 2026-10-06
 
 - Added a dedicated technical filter: `Runtime Tint / Color Masks`.
