@@ -183,6 +183,29 @@ Species identity may affect:
 - needle vs broadleaf structure
 - environmental aging
 
+## Mineclonia material-reference dependencies
+
+Some textures must visually inherit a material from another Mineclonia texture. These relationships must be established from Mineclonia's own runtime/source definitions, not inferred from Minecraft naming or Minecraft asset structure.
+
+When a dependency is verified:
+
+1. generate/finish the authoritative base or host material first;
+2. use that finished Mineclonia texture while generating the target texture's **reference image**;
+3. use the dependency-aware reference image as Image B for the target's final production pass;
+4. keep Image A authoritative for the target's own geometry, gameplay function, mask, face role and layout.
+
+The referenced texture controls only the physically shared material language: host/base material identity, scale, microstructure, roughness, weathering and value behavior. It must not overwrite the target's distinct functional structure.
+
+Current verified families include:
+- `mcl_core_grass_block_side_overlay.png` → `mcl_core_grass_block_top.png` for grass material continuity; Mineclonia composites the side overlay over dirt and applies grass palette tinting.
+- Mineclonia stone ore textures (`mcl_core_*_ore.png`) → `default_stone.png` as host-rock appearance where source definitions register them as stone-with-ore nodes.
+- `mcl_copper_ore.png` → `default_stone.png`; Mineclonia explicitly composes this at runtime as `default_stone.png ^ mcl_copper_ore.png`.
+- `mcl_deepslate_*_ore.png` → `mcl_deepslate_deepslate.png`; these are created by Mineclonia's deepslate-ore registration path.
+- Nether quartz/gold ore → Mineclonia netherrack where the corresponding catalog texture exists.
+
+Do not add a dependency merely because Minecraft has the same relationship. Verify the Mineclonia texture name and Mineclonia runtime/source usage first.
+
+
 ## Runtime tint / grayscale mask rule
 
 Some Mineclonia textures are deliberately neutral, gray, desaturated, or mask-like because the engine applies their visible color later at runtime. This includes biome palettes, state/power palettes, dyes, and explicit texture `^[colorize]` composition.
