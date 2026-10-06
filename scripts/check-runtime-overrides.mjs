@@ -133,3 +133,14 @@ expect(!source.includes('<<<<<<<') && !source.includes('>>>>>>>'), 'merge-confli
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log('Runtime override guards: OK');
+
+
+const loaderSource = fs.readFileSync(new URL('../js/data/catalog-loader.js', import.meta.url), 'utf8');
+expect(loaderSource.includes(".catch(()=>ASSET_TAGS={})"), 'asset tag metadata must remain optional and fall back to an empty tag map');
+expect(loaderSource.includes("tags:ASSET_TAGS['tex_'+r[7]]?.tags||[]"), 'catalog tags must be additive metadata with an empty-array fallback');
+const appSource = fs.readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
+expect(appSource.includes('function runtimeTintInfo'), 'legacy runtime-tint detector must remain available while tag metadata is additive');
+expect(appSource.includes('.animated') || appSource.includes('animated:'), 'legacy catalog animated metadata must remain available while tag metadata is additive');
+const preview3dSource = fs.readFileSync(new URL('../js/preview3d.js', import.meta.url), 'utf8');
+expect(preview3dSource.includes('function faceFamily(meta)'), '3D filename/semantic face resolver must remain as fallback');
+expect(preview3dSource.includes('if(fromLua)return fromLua'), '3D must prefer Lua manifest but preserve fallback resolution');
