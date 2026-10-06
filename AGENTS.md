@@ -87,6 +87,16 @@ Key non-negotiables:
 - Static technical asset tags are additive catalog metadata only. Prompt status and browser `Değiştirildi` state remain separate runtime concerns and must stay compatible with existing IndexedDB/localStorage records.
 - Mineclonia Lua/source is authoritative for node faces, overlays, composition and palette/tint semantics. Minecraft naming assumptions are not a source of truth.
 
+
+## Front-end module boundary
+
+- Do not grow `index.html` / `js/app.js` into feature monoliths. A substantial independent screen, editor, lab, or workflow must live in its own JS module and its own CSS file.
+- `js/app.js` is the application core/orchestrator: catalog, shared persistence/runtime helpers, and small public bridges. Feature-specific state, gestures, rendering, import/export, and UI event wiring belong to the feature module.
+- Feature modules must be failure-isolated: a missing/broken optional editor must not prevent the main catalog, detail sheet, or unrelated tools from booting.
+- Prefer a small explicit `window.MTS*Bridge` / public API over reaching into another module's private state.
+- Keep `index.html` primarily structural. Do not add large feature CSS or feature logic inline; use files under `css/` and `js/`.
+- Current examples: Island Studio → `js/island-studio.js` + `css/island-studio.css`; Variant Lab should follow the same boundary.
+
 ## Session / handoff protocol
 
 Before meaningful changes:
