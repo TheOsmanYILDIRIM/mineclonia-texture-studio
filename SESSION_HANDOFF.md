@@ -62,7 +62,7 @@ The 3D module is lazy-loaded only when opened.
 ## Open work
 
 1. Device-test several entity families in the live Android UI: cow/pig/cat, zombie/skeleton, horse, wolf/spider/creeper where runtime mesh mapping exists.
-2. Multipart object preview now composes two-node doors (classic acacia/birch/dark-oak/jungle/spruce plus crimson/warped and modern cherry/mangrove/pale-oak naming families) into one two-block-high thin 3D object. Device-test those families, then extend the same source-family approach to beds, double chests, tall plants and similar objects.
+2. Multipart object preview now composes two-node doors (including bamboo), Mineclonia double-plant top/bottom families, and normal/trapped double-chest atlas families. Beds are not yet implemented because the current catalog contains no bed texture family to map safely; resolve their actual Mineclonia runtime asset/model source before adding them.
 3. Expand `node-faces.json` coverage from Mineclonia source. Keep Lua/source mapping authoritative and filename matching as fallback.
 4. If a composite/tinted block renders incorrectly, fix the generic Lua render-plan interpretation first. Add a manual override only as a safe fallback for a genuinely exceptional runtime behavior.
 5. Keep runtime guards green; the recent guard failure around metadata migration should be inspected before treating guards as fully healthy.
@@ -80,4 +80,4 @@ The 3D module is lazy-loaded only when opened.
 
 ## Next concrete step
 
-Open the deployed app after the latest Pages build and spot-check classic and modern door families (including edited upper/lower parts), then one simple entity skin (cow/cat), one multi-material entity (zombie/skeleton), grass/dirt block separation, and one ordinary top/side block. Fix incorrect mappings at the source-family/Lua/B3D interpretation layer before expanding multipart coverage to beds/chests/tall plants.
+Open the deployed app after the latest Pages build and spot-check classic and modern door families (including edited upper/lower parts), then one simple entity skin (cow/cat), one multi-material entity (zombie/skeleton), grass/dirt block separation, and one ordinary top/side block. Fix incorrect mappings at the source-family/Lua/B3D interpretation layer before expanding multipart coverage to beds and other source-verified multipart objects.
