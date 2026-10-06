@@ -2,10 +2,18 @@
  function img(canvas){return canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,canvas.width,canvas.height)}
  function median(a){if(!a.length)return 0;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2}
  function dist(d,i,c){const dr=d[i]-c[0],dg=d[i+1]-c[1],db=d[i+2]-c[2];return Math.sqrt(dr*dr+dg*dg+db*db)}
- function estimateBackground(im,w,h){
-  const d=im.data,alphas=[];for(let i=3;i<d.length;i+=4)alphas.push(d[i]);
+ function luminance(r,g,b){return .2126*r+.7152*g+.0722*b}
+ function isBackgroundDark(r,g,b,lumThr=34,spreadThr=28){const lum=luminance(r,g,b),spread=Math.max(r,g,b)-Math.min(r,g,b);return lum<=lumThr&&spread<=spreadThr}
+ function estimateBackground(im,w,h,opts={}){
+  const mode=opts.bgMode||'auto',d=im.data,alphas=[];for(let i=3;i<d.length;i+=4)alphas.push(d[i]);
   const transparent=alphas.filter(a=>a<16).length/alphas.length;
-  if(transparent>.002)return {mode:'alpha',color:[0,0,0],threshold:0};
+  if(mode==='alpha')return {mode:'alpha',color:[0,0,0],threshold:0};
+  if(transparent>.002&&mode!=='black')return {mode:'alpha',color:[0,0,0],threshold:0};
+  if(mode==='black')return {mode:'forced-black',color:[0,0,0],threshold:34};
+  let darkHits=0,total=0;
+  const probe=(x,y)=>{const i=(y*w+x)*4;total++;if(isBackgroundDark(d[i],d[i+1],d[i+2]))darkHits++};
+  for(let x=0;x<w;x++){probe(x,0);probe(x,h-1)}for(let y=0;y<h;y++){probe(0,y);probe(w-1,y)}
+  if(total&&darkHits/total>.55)return {mode:'forced-black',color:[0,0,0],threshold:34};
   const rs=[],gs=[],bs=[],edge=[];
   const sample=(x,y)=>{const i=(y*w+x)*4;rs.push(d[i]);gs.push(d[i+1]);bs.push(d[i+2])};
   const k=Math.max(2,Math.min(8,Math.floor(Math.min(w,h)/8)));
@@ -16,11 +24,11 @@
   const threshold=Math.max(18,Math.min(72,median(edge)+20));
   return {mode:'edge-fill',color,threshold}
  }
- function foregroundMask(canvas){
-  const im=img(canvas),w=canvas.width,h=canvas.height,d=im.data,bg=estimateBackground(im,w,h),mask=new Uint8Array(w*h);
+ function foregroundMask(canvas,opts={}){
+  const im=img(canvas),w=canvas.width,h=canvas.height,d=im.data,bg=estimateBackground(im,w,h,opts),mask=new Uint8Array(w*h);
   if(bg.mode==='alpha'){for(let p=0,i=3;p<mask.length;p++,i+=4)mask[p]=d[i]>=16?1:0;return {im,w,h,mask,bg}}
   const background=new Uint8Array(w*h),q=new Int32Array(w*h);let head=0,tail=0;
-  const ok=p=>{const i=p*4;return d[i+3]<16||dist(d,i,bg.color)<=bg.threshold};
+  const ok=p=>{const i=p*4;if(d[i+3]<16)return true;if(bg.mode==='forced-black')return isBackgroundDark(d[i],d[i+1],d[i+2],bg.threshold,30);return dist(d,i,bg.color)<=bg.threshold};
   const push=p=>{if(p<0||p>=mask.length||background[p]||!ok(p))return;background[p]=1;q[tail++]=p};
   for(let x=0;x<w;x++){push(x);push((h-1)*w+x)}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}
   while(head<tail){const p=q[head++],x=p%w,y=(p/w)|0;if(x)push(p-1);if(x<w-1)push(p+1);if(y)push(p-w);if(y<h-1)push(p+w)}
@@ -28,7 +36,7 @@
   return {im,w,h,mask,bg}
  }
  function components(a){
-  const {mask,w,h}=a,seen=new Uint8Array(mask.length),out=[],q=new Int32Array(mask.length),minArea=Math.max(2,Math.floor(w*h*0.00001));
+  const {mask,w,h}=a,seen=new Uint8Array(mask.length),out=[],q=new Int32Array(mask.length),minArea=Math.max(4,Math.floor(w*h*0.00002));
   for(let s=0;s<mask.length;s++){if(!mask[s]||seen[s])continue;let head=0,tail=0;q[tail++]=s;seen[s]=1;let minX=w,minY=h,maxX=0,maxY=0,area=0,sumX=0,sumY=0,pix=[];
    while(head<tail){const p=q[head++],x=p%w,y=(p/w)|0;pix.push(p);area++;sumX+=x;sumY+=y;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;
     const ns=[p-1,p+1,p-w,p+w];for(const n of ns){if(n<0||n>=mask.length||seen[n]||!mask[n])continue;const nx=n%w,ny=(n/w)|0;if(Math.abs(nx-x)+Math.abs(ny-y)!==1)continue;seen[n]=1;q[tail++]=n}
@@ -43,7 +51,7 @@
   }
   return out.sort((x,y)=>y.area-x.area)
  }
- function analyze(canvas){const a=foregroundMask(canvas);a.components=components(a);return a}
+ function analyze(canvas,opts={}){const a=foregroundMask(canvas,opts);a.components=components(a);return a}
  function score(a,b,aw,ah,bw,bh){
   const ax=a.cx/aw,ay=a.cy/ah,bx=b.cx/bw,by=b.cy/bh,pos=Math.hypot(ax-bx,ay-by);
   const arA=a.bbox.w/a.bbox.h,arB=b.bbox.w/b.bbox.h,asp=Math.abs(Math.log((arA||1)/(arB||1)));
