@@ -138,7 +138,27 @@ async function islandStudioRestore(){
  islandStudio.restored=out;islandStudioStatus('Geri toplandı · '+m.parts.length+' ada · '+out.width+'×'+out.height);islandStudioSetTab('restored')
 }
 
-function bindIslandStudioUi(){const root=$('islandStudio');if(!root)return;root.dataset.bound='1';const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};bind('islandStudioClose',()=>root.classList.remove('open'));const tex=$('islandStudioTexture');if(tex)tex.onchange=e=>islandStudioChoose(e.target.value);document.querySelectorAll('[data-islandtab]').forEach(b=>b.onclick=()=>islandStudioSetTab(b.dataset.islandtab));bind('islandStudioNew',islandStudioNew);bind('islandStudioAdd',islandStudioAdd);bind('islandStudioPrev',()=>islandStudioCycle(-1));bind('islandStudioNext',()=>islandStudioCycle(1));bind('islandStudioDelete',islandStudioDelete);bind('islandStudioExport',()=>islandStudioBuildTemplate(true));bind('islandStudioImport',()=>$('islandStudioFile')?.click());bind('islandStudioRestore',islandStudioRestore);const file=$('islandStudioFile');if(file)file.onchange=e=>{const f=e.target.files?.[0];e.target.value='';islandStudioImport(f)};const st=$('islandStudioStage');if(st&&!st.dataset.bound){st.dataset.bound='1';let pid=null,start=null;st.addEventListener('pointerdown',e=>{if(islandStudio.tab!=='edit'||e.target.closest('[data-ih]'))return;pid=e.pointerId;st.setPointerCapture?.(pid);start=islandStudioPoint(e);islandStudio.sel={x:start.x,y:start.y,w:1,h:1};islandStudioDrawSel();e.preventDefault()});st.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=islandStudioPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);islandStudio.sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};islandStudioDrawSel();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end)}}
+function bindIslandStudioUi(){
+ const root=$('islandStudio');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
+ root.addEventListener('click',async e=>{
+   const t=e.target.closest('button,[data-islandtab],[data-ih]');if(!t)return;
+   if(t.id==='islandStudioClose'){root.classList.remove('open');return}
+   if(t.dataset.islandtab){islandStudioSetTab(t.dataset.islandtab);return}
+   if(t.dataset.ih){islandStudioSetHandle(t.dataset.ih);e.stopPropagation();return}
+   if(t.id==='islandStudioNew'){islandStudioNew();return}
+   if(t.id==='islandStudioAdd'){await islandStudioAdd();return}
+   if(t.id==='islandStudioPrev'){islandStudioCycle(-1);return}
+   if(t.id==='islandStudioNext'){islandStudioCycle(1);return}
+   if(t.id==='islandStudioDelete'){await islandStudioDelete();return}
+   if(t.id==='islandStudioExport'){await islandStudioBuildTemplate(true);return}
+   if(t.id==='islandStudioImport'){$('islandStudioFile')?.click();return}
+   if(t.id==='islandStudioRestore'){await islandStudioRestore();return}
+ });
+ const tex=$('islandStudioTexture');if(tex)tex.addEventListener('change',e=>islandStudioChoose(e.target.value));
+ const file=$('islandStudioFile');if(file)file.addEventListener('change',e=>islandStudioImport(e.target.files?.[0]));
+ const joy=$('islandJoystick'),stick=$('islandStick');if(joy&&stick){let pid=null;joy.addEventListener('pointerdown',e=>{pid=e.pointerId;joy.setPointerCapture?.(pid);e.preventDefault()});joy.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,rad=Math.max(1,r.width*.34),m=Math.hypot(dx,dy),k=Math.min(1,rad/(m||1));stick.style.transform='translate('+(dx*k)+'px,'+(dy*k)+'px)';const sx=Math.abs(dx)>r.width*.16?Math.sign(dx):0,sy=Math.abs(dy)>r.height*.16?Math.sign(dy):0;if((sx||sy)&&performance.now()-(joy._lastMove||0)>55){islandStudioMove(sx,sy);joy._lastMove=performance.now()}e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;stick.style.transform='translate(0,0)'}};joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end)}
+ const st=$('islandStudioStage');if(st){let pid=null,start=null;st.addEventListener('pointerdown',e=>{if(islandStudio.tab!=='edit'||e.target.closest('[data-ih]'))return;pid=e.pointerId;st.setPointerCapture?.(pid);start=islandStudioPoint(e);islandStudio.sel={x:start.x,y:start.y,w:1,h:1};islandStudioDrawSel();e.preventDefault()});st.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=islandStudioPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y);islandStudio.sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};islandStudioDrawSel();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end)}
+}
 window.MTSIslandStudio={open:async(path)=>islandStudioOpen(path),choose:islandStudioChoose};
 const __bindIsland=()=>{try{bindIslandStudioUi()}catch(e){console.error('Island Studio bind',e)}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__bindIsland,{once:true});else __bindIsland();
 })();
