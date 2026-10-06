@@ -124,6 +124,16 @@ This texture is intentionally color-neutral because Mineclonia applies its visib
 Preserve the neutral/grayscale value structure and material detail. Do NOT bake the final green, foliage, biome, redstone-power, dye, skin, armor, banner, or entity color into the texture.
 Keep luminance/value relationships suitable for multiplication/colorization. Avoid colored lighting, colored stains, or hue information that would contaminate runtime tinting.
 The runtime-applied color is authoritative; author material detail and value only.`;
+function tintPromptText(text,x){
+ if(!isRuntimeTintTexture(x))return text;
+ return String(text)
+  .replaceAll('characteristic color family','neutral grayscale/value structure suitable for runtime tinting')
+  .replaceAll('color relationships','value/luminance relationships')
+  .replaceAll('color variation','value/luminance variation')
+  .replaceAll('restrained in color','neutral and disciplined in value/luminance, without a baked final hue')
+  .replaceAll('restrained saturation','neutral tint-ready values')
+  .replaceAll('pigmentation','neutral value patterning');
+}
 
 function textureTechnicalCategoriesOf(x){
  const {top,mod,n,q,broad}=textureFacts(x),out=new Set(),add=(...ids)=>ids.forEach(id=>out.add(id));
@@ -520,7 +530,7 @@ Outside the original occupied mask must remain transparent. Do not add any backg
 If realism conflicts with the source UV geometry, the source UV geometry wins.`;
 
 function applyPromptOutputRequirements(text,x){
- let out=String(text||'').trimEnd();
+ let out=tintPromptText(String(text||'').trimEnd(),x);
  if(isRuntimeTintTexture(x)&&!out.includes('RUNTIME TINT / COLOR MASK LOCK:'))out+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;
  if(assetTypeOf(x)==='Entity'){
    if(!out.includes(ENTITY_TRANSPARENCY_MARKER)) out+='\n\n'+ENTITY_TRANSPARENCY_REQUIREMENT;
@@ -554,7 +564,7 @@ function mobPromptMeta(x){
 function mobHqUvPromptFor(x){const m=mobPromptMeta(x);return 'EDIT THE PROVIDED ENTITY TEXTURE / UV ATLAS.\n\nASSET: '+m.name+'\nRUNTIME ROLE: '+m.role+'\nMODEL CONTEXT: '+m.model+'\n\nThe provided image is the STRUCTURAL MASTER REFERENCE.\n\nABSOLUTE PRIORITY:\nPreserve the exact canvas and UV topology: every island position, island size, orientation, spacing, occupied region, transparent region, internal cutout, anatomical assignment, marking placement and layer alignment must remain coordinate-locked. Treat every occupied UV region as a locked mask. Do not move, rotate, resize, merge, split, crop, repack, expand, shrink, blur or reinterpret any UV island.\n\nThis is a SURFACE / MATERIAL RECONSTRUCTION ONLY, not a creature redesign. Preserve the identity and variant/state/layer meaning of '+m.name+'. Preserve all source landmarks needed for the texture to map correctly onto '+m.model+'.\n\nReplace low-resolution pixel information with continuous high-quality '+m.material+'. Resolve tiny ambiguous source regions conservatively from their existing placement; never invent anatomy to fill uncertainty.\n\nSTYLE:\nGrounded dark-fantasy material realism; physically believable, somber and restrained. Soft diffuse illumination, restrained saturation, natural micro-detail and subtle age/weathering. No scene lighting, perspective, background, cute redesign, exaggerated horror redesign, glossy toy finish or HD-pixel-art imitation.\n\nOUTPUT:\nOnly the completed high-resolution UV atlas on the exact original layout. No rendered creature, labels, guides, scene or background.'}
 function mobCreatureRefPromptFor(x){const m=mobPromptMeta(x);return 'Create a high-quality visual MATERIAL REFERENCE for the creature/variant represented by "'+m.name+'".\n\nThis is reference art for a later UV-texture transfer, NOT a UV map and NOT a Minecraft-style render.\n\nIDENTITY / VARIANT:\n'+m.name+'\nRuntime role: '+m.role+'.\n\nShow the creature or relevant wearable/material layer clearly enough that its important surface identity can be understood: species-appropriate anatomy, pigmentation, markings, '+m.material+', age, wear and material transitions.\n\nART DIRECTION:\nGrounded dark-fantasy realism. Ancient, weathered, somber and physically believable; restrained saturation; soft diffuse neutral lighting; tactile natural surfaces; controlled micro-detail. Keep the entity recognizable rather than redesigning it into a different creature.\n\nREFERENCE QUALITY:\nPrioritize readable material information and color relationships over dramatic composition. Avoid heavy shadows, colored cinematic lighting, depth-of-field obscuring surfaces, action poses that hide major body regions, glossy toy surfaces, cartoon styling, pixel art, voxel styling, text, UI, diagrams or UV layouts.\n\nUse a simple neutral unobtrusive background. The image should function as a clean appearance/material reference for transferring the look onto an already-correct UV atlas.'}
 function mobFinalUvPromptFor(x){const m=mobPromptMeta(x);return 'Image A is the already high-quality, structurally correct UV atlas for "'+m.name+'" produced by the strict HQ UV pass.\nImage B is the dominant creature/material reference for the same identity or compatible variant.\n\nRUNTIME ROLE: '+m.role+'\nMODEL CONTEXT: '+m.model+'\n\nIMAGE A IS THE ABSOLUTE STRUCTURAL MASTER.\nPreserve its exact canvas, UV island positions, sizes, orientations, spacing, occupied/transparent regions, internal cutouts, anatomical assignments, markings and layer alignment. Do not move, rotate, resize, merge, split, crop, extend, shrink, blur, repack or reinterpret UV regions. Do not re-solve anatomy.\n\nIMAGE B CONTROLS APPEARANCE ONLY.\nTransfer the compatible material language from Image B into the already-correct surfaces of Image A: '+m.material+', pigmentation, color relationships, tactile micro-detail, natural variation, age and weathering. Do not copy Image B pose, perspective, silhouette, background or scene lighting. Do not invent anatomy or markings that conflict with Image A UV assignments.\n\nKeep the result grounded dark-fantasy realism with restrained saturation and believable material response. Preserve rich detail right up to occupied-region boundaries without changing those boundaries.\n\nFINAL PRIORITY:\n1. Exact HQ UV structure/anatomical mapping from Image A.\n2. Identity, variant/state/layer meaning of '+m.name+'.\n3. Compatible material/style information from Image B.\n4. No structural invention.\n\nOUTPUT ONLY the completed UV atlas.'}
-async function copyMobPrompt(kind){if(!active||!isThreeStageUvTexture(active))return;const t=kind==='hq'?mobHqUvPromptFor(active):kind==='ref'?referencePromptFor(active):mobFinalUvPromptFor(active);try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast(kind==='hq'?'HQ UV promptu kopyalandı':kind==='ref'?(isArmorUvTexture(active)?'Armor Ref promptu kopyalandı':'Creature Ref promptu kopyalandı'):'Final UV promptu kopyalandı')}
+async function copyMobPrompt(kind){if(!active||!isThreeStageUvTexture(active))return;const t=tintPromptText(kind==='hq'?mobHqUvPromptFor(active):kind==='ref'?referencePromptFor(active):mobFinalUvPromptFor(active),active)+(isRuntimeTintTexture(active)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:'');try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast(kind==='hq'?'HQ UV promptu kopyalandı':kind==='ref'?(isArmorUvTexture(active)?'Armor Ref promptu kopyalandı':'Creature Ref promptu kopyalandı'):'Final UV promptu kopyalandı')}
 
 let promptViewMode='classic';
 function promptFor(x,mode='classic'){
@@ -844,7 +854,7 @@ function p0ProductionMeta(x){
 }
 function p0ProductionPromptFor(x){
  const m=p0ProductionMeta(x);
- return `Use Image A to understand WHAT the texture is and how it functions in the game.
+ return tintPromptText(`Use Image A to understand WHAT the texture is and how it functions in the game.
 Use Image B to determine HOW the final material should actually look.
 
 SELECTED MATERIAL: ${m.subject}
@@ -875,7 +885,7 @@ FINAL PRIORITY:
 3. ${m.tileable?'Create true physical continuity across opposite canvas edges.':'Preserve the functional placement/role defined by Image A.'}
 4. Preserve Image B's detail and visual energy without copying its composition.
 
-Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.${isRuntimeTintTexture(x)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:''}`;
+Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.${isRuntimeTintTexture(x)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:''}`,x);
 }
 
 
@@ -1128,7 +1138,7 @@ const P0_REFERENCE_REQUIRED=[
 if(P0_REFERENCE_REQUIRED.some(k=>!P0_REFERENCE_SUBJECT_EXACT[k]))console.error('P0 reference subject map incomplete');
 const __legacyPromptForP0Ref=promptFor;
 promptFor=function(x,mode='classic'){
- if(x&&x.priority==='P0'){let text=p0ReferencePromptFor(x);if(isRuntimeTintTexture(x)&&!text.includes('RUNTIME TINT / COLOR MASK LOCK:'))text+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;return {text,family:'P0 · Reference-first'}};
+ if(x&&x.priority==='P0'){let text=tintPromptText(p0ReferencePromptFor(x),x);if(isRuntimeTintTexture(x)&&!text.includes('RUNTIME TINT / COLOR MASK LOCK:'))text+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;return {text,family:'P0 · Reference-first'}};
  return __legacyPromptForP0Ref(x,mode);
 };
 try{creativeP0PromptFor=()=>null}catch{}
