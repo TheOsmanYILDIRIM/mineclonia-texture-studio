@@ -1212,7 +1212,7 @@ function renderVariantStage(){
 }
 async function ensurePreview3dLoaded(){
  if(window.MTSPreview3D)return window.MTSPreview3D;
- if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
+ if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d2';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
  await preview3dLoadPromise;return window.MTSPreview3D;
 }
 function updateVariant3dButton(){
@@ -1258,7 +1258,7 @@ $('activateSelectedVariant').onclick=activateSelectedVariant;
 $('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
 $('variant3dToggle').onclick=async()=>{
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
+ try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
 };
 $('variantLab').addEventListener('click',e=>{
  const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
