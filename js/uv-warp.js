@@ -184,36 +184,39 @@
  function orderedSegmentPoints(seg){
   const pts=[...(seg?.points||[])],b=seg?.bbox||{w:0,h:0},horizontal=b.w>=b.h;
   pts.sort(horizontal?(a,b)=>a.x-b.x||a.y-b.y:(a,b)=>a.y-b.y||a.x-b.x);
-  return pts
+  // Collapse duplicate coordinate positions on the major axis to a sub-pixel centerline.
+  const groups=[];for(const p of pts){const key=horizontal?p.x:p.y,last=groups[groups.length-1];if(last&&Math.abs(last.key-key)<1e-6){last.x+=p.x;last.y+=p.y;last.n++}else groups.push({key,x:p.x,y:p.y,n:1})}
+  return groups.map(g=>({x:g.x/g.n,y:g.y/g.n}))
  }
  function sampleOrdered(arr,t){if(!arr.length)return null;const f=t*(arr.length-1),i=Math.floor(f),j=Math.min(arr.length-1,i+1),u=f-i;return{x:arr[i].x*(1-u)+arr[j].x*u,y:arr[i].y*(1-u)+arr[j].y*u}}
- function minimalControls(target,source,pairs,segmentPairs=[]){
+ function exactEdgeControls(segmentPairs=[]){
   const out=[];
-  const add=(s,t,kind='edge',localScale=1)=>{if(!s||!t)return;
-    // In inverse mapping, an output point at target t must sample from source s.
-    let dx=s.x-t.x,dy=s.y-t.y,mag=Math.hypot(dx,dy);if(mag<.02)return;
-    const maxMove=6;if(mag>maxMove){const k=maxMove/mag;dx*=k;dy*=k;mag=maxMove}
-    const radius=kind==='manual'?Math.max(8,Math.min(14,8+mag*1.5)):Math.max(3,Math.min(7,(mag+2)*localScale));
-    out.push({src:{x:s.x,y:s.y},dst:{x:t.x,y:t.y},dx,dy,mag,radius,kind})};
-  // Auto island pairs are deliberately weak; they must never dominate precise manual edge pairs.
-  for(const pair of pairs||[]){if(segmentPairs?.length)break;const tb=pair.target.boundary||[],sb=pair.source.boundary||[];if(!tb.length||!sb.length)continue;const stride=Math.max(1,Math.ceil(tb.length/120));for(let i=0;i<tb.length;i+=stride){const t=tb[i],s=nearestBoundaryPoint(sb,t.x,t.y);if(s&&Math.hypot(s.x-t.x,s.y-t.y)<=3)add(s,t,'auto',.8)}}
   for(const pair of segmentPairs||[]){
-    const ta=orderedSegmentPoints(pair.targetSegment),sa=orderedSegmentPoints(pair.sourceSegment);if(!ta.length||!sa.length)continue;
-    const n=Math.max(3,Math.min(20,Math.round(Math.max(ta.length,sa.length)/2)));
-    for(let i=0;i<n;i++){const t=i/Math.max(1,n-1);add(sampleOrdered(sa,t),sampleOrdered(ta,t),'manual',1)}
+    let ta=orderedSegmentPoints(pair.targetSegment),sa=orderedSegmentPoints(pair.sourceSegment);if(ta.length<2||sa.length<2)continue;
+    // Align orientation by endpoint cost so the edge cannot be paired backwards.
+    const same=Math.hypot(ta[0].x-sa[0].x,ta[0].y-sa[0].y)+Math.hypot(ta.at(-1).x-sa.at(-1).x,ta.at(-1).y-sa.at(-1).y);
+    const flip=Math.hypot(ta[0].x-sa.at(-1).x,ta[0].y-sa.at(-1).y)+Math.hypot(ta.at(-1).x-sa[0].x,ta.at(-1).y-sa[0].y);
+    if(flip<same)sa=sa.reverse();
+    const span=Math.max(pair.targetSegment.bbox.w,pair.targetSegment.bbox.h,pair.sourceSegment.bbox.w,pair.sourceSegment.bbox.h);
+    const n=Math.max(4,Math.min(64,Math.ceil(span*2)+1));
+    for(let i=0;i<n;i++){const t=i/(n-1),dst=sampleOrdered(ta,t),src=sampleOrdered(sa,t);out.push({dst,src,dx:src.x-dst.x,dy:src.y-dst.y})}
   }
   return out
  }
  function smoothWarp(sourceCanvas,targetAnalysis,sourceAnalysis,pairs,segmentPairs=[]){
   const out=document.createElement('canvas');out.width=sourceCanvas.width;out.height=sourceCanvas.height;
-  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=minimalControls(targetAnalysis,sourceAnalysis,pairs,segmentPairs);
+  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=exactEdgeControls(segmentPairs);
   const sxScale=sourceAnalysis.w/out.width,syScale=sourceAnalysis.h/out.height,txScale=targetAnalysis.w/out.width,tyScale=targetAnalysis.h/out.height;
   if(!controls.length){out.getContext('2d').putImageData(src,0,0);return out}
-  for(let oy=0;oy<out.height;oy++){const ty=oy*tyScale;for(let ox=0;ox<out.width;ox++){const tx=ox*txScale;let wx=0,wy=0,ws=0,maxInf=0;
-    for(const c of controls){const ddx=tx-c.dst.x,ddy=ty-c.dst.y,d=Math.hypot(ddx,ddy),r=c.radius;if(d>=r)continue;const u=1-d/r,inf=u*u*(3-2*u),w=inf/(.2+c.mag*.15);wx+=c.dx*w;wy+=c.dy*w;ws+=w;maxInf=Math.max(maxInf,inf)}
-    let dx=ws?wx/ws:0,dy=ws?wy/ws:0;if(maxInf<.001){dx=0;dy=0}else{dx*=maxInf;dy*=maxInf}
-    const limit=6;dx=Math.max(-limit,Math.min(limit,dx));dy=Math.max(-limit,Math.min(limit,dy));
-    const rgba=sampleBilinear(src,(tx+dx)/sxScale,(ty+dy)/syScale),i=(oy*out.width+ox)*4;od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3]
+  // Exact inverse deformation: matched edge samples are hard constraints. IDW interpolation
+  // moves nearby texels coherently while rapidly decaying away from the selected edges.
+  for(let oy=0;oy<out.height;oy++){const ty=(oy+.5)*tyScale,oxLoop=out.width;for(let ox=0;ox<oxLoop;ox++){const tx=(ox+.5)*txScale;let wx=0,wy=0,ws=0,nearest=Infinity,hard=null;
+    for(const q of controls){const ddx=tx-q.dst.x,ddy=ty-q.dst.y,d2=ddx*ddx+ddy*ddy;if(d2<nearest){nearest=d2;hard=q}if(d2>144)continue;const w=1/Math.pow(d2+.015,1.35);wx+=q.dx*w;wy+=q.dy*w;ws+=w}
+    let dx=0,dy=0;
+    if(nearest<.08&&hard){dx=hard.dx;dy=hard.dy}
+    else if(ws){const d=Math.sqrt(nearest),fade=d>=12?0:Math.pow(1-d/12,2);dx=wx/ws*fade;dy=wy/ws*fade}
+    const limit=8,mag=Math.hypot(dx,dy);if(mag>limit){dx*=limit/mag;dy*=limit/mag}
+    const rgba=sampleBilinear(src,(tx+dx)/sxScale-.5,(ty+dy)/syScale-.5),i=(oy*out.width+ox)*4;od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3]
   }}
   out.getContext('2d').putImageData(dst,0,0);return out
  }
