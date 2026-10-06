@@ -27,10 +27,7 @@
 .preview3dMeta{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:44vw}
 .preview3dVariants{display:none;gap:7px;overflow-x:auto;padding:8px 10px calc(8px + var(--safe));background:rgba(13,15,18,.97);border-top:1px solid var(--line);scrollbar-width:none}
 .preview3dVariants.show{display:flex}.preview3dVariant{position:relative;flex:0 0 58px;width:58px;height:58px;border:2px solid transparent;border-radius:10px;padding:0;background:#0b0d10;overflow:hidden}
-.preview3dVariant img{width:100%;height:100%;display:block;object-fit:cover}.preview3dVariant.active{border-color:var(--accent)}
-.preview3dJoystick{position:absolute;left:12px;bottom:34px;width:76px;height:76px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(15,18,22,.46);backdrop-filter:blur(3px);z-index:8;touch-action:none;user-select:none}
-.preview3dJoystick::before,.preview3dJoystick::after{content:"";position:absolute;background:rgba(255,255,255,.12);pointer-events:none}.preview3dJoystick::before{left:37px;top:9px;bottom:9px;width:1px}.preview3dJoystick::after{top:37px;left:9px;right:9px;height:1px}
-.preview3dStick{position:absolute;left:25px;top:25px;width:26px;height:26px;border-radius:50%;background:rgba(245,247,250,.72);border:1px solid rgba(255,255,255,.6);pointer-events:none;transform:translate(0,0)}.preview3dVariant span{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.72);font-size:7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview3dVariant img{width:100%;height:100%;display:block;object-fit:cover}.preview3dVariant.active{border-color:var(--accent)}.preview3dVariant span{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.72);font-size:7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 @media(min-width:700px){.grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;padding:12px}.controls{grid-template-columns:minmax(240px,1fr) 190px 160px 120px auto}.controls .search{grid-column:auto}.drawer{max-width:720px;margin:0 auto}.bottom{left:50%;transform:translateX(-50%);max-width:720px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
 </style></head><body><div class="app">
@@ -75,7 +72,7 @@
   </div>
   <div class="preview3dStage" id="preview3dStage">
     <div class="preview3dScene" id="preview3dScene"></div>
-    <div class="preview3dJoystick" id="preview3dJoystick" aria-label="3D döndürme joystick"><div class="preview3dStick" id="preview3dStick"></div></div>\n    <div class="preview3dHint">Sürükle / joystick: döndür · İki parmak / tekerlek: yakınlaştır</div>
+    <div class="preview3dHint">Sürükle: döndür · İki parmak / tekerlek: yakınlaştır</div>
   </div>
   <div class="preview3dVariants" id="preview3dVariants"></div>
 </div>
