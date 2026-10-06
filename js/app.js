@@ -1264,7 +1264,7 @@ async function activateSelectedVariant(){
  const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 
-const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null};
+const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target'};
 function uvClampSel(s,w,h){s.x=Math.max(0,Math.min(w-1,s.x));s.y=Math.max(0,Math.min(h-1,s.y));s.w=Math.max(1,Math.min(w-s.x,s.w));s.h=Math.max(1,Math.min(h-s.y,s.h));return s}
 function uvDrawSelection(kind){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),el=$(kind==='orig'?'uvOrigSel':'uvGenSel'),s=uvMap[kind+'Sel'];if(!canvas||!s)return;const wrap=$('uvLiveWrap'),rx=wrap.clientWidth/canvas.width*uvMap.zoom,ry=wrap.clientHeight/canvas.height*uvMap.zoom;el.style.left=(uvMap.panX+s.x*rx)+'px';el.style.top=(uvMap.panY+s.y*ry)+'px';el.style.width=(s.w*rx)+'px';el.style.height=(s.h*ry)+'px'}
 function uvStatus(){const a=uvMap.origSel,b=uvMap.genSel;$('uvMapStatus').textContent=uvMap.history.length+' canlı düzeltme · O:'+(a?(a.x+','+a.y+' '+a.w+'×'+a.h):'-')+' · Ü:'+(b?(b.x+','+b.y+' '+b.w+'×'+b.h):'-')}
@@ -1284,31 +1284,23 @@ function uvRefreshContours(){
  cv.width=uvMap.work.width;cv.height=uvMap.work.height;cv.style.display=uvMap.contours?'':'none';
  if(!uvMap.contours||!uvMap.autoTarget||!uvMap.autoSource){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);return}
  const view=uvMap.view,showTarget=view==='orig'||view==='overlay'||view==='work'||view==='lines',showSource=view==='gen'||view==='overlay'||view==='lines';
- window.MTSUvWarp?.draw?.(cv,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs||[],{showTarget,showSource,excludedTarget:uvMap.excludedTarget,excludedSource:uvMap.excludedSource});
+ window.MTSUvWarp?.draw?.(cv,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs||[],{showTarget,showSource,excludedTarget:uvMap.excludedTarget,excludedSource:uvMap.excludedSource,segmentPairs:uvMap.edgePairs,selectedTargetSegment:uvMap.selectedTargetSegment,selectedSourceSegment:uvMap.selectedSourceSegment});
  uvApplyTransform();
 }
 function uvAnalysisPoint(analysis,e){const wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(analysis.w-1,Math.floor(bx*analysis.w/wrap.clientWidth))),y:Math.max(0,Math.min(analysis.h-1,Math.floor(by*analysis.h/wrap.clientHeight)))}}
 function uvManualLinkPick(e){
  if(!uvMap.manualLink&&!uvMap.excludeMode)return false;
  if(!uvMap.autoTarget||!uvMap.autoSource)if(!uvAnalyzeSmart())return true;
- const view=uvMap.view;
- if(uvMap.excludeMode){
-  const sourceSide=view==='gen'||view==='work';
-  const analysis=sourceSide?uvMap.autoSource:uvMap.autoTarget,p=uvAnalysisPoint(analysis,e),set=sourceSide?uvMap.excludedSource:uvMap.excludedTarget;
-  const hit=window.MTSUvWarp.nearest(analysis,p.x,p.y,set,Math.max(3,Math.min(analysis.w,analysis.h)*.12));if(!hit)return true;
-  if(set.has(hit.id))set.delete(hit.id);else set.add(hit.id);
-  uvMap.autoPairs=(uvMap.autoPairs||[]).filter(x=>sourceSide?x.source.id!==hit.id:x.target.id!==hit.id);
-  uvRefreshContours();$('uvAutoMeta').textContent='Kenar '+(set.has(hit.id)?'elendi':'geri alındı')+' · toplam '+(uvMap.excludedTarget.size+uvMap.excludedSource.size);return true;
+ if(uvMap.excludeMode)return false;
+ const analysis=uvMap.edgePickSide==='target'?uvMap.autoTarget:uvMap.autoSource,p=uvAnalysisPoint(analysis,e);
+ const hit=window.MTSUvWarp.nearestSegment?.(analysis,p.x,p.y,null,Math.max(2,Math.min(analysis.w,analysis.h)*.09));
+ if(!hit){$('uvAutoMeta').textContent=(uvMap.edgePickSide==='target'?'Orijinal':'Eklenen')+' kenara daha yakın dokun';return true}
+ if(uvMap.edgePickSide==='target'){
+   uvMap.selectedTargetSegment=hit;uvMap.edgePickSide='source';uvSetView('lines');$('uvAutoMeta').textContent='Orijinal kenar seçildi · şimdi Eklenen karşılığını seç';
+ }else{
+   uvMap.selectedSourceSegment=hit;$('uvConfirmEdgeMatch').style.display='';$('uvAutoMeta').textContent='İki kenar seçildi · beyaz vurguları kontrol et ve Eşle';
  }
- if(!uvMap.manualSource){
-  if(view!=='gen'&&view!=='work'){uvSetView('gen');$('uvAutoMeta').textContent='Önce Üretilen sınırı seç';return true}
-  const p=uvAnalysisPoint(uvMap.autoSource,e),hit=window.MTSUvWarp.nearest(uvMap.autoSource,p.x,p.y,uvMap.excludedSource,Math.max(3,Math.min(uvMap.autoSource.w,uvMap.autoSource.h)*.12));if(!hit)return true;
-  uvMap.manualSource=hit;$('uvAutoMeta').textContent='Turuncu seçildi · şimdi yeşil Orijinal sınırı seç';toast('Üretilen sınır seçildi');return true;
- }
- const p=uvAnalysisPoint(uvMap.autoTarget,e),hit=window.MTSUvWarp.nearest(uvMap.autoTarget,p.x,p.y,uvMap.excludedTarget,Math.max(3,Math.min(uvMap.autoTarget.w,uvMap.autoTarget.h)*.12));if(!hit)return true;
- uvMap.autoPairs=(uvMap.autoPairs||[]).filter(x=>x.source.id!==uvMap.manualSource.id&&x.target.id!==hit.id);
- uvMap.autoPairs.push({target:hit,source:uvMap.manualSource,score:-1,manual:true});
- uvMap.manualSource=null;uvRefreshContours();$('uvAutoMeta').textContent='Manuel eşleşme '+uvMap.autoPairs.filter(x=>x.manual).length+' · sonraki turuncu sınırı seç';toast('Sınırlar manuel eşlendi');return true
+ uvRefreshContours();return true
 }
 function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
@@ -1338,7 +1330,7 @@ function uvAutoWarpSmart(){
  if(!uvMap.autoApplied)uvMap.history.push(g.getImageData(0,0,uvMap.work.width,uvMap.work.height));
  const base=document.createElement('canvas');base.width=uvMap.work.width;base.height=uvMap.work.height;base.getContext('2d').putImageData(uvMap.autoBase,0,0);
  const sourceAnalysis=window.MTSUvWarp.analyze(base);
- const warped=(window.MTSUvWarp.smoothWarp||window.MTSUvWarp.warp)(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs);
+ const warped=window.MTSUvWarp.smoothWarp?window.MTSUvWarp.smoothWarp(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs,uvMap.edgePairs):(window.MTSUvWarp.warp)(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs);
  uvMap.work.width=warped.width;uvMap.work.height=warped.height;uvMap.work.getContext('2d').drawImage(warped,0,0);uvMap.autoApplied=true;
  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work);
  uvRenderWork();uvRefreshContours();uvStatus();toast('Otomatik bükme güncellendi');
@@ -1361,9 +1353,10 @@ $('uvPreview3dLive').onclick=async()=>{if(!uvMap.meta||!uvMap.work)return;try{co
 $('uvBgMode').onchange=e=>{uvMap.bgMode=e.target.value;uvMap.autoTarget=null;uvMap.autoSource=null;uvMap.autoPairs=[];uvAnalyzeSmart()};
 $('uvDetectIslands').onclick=()=>uvAnalyzeSmart();
 
-$('uvManualLink').onclick=()=>{uvMap.manualLink=!uvMap.manualLink;uvMap.excludeMode=false;uvMap.manualSource=null;uvMap.panMode=false;uvMap.globalMode=false;uvMap.pointers.clear();$('uvPanToggle').classList.remove('primary');$('uvLiveWrap').classList.remove('panMode');$('uvExcludeContour').classList.remove('primary');$('uvManualLink').classList.toggle('primary',uvMap.manualLink);$('uvManualLink').textContent=uvMap.manualLink?'Manuel: İptal':'Manuel Eşle';if(uvMap.manualLink){if(!uvMap.autoTarget||!uvMap.autoSource)uvAnalyzeSmart();uvSetView('lines');$('uvAutoMeta').textContent='Sadece sınırlar · önce turuncu Üretilen sınırı seç'}else uvRefreshContours()};
+$('uvManualLink').onclick=()=>{uvMap.manualLink=!uvMap.manualLink;uvMap.excludeMode=false;uvMap.edgePickSide='target';uvMap.selectedTargetSegment=null;uvMap.selectedSourceSegment=null;$('uvConfirmEdgeMatch').style.display='none';uvMap.panMode=false;uvMap.globalMode=false;uvMap.pointers.clear();$('uvPanToggle').classList.remove('primary');$('uvLiveWrap').classList.remove('panMode');$('uvExcludeContour').classList.remove('primary');$('uvManualLink').classList.toggle('primary',uvMap.manualLink);$('uvManualLink').textContent=uvMap.manualLink?'Kenar Eşle: İptal':'Kenar Eşle';if(uvMap.manualLink){if(!uvMap.autoTarget||!uvMap.autoSource)uvAnalyzeSmart();uvSetView('lines');$('uvAutoMeta').textContent='1/2 · Orijinal (yeşil) kenarı seç'}else uvRefreshContours()};
+$('uvConfirmEdgeMatch').onclick=()=>{if(!uvMap.selectedTargetSegment||!uvMap.selectedSourceSegment)return;uvMap.edgePairs.push({targetSegment:uvMap.selectedTargetSegment,sourceSegment:uvMap.selectedSourceSegment,manual:true});uvMap.selectedTargetSegment=null;uvMap.selectedSourceSegment=null;uvMap.edgePickSide='target';$('uvConfirmEdgeMatch').style.display='none';uvRefreshContours();$('uvAutoMeta').textContent='K'+uvMap.edgePairs.length+' kaydedildi · sonraki Orijinal kenarı seç';toast('Kenar çifti eşlendi')};
 $('uvExcludeContour').onclick=()=>{uvMap.excludeMode=!uvMap.excludeMode;uvMap.manualLink=false;uvMap.manualSource=null;$('uvManualLink').classList.remove('primary');$('uvManualLink').textContent='Manuel Eşle';$('uvExcludeContour').classList.toggle('primary',uvMap.excludeMode);$('uvExcludeContour').textContent=uvMap.excludeMode?'Eleme: İptal':'Kenar Ele';if(uvMap.excludeMode){uvMap.panMode=false;uvMap.pointers.clear();$('uvPanToggle').classList.remove('primary');$('uvAutoMeta').textContent='Orijinal veya Üretilen görünümünde elenecek sınıra dokun'}};
-$('uvClearMatches').onclick=()=>{uvMap.autoPairs=[];uvMap.manualSource=null;uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.autoBase=null;uvMap.autoApplied=false;uvRefreshContours();$('uvAutoMeta').textContent='Eşlemeler ve elemeler temizlendi'};
+$('uvClearMatches').onclick=()=>{uvMap.autoPairs=[];uvMap.manualSource=null;uvMap.edgePairs=[];uvMap.selectedTargetSegment=null;uvMap.selectedSourceSegment=null;$('uvConfirmEdgeMatch').style.display='none';uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.autoBase=null;uvMap.autoApplied=false;uvRefreshContours();$('uvAutoMeta').textContent='Eşlemeler ve elemeler temizlendi'};
 
 $('uvAutoMatch').onclick=()=>uvAutoMatchSmart();
 $('uvAutoWarp').onclick=()=>uvAutoWarpSmart();
