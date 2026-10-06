@@ -97,7 +97,9 @@
   resetView();
  }
  async function open(){
-  if(!active)return;mode='object';root.classList.add('open');await render();
+  if(!active)return;
+  if(!['Block','Functional Block'].includes(assetTypeOf(active))){toast('3D önizleme şu an blok ve fonksiyonel bloklar için');return}
+  mode='object';root.classList.add('open');await render();
  }
  function close(){root.classList.remove('open');scene.innerHTML='';pointers.clear();lastPinch=0}
  openBtn.addEventListener('click',open);
