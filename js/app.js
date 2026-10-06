@@ -1318,16 +1318,46 @@ function islandStudioCycle(d){if(!islandStudio.islands.length)return;islandStudi
 function islandStudioDelete(){if(islandStudio.index<0)return;islandStudio.islands.splice(islandStudio.index,1);islandStudio.index=Math.min(islandStudio.islands.length-1,islandStudio.index);islandStudioSave();islandStudioBuildTemplate(false)}
 async function islandStudioBuildTemplate(download=false){
  if(!islandStudio.orig||!islandStudio.islands.length){islandStudioStatus('Önce ada tanımla.');return null}
- const src=islandStudio.orig,w=src.width,h=src.height,gap=Math.max(8,Math.round(Math.max(w,h)*.08)),pad=gap,parts=[];
- for(let ai=0;ai<islandStudio.islands.length;ai++){const a=islandStudio.islands[ai],rs=a.rects||[];if(!rs.length)continue;const x0=Math.min(...rs.map(r=>r.x)),y0=Math.min(...rs.map(r=>r.y)),x1=Math.max(...rs.map(r=>r.x+r.w)),y1=Math.max(...rs.map(r=>r.y+r.h));parts.push({ai,x0,y0,w:x1-x0,h:y1-y0,rects:rs})}
+ const src=islandStudio.orig,w=src.width,h=src.height,parts=[];
+ for(let ai=0;ai<islandStudio.islands.length;ai++){
+   const a=islandStudio.islands[ai],rs=a.rects||[];if(!rs.length)continue;
+   const x0=Math.min(...rs.map(r=>r.x)),y0=Math.min(...rs.map(r=>r.y)),x1=Math.max(...rs.map(r=>r.x+r.w)),y1=Math.max(...rs.map(r=>r.y+r.h));
+   parts.push({ai,x0,y0,w:x1-x0,h:y1-y0,rects:rs,cx:(x0+x1)/2,cy:(y0+y1)/2})
+ }
  if(!parts.length){islandStudioStatus('Adalarda kayıtlı seçim yok.');return null}
- const sheetW=Math.max(w*2,Math.max(...parts.map(p=>p.w))+pad*2);let x=pad,y=pad,rh=0;
- for(const p of parts){if(x+p.w+pad>sheetW){x=pad;y+=rh+gap;rh=0}p.tx=x;p.ty=y;x+=p.w+gap;rh=Math.max(rh,p.h)}
- const out=document.createElement('canvas');out.width=sheetW;out.height=y+rh+pad;const g=out.getContext('2d');
- for(const p of parts){for(const r of p.rects)g.drawImage(src,r.x,r.y,r.w,r.h,p.tx+r.x-p.x0,p.ty+r.y-p.y0,r.w,r.h)}
- islandStudio.template=out;islandStudio.map={sheetW:out.width,sheetH:out.height,parts:parts.map(p=>({ai:p.ai,src:{x:p.x0,y:p.y0,w:p.w,h:p.h},dst:{x:p.tx,y:p.ty,w:p.w,h:p.h},rects:p.rects}))};
+
+ // Preserve the original UV composition. Enlarge the canvas around its center and push
+ // every island radially away from the atlas center. Gap is proportional, never fixed pixels.
+ const atlasCx=w/2,atlasCy=h/2;
+ const gapRatio=.18; // 18% breathing room relative to each island + atlas scale
+ const marginRatio=.16;
+ const placed=parts.map(p=>{
+   let vx=p.cx-atlasCx,vy=p.cy-atlasCy;
+   // An island exactly at center still needs deterministic separation.
+   if(Math.abs(vx)<.001&&Math.abs(vy)<.001){vx=1;vy=0}
+   const ax=Math.abs(vx)/(w/2||1),ay=Math.abs(vy)/(h/2||1);
+   // Push independently on both axes so separation grows horizontally AND vertically.
+   const pushX=Math.sign(vx)*(w*gapRatio*(.55+.45*ax) + p.w*gapRatio*.5);
+   const pushY=Math.sign(vy)*(h*gapRatio*(.55+.45*ay) + p.h*gapRatio*.5);
+   return {...p,rawX:p.x0+pushX,rawY:p.y0+pushY}
+ });
+ const minX=Math.min(0,...placed.map(p=>p.rawX)),minY=Math.min(0,...placed.map(p=>p.rawY));
+ const maxX=Math.max(w,...placed.map(p=>p.rawX+p.w)),maxY=Math.max(h,...placed.map(p=>p.rawY+p.h));
+ const margin=Math.max(4,Math.round(Math.max(w,h)*marginRatio));
+ const sheetW=Math.ceil(maxX-minX+margin*2),sheetH=Math.ceil(maxY-minY+margin*2);
+ const shiftX=-minX+margin,shiftY=-minY+margin;
+ const out=document.createElement('canvas');out.width=sheetW;out.height=sheetH;const g=out.getContext('2d');
+ for(const p of placed){
+   p.tx=Math.round(p.rawX+shiftX);p.ty=Math.round(p.rawY+shiftY);
+   for(const rr of p.rects)g.drawImage(src,rr.x,rr.y,rr.w,rr.h,p.tx+rr.x-p.x0,p.ty+rr.y-p.y0,rr.w,rr.h)
+ }
+ islandStudio.template=out;
+ islandStudio.map={v:2,layout:'radial-original',gapRatio,marginRatio,sheetW:out.width,sheetH:out.height,sourceW:w,sourceH:h,parts:placed.map(p=>({ai:p.ai,src:{x:p.x0,y:p.y0,w:p.w,h:p.h},dst:{x:p.tx,y:p.ty,w:p.w,h:p.h},rects:p.rects}))};
  try{localStorage.setItem(islandStudioKey()+':template',JSON.stringify(islandStudio.map))}catch(_){}
- if(download){const blob=await canvasPngBlob(out),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(islandStudio.meta.id||'texture')+'_ISLAND_TEMPLATE.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);islandStudioStatus('Export tamamlandı · '+out.width+'×'+out.height+' · '+parts.length+' ada')}
+ if(download){
+   const blob=await canvasPngBlob(out),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(islandStudio.meta.id||'texture')+'_ISLAND_TEMPLATE.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+   islandStudioStatus('Export tamamlandı · orijinal düzen korunuyor · '+out.width+'×'+out.height+' · '+parts.length+' ada · boşluk %'+Math.round(gapRatio*100))
+ }
  if(islandStudio.tab==='template')islandStudioDraw(out);return out
 }
 async function islandStudioImport(file){
