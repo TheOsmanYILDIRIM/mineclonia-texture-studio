@@ -6,7 +6,7 @@ This repository is the canonical source of truth for the Mineclonia Texture Stud
 
 1. `AGENTS.md` — working contract and source-of-truth rules.
 2. `README.md` — project/deployment entry point.
-3. `SESSION_HANDOFF.md` — current state, completed work, open work, and next concrete step.
+3. `SESSION_HANDOFF.md` — concise current state, verification, open work, and next concrete step.
 4. `PROMPT_AUTHORING_GUIDE.md` — persistent texture-prompt methodology.
 
 Current code on `main` always outranks stale prose. If a handoff note conflicts with the repository state, verify the code/history and repair the handoff instead of forcing the code to match old notes.
@@ -78,12 +78,14 @@ Key non-negotiables:
 
 ## Existing decisions that must not silently regress
 
-- The abandoned browser Piglin/B3D 3D-preview experiment stays removed unless the user explicitly requests its return.
+- 3D preview is intentionally supported: blocks use Lua-derived node-face composition with semantic/name fallback; supported entity skins use Mineclonia's real `.b3d` mesh + UV data in a lazy WebGL renderer. Do not replace real runtime/mesh mapping with guessed cube wrapping.
 - High-resolution edited animation atlases must reconstruct at the edited cell resolution, not be forced back to the original low resolution.
 - Main Original/New comparison preview supports mobile pinch zoom/pan without modifying texture data.
 - Runtime-role classification exists because directory names are not semantically sufficient.
 - P0–P6 is only the priority axis. Browsing/classification is separate and follows Mineclonia creative-inventory categories plus deeper technical/runtime classes; do not overload P0/P1 as asset categories.
-- Variant Lab is a comparison gallery, not a prompt/generation page: unlimited multi-PNG import, horizontal thumbnails, 1×1/3×3/6×6 tile preview, mixed mode, and per-variant enable/disable.
+- Variant Lab is a temporary comparison gallery. Non-winning variants stay session-only; only `Aktif yap` writes through the normal persistent edit store.
+- Static technical asset tags are additive catalog metadata only. Prompt status and browser `Değiştirildi` state remain separate runtime concerns and must stay compatible with existing IndexedDB/localStorage records.
+- Mineclonia Lua/source is authoritative for node faces, overlays, composition and palette/tint semantics. Minecraft naming assumptions are not a source of truth.
 
 ## Session / handoff protocol
 
