@@ -1311,7 +1311,7 @@ async function uvIslandBuildTemplate(download=true){
  return out
 }
 async function uvIslandImportFile(file){
- if(!file)return;try{uvMap.islandTemplate=await blobToCanvas(file);toast('AI ada şablonu yüklendi')}catch(e){toast('PNG yüklenemedi')}
+ if(!file)return;try{uvMap.islandTemplate=await decodeBlobToCanvas(file);toast('AI ada şablonu yüklendi')}catch(e){toast('PNG yüklenemedi')}
 }
 async function uvIslandRestore(){
  if(!uvMap.islandTemplate)return toast('Önce AI şablonunu yükle');
