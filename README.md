@@ -1,26 +1,12 @@
 # Mineclonia Texture Studio
 
-Web-hosted Mineclonia texture workflow.
+Browser-based texture authoring and inspection tool for Mineclonia. The canonical branch is `main`; production is deployed to GitHub Pages by GitHub Actions.
 
-## Source of truth
+The app preserves gameplay-facing texture structure while supporting high-resolution edits, prompt workflows, animation handling, temporary variant comparison, runtime-aware classification, and lazy 3D preview.
 
-- Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio`
-- Canonical branch: `main`
-- Production: GitHub Pages via GitHub Actions
-- Live site: https://theosmanyildirim.github.io/mineclonia-texture-studio/
+3D preview uses Mineclonia/Luanti source semantics for block faces and real Mineclonia `.b3d` meshes for supported entity skins. Filename inference is a fallback, not the source of truth.
 
-The GitHub repository is the authoritative source for code, prompts, runtime-role classifications, project decisions, and current work state.
-
-For future agent sessions, read:
-
-1. `AGENTS.md`
-2. `SESSION_HANDOFF.md`
-3. `PROMPT_AUTHORING_GUIDE.md`
-
-Avenox/Beyin is used only as a compact continuity/index layer. If project memory and current repository state ever disagree, verify `main`; the repository wins and memory should be refreshed.
-
-## Deployment
-
-The project is a static site and requires no build step for the site content itself.
-
-`netlify.toml` remains in the repository as legacy/supporting configuration, but Netlify is not the production source of truth.
+Project working rules and continuation state:
+- `AGENTS.md` — repository contract and invariants.
+- `SESSION_HANDOFF.md` — concise current implementation state and next work.
+- `PROMPT_AUTHORING_GUIDE.md` — persistent prompt methodology.
