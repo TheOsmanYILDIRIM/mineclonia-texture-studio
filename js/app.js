@@ -72,7 +72,7 @@ const TEXTURE_TECH_CATEGORIES=[
  ['workstations','Workstations'],['containers','Containers'],['doors','Doors / Trapdoors'],['redstone-tech','Redstone Components'],
  ['hud','HUD'],['gui','GUI / Menus'],['icons','Icons / Indicators'],['overlays','Overlays'],
  ['particles','Particles'],['effects','Effects / VFX'],['sky','Sky / Weather'],['environment','Environment'],
- ['maps','Maps / Minimap'],['debug','System / Debug'],['other','Other / Unresolved']
+ ['maps','Maps / Minimap'],['runtime-tint','Runtime Tint / Color Masks'],['debug','System / Debug'],['other','Other / Unresolved']
 ];
 function textureFacts(x){
  const p=String(x.path||''),parts=p.split('/'),top=(parts[0]||'').toUpperCase(),mod=(parts[1]||'').toLowerCase();
@@ -100,6 +100,31 @@ function minecloniaInventoryCategoriesOf(x){
  if(!out.size)add('misc');
  return [...out];
 }
+const RUNTIME_TINT_EXACT=new Set([
+ 'mcl_core_grass_block_top.png','mcl_core_grass_block_side_overlay.png','mcl_core_papyrus.png',
+ 'mcl_farming_melon_stem_disconnected.png','mcl_farming_pumpkin_stem_disconnected.png',
+ 'mcl_candles_candle.png','mcl_banners_banner_base.png','mcl_banners_item_base_48.png',
+ 'mcl_bows_arrow_overlay.png','mcl_potions_arrow_inv.png',
+ 'mobs_mc_cat_collar.png','mobs_mc_wolf_collar.png','mobs_mc_sheep_fur.png','mobs_mc_sheep_sheared.png'
+]);
+function runtimeTintInfo(x){
+ const n=String(x?.name||'').toLowerCase(),p=String(x?.path||'').toLowerCase();
+ if(RUNTIME_TINT_EXACT.has(n))return {kind:/grass_block|papyrus/.test(n)?'biome':'runtime',reason:'Mineclonia runtime palette/colorize mask'};
+ if(/(?:^|_)(?:leaves|leaf)(?:_|\.|$)/.test(n)&&!/azalea|cherry/.test(n))return {kind:'biome',reason:'Mineclonia leaves palette'};
+ if(/mcl_redstone.*(?:wire|dust)/.test(p+n))return {kind:'state',reason:'redstone power palette'};
+ if(/tropical_fish/.test(p+n))return {kind:'runtime',reason:'entity base/pattern colorize'};
+ if(/mcl_skins/.test(p)&&/(mask|base)/.test(n))return {kind:'runtime',reason:'player skin color mask'};
+ if(/mcl_armor/.test(p)&&/leather/.test(n))return {kind:'runtime',reason:'dyed leather armor colorize'};
+ if(/mcl_banners/.test(p)&&/(base|pattern)/.test(n))return {kind:'runtime',reason:'banner dye colorize'};
+ return null;
+}
+function isRuntimeTintTexture(x){return !!runtimeTintInfo(x)}
+const RUNTIME_TINT_PROMPT_LOCK=`RUNTIME TINT / COLOR MASK LOCK:
+This texture is intentionally color-neutral because Mineclonia applies its visible color later at runtime through a biome palette, state palette, dye, or colorize modifier.
+Preserve the neutral/grayscale value structure and material detail. Do NOT bake the final green, foliage, biome, redstone-power, dye, skin, armor, banner, or entity color into the texture.
+Keep luminance/value relationships suitable for multiplication/colorization. Avoid colored lighting, colored stains, or hue information that would contaminate runtime tinting.
+The runtime-applied color is authoritative; author material detail and value only.`;
+
 function textureTechnicalCategoriesOf(x){
  const {top,mod,n,q,broad}=textureFacts(x),out=new Set(),add=(...ids)=>ids.forEach(id=>out.add(id));
  if(top==='HUD'||/\/hud\/|crosshair|hotbar|heart|hunger|armor_bar|experience|xp_bar|breath|damage_indicator/.test(q))add('hud');
@@ -137,6 +162,7 @@ function textureTechnicalCategoriesOf(x){
  if(/ingot|nugget|shard|crystal|dye|string|leather|paper|stick|flint|feather/.test(q))add('materials');
  if(top==='ITEMS'&&![...out].some(v=>['tools-tech','weapons','food-tech','materials','armor'].includes(v)))add('items');
  if(/map|minimap|map_/.test(q))add('maps');
+ if(isRuntimeTintTexture(x))add('runtime-tint');
  if(/debug|unknown|placeholder|blank|missing|structure_void|barrier/.test(q))add('debug');
  if(!out.size&&/environment|biome|fog/.test(q))add('environment');
  if(!out.size)add('other');
@@ -495,6 +521,7 @@ If realism conflicts with the source UV geometry, the source UV geometry wins.`;
 
 function applyPromptOutputRequirements(text,x){
  let out=String(text||'').trimEnd();
+ if(isRuntimeTintTexture(x)&&!out.includes('RUNTIME TINT / COLOR MASK LOCK:'))out+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;
  if(assetTypeOf(x)==='Entity'){
    if(!out.includes(ENTITY_TRANSPARENCY_MARKER)) out+='\n\n'+ENTITY_TRANSPARENCY_REQUIREMENT;
    return out;
@@ -848,7 +875,7 @@ FINAL PRIORITY:
 3. ${m.tileable?'Create true physical continuity across opposite canvas edges.':'Preserve the functional placement/role defined by Image A.'}
 4. Preserve Image B's detail and visual energy without copying its composition.
 
-Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.`;
+Do not preserve Image A's internal composition unnecessarily. Reconstruct the surface freely within its gameplay and orientation constraints.${isRuntimeTintTexture(x)?'\n\n'+RUNTIME_TINT_PROMPT_LOCK:''}`;
 }
 
 
@@ -1101,7 +1128,7 @@ const P0_REFERENCE_REQUIRED=[
 if(P0_REFERENCE_REQUIRED.some(k=>!P0_REFERENCE_SUBJECT_EXACT[k]))console.error('P0 reference subject map incomplete');
 const __legacyPromptForP0Ref=promptFor;
 promptFor=function(x,mode='classic'){
- if(x&&x.priority==='P0')return {text:p0ReferencePromptFor(x),family:'P0 · Reference-first'};
+ if(x&&x.priority==='P0'){let text=p0ReferencePromptFor(x);if(isRuntimeTintTexture(x)&&!text.includes('RUNTIME TINT / COLOR MASK LOCK:'))text+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;return {text,family:'P0 · Reference-first'}};
  return __legacyPromptForP0Ref(x,mode);
 };
 try{creativeP0PromptFor=()=>null}catch{}
