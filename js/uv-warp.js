@@ -81,11 +81,12 @@
   ctx.putImageData(dst,0,0);return out
  }
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true}={}){
-  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.lineWidth=1;
-  const drawComp=(a,c,stroke)=>{ctx.strokeStyle=stroke;ctx.beginPath();for(let i=0;i<c.boundary.length;i++){const p=c.boundary[i],x=p.x/a.w*canvas.width,y=p.y/a.h*canvas.height;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()};
-  if(showTarget)for(const c of target.components)drawComp(target,c,'rgba(80,220,120,.9)');
-  if(showSource)for(const c of source.components)drawComp(source,c,'rgba(255,170,70,.9)');
-  ctx.strokeStyle='rgba(110,170,255,.8)';for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke()}
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
+  const dot=(a,c,fill)=>{ctx.fillStyle=fill;const sx=canvas.width/a.w,sy=canvas.height/a.h,sz=Math.max(1,Math.min(2,Math.min(sx,sy)));for(const p of c.boundary)ctx.fillRect(p.x*sx,p.y*sy,sz,sz)};
+  if(showTarget)for(const c of target.components)dot(target,c,'rgba(80,220,120,.95)');
+  if(showSource)for(const c of source.components)dot(source,c,'rgba(255,170,70,.95)');
+  ctx.lineWidth=1.2;ctx.strokeStyle='rgba(110,170,255,.85)';
+  for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke()}
  }
  window.MTSUvWarp={analyze,match,warp,draw};
 })();
