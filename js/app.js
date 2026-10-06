@@ -1281,7 +1281,7 @@ function uvRefreshContours(){
 }
 function uvAnalysisPoint(analysis,e){const wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(analysis.w-1,Math.floor(bx*analysis.w/wrap.clientWidth))),y:Math.max(0,Math.min(analysis.h-1,Math.floor(by*analysis.h/wrap.clientHeight)))}}
 function uvManualLinkPick(e){
- if(!uvMap.manualLink)return false;
+ if(!uvMap.manualLink)return false;uvMap.panMode=false;uvMap.globalMode=false;uvMap.pointers.clear();$('uvPanToggle').classList.remove('primary');$('uvLiveWrap').classList.remove('panMode');
  if(!uvMap.autoTarget||!uvMap.autoSource)if(!uvAnalyzeSmart())return true;
  if(!uvMap.manualTarget){
   const p=uvAnalysisPoint(uvMap.autoTarget,e),hit=window.MTSUvWarp.nearest(uvMap.autoTarget,p.x,p.y);if(!hit)return true;
@@ -1315,7 +1315,7 @@ function uvAutoWarpSmart(){
  if(!uvAutoMatchSmart())return;
  const before=uvMap.work.getContext('2d').getImageData(0,0,uvMap.work.width,uvMap.work.height);
  uvMap.history.push(before);
- const warped=window.MTSUvWarp.warp(uvMap.work,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs);
+ const warped=(window.MTSUvWarp.smoothWarp||window.MTSUvWarp.warp)(uvMap.work,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs);
  uvMap.work.width=warped.width;uvMap.work.height=warped.height;uvMap.work.getContext('2d').drawImage(warped,0,0);
  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work);
  uvMap.autoPairs=window.MTSUvWarp.match(uvMap.autoTarget,uvMap.autoSource);
@@ -1338,7 +1338,7 @@ $('uvPreview3dLive').onclick=async()=>{if(!uvMap.meta||!uvMap.work)return;try{co
 
 $('uvDetectIslands').onclick=()=>uvAnalyzeSmart();
 
-$('uvManualLink').onclick=()=>{uvMap.manualLink=!uvMap.manualLink;uvMap.manualTarget=null;$('uvManualLink').classList.toggle('primary',uvMap.manualLink);$('uvManualLink').textContent=uvMap.manualLink?'İptal':'Elle Eşle';if(uvMap.manualLink){if(!uvMap.autoTarget||!uvMap.autoSource)uvAnalyzeSmart();uvSetView('orig');$('uvAutoMeta').textContent='Orijinalde bağlanacak sınırı seç'}else uvRefreshContours()};
+$('uvManualLink').onclick=()=>{uvMap.manualLink=!uvMap.manualLink;uvMap.manualTarget=null;if(uvMap.manualLink){uvMap.panMode=false;uvMap.globalMode=false;uvMap.pointers.clear();$('uvPanToggle').classList.remove('primary');$('uvLiveWrap').classList.remove('panMode');}$('uvManualLink').classList.toggle('primary',uvMap.manualLink);$('uvManualLink').textContent=uvMap.manualLink?'İptal':'Elle Eşle';if(uvMap.manualLink){if(!uvMap.autoTarget||!uvMap.autoSource)uvAnalyzeSmart();uvSetView('orig');$('uvAutoMeta').textContent='Orijinalde bağlanacak sınırı seç'}else uvRefreshContours()};
 
 $('uvAutoMatch').onclick=()=>uvAutoMatchSmart();
 $('uvAutoWarp').onclick=()=>uvAutoWarpSmart();
