@@ -1,0 +1,25 @@
+.variantLab{position:fixed;z-index:80;inset:0;background:var(--bg);display:none;overflow:auto;padding-bottom:calc(40px + var(--safe))}
+.variantLab.open{display:block}.variantTop{position:sticky;top:0;z-index:5;background:rgba(13,15,18,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px}
+.variantTopRow{display:flex;gap:7px;align-items:center}.variantTopRow .select{min-width:0;flex:1}.variantAdd{white-space:nowrap}
+.variantThumbStrip{display:flex;gap:7px;overflow-x:auto;padding:9px 10px 7px;scrollbar-width:none;overscroll-behavior-x:contain}.variantThumbStrip::-webkit-scrollbar{display:none}
+.variantThumb{position:relative;flex:0 0 58px;width:58px;height:58px;border:2px solid transparent;border-radius:10px;padding:0;background:#0b0d10;overflow:hidden}
+.variantThumb img{width:100%;height:100%;display:block;object-fit:cover}.variantThumb.selected{border-color:var(--accent)}.variantThumb.off{opacity:.28;filter:grayscale(.8)}
+.variantThumb.off::after{content:"×";position:absolute;inset:0;display:grid;place-items:center;font-size:32px;font-weight:900;color:#fff;text-shadow:0 2px 7px #000}.variantThumbName{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.7);font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.variantBody{padding:8px 10px 14px}.variantControls{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap;margin:4px 0 8px}.variantControls .btn{padding:8px 10px;font-size:11px}.variantControls .active{background:#dcecff;color:#101820;border-color:#dcecff}.variantControls .mix.active{background:var(--accent);color:#10140d;border-color:transparent}
+.variantStage{width:min(94vw,720px);aspect-ratio:1;margin:0 auto;background:#0b0d10;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;background-repeat:repeat;background-position:0 0}
+.variantStage.single{display:block;background-repeat:repeat}.variantStage img{width:100%;height:100%;object-fit:contain;display:block}.variantMixCell{background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+.variantNone{font-size:12px;color:var(--muted);padding:28px;text-align:center;display:grid;place-items:center;height:100%}
+.variantFooter{display:flex;gap:7px;max-width:720px;margin:8px auto 0}.variantFooter .btn{flex:1}.variantStatus{font-size:11px;color:var(--muted);text-align:center;min-height:18px;margin-top:6px}
+
+.preview3d{position:fixed;z-index:95;inset:0;background:rgba(7,9,12,.96);display:none;flex-direction:column}
+.preview3d.open{display:flex}.preview3dTop{display:flex;gap:7px;align-items:center;padding:10px;border-bottom:1px solid var(--line);background:rgba(13,15,18,.96)}
+.preview3dTop .spacer{flex:1}.preview3dStage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;perspective:850px;background:radial-gradient(circle at 50% 42%,#20252d 0,#11151a 44%,#080a0d 100%)}
+.preview3dScene{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;will-change:transform}
+.preview3dCube{position:absolute;width:var(--s);height:var(--s);margin-left:calc(var(--s)/-2);margin-top:calc(var(--s)/-2);transform-style:preserve-3d}
+.preview3dFace{position:absolute;inset:0;background-repeat:repeat;background-position:center;background-size:100% 100%;backface-visibility:hidden;image-rendering:auto}
+.preview3dShade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(0,0,0,.14))}
+.preview3dHint{position:absolute;left:10px;right:10px;bottom:10px;text-align:center;font-size:11px;color:var(--muted);pointer-events:none;text-shadow:0 1px 2px #000}
+.preview3dMeta{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:44vw}
+.preview3dVariants{display:none;gap:7px;overflow-x:auto;padding:8px 10px calc(8px + var(--safe));background:rgba(13,15,18,.97);border-top:1px solid var(--line);scrollbar-width:none}
+.preview3dVariants.show{display:flex}.preview3dVariant{position:relative;flex:0 0 58px;width:58px;height:58px;border:2px solid transparent;border-radius:10px;padding:0;background:#0b0d10;overflow:hidden}
+.preview3dVariant img{width:100%;height:100%;display:block;object-fit:cover}.preview3dVariant.active{border-color:var(--accent)}.preview3dVariant span{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.72);font-size:7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
