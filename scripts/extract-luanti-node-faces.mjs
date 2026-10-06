@@ -10,7 +10,22 @@ import path from 'node:path';
 const inputs=process.argv.slice(2);
 if(!inputs.length){console.error('usage: node scripts/extract-luanti-node-faces.mjs <lua paths...>');process.exit(2)}
 function walk(p,out=[]){const st=fs.statSync(p);if(st.isDirectory())for(const n of fs.readdirSync(p))walk(path.join(p,n),out);else if(/\.lua$/i.test(p))out.push(p);return out}
-function balanced(src,start){let d=0,q=null,esc=false;for(let i=start;i<src.length;i++){const c=src[i];if(q){if(esc)esc=false;else if(c==='\\')esc=true;else if(c===q)q=null;continue}if(c==='"'||c==="'"){q=c;continue}if(c==='{')d++;else if(c==='}'&&!--d)return src.slice(start,i+1)}return null}
+function balanced(src,start){
+ let depth=0,quote=null,escaped=false;
+ for(let i=start;i<src.length;i++){
+  const c=src[i];
+  if(quote){
+   if(escaped)escaped=false;
+   else if(c==='\\\\')escaped=true;
+   else if(c===quote)quote=null;
+   continue;
+  }
+  if(c==='"'||c==="'"){quote=c;continue}
+  if(c==='{')depth++;
+  else if(c==='}'){depth--;if(depth===0)return src.slice(start,i+1)}
+ }
+ return null;
+}
 function field(body,key){const m=new RegExp('(?:^|[\\n,])\\s*'+key+'\\s*=\\s*').exec(body);if(!m)return null;let i=m.index+m[0].length;if(body[i]==='{')return balanced(body,i);const s=body.slice(i).match(/^["']([^"']*)["']/);return s?s[1]:null}
 function tiles(v){if(!v)return null;const out=[];for(const m of v.matchAll(/(?:name\s*=\s*)?["']([^"']+\.png(?:\^[^"']+)?)["']/g))out.push(m[1]);return out.length?out:null}
 const nodes={};
