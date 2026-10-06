@@ -1,5 +1,17 @@
 ## Lightweight 3D preview — 2026-10-06
 
+- Completed the existing lightweight CSS-3D preview without adding a WebGL/game-engine dependency.
+- The detail-view 3D preview module is lazy-loaded only on first use; normal browsing pays no 3D module/render cost.
+- Object mode supports Block and Functional Block assets and resolves top/bottom/front/back/left/right sibling textures where available.
+- Family matching handles furnace active/on/off fronts, horizontal/vertical fronts, observer/back-lit faces, numbered side faces, tops and bottoms.
+- Grass preview combines the current grass top with dirt and the tintable side overlay so cross-face continuity can be judged as one block.
+- World mode is limited to true Block assets and renders a small 5x5 patch. It prepares one textured cube and clones it instead of recomputing 25 cubes.
+- Entity/item/UV assets are not wrapped onto cubes.
+- Drag rotates; pinch/wheel zooms; preview DOM is cleared on close.
+- Static JS parsing and lazy-load wiring checks pass.
+- Direct-main workflow preserved.
+## Lightweight 3D preview — 2026-10-06
+
 - Added an on-demand CSS 3D preview with no Three.js/WebGL dependency and no render loop.
 - 3D code is inactive until the user opens the preview and the scene DOM is destroyed on close.
 - Object mode: one rotatable/zoomable block/object using inferred Mineclonia top/side/bottom/front/back siblings.
