@@ -7,11 +7,12 @@
  let mode='object',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0;
  const S=150;
  const byName=name=>CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name).toLowerCase())||null;
+ const canObject=x=>!!x&&['Block','Functional Block'].includes(assetTypeOf(x));
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
 
  function familyKey(name){
   return String(name||'').toLowerCase().replace(/\.png$/,'')
-   .replace(/_(?:front_(?:on|off|active)|front|back|top|bottom|side|lit|unlit)$/,'');
+   .replace(/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front|back_lit|back|top_damaged_\d+|top|bottom|side\d*|lit|unlit)$/,'');
  }
  function faceFamily(meta){
   const name=String(meta?.name||'').toLowerCase();
