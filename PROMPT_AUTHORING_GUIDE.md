@@ -1,6 +1,6 @@
 # Mineclonia Texture Studio — Prompt Authoring Guide
 
-Updated: 2026-10-04
+Updated: 2026-10-06
 Purpose: persistent instruction for future sessions that prepare AI texture-edit prompts for this project.
 
 This document is about **prompt authoring only**. It does not define application architecture or 3D preview work.
@@ -203,7 +203,7 @@ Current verified families include:
 - `mcl_deepslate_*_ore.png` → `mcl_deepslate_deepslate.png`; these are created by Mineclonia's deepslate-ore registration path.
 - Nether quartz/gold ore → Mineclonia netherrack where the corresponding catalog texture exists.
 
-Do not add a dependency merely because Minecraft has the same relationship. Verify the Mineclonia texture name and Mineclonia runtime/source usage first.
+Do not add a dependency merely because Minecraft has the same relationship. Verify the Mineclonia texture name and Mineclonia runtime/source usage first. Lua/runtime composition is authoritative when it conflicts with filename or visual intuition.
 
 
 ## Runtime tint / grayscale mask rule
@@ -270,7 +270,6 @@ For character/entity identity, preserve all structural landmarks represented in 
 
 The prompt is a **surface/material replacement**, not a redesign.
 
-For Piglin-like entity prompts specifically, the source entity must remain unmistakably the same entity. Do not humanize, cute-ify, demonize, exaggerate anatomy, extend tusks/ears/fingers, or invent accessories beyond the original masks.
 
 Entity prompts should explicitly say that anatomy and proportions are not being redesigned.
 
