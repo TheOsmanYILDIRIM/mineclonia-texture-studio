@@ -105,22 +105,19 @@ async function activateSelectedVariant(){
 
 
 function bindVariantLabUi(){
- const root=$('variantLab');if(!root||root.dataset.bound==='1')return;
- const close=$('closeVariantLab'),add=$('addVariantPngs'),files=$('variantFiles'),activate=$('activateSelectedVariant'),mix=$('variantMixToggle'),uv=$('variantUvManual'),v3=$('variant3dToggle'),lab=$('variantLab');
- if(close)close.onclick=()=>lab?.classList.remove('open');
- if(add) add.onclick=()=>files?.click();
- if(files)files.onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
- if(activate)activate.onclick=activateSelectedVariant;
- if(mix)mix.onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
- if(uv)uv.onclick=()=>window.MTSUvMapper?.open?.();
- if(v3)v3.onclick=async()=>{const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}};
- if(lab)lab.addEventListener('click',e=>{
-   const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
-   const th=e.target.closest('[data-variant-index]');if(!th)return;const idx=Number(th.dataset.variantIndex);
-   if(variantMixMode){const rec=variantList()[idx];if(rec&&!rec.system){rec.enabled=rec.enabled===false;renderVariantLab()}}
-   else{variantSelectedIndex=idx;renderVariantLab()}
+ const root=$('variantLab');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
+ root.addEventListener('click',async e=>{
+   const t=e.target.closest('button,[data-variant-index],[data-vtile]');if(!t)return;
+   if(t.id==='closeVariantLab'){root.classList.remove('open');return}
+   if(t.id==='addVariantPngs'){e.preventDefault();$('variantFiles')?.click();return}
+   if(t.id==='activateSelectedVariant'){await activateSelectedVariant();return}
+   if(t.id==='variantMixToggle'){variantMixMode=!variantMixMode;renderVariantLab();return}
+   if(t.id==='variantUvManual'){window.MTSUvMapper?.open?.();return}
+   if(t.id==='variant3dToggle'){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}return}
+   if(t.dataset.vtile){variantTileN=Number(t.dataset.vtile);renderVariantStage();return}
+   if(t.dataset.variantIndex!=null){const idx=Number(t.dataset.variantIndex);if(variantMixMode){const rec=variantList()[idx];if(rec&&!rec.system){rec.enabled=rec.enabled===false;renderVariantLab()}}else{variantSelectedIndex=idx;renderVariantLab()}}
  });
- if(lab)lab.dataset.bound='1'
+ const files=$('variantFiles');if(files)files.addEventListener('change',async e=>{await addVariantFiles([...e.target.files]);e.target.value=''});
 }
 window.MTSVariantLab={open:openVariantLabFor,selectedMeta:variantSelectedMeta,list:variantList,render:renderVariantLab,selectedIndex:()=>variantSelectedIndex,userList:variantUserList,sourcesLength:()=>variantSources.length,saveUvVariant:async(meta,rec,blob)=>{const list=variantUserList();list.push({blob,name:(rec?.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;renderVariantLab()}};
 const __bindVariant=()=>{try{bindVariantLabUi()}catch(e){console.error('Variant Lab bind',e)}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__bindVariant,{once:true});else __bindVariant();
