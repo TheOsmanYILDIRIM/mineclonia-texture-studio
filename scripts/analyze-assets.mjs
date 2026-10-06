@@ -41,6 +41,6 @@ function tags(a){
 }
 const records={};
 for(const a of assets)records[a.id]={name:a.name,mod:a.mod,tags:tags(a)};
-const out={schema:1,generated_at:new Date().toISOString(),count:assets.length,records};
+const out={schema:1,generator:'scripts/analyze-assets.mjs',count:assets.length,records};
 fs.writeFileSync(path.join(dataDir,'asset-tags.json'),JSON.stringify(out));
 console.log('asset tags:',assets.length);
