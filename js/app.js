@@ -1307,7 +1307,8 @@ function uvAnalyzeSmart(){
   uvMap.autoTarget=window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'alpha',role:'target',strictAlpha:true});
   uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:'alpha',role:'source',strictAlpha:true});
   uvMap.autoPairs=[];
-  $('uvAutoMeta').textContent='Alpha: Orijinal '+uvMap.autoTarget.components.length+' ada · Üretilen '+uvMap.autoSource.components.length+' ada';
+  const tb=uvMap.autoTarget.bg,sb=uvMap.autoSource.bg;
+  $('uvAutoMeta').textContent='Alpha · O '+uvMap.autoTarget.components.length+' ada ('+tb.transparent+' boş) · Ü '+uvMap.autoSource.components.length+' ada ('+sb.transparent+' boş)';
   uvRefreshContours();return true;
  }catch(err){console.error('UV analyze',err);toast('Sınır analizi başarısız');return false}
 }
