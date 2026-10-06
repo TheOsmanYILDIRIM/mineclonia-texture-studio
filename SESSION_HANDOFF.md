@@ -20,7 +20,7 @@ Important current decisions:
 - Tint-aware prompt rewriting removes contradictory color-language rather than relying only on a final warning.
 - Material dependencies are Mineclonia-source verified, not inferred from Minecraft. Examples include grass continuity and ore host-rock references.
 - Entity UV atlases keep source UV/alpha geometry locked. Entity imports reapply the source alpha mask.
-- Variant Lab drafts are temporary; only the activated winner is persisted as the normal edit.
+- Variant Lab drafts are temporary; only the activated winner is persisted as the normal edit. For entity UV maps with a real `.b3d` mapping, Variant Lab exposes a 3D button that applies the selected session-only PNG directly to the real mesh for UV comparison without persisting it.
 
 ## 3D preview
 
