@@ -252,6 +252,30 @@
   }
   g.putImageData(im,0,0);return canvas
  }
+ function exactUvSnap(sourceCanvas,targetCanvas){
+  const out=document.createElement('canvas');out.width=sourceCanvas.width;out.height=sourceCanvas.height;
+  const g=out.getContext('2d',{willReadFrequently:true});g.drawImage(sourceCanvas,0,0);
+  const im=g.getImageData(0,0,out.width,out.height),d=im.data,t=img(targetCanvas),tw=targetCanvas.width,th=targetCanvas.height;
+  let inside=0,outside=0;
+  for(let y=0;y<out.height;y++)for(let x=0;x<out.width;x++){
+    const tx=Math.min(tw-1,Math.floor(x*tw/out.width)),ty=Math.min(th-1,Math.floor(y*th/out.height)),ta=t.data[(ty*tw+tx)*4+3],i=(y*out.width+x)*4;
+    if(ta>0){d[i+3]=255;inside++}else{d[i+3]=0;outside++}
+  }
+  g.putImageData(im,0,0);return {canvas:out,inside,outside}
+ }
+ function nativeTopologyMatch(sourceCanvas,targetCanvas){
+  const sw=sourceCanvas.width,sh=sourceCanvas.height,tw=targetCanvas.width,th=targetCanvas.height;
+  if(sw%tw||sh%th)return {match:false,reason:'non-integer-scale'};
+  const sx=sw/tw,sy=sh/th;if(Math.abs(sx-sy)>.001)return {match:false,reason:'non-uniform-scale'};
+  const s=img(sourceCanvas),t=img(targetCanvas);let mismatch=0,total=tw*th;
+  for(let ty=0;ty<th;ty++)for(let tx=0;tx<tw;tx++){
+    let solid=0,n=0;
+    for(let y=Math.floor(ty*sy);y<Math.floor((ty+1)*sy);y++)for(let x=Math.floor(tx*sx);x<Math.floor((tx+1)*sx);x++){const i=(y*sw+x)*4;
+      const alpha=s.data[i+3],black=s.data[i]<8&&s.data[i+1]<8&&s.data[i+2]<8;solid+=(alpha>8&&!black)?1:0;n++}
+    const srcOn=n?solid/n>.72:false,tgtOn=t.data[(ty*tw+tx)*4+3]>0;if(srcOn!==tgtOn)mismatch++;
+  }
+  return {match:mismatch===0,mismatch,total,scale:sx,ratio:mismatch/total}
+ }
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true,excludedTarget=new Set(),excludedSource=new Set(),segmentPairs=[],selectedTargetSegment=null,selectedSourceSegment=null}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
   const edge=(a,c,fill)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=Math.max(3,Math.min(6,Math.min(sx,sy)*1.35));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz)};
@@ -266,5 +290,5 @@
   for(const c of analysis.components){if(excluded?.has?.(c.id))continue;for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}
   return best
  }
- window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,edgeError,snapAlphaToTarget,draw,nearest,contourSegments,nearestSegment};
+ window.MTSUvWarp={analyze,analyzeWithMask,analyzeSourceWithinReference,match,warp,smoothWarp,edgeError,snapAlphaToTarget,exactUvSnap,nativeTopologyMatch,draw,nearest,contourSegments,nearestSegment};
 })();
