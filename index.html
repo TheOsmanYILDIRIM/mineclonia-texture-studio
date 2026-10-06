@@ -30,7 +30,7 @@
 .preview3dVariant img{width:100%;height:100%;display:block;object-fit:cover}.preview3dVariant.active{border-color:var(--accent)}.preview3dVariant span{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.72);font-size:7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .uvMapper{position:fixed;z-index:110;inset:0;background:var(--bg);display:none;flex-direction:column}.uvMapper.open{display:flex}
 .uvMapTop{display:flex;gap:7px;align-items:center;padding:9px;border-bottom:1px solid var(--line)}.uvMapTop .spacer{flex:1}.uvMapWork{flex:1;min-height:0;overflow:auto;padding:8px}
-.uvMobileTabs{display:none;gap:7px;margin:0 auto 8px;max-width:600px}.uvMobileTabs .btn{flex:1}.uvMapGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:980px;margin:auto}.uvPane{min-width:0}.uvPaneTitle{text-align:center;font-size:11px;color:var(--muted);margin-bottom:5px}
+.uvViewModes{display:flex;gap:7px;max-width:720px;margin:0 auto 8px}.uvViewModes .btn{flex:1}.uvLiveWrap{position:relative;width:min(96vw,820px);margin:auto;background:#090b0e;border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:none}.uvLiveWrap canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.uvLiveWrap #uvGenCanvas{position:absolute;inset:0}.uvOverlayCtl{display:flex;align-items:center;gap:8px;max-width:720px;margin:8px auto}.uvOverlayCtl input{flex:1}.uvPane{min-width:0}.uvPaneTitle{text-align:center;font-size:11px;color:var(--muted);margin-bottom:5px}
 .uvCanvasWrap{position:relative;width:100%;background:#090b0e;border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:none}.uvCanvasWrap canvas{display:block;width:100%;height:auto;position:relative;image-rendering:pixelated}
 .uvSelection{position:absolute;border:2px solid var(--accent);background:rgba(143,209,79,.12);pointer-events:auto}
 .uvHandle{position:absolute;width:18px;height:18px;border-radius:50%;background:#f5f7fa;border:3px solid #20242b;transform:translate(-50%,-50%);z-index:3;touch-action:none}.uvHandle.active{background:var(--accent);border-color:#fff}
@@ -76,12 +76,13 @@
 </div>
 
 <div class="uvMapper" id="uvMapper">
- <div class="uvMapTop"><button class="btn" id="uvMapClose">←</button><b>Manuel UV Eşleme</b><div class="spacer"></div><span class="stat" id="uvMapMeta"></span></div>
- <div class="uvMapWork"><div class="uvMobileTabs"><button class="btn primary" id="uvTabOrig">Orijinal</button><button class="btn" id="uvTabGen">Üretilen</button></div><div class="uvMapGrid">
-  <div class="uvPane"><div class="uvPaneTitle">Orijinal · hedef koordinat</div><div class="uvCanvasWrap" id="uvOrigWrap"><canvas id="uvOrigCanvas"></canvas><div class="uvSelection" id="uvOrigSel"><i class="uvHandle" data-corner="tl"></i><i class="uvHandle" data-corner="tr"></i><i class="uvHandle" data-corner="bl"></i><i class="uvHandle" data-corner="br"></i><i class="uvMoveCenter" data-corner="move"></i></div></div></div>
-  <div class="uvPane"><div class="uvPaneTitle">Üretilen · kaynak alan</div><div class="uvCanvasWrap" id="uvGenWrap"><canvas id="uvGenCanvas"></canvas><div class="uvSelection" id="uvGenSel"><i class="uvHandle" data-corner="tl"></i><i class="uvHandle" data-corner="tr"></i><i class="uvHandle" data-corner="bl"></i><i class="uvHandle" data-corner="br"></i><i class="uvMoveCenter" data-corner="move"></i></div></div></div>
- </div></div>
- <div class="uvMapBottom"><div class="uvMapActions"><button class="btn primary" id="uvAddPair">+ Eşleştir</button><button class="btn" id="uvUndoPair">Geri al</button><button class="btn" id="uvTargetToggle">Joystick: Üretilen</button><button class="btn primary" id="uvApplyFix">Düzelt → Varyant</button></div><div class="uvMapStatus" id="uvMapStatus"></div><div class="uvJoystick" id="uvJoystick"><div class="uvStick" id="uvStick"></div></div></div>
+ <div class="uvMapTop"><button class="btn" id="uvMapClose">←</button><b>Manuel UV Düzeltme</b><div class="spacer"></div><span class="stat" id="uvMapMeta"></span></div>
+ <div class="uvMapWork">
+  <div class="uvViewModes"><button class="btn" data-uvview="orig">Orijinal</button><button class="btn" data-uvview="work">Üretilen</button><button class="btn primary" data-uvview="overlay">Üst üste</button></div>
+  <div class="uvLiveWrap" id="uvLiveWrap"><canvas id="uvOrigCanvas"></canvas><canvas id="uvGenCanvas"></canvas><div class="uvSelection orig" id="uvOrigSel"><i class="uvHandle" data-corner="tl"></i><i class="uvHandle" data-corner="tr"></i><i class="uvHandle" data-corner="bl"></i><i class="uvHandle" data-corner="br"></i><i class="uvMoveCenter" data-corner="move"></i></div><div class="uvSelection gen" id="uvGenSel"><i class="uvHandle" data-corner="tl"></i><i class="uvHandle" data-corner="tr"></i><i class="uvHandle" data-corner="bl"></i><i class="uvHandle" data-corner="br"></i><i class="uvMoveCenter" data-corner="move"></i></div></div>
+  <div class="uvOverlayCtl"><span>Üst üste</span><input id="uvOverlayRange" type="range" min="0" max="100" value="50"><span id="uvOverlayValue">50%</span></div>
+ </div>
+ <div class="uvMapBottom"><div class="uvMapActions"><button class="btn primary" id="uvAddPair">Parçayı uygula</button><button class="btn" id="uvUndoPair">Geri al</button><button class="btn" id="uvTargetToggle">Joystick: Üretilen · Taşı</button><button class="btn primary" id="uvApplyFix">Bitti → Varyant</button></div><div class="uvMapStatus" id="uvMapStatus"></div><div class="uvJoystick" id="uvJoystick"><div class="uvStick" id="uvStick"></div></div></div>
 </div>
 <div class="preview3d" id="preview3d">
   <div class="preview3dTop">
