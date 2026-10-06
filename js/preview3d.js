@@ -368,10 +368,10 @@
   if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
  }
  function cleanupEntityGL(){if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
- async function renderEntity(meta){
+ async function renderEntity(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';const model=entityModelFile(meta);if(!model)throw Error('Bu entity için Mineclonia mesh eşleşmesi yok');
   const modelUrl=MINECLONIA_RAW_BASE+'/ENTITIES/mobs_mc/models/'+encodeURIComponent(model);
-  const [res,blob]=await Promise.all([fetch(modelUrl,{cache:'force-cache'}),displayBlob(meta.path)]);if(!res.ok)throw Error('Entity mesh yüklenemedi: '+model);
+  const [res,blob]=await Promise.all([fetch(modelUrl,{cache:'force-cache'}),textureBlob?Promise.resolve(textureBlob):displayBlob(meta.path)]);if(!res.ok)throw Error('Entity mesh yüklenemedi: '+model);
   const mesh=parseB3D(await res.arrayBuffer()),indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
   const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
   const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
@@ -428,5 +428,12 @@
  const end=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinch=0};
  stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
  stage.addEventListener('wheel',e=>{e.preventDefault();zoom*=e.deltaY>0?.9:1.1;zoom=Math.max(.35,Math.min(2.4,zoom));applyView()},{passive:false});
- window.MTSPreview3D={open,close};
+ async function openVariant(meta,blob,label='Varyant'){
+  if(!canEntity(meta))throw Error('Bu UV map için gerçek Mineclonia .b3d mesh eşleşmesi yok');
+  mode='object';root.classList.add('open');document.getElementById('preview3dMeta').textContent=meta.name+' · '+label;
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld');obj.textContent='Entity';w.style.display='none';
+  await renderEntity(meta,blob);resetView();
+ }
+ function canVariant3D(meta){return canEntity(meta)}
+ window.MTSPreview3D={open,close,openVariant,canVariant3D};
 })();
