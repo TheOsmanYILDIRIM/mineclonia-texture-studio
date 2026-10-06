@@ -8,7 +8,7 @@
  let mode='object',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0;
  const S=150;
  const byName=name=>CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name).toLowerCase())||null;
- const canWorld=x=>!!x&&['Block','Functional Block','Plant / Foliage'].includes(assetTypeOf(x));
+ const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
 
  function familyKey(name){
   return String(name||'').toLowerCase().replace(/\.png$/,'')
@@ -30,7 +30,7 @@
   const base=await texUrl(meta);
   const ov=overlay?await texUrl(overlay):'';
   if(ov){
-   return {backgroundImage:`url("${ov}"),url("${base}")`,backgroundSize:'100% 100%,100% 100%',overlayTint:true};
+   return {backgroundImage:base?`url("${base}")`:'none',backgroundSize:'100% 100%',overlayTint:true,overlayUrl:ov};
   }
   return {backgroundImage:base?`url("${base}")`:'none',backgroundSize:'100% 100%',overlayTint:false,tint};
  }
@@ -38,8 +38,10 @@
   const f=document.createElement('div');f.className='preview3dFace '+cls;f.style.transform=transform;
   f.style.backgroundImage=style.backgroundImage;f.style.backgroundSize=style.backgroundSize||'100% 100%';
   if(style.tint){f.style.backgroundImage=`linear-gradient(rgba(112,166,90,.68),rgba(112,166,90,.68)),${style.backgroundImage}`;f.style.backgroundBlendMode='multiply';}
-  if(style.overlayTint){
-   f.style.backgroundColor='#70a65a';f.style.backgroundBlendMode='multiply,normal';
+  if(style.overlayTint&&style.overlayUrl){
+   const ov=document.createElement('div');ov.style.cssText='position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;pointer-events:none';
+   ov.style.backgroundImage=`linear-gradient(rgba(112,166,90,.72),rgba(112,166,90,.72)),url("${style.overlayUrl}")`;
+   ov.style.backgroundBlendMode='multiply';f.appendChild(ov);
   }
   const sh=document.createElement('div');sh.className='preview3dShade';sh.style.opacity=String(shade);f.appendChild(sh);
   cube.appendChild(f);
