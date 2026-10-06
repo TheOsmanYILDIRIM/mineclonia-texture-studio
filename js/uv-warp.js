@@ -64,6 +64,12 @@
   return out.sort((x,y)=>y.area-x.area)
  }
  function analyze(canvas,opts={}){
+  if(opts.strictAlpha){
+    const im=img(canvas),w=canvas.width,h=canvas.height,d=im.data,mask=new Uint8Array(w*h);
+    let transparent=0,opaque=0,partial=0;
+    for(let p=0,i=3;p<mask.length;p++,i+=4){const a=d[i];mask[p]=a>0?1:0;if(a===0)transparent++;else if(a===255)opaque++;else partial++}
+    const out={im,w,h,mask,bg:{mode:'strict-alpha',transparent,opaque,partial}};out.components=components(out);return out
+  }
   let a=foregroundMask(canvas,opts);a.components=components(a);
   const bad=!a.components.length||a.components.some(c=>c.area>a.w*a.h*.9&&c.bbox.w>=a.w*.98&&c.bbox.h>=a.h*.98);
   if(bad&&opts.role==='source'&&opts.bgMode==='alpha'){
