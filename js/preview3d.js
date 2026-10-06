@@ -24,12 +24,30 @@
   for(const [,re] of FACE_SUFFIX_RULES)if(re.test(n))return n.replace(re,'.png').replace(/\.png$/,'');
   return n.replace(/\.png$/,'');
  }
+ function woodFaceIdentity(name){
+  const n=String(name||'').toLowerCase().replace(/\.png$/,'');
+  let m;
+  if((m=n.match(/^default_(acacia|aspen|birch|jungle|jungletree|pine|spruce|dark_oak)?_?tree(_top)?$/))){
+   const species=(m[1]||'oak').replace('jungletree','jungle').replace('pine','spruce');
+   return {key:'wood:'+species+':natural',role:m[2]?'top':'side'};
+  }
+  if(n==='default_tree')return {key:'wood:oak:natural',role:'side'};
+  if(n==='default_tree_top')return {key:'wood:oak:natural',role:'top'};
+  if((m=n.match(/^(?:mcl_)?(?:cherry_blossom_|mangrove_|pale_oak_)?log(?:_(top))?(?:_(stripped))?$/))){
+   const species=n.includes('cherry')?'cherry':n.includes('mangrove')?'mangrove':n.includes('pale_oak')?'pale_oak':'oak';
+   const stripped=n.includes('stripped')?'stripped':'natural';
+   return {key:'wood:'+species+':'+stripped,role:n.includes('_top')?'top':'side'};
+  }
+  if((m=n.match(/^mcl_stripped_(mangrove|pale_oak)_log_(side|top)$/)))return {key:'wood:'+m[1]+':stripped',role:m[2]};
+  if((m=n.match(/^mcl_cherry_blossom_log_(top_)?stripped$/)))return {key:'wood:cherry:stripped',role:m[1]?'top':'side'};
+  return null;
+ }
  const FACE_FAMILY_INDEX=new Map();
  function buildFaceFamilyIndex(){
   FACE_FAMILY_INDEX.clear();
   for(const x of CATALOG){
    if(!canObject(x))continue;
-   const key=x.mod+'|'+familyKey(x.name),role=faceRole(x.name);
+   const wood=woodFaceIdentity(x.name),key=wood?wood.key:(x.mod+'|'+familyKey(x.name)),role=wood?wood.role:faceRole(x.name);
    let f=FACE_FAMILY_INDEX.get(key);if(!f){f={plain:[],front:[],back:[],top:[],bottom:[],side:[],side1:[],side2:[],side3:[],side4:[]};FACE_FAMILY_INDEX.set(key,f)}
    f[role].push(x);
   }
@@ -48,7 +66,7 @@
    return {special:'grass',top,bottom:dirt,side:dirt,front:dirt,back:dirt,left:dirt,right:dirt,overlay};
   }
   if(!FACE_FAMILY_INDEX.size)buildFaceFamilyIndex();
-  const f=FACE_FAMILY_INDEX.get(meta.mod+'|'+familyKey(meta.name));
+  const wood=woodFaceIdentity(meta.name),f=FACE_FAMILY_INDEX.get(wood?wood.key:(meta.mod+'|'+familyKey(meta.name)));
   if(!f)return {top:meta,bottom:meta,side:meta,front:meta,back:meta,left:meta,right:meta,overlay:null};
   const plain=best(f.plain,meta),side=best(f.side,meta)||best(f.side1,meta)||plain||meta;
   const top=best(f.top,meta)||plain||meta,bottom=best(f.bottom,meta)||plain||top;
