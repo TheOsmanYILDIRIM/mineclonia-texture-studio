@@ -80,6 +80,44 @@
   }
   ctx.putImageData(dst,0,0);return out
  }
+
+ function controlsFromPairs(target,source,pairs){
+  const out=[];
+  for(const pair of pairs){
+   const t=pair.target.bbox,s=pair.source.bbox;
+   const pts=[[0,0],[.5,0],[1,0],[0,.5],[.5,.5],[1,.5],[0,1],[.5,1],[1,1]];
+   for(const [u,v] of pts)out.push({
+    src:{x:s.x+u*Math.max(0,s.w-1),y:s.y+v*Math.max(0,s.h-1)},
+    dst:{x:t.x+u*Math.max(0,t.w-1),y:t.y+v*Math.max(0,t.h-1)},
+    radius:Math.max(t.w,t.h,s.w,s.h)*2.2
+   });
+  }
+  const w=target.w,h=target.h;
+  for(const p of [{x:0,y:0},{x:w-1,y:0},{x:0,y:h-1},{x:w-1,y:h-1},{x:w/2,y:0},{x:w/2,y:h-1},{x:0,y:h/2},{x:w-1,y:h/2}])
+   out.push({src:{...p},dst:{...p},radius:Math.max(w,h)*.55,anchor:true});
+  return out;
+ }
+ function smoothWarp(sourceCanvas,targetAnalysis,sourceAnalysis,pairs){
+  const out=document.createElement('canvas');out.width=sourceCanvas.width;out.height=sourceCanvas.height;
+  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=controlsFromPairs(targetAnalysis,sourceAnalysis,pairs);
+  const sxScale=sourceAnalysis.w/out.width,syScale=sourceAnalysis.h/out.height,txScale=targetAnalysis.w/out.width,tyScale=targetAnalysis.h/out.height;
+  for(let oy=0;oy<out.height;oy++){
+   const ty=oy*tyScale;
+   for(let ox=0;ox<out.width;ox++){
+    const tx=ox*txScale;let wx=0,wy=0,ws=0;
+    for(const c of controls){
+     const dx=tx-c.dst.x,dy=ty-c.dst.y,d2=dx*dx+dy*dy,r=Math.max(1,c.radius),fall=Math.exp(-d2/(2*r*r));
+     if(fall<.002)continue;
+     const w=fall/(1+.018*d2);
+     wx+=(c.src.x-c.dst.x)*w;wy+=(c.src.y-c.dst.y)*w;ws+=w;
+    }
+    const sx=(tx+(ws?wx/ws:0))/sxScale,sy=(ty+(ws?wy/ws:0))/syScale,rgba=sampleBilinear(src,sx,sy),i=(oy*out.width+ox)*4;
+    od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3];
+   }
+  }
+  out.getContext('2d').putImageData(dst,0,0);return out
+ }
+
  function draw(canvas,target,source,pairs,{showTarget=true,showSource=true}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
   const dot=(a,c,fill)=>{ctx.fillStyle=fill;const sx=canvas.width/a.w,sy=canvas.height/a.h,sz=Math.max(1,Math.min(2,Math.min(sx,sy)));for(const p of c.boundary)ctx.fillRect(p.x*sx,p.y*sy,sz,sz)};
@@ -91,5 +129,5 @@
  function nearest(analysis,x,y){
   let best=null,bd=Infinity;for(const c of analysis.components){for(const p of c.boundary){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}}return best
  }
- window.MTSUvWarp={analyze,match,warp,draw,nearest};
+ window.MTSUvWarp={analyze,match,warp,smoothWarp,draw,nearest};
 })();
