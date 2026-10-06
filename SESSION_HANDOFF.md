@@ -1,3 +1,12 @@
+
+## Front-end modularization (2026-10-06)
+- Repository invariant is now documented in `AGENTS.md`: substantial independent screens/editors/labs must use isolated JS + CSS modules; optional feature failure must not block core catalog boot.
+- Island Studio: `js/island-studio.js` + `css/island-studio.css`.
+- Variant Lab: `js/variant-lab.js` + `css/variant-lab.css`.
+- Manual UV Mapper: `js/uv-mapper.js` + `css/uv-mapper.css`.
+- `js/app.js` now exposes narrow `MTSIslandBridge`, `MTSVariantBridge`, and `MTSUvBridge` APIs instead of owning those feature implementations.
+- Next: verify GitHub Pages boot plus Entity → Variant Lab → UV Eşle and Entity → Ada flows on mobile before further feature changes.
+
 # SESSION HANDOFF — Mineclonia Texture Studio
 
 Updated: 2026-10-06
