@@ -1171,9 +1171,16 @@ promptFor=function(x,mode='classic'){
 try{creativeP0PromptFor=()=>null}catch{}
 
 const variantSets=new Map();
-let variantTextureId=null,variantSelectedIndex=0,variantTileN=6,variantMixMode=false;
+let variantTextureId=null,variantSelectedIndex=0,variantTileN=6,variantMixMode=false,variantSources=[];
 function variantSelectedMeta(){return CATALOG.find(x=>x.id===variantTextureId)||null}
-function variantList(){if(!variantTextureId)return[];if(!variantSets.has(variantTextureId))variantSets.set(variantTextureId,[]);return variantSets.get(variantTextureId)}
+function variantUserList(){if(!variantTextureId)return[];if(!variantSets.has(variantTextureId))variantSets.set(variantTextureId,[]);return variantSets.get(variantTextureId)}
+function variantList(){return [...variantSources,...variantUserList()]}
+async function refreshVariantSources(){
+ const x=variantSelectedMeta();variantSources=[];if(!x)return;
+ const orig=await originalBlob(x.path),edit=await getEdit(x.path);
+ variantSources.push({blob:orig,name:'Orijinal',enabled:true,url:null,system:true,kind:'original'});
+ variantSources.push({blob:edit?.blob||orig,name:'Aktif',enabled:true,url:null,system:true,kind:'active'});
+}
 function variantUrl(rec){if(!rec.url)rec.url=URL.createObjectURL(rec.blob);return rec.url}
 function variantEnabled(){return variantList().filter(v=>v.enabled!==false)}
 function variantMixIndex(i,n){let x=(i+1)*1103515245+12345;x=(x^(x>>>16))>>>0;return n?x%n:0}
@@ -1194,7 +1201,7 @@ function renderVariantStage(){
  document.querySelectorAll('[data-vtile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.vtile)===variantTileN));
  $('variantMixToggle').classList.toggle('active',variantMixMode);
  const selected=list[variantSelectedIndex]||null;
- $('activateSelectedVariant').disabled=!selected||variantMixMode;
+ $('activateSelectedVariant').disabled=!selected||variantMixMode||!!selected.system;
  if(!list.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">PNG ekleyerek varyantları karşılaştır.</div>';$('variantStatus').textContent='';return}
  if(variantMixMode){
    if(!enabled.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">Tüm varyantlar kapalı. Üstteki thumbnail’lere dokunup geri açabilirsin.</div>';$('variantStatus').textContent='0 aktif varyant';return}
@@ -1212,7 +1219,7 @@ function renderVariantStage(){
 }
 async function ensurePreview3dLoaded(){
  if(window.MTSPreview3D)return window.MTSPreview3D;
- if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d2';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
+ if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d3';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
  await preview3dLoadPromise;return window.MTSPreview3D;
 }
 function updateVariant3dButton(){
@@ -1222,32 +1229,32 @@ function updateVariant3dButton(){
 }
 function renderVariantLab(){
  const x=variantSelectedMeta();if(!x)return;
- const list=variantList(),enabled=variantEnabled();
- $('variantMeta').textContent=`${x.name} · ${list.length} varyant${variantMixMode?` · ${enabled.length} aktif`:''}`;
+ const list=variantList(),enabled=variantEnabled(),user=variantUserList();
+ $('variantMeta').textContent=`${x.name} · ${user.length} varyant${variantMixMode?` · ${enabled.length} aktif`:''}`;
  renderVariantThumbs();renderVariantStage();updateVariant3dButton();
 }
 async function populateVariantTextureSelect(){
  const sel=$('variantTexture');if(sel.dataset.ready)return;
  sel.innerHTML=CATALOG.map(x=>`<option value="${x.id}">${x.priority} · ${x.name}</option>`).join('');
- sel.dataset.ready='1';sel.onchange=()=>{variantTextureId=sel.value;variantSelectedIndex=0;variantMixMode=false;renderVariantLab()};
+ sel.dataset.ready='1';sel.onchange=async()=>{variantTextureId=sel.value;variantSelectedIndex=0;variantMixMode=false;await refreshVariantSources();renderVariantLab()};
 }
 async function openVariantLabFor(meta){
  await populateVariantTextureSelect();
  const chosen=meta||active||CATALOG[0];variantTextureId=chosen.id;$('variantTexture').value=chosen.id;
- $('variantLab').classList.add('open');renderVariantLab();
+ await refreshVariantSources();$('variantLab').classList.add('open');renderVariantLab();
 }
 async function addVariantFiles(files){
  const x=variantSelectedMeta();if(!x||!files?.length)return;
- const list=variantList();let added=0;
+ const list=variantUserList();let added=0;
  for(const file of files){
    if(!file.type.includes('png')&&!/\.png$/i.test(file.name))continue;
    try{const blob=await prepareImportedTextureBlob(file,x);list.push({blob,name:file.name,enabled:true,url:null,addedAt:Date.now()});added++}catch(err){console.warn('Varyant PNG alınamadı',file.name,err)}
  }
- if(added){variantSelectedIndex=Math.max(0,list.length-added);renderVariantLab();toast(`${added} varyant eklendi`)}
+ if(added){variantSelectedIndex=variantSources.length+Math.max(0,list.length-added);renderVariantLab();toast(`${added} varyant eklendi`)}
 }
 async function activateSelectedVariant(){
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await applyFilter();toast('Seçili varyant ana texture olarak kaydedildi');
+ await putEdit(x.path,rec.blob);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 $('openVariantLab').onclick=()=>openVariantLabFor(active||null);
 $('detailVariantLab').onclick=()=>openVariantLabFor(active);
@@ -1264,7 +1271,7 @@ $('variantLab').addEventListener('click',e=>{
  const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
  const thumb=e.target.closest('[data-variant-index]');if(!thumb)return;
  const i=Number(thumb.dataset.variantIndex),list=variantList();if(!list[i])return;
- if(variantMixMode)list[i].enabled=list[i].enabled===false;
+ if(variantMixMode){if(!list[i].system)list[i].enabled=list[i].enabled===false;}
  else variantSelectedIndex=i;
  renderVariantLab();
 });
