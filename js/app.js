@@ -1330,7 +1330,14 @@ function uvAutoWarpSmart(){
  if(!uvMap.autoBase)uvMap.autoBase=g.getImageData(0,0,uvMap.work.width,uvMap.work.height);
  if(!uvMap.autoApplied)uvMap.history.push(g.getImageData(0,0,uvMap.work.width,uvMap.work.height));
  const base=document.createElement('canvas');base.width=uvMap.work.width;base.height=uvMap.work.height;base.getContext('2d').putImageData(uvMap.autoBase,0,0);
- const sourceAnalysis=window.MTSUvWarp.analyze(base);
+ const topo=window.MTSUvWarp.nativeTopologyMatch?.(base,uvMap.orig);
+ if(topo?.match&&window.MTSUvWarp.exactUvSnap){
+   const snapped=window.MTSUvWarp.exactUvSnap(base,uvMap.orig).canvas;
+   uvMap.work.width=snapped.width;uvMap.work.height=snapped.height;uvMap.work.getContext('2d').drawImage(snapped,0,0);uvMap.autoApplied=true;
+   uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:'alpha',role:'source',strictAlpha:true});
+   uvRenderWork();uvRefreshContours();uvStatus();if($('uvSaveHint'))$('uvSaveHint').textContent='Exact UV Snap · native grid birebir · '+topo.scale+'×';toast('UV sınırı piksel-perfect olarak kilitlendi');return;
+ }
+ const sourceAnalysis=window.MTSUvWarp.analyze(base,{bgMode:'alpha',role:'source',strictAlpha:true});
  let warped=window.MTSUvWarp.smoothWarp?window.MTSUvWarp.smoothWarp(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs,uvMap.edgePairs):(window.MTSUvWarp.warp)(base,uvMap.autoTarget,sourceAnalysis,uvMap.autoPairs);
  if(uvMap.edgePairs.length&&window.MTSUvWarp.snapAlphaToTarget)warped=window.MTSUvWarp.snapAlphaToTarget(warped,uvMap.autoTarget,uvMap.edgePairs);
  uvMap.work.width=warped.width;uvMap.work.height=warped.height;uvMap.work.getContext('2d').drawImage(warped,0,0);uvMap.autoApplied=true;
