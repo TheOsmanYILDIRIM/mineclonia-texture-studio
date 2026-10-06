@@ -8,7 +8,10 @@
  const S=150;
  const byName=name=>CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name).toLowerCase())||null;
  const canObject=x=>!!x&&['Block','Functional Block'].includes(assetTypeOf(x));
+ const entityModelFile=x=>{const m=runtimeRoleInfo?.(x)?.model||'';return (String(m).match(/[A-Za-z0-9_.-]+\.b3d/i)||[])[0]||null};
+ const canEntity=x=>!!x&&assetTypeOf(x)==='Entity'&&!!entityModelFile(x);
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
+ let entityGL=null;
 
  const FACE_SUFFIX_RULES=[
   ['front',/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front)\.png$/],
@@ -217,8 +220,77 @@
   addFace(c,'bottom',`rotateX(-90deg) translateZ(${z}px)`,styles.bottom,.30);
   return c;
  }
- function applyView(){scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
- function resetView(){rx=mode==='world'?-34:-24;ry=mode==='world'?42:38;zoom=mode==='world'?.72:1;applyView();}
+
+ function b3dCString(view,state,end){let out='';while(state.p<end){const c=view.getUint8(state.p++);if(!c)break;out+=String.fromCharCode(c)}return out}
+ function b3dMatrix(pos,scale,q){
+  const w=q[0],x=q[1],y=q[2],z=q[3],xx=x*x,yy=y*y,zz=z*z,xy=x*y,xz=x*z,yz=y*z,wx=w*x,wy=w*y,wz=w*z;
+  return [(1-2*(yy+zz))*scale[0],(2*(xy+wz))*scale[0],(2*(xz-wy))*scale[0],0,(2*(xy-wz))*scale[1],(1-2*(xx+zz))*scale[1],(2*(yz+wx))*scale[1],0,(2*(xz+wy))*scale[2],(2*(yz-wx))*scale[2],(1-2*(xx+yy))*scale[2],0,pos[0],pos[1],pos[2],1];
+ }
+ function mul4(a,b){const o=new Array(16).fill(0);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o}
+ function transform3(m,x,y,z){return [m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]]}
+ const I4=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
+ function parseB3D(buf){
+  const v=new DataView(buf),td=new TextDecoder('latin1'),out={p:[],uv:[],idx:[]};let pos=0;
+  const tag=()=>{const a=new Uint8Array(buf,pos,4);pos+=4;return td.decode(a)},i32=()=>{const n=v.getInt32(pos,true);pos+=4;return n},f32=()=>{const n=v.getFloat32(pos,true);pos+=4;return n};
+  function chunks(end,matrix){
+   while(pos+8<=end){const t=tag(),size=i32(),ce=Math.min(end,pos+Math.max(0,size));if(ce<pos)break;
+    if(t==='NODE'){
+     const st={p:pos};b3dCString(v,st,ce);pos=st.p;
+     if(pos+40<=ce){const p=[f32(),f32(),f32()],sc=[f32(),f32(),f32()],q=[f32(),f32(),f32(),f32()];chunks(ce,mul4(matrix,b3dMatrix(p,sc,q)))}else pos=ce;
+    }else if(t==='MESH'){
+     if(pos+4>ce){pos=ce;continue}i32();let verts=null,uvs=null;
+     while(pos+8<=ce){const mt=tag(),ms=i32(),me=Math.min(ce,pos+Math.max(0,ms));
+      if(mt==='VRTS'&&pos+12<=me){
+       const flags=i32(),sets=i32(),sz=i32(),pp=[],tt=[];
+       while(pos<me){
+        const stride=12+((flags&1)?12:0)+((flags&2)?16:0)+Math.max(0,sets*sz)*4;if(pos+stride>me)break;
+        const xyz=transform3(matrix,f32(),f32(),f32());pp.push(...xyz);
+        if(flags&1){f32();f32();f32()}if(flags&2){f32();f32();f32();f32()}
+        let u=0,w=0;for(let set=0;set<sets;set++)for(let k=0;k<sz;k++){const z=f32();if(set===0&&k===0)u=z;if(set===0&&k===1)w=z}
+        tt.push(u,w);
+       }verts=pp;uvs=tt;pos=me;
+      }else if(mt==='TRIS'&&verts){
+       if(pos+4>me){pos=me;continue}i32();const base=out.p.length/3;out.p.push(...verts);out.uv.push(...uvs);while(pos+12<=me)out.idx.push(base+i32(),base+i32(),base+i32());verts=null;uvs=null;pos=me;
+      }else pos=me;
+     }pos=ce;
+    }else pos=ce;
+   }pos=end;
+  }
+  if(tag()!=='BB3D')throw Error('B3D header bulunamadı');const rootEnd=Math.min(v.byteLength,pos+i32());if(pos+4<=rootEnd)i32();chunks(rootEnd,I4);
+  if(out.p.length<9||out.idx.length<3)throw Error('B3D mesh/UV bulunamadı');
+  let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
+  for(let i=0;i<out.p.length;i+=3)for(let k=0;k<3;k++){min[k]=Math.min(min[k],out.p[i+k]);max[k]=Math.max(max[k],out.p[i+k])}
+  const c=min.map((x,k)=>(x+max[k])/2),span=Math.max(...max.map((x,k)=>x-min[k]))||1,scale=1.55/span;
+  for(let i=0;i<out.p.length;i+=3){out.p[i]=(out.p[i]-c[0])*scale;out.p[i+1]=(out.p[i+1]-c[1])*scale;out.p[i+2]=(out.p[i+2]-c[2])*scale}
+  return out;
+ }
+ function glShader(gl,type,src){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh)||'shader');return sh}
+ function entityRotation(){const ax=rx*Math.PI/180,ay=ry*Math.PI/180,cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Math.sin(ay);return new Float32Array([cy,sx*sy,-cx*sy,0,0,cx,sx,0,sy,-sx*cy,cx*cy,0,0,0,0,1])}
+ function drawEntityGL(){
+  const e=entityGL;if(!e)return;const {gl,canvas}=e,dpr=Math.min(1.5,devicePixelRatio||1),w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
+  if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
+ }
+ function cleanupEntityGL(){if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
+ async function renderEntity(meta){
+  cleanupEntityGL();scene.innerHTML='';scene.style.display='none';const model=entityModelFile(meta);if(!model)throw Error('Bu entity için Mineclonia mesh eşleşmesi yok');
+  const modelUrl=MINECLONIA_RAW_BASE+'/ENTITIES/mobs_mc/models/'+encodeURIComponent(model);
+  const [res,blob]=await Promise.all([fetch(modelUrl,{cache:'force-cache'}),displayBlob(meta.path)]);if(!res.ok)throw Error('Entity mesh yüklenemedi: '+model);
+  const mesh=parseB3D(await res.arrayBuffer()),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
+  const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
+  const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
+  const fs=glShader(gl,gl.FRAGMENT_SHADER,'precision mediump float;uniform sampler2D tex;varying vec2 u;void main(){vec4 c=texture2D(tex,u);if(c.a<0.02)discard;gl_FragColor=c;}');
+  const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
+  const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.p),gl.STATIC_DRAW);const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
+  const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.uv),gl.STATIC_DRAW);const ta=gl.getAttribLocation(program,'t');gl.enableVertexAttribArray(ta);gl.vertexAttribPointer(ta,2,gl.FLOAT,false,0,0);
+  const maxIdx=Math.max(...mesh.idx),use32=maxIdx>65535&&!!gl.getExtension('OES_element_index_uint'),IndexArray=use32?Uint32Array:Uint16Array,indexType=use32?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT;if(maxIdx>65535&&!use32)throw Error('Entity mesh cihazın WebGL index sınırını aşıyor');
+  const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new IndexArray(mesh.idx),gl.STATIC_DRAW);
+  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);const bmp=await createImageBitmap(blob);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.clearColor(0,0,0,0);
+  entityGL={canvas,gl,program,pb,tb,ib,tex,count:mesh.idx.length,indexType,uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s')};drawEntityGL();
+ }
+
+ function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
+ function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
  async function renderObject(meta){
   scene.innerHTML='';const c=await makeCube(meta,S);scene.appendChild(c);
  }
@@ -231,19 +303,19 @@
  async function render(){
   if(!active)return;
   document.getElementById('preview3dMeta').textContent=active.name;
-  const w=document.getElementById('preview3dWorld');w.disabled=!canWorld(active);
-  document.getElementById('preview3dObject').classList.toggle('primary',mode==='object');
-  w.classList.toggle('primary',mode==='world');
-  if(mode==='world'&&!canWorld(active))mode='object';
-  if(mode==='world')await renderWorld(active);else await renderObject(active);
-  resetView();
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),entity=canEntity(active);
+  obj.textContent=entity?'Entity':'Obje';w.disabled=entity||!canWorld(active);w.style.display=entity?'none':'';
+  obj.classList.toggle('primary',mode==='object');w.classList.toggle('primary',mode==='world');
+  if(entity){mode='object';await renderEntity(active);resetView();return}
+  cleanupEntityGL();if(mode==='world'&&!canWorld(active))mode='object';
+  if(mode==='world')await renderWorld(active);else await renderObject(active);resetView();
  }
  async function open(){
   if(!active)return;
-  if(!['Block','Functional Block'].includes(assetTypeOf(active))){toast('3D önizleme şu an blok ve fonksiyonel bloklar için');return}
+  if(!canObject(active)&&!canEntity(active)){toast(assetTypeOf(active)==='Entity'?'Bu entity için henüz gerçek Mineclonia .b3d mesh eşleşmesi yok':'3D önizleme şu an blok ve eşleşmiş entity modelleri için');return}
   mode='object';root.classList.add('open');await render();
  }
- function close(){root.classList.remove('open');scene.innerHTML='';pointers.clear();lastPinch=0}
+ function close(){root.classList.remove('open');cleanupEntityGL();scene.innerHTML='';pointers.clear();lastPinch=0}
  document.getElementById('preview3dClose').addEventListener('click',close);
  document.getElementById('preview3dReset').addEventListener('click',resetView);
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
