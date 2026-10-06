@@ -1264,7 +1264,68 @@ async function activateSelectedVariant(){
  const committed=assetTypeOf(x)==='Entity'?await lockEntityAlphaToSource(rec.blob,x):rec.blob;await putEdit(x.path,committed);changedPathsFast?.add?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 
-const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target'};
+const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target',islands:[],islandIndex:-1,islandTemplate:null,islandTemplateMap:null};
+
+function uvIslandKey(){return 'mts_uv_islands_v1:'+(uvMap.meta?.path||uvMap.meta?.id||'unknown')}
+function uvIslandLoad(){
+ try{const x=JSON.parse(localStorage.getItem(uvIslandKey())||'null');uvMap.islands=Array.isArray(x?.islands)?x.islands:[];uvMap.islandIndex=uvMap.islands.length?0:-1}catch(_){uvMap.islands=[];uvMap.islandIndex=-1}
+ uvIslandStatus()
+}
+function uvIslandSave(){try{localStorage.setItem(uvIslandKey(),JSON.stringify({v:1,islands:uvMap.islands,updatedAt:Date.now()}))}catch(_){}uvIslandStatus()}
+function uvIslandStatus(){
+ const el=$('uvIslandMeta');if(!el)return;const i=uvMap.islandIndex,n=uvMap.islands.length,a=i>=0?uvMap.islands[i]:null;
+ el.textContent=n?(('Ada '+(i+1)+'/'+n)+' · '+(a?.rects?.length||0)+' alan'):'Ada yok'
+}
+function uvIslandNew(){uvMap.islands.push({id:'island_'+Date.now().toString(36),rects:[]});uvMap.islandIndex=uvMap.islands.length-1;uvIslandSave();toast('Yeni ada oluşturuldu')}
+function uvIslandAddSelection(){
+ if(uvMap.islandIndex<0)uvIslandNew();const s=uvMap.origSel;if(!s)return toast('Önce orijinalde alan seç');
+ const a=uvMap.islands[uvMap.islandIndex];a.rects.push({x:Math.round(s.x),y:Math.round(s.y),w:Math.round(s.w),h:Math.round(s.h)});uvIslandSave();toast('Seçim Ada '+(uvMap.islandIndex+1)+' içine eklendi')
+}
+function uvIslandCycle(d){if(!uvMap.islands.length)return;uvMap.islandIndex=(uvMap.islandIndex+d+uvMap.islands.length)%uvMap.islands.length;uvIslandStatus()}
+function uvIslandDelete(){if(uvMap.islandIndex<0)return;uvMap.islands.splice(uvMap.islandIndex,1);uvMap.islandIndex=Math.min(uvMap.islands.length-1,uvMap.islandIndex);uvIslandSave();toast('Ada silindi')}
+function uvIslandMaskFor(island,w,h){
+ const m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#fff';
+ for(const r of island.rects||[])g.fillRect(r.x,r.y,r.w,r.h);return m
+}
+async function uvIslandBuildTemplate(download=true){
+ if(!uvMap.orig||!uvMap.islands.length)return toast('Önce en az bir ada tanımla');
+ const src=uvMap.orig,w=src.width,h=src.height,gap=Math.max(8,Math.round(Math.max(w,h)*.06)),pad=gap;
+ const parts=[];
+ for(let ai=0;ai<uvMap.islands.length;ai++){
+  const a=uvMap.islands[ai],rs=a.rects||[];if(!rs.length)continue;
+  const x0=Math.min(...rs.map(r=>r.x)),y0=Math.min(...rs.map(r=>r.y)),x1=Math.max(...rs.map(r=>r.x+r.w)),y1=Math.max(...rs.map(r=>r.y+r.h));
+  parts.push({ai,a,x0,y0,x1,y1,w:x1-x0,h:y1-y0})
+ }
+ if(!parts.length)return toast('Adalarda seçim yok');
+ const maxW=Math.max(...parts.map(p=>p.w)),sheetW=Math.max(w*2,maxW+pad*2);let x=pad,y=pad,rowH=0;
+ for(const p of parts){if(x+p.w+pad>sheetW){x=pad;y+=rowH+gap;rowH=0}p.tx=x;p.ty=y;x+=p.w+gap;rowH=Math.max(rowH,p.h)}
+ const sheetH=y+rowH+pad,out=document.createElement('canvas');out.width=sheetW;out.height=sheetH;const og=out.getContext('2d');
+ for(const p of parts){
+  const temp=document.createElement('canvas');temp.width=p.w;temp.height=p.h;const tg=temp.getContext('2d');
+  for(const r of p.a.rects||[])tg.drawImage(src,r.x,r.y,r.w,r.h,r.x-p.x0,r.y-p.y0,r.w,r.h);
+  og.drawImage(temp,p.tx,p.ty)
+ }
+ uvMap.islandTemplate=out;uvMap.islandTemplateMap={sheetW,sheetH,parts:parts.map(p=>({ai:p.ai,src:{x:p.x0,y:p.y0,w:p.w,h:p.h},dst:{x:p.tx,y:p.ty,w:p.w,h:p.h},rects:p.a.rects}))};
+ try{localStorage.setItem(uvIslandKey()+':template',JSON.stringify(uvMap.islandTemplateMap))}catch(_){}
+ if(download){const blob=await canvasPngBlob(out),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(uvMap.meta?.id||'texture')+'_ISLAND_TEMPLATE.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Ada şablonu indirildi')}
+ return out
+}
+async function uvIslandImportFile(file){
+ if(!file)return;try{uvMap.islandTemplate=await blobToCanvas(file);toast('AI ada şablonu yüklendi')}catch(e){toast('PNG yüklenemedi')}
+}
+async function uvIslandRestore(){
+ if(!uvMap.islandTemplate)return toast('Önce AI şablonunu yükle');
+ let map=uvMap.islandTemplateMap;try{if(!map)map=JSON.parse(localStorage.getItem(uvIslandKey()+':template')||'null')}catch(_){}
+ if(!map?.parts?.length)return toast('Şablon eşleme bilgisi yok');
+ const src=uvMap.islandTemplate,out=document.createElement('canvas');out.width=uvMap.orig.width;out.height=uvMap.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ for(const p of map.parts){
+  // Scale AI output back to the original island bbox, then mask to the user's saved rectangles.
+  const temp=document.createElement('canvas');temp.width=p.src.w;temp.height=p.src.h;const tg=temp.getContext('2d');tg.drawImage(src,p.dst.x,p.dst.y,p.dst.w,p.dst.h,0,0,p.src.w,p.src.h);
+  const island=uvMap.islands[p.ai];if(!island)continue;
+  for(const r of island.rects||[])g.drawImage(temp,r.x-p.src.x,r.y-p.src.y,r.w,r.h,r.x,r.y,r.w,r.h)
+ }
+ uvMap.work.width=out.width;uvMap.work.height=out.height;uvMap.work.getContext('2d').drawImage(out,0,0);uvRenderWork();toast('Adalar orijinal UV konumlarına oturtuldu')
+}
 function uvClampSel(s,w,h){s.x=Math.max(0,Math.min(w-1,s.x));s.y=Math.max(0,Math.min(h-1,s.y));s.w=Math.max(1,Math.min(w-s.x,s.w));s.h=Math.max(1,Math.min(h-s.y,s.h));return s}
 function uvDrawSelection(kind){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),el=$(kind==='orig'?'uvOrigSel':'uvGenSel'),s=uvMap[kind+'Sel'];if(!canvas||!s)return;const wrap=$('uvLiveWrap'),rx=wrap.clientWidth/canvas.width*uvMap.zoom,ry=wrap.clientHeight/canvas.height*uvMap.zoom;el.style.left=(uvMap.panX+s.x*rx)+'px';el.style.top=(uvMap.panY+s.y*ry)+'px';el.style.width=(s.w*rx)+'px';el.style.height=(s.h*ry)+'px'}
 function uvStatus(){const a=uvMap.origSel,b=uvMap.genSel;$('uvMapStatus').textContent=uvMap.history.length+' canlı düzeltme · O:'+(a?(a.x+','+a.y+' '+a.w+'×'+a.h):'-')+' · Ü:'+(b?(b.x+','+b.y+' '+b.w+'×'+b.h):'-')}
@@ -1350,7 +1411,7 @@ function uvSetView(mode){uvMap.view=mode;const o=$('uvOrigCanvas'),g=$('uvGenCan
 function uvRenderWorkCanvasOnly(){if(!uvMap.work)return;const d=$('uvGenCanvas');d.width=uvMap.work.width;d.height=uvMap.work.height;d.getContext('2d').drawImage(uvMap.work,0,0)}
 function uvPoint(e){const canvas=$('uvGenCanvas'),wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(canvas.width-1,Math.floor(bx*canvas.width/wrap.clientWidth))),y:Math.max(0,Math.min(canvas.height-1,Math.floor(by*canvas.height/wrap.clientHeight)))}}
 function bindUvWorkspace(){const wrap=$('uvLiveWrap');let start=null,pid=null;wrap.addEventListener('pointerdown',e=>{if(uvManualLinkPick(e)){e.preventDefault();return}if(uvMap.panMode||uvMap.pointers.size){return}if(e.target.closest('.uvSelection'))return;pid=e.pointerId;wrap.setPointerCapture?.(pid);start=uvPoint(e);uvMap.target='gen';uvMap.handle='move';uvMap.genSel={x:start.x,y:start.y,w:1,h:1};uvMap.origSel={...uvMap.genSel};uvDrawSelection('orig');uvDrawSelection('gen');e.preventDefault()});wrap.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=uvPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y),sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};uvMap.genSel={...sel};uvMap.origSel={...sel};uvDrawSelection('orig');uvDrawSelection('gen');uvStatus();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end)}
-async function openUvMapper(){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec)return;const ob=await originalBlob(x.path),oc=await decodeBlobToCanvas(ob),gc=await decodeBlobToCanvas(rec.blob),wc=document.createElement('canvas');wc.width=gc.width;wc.height=gc.height;wc.getContext('2d').drawImage(gc,0,0);uvMap.meta=x;uvMap.rec=rec;uvMap.orig=oc;uvMap.gen=gc;uvMap.work=wc;uvMap.history=[];uvMap.target='gen';uvMap.handle='move';uvMap.globalX=0;uvMap.globalY=0;uvMap.globalMode=false;uvMap.zoom=1;uvMap.panX=uvMap.panY=0;uvMap.panMode=false;uvMap.pointers.clear();uvMap.grid=true;uvMap.autoTarget=null;uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.contours=true;uvMap.manualLink=false;uvMap.manualTarget=null;uvMap.autoBase=null;uvMap.autoApplied=false;uvMap.bgMode=$('uvBgMode')?.value||'auto';uvMap.excludeMode=false;uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.manualSource=null;const d=$('uvOrigCanvas');d.width=oc.width;d.height=oc.height;d.getContext('2d').drawImage(oc,0,0);const base={x:0,y:0,w:Math.max(1,Math.floor(oc.width/8)),h:Math.max(1,Math.floor(oc.height/8))};uvMap.origSel={...base};uvMap.genSel={...base};$('uvMapMeta').textContent=x.name;$('uvMapper').classList.add('open');if($('uvManualTools'))$('uvManualTools').open=false;$('uvOrigSel').style.display='none';$('uvGenSel').style.display='none';uvRenderWork();uvSetView('work');uvSetZoom(1);uvSetHandle('gen','move');uvStatus();setTimeout(()=>{uvAnalyzeSmart();$('uvContourToggle').classList.toggle('primary',uvMap.contours)},0)}
+async function openUvMapper(){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec)return;const ob=await originalBlob(x.path),oc=await decodeBlobToCanvas(ob),gc=await decodeBlobToCanvas(rec.blob),wc=document.createElement('canvas');wc.width=gc.width;wc.height=gc.height;wc.getContext('2d').drawImage(gc,0,0);uvMap.meta=x;uvMap.rec=rec;uvMap.orig=oc;uvMap.gen=gc;uvMap.work=wc;uvMap.history=[];uvMap.target='gen';uvMap.handle='move';uvMap.globalX=0;uvMap.globalY=0;uvMap.globalMode=false;uvMap.zoom=1;uvMap.panX=uvMap.panY=0;uvMap.panMode=false;uvMap.pointers.clear();uvMap.grid=true;uvMap.autoTarget=null;uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.contours=true;uvMap.manualLink=false;uvMap.manualTarget=null;uvMap.autoBase=null;uvMap.autoApplied=false;uvMap.bgMode=$('uvBgMode')?.value||'auto';uvMap.excludeMode=false;uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.manualSource=null;const d=$('uvOrigCanvas');d.width=oc.width;d.height=oc.height;d.getContext('2d').drawImage(oc,0,0);const base={x:0,y:0,w:Math.max(1,Math.floor(oc.width/8)),h:Math.max(1,Math.floor(oc.height/8))};uvMap.origSel={...base};uvMap.genSel={...base};$('uvMapMeta').textContent=x.name;uvIslandLoad();$('uvMapper').classList.add('open');if($('uvManualTools'))$('uvManualTools').open=false;$('uvOrigSel').style.display='none';$('uvGenSel').style.display='none';uvRenderWork();uvSetView('work');uvSetZoom(1);uvSetHandle('gen','move');uvStatus();setTimeout(()=>{uvAnalyzeSmart();$('uvContourToggle').classList.toggle('primary',uvMap.contours)},0)}
 function uvSetHandle(kind,handle){uvMap.target=kind;uvMap.handle=handle;document.querySelectorAll('.uvHandle,.uvMoveCenter').forEach(x=>x.classList.remove('active'));const root=$(kind==='orig'?'uvOrigSel':'uvGenSel'),h=root?.querySelector('[data-corner="'+handle+'"]');h?.classList.add('active');$('uvTargetToggle').textContent='Joystick: '+(kind==='orig'?'Hedef':'Kaynak')+' · '+(handle==='move'?'Taşı':handle.toUpperCase())}
 function uvMoveTarget(dx,dy){const kind=uvMap.target,s=uvMap[kind+'Sel'],canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas');if(!s||!canvas)return;const right=s.x+s.w-1,bottom=s.y+s.h-1,h=uvMap.handle;if(h==='move'){s.x+=dx;s.y+=dy}else if(h==='tl'){const nx=Math.max(0,Math.min(right,s.x+dx)),ny=Math.max(0,Math.min(bottom,s.y+dy));s.w=right-nx+1;s.h=bottom-ny+1;s.x=nx;s.y=ny}else if(h==='tr'){const nr=Math.max(s.x,Math.min(canvas.width-1,right+dx)),ny=Math.max(0,Math.min(bottom,s.y+dy));s.w=nr-s.x+1;s.h=bottom-ny+1;s.y=ny}else if(h==='bl'){const nx=Math.max(0,Math.min(right,s.x+dx)),nb=Math.max(s.y,Math.min(canvas.height-1,bottom+dy));s.w=right-nx+1;s.h=nb-s.y+1;s.x=nx}else if(h==='br'){const nr=Math.max(s.x,Math.min(canvas.width-1,right+dx)),nb=Math.max(s.y,Math.min(canvas.height-1,bottom+dy));s.w=nr-s.x+1;s.h=nb-s.y+1}uvClampSel(s,canvas.width,canvas.height);uvDrawSelection(kind);uvStatus()}
 
@@ -1390,6 +1451,7 @@ $('uvGlobalApply').onclick=()=>{if(!uvMap.work||(!uvMap.globalX&&!uvMap.globalY)
 $('uvAddPair').onclick=()=>uvApplyCurrentTransform(false);
 $('uvUndoPair').onclick=()=>{const prev=uvMap.history.pop();if(!prev)return;uvMap.work.getContext('2d').putImageData(prev,0,0);uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;uvRenderWork();uvRefreshContours();uvStatus()};
 $('uvTargetToggle').onclick=()=>{if(!uvMap.globalMode){uvMap.globalMode=true;$('uvTargetToggle').textContent='Joystick: Tüm resim'}else{uvMap.globalMode=false;uvSetHandle('gen','move')}};
+$('uvIslandNew').onclick=uvIslandNew;$('uvIslandAdd').onclick=uvIslandAddSelection;$('uvIslandPrev').onclick=()=>uvIslandCycle(-1);$('uvIslandNext').onclick=()=>uvIslandCycle(1);$('uvIslandDelete').onclick=uvIslandDelete;$('uvIslandTemplate').onclick=()=>uvIslandBuildTemplate(true);$('uvIslandImport').onclick=()=>$('uvIslandFile').click();$('uvIslandFile').onchange=e=>uvIslandImportFile(e.target.files?.[0]);$('uvIslandRestore').onclick=uvIslandRestore;
 $('uvApplyFix').onclick=async()=>{if(!uvMap.meta||!uvMap.rec)return;const blob=await canvasPngBlob(uvMap.work),list=variantUserList();list.push({blob,name:(uvMap.rec.name||'varyant').replace(/\.png$/i,'')+'_UV_FIXED.png',enabled:true,url:null,addedAt:Date.now(),rawAlpha:true,uvFixed:true});variantSelectedIndex=variantSources.length+list.length-1;$('uvMapper').classList.remove('open');renderVariantLab();toast('Düzeltilmiş UV varyanta kaydedildi')};
 const manualTools=$('uvManualTools');
 if(manualTools)manualTools.addEventListener('toggle',()=>{const show=manualTools.open;$('uvOrigSel').style.display=show?'block':'none';$('uvGenSel').style.display=show?'block':'none';if(show){uvDrawSelection('orig');uvDrawSelection('gen')}});
