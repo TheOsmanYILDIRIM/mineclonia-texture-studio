@@ -180,45 +180,24 @@
   ctx.putImageData(dst,0,0);return out
  }
 
- function controlsFromPairs(target,source,pairs,segmentPairs=[]){
+ function nearestBoundaryPoint(points,x,y){let best=null,bd=Infinity;for(const p of points||[]){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=p}}return best}
+ function minimalControls(target,source,pairs,segmentPairs=[]){
   const out=[];
-  for(const pair of pairs){
-   const t=pair.target.bbox,s=pair.source.bbox;
-   const pts=[[0,0],[.5,0],[1,0],[0,.5],[.5,.5],[1,.5],[0,1],[.5,1],[1,1]];
-   for(const [u,v] of pts)out.push({
-    src:{x:s.x+u*Math.max(0,s.w-1),y:s.y+v*Math.max(0,s.h-1)},
-    dst:{x:t.x+u*Math.max(0,t.w-1),y:t.y+v*Math.max(0,t.h-1)},
-    radius:Math.max(t.w,t.h,s.w,s.h)*2.2
-   });
-  }
-  for(const pair of segmentPairs||[]){
-   const a=pair.targetSegment.points,b=pair.sourceSegment.points,n=Math.max(3,Math.min(18,Math.max(a.length,b.length)));
-   const sample=(arr,i)=>arr[Math.min(arr.length-1,Math.round(i*(arr.length-1)/Math.max(1,n-1)))];
-   for(let i=0;i<n;i++){const t=sample(a,i),s=sample(b,i);out.push({src:{x:s.x,y:s.y},dst:{x:t.x,y:t.y},radius:Math.max(3,Math.hypot(pair.targetSegment.bbox.w,pair.targetSegment.bbox.h)*2.5)})}
-  }
-  const w=target.w,h=target.h;
-  for(const p of [{x:0,y:0},{x:w-1,y:0},{x:0,y:h-1},{x:w-1,y:h-1},{x:w/2,y:0},{x:w/2,y:h-1},{x:0,y:h/2},{x:w-1,y:h/2}])
-   out.push({src:{...p},dst:{...p},radius:Math.max(w,h)*.55,anchor:true});
-  return out;
+  const add=(s,t,kind='edge')=>{if(!s||!t)return;const dx=s.x-t.x,dy=s.y-t.y,mag=Math.hypot(dx,dy);if(mag<.08)return;out.push({src:{x:s.x,y:s.y},dst:{x:t.x,y:t.y},dx,dy,mag,radius:Math.max(1.5,Math.min(6,mag*1.8+1)),kind})};
+  for(const pair of pairs||[]){const tb=pair.target.boundary||[],sb=pair.source.boundary||[];if(!tb.length||!sb.length)continue;const stride=Math.max(1,Math.ceil(tb.length/180));for(let i=0;i<tb.length;i+=stride){const t=tb[i],s=nearestBoundaryPoint(sb,t.x,t.y);if(s&&Math.hypot(s.x-t.x,s.y-t.y)<=8)add(s,t,'island')}}
+  for(const pair of segmentPairs||[]){const a=pair.targetSegment?.points||[],b=pair.sourceSegment?.points||[],n=Math.max(3,Math.min(24,Math.max(a.length,b.length)));const sample=(arr,i)=>arr[Math.min(arr.length-1,Math.round(i*(arr.length-1)/Math.max(1,n-1)))];for(let i=0;i<n;i++)add(sample(b,i),sample(a,i),'manual')}
+  return out
  }
  function smoothWarp(sourceCanvas,targetAnalysis,sourceAnalysis,pairs,segmentPairs=[]){
   const out=document.createElement('canvas');out.width=sourceCanvas.width;out.height=sourceCanvas.height;
-  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=controlsFromPairs(targetAnalysis,sourceAnalysis,pairs,segmentPairs);
+  const src=img(sourceCanvas),dst=new ImageData(out.width,out.height),od=dst.data,controls=minimalControls(targetAnalysis,sourceAnalysis,pairs,segmentPairs);
   const sxScale=sourceAnalysis.w/out.width,syScale=sourceAnalysis.h/out.height,txScale=targetAnalysis.w/out.width,tyScale=targetAnalysis.h/out.height;
-  for(let oy=0;oy<out.height;oy++){
-   const ty=oy*tyScale;
-   for(let ox=0;ox<out.width;ox++){
-    const tx=ox*txScale;let wx=0,wy=0,ws=0;
-    for(const c of controls){
-     const dx=tx-c.dst.x,dy=ty-c.dst.y,d2=dx*dx+dy*dy,r=Math.max(1,c.radius),fall=Math.exp(-d2/(2*r*r));
-     if(fall<.002)continue;
-     const w=fall/(1+.018*d2);
-     wx+=(c.src.x-c.dst.x)*w;wy+=(c.src.y-c.dst.y)*w;ws+=w;
-    }
-    const sx=(tx+(ws?wx/ws:0))/sxScale,sy=(ty+(ws?wy/ws:0))/syScale,rgba=sampleBilinear(src,sx,sy),i=(oy*out.width+ox)*4;
-    od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3];
-   }
-  }
+  if(!controls.length){out.getContext('2d').putImageData(src,0,0);return out}
+  for(let oy=0;oy<out.height;oy++){const ty=oy*tyScale;for(let ox=0;ox<out.width;ox++){const tx=ox*txScale;let wx=0,wy=0,ws=0,maxInf=0;
+    for(const c of controls){const ddx=tx-c.dst.x,ddy=ty-c.dst.y,d=Math.hypot(ddx,ddy),r=c.radius;if(d>=r)continue;const u=1-d/r,inf=u*u*(3-2*u),w=inf/(.35+c.mag);wx+=c.dx*w;wy+=c.dy*w;ws+=w;if(inf>maxInf)maxInf=inf}
+    let dx=ws?wx/ws:0,dy=ws?wy/ws:0;if(maxInf<.001){dx=0;dy=0}else{dx*=maxInf;dy*=maxInf}
+    const limit=6;dx=Math.max(-limit,Math.min(limit,dx));dy=Math.max(-limit,Math.min(limit,dy));const rgba=sampleBilinear(src,(tx+dx)/sxScale,(ty+dy)/syScale),i=(oy*out.width+ox)*4;od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3]
+  }}
   out.getContext('2d').putImageData(dst,0,0);return out
  }
 
