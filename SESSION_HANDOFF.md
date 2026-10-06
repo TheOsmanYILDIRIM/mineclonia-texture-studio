@@ -59,6 +59,10 @@ The 3D module is lazy-loaded only when opened.
 - 3D lazy-load cache key is currently `preview3d.js?v=20261006-entity1`.
 - No external Three.js/game-engine dependency was added.
 
+## Manual UV fallback
+
+Variant Lab now exposes `UV Eşle` for non-system Entity variants. It opens a mobile-first manual mapper with original/source canvases, drag-created rectangular selections, pair history, target switching, and a compact joystick that nudges the selected rectangle one source pixel at a time. Applying the repair copies each generated source rectangle into its paired original destination rectangle, reapplies the original alpha footprint, and returns the result to Variant Lab as a new temporary `_UV_FIXED` variant rather than overwriting the active texture.
+
 ## Open work
 
 1. Device-test several entity families in the live Android UI: cow/pig/cat, zombie/skeleton, horse, wolf/spider/creeper where runtime mesh mapping exists.
