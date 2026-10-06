@@ -1210,11 +1210,15 @@ function renderVariantStage(){
    $('variantStatus').textContent=`${variantSelectedIndex+1}/${list.length} · ${selected.name}`;
  }
 }
+function updateVariant3dButton(){
+ const x=variantSelectedMeta(),b=$('variant3dToggle');if(!b)return;
+ const ok=!!window.MTSPreview3D?.canVariant3D?.(x);b.style.display=ok?'':'none';b.disabled=!ok||variantMixMode||!variantList()[variantSelectedIndex];
+}
 function renderVariantLab(){
  const x=variantSelectedMeta();if(!x)return;
  const list=variantList(),enabled=variantEnabled();
  $('variantMeta').textContent=`${x.name} · ${list.length} varyant${variantMixMode?` · ${enabled.length} aktif`:''}`;
- renderVariantThumbs();renderVariantStage();
+ renderVariantThumbs();renderVariantStage();updateVariant3dButton();
 }
 async function populateVariantTextureSelect(){
  const sel=$('variantTexture');if(sel.dataset.ready)return;
@@ -1246,6 +1250,10 @@ $('addVariantPngs').onclick=()=>$('variantFiles').click();
 $('variantFiles').onchange=async e=>{await addVariantFiles([...e.target.files]);e.target.value=''};
 $('activateSelectedVariant').onclick=activateSelectedVariant;
 $('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
+$('variant3dToggle').onclick=async()=>{
+ const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
+ try{await window.MTSPreview3D?.openVariant?.(x,rec.blob,rec.name)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
+};
 $('variantLab').addEventListener('click',e=>{
  const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
  const thumb=e.target.closest('[data-variant-index]');if(!thumb)return;
