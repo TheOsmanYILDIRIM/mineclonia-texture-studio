@@ -189,9 +189,12 @@
  function sampleOrdered(arr,t){if(!arr.length)return null;const f=t*(arr.length-1),i=Math.floor(f),j=Math.min(arr.length-1,i+1),u=f-i;return{x:arr[i].x*(1-u)+arr[j].x*u,y:arr[i].y*(1-u)+arr[j].y*u}}
  function minimalControls(target,source,pairs,segmentPairs=[]){
   const out=[];
-  const add=(s,t,kind='edge',localScale=1)=>{if(!s||!t)return;let dx=s.x-t.x,dy=s.y-t.y,mag=Math.hypot(dx,dy);if(mag<.05)return;
-    const maxMove=4;if(mag>maxMove){const k=maxMove/mag;dx*=k;dy*=k;mag=maxMove}
-    out.push({src:{x:t.x+dx,y:t.y+dy},dst:{x:t.x,y:t.y},dx,dy,mag,radius:Math.max(1.25,Math.min(4.5,(mag+1.25)*localScale)),kind})};
+  const add=(s,t,kind='edge',localScale=1)=>{if(!s||!t)return;
+    // In inverse mapping, an output point at target t must sample from source s.
+    let dx=s.x-t.x,dy=s.y-t.y,mag=Math.hypot(dx,dy);if(mag<.02)return;
+    const maxMove=6;if(mag>maxMove){const k=maxMove/mag;dx*=k;dy*=k;mag=maxMove}
+    const radius=kind==='manual'?Math.max(8,Math.min(14,8+mag*1.5)):Math.max(3,Math.min(7,(mag+2)*localScale));
+    out.push({src:{x:s.x,y:s.y},dst:{x:t.x,y:t.y},dx,dy,mag,radius,kind})};
   // Auto island pairs are deliberately weak; they must never dominate precise manual edge pairs.
   for(const pair of pairs||[]){if(segmentPairs?.length)break;const tb=pair.target.boundary||[],sb=pair.source.boundary||[];if(!tb.length||!sb.length)continue;const stride=Math.max(1,Math.ceil(tb.length/120));for(let i=0;i<tb.length;i+=stride){const t=tb[i],s=nearestBoundaryPoint(sb,t.x,t.y);if(s&&Math.hypot(s.x-t.x,s.y-t.y)<=3)add(s,t,'auto',.8)}}
   for(const pair of segmentPairs||[]){
@@ -207,9 +210,9 @@
   const sxScale=sourceAnalysis.w/out.width,syScale=sourceAnalysis.h/out.height,txScale=targetAnalysis.w/out.width,tyScale=targetAnalysis.h/out.height;
   if(!controls.length){out.getContext('2d').putImageData(src,0,0);return out}
   for(let oy=0;oy<out.height;oy++){const ty=oy*tyScale;for(let ox=0;ox<out.width;ox++){const tx=ox*txScale;let wx=0,wy=0,ws=0,maxInf=0;
-    for(const c of controls){const ddx=tx-c.dst.x,ddy=ty-c.dst.y,d=Math.hypot(ddx,ddy),r=c.radius;if(d>=r)continue;const u=1-d/r,inf=u*u*(3-2*u),w=inf/(.5+c.mag);wx+=c.dx*w;wy+=c.dy*w;ws+=w;maxInf=Math.max(maxInf,inf)}
+    for(const c of controls){const ddx=tx-c.dst.x,ddy=ty-c.dst.y,d=Math.hypot(ddx,ddy),r=c.radius;if(d>=r)continue;const u=1-d/r,inf=u*u*(3-2*u),w=inf/(.2+c.mag*.15);wx+=c.dx*w;wy+=c.dy*w;ws+=w;maxInf=Math.max(maxInf,inf)}
     let dx=ws?wx/ws:0,dy=ws?wy/ws:0;if(maxInf<.001){dx=0;dy=0}else{dx*=maxInf;dy*=maxInf}
-    const limit=4;dx=Math.max(-limit,Math.min(limit,dx));dy=Math.max(-limit,Math.min(limit,dy));
+    const limit=6;dx=Math.max(-limit,Math.min(limit,dx));dy=Math.max(-limit,Math.min(limit,dy));
     const rgba=sampleBilinear(src,(tx+dx)/sxScale,(ty+dy)/syScale),i=(oy*out.width+ox)*4;od[i]=rgba[0];od[i+1]=rgba[1];od[i+2]=rgba[2];od[i+3]=rgba[3]
   }}
   out.getContext('2d').putImageData(dst,0,0);return out
