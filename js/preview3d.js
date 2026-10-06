@@ -196,6 +196,54 @@
   addFace(c,'front',`translateZ(${z}px)`,styles[5],.08);
   return c;
  }
+ function doorFamily(meta){
+  const n=String(meta?.name||'').toLowerCase().replace(/\.png$/,'');
+  let m=n.match(/^mcl_doors_door_(acacia|birch|dark_oak|jungle|spruce|crimson|warped)(?:_(lower|upper|side_lower|side_upper))?$/);
+  if(m)return {key:m[1],scheme:'classic'};
+  m=n.match(/^mcl_(cherry_blossom|mangrove|pale_oak)_door_(bottom|top|bottom_side|top_side|bottom_bottompart|top_toppart)$/);
+  if(m)return {key:m[1],scheme:'modern'};
+  m=n.match(/^mcl_crimson_(crimson|warped)_door_(bottom|top)$/);
+  if(m)return {key:m[1],scheme:'nether'};
+  return null;
+ }
+ function doorPart(f,role){
+  const names=f.scheme==='classic'?{
+   lower:`mcl_doors_door_${f.key}_lower.png`,upper:`mcl_doors_door_${f.key}_upper.png`,
+   sideLower:`mcl_doors_door_${f.key}_side_lower.png`,sideUpper:`mcl_doors_door_${f.key}_side_upper.png`
+  }:f.scheme==='modern'?{
+   lower:`mcl_${f.key}_door_bottom.png`,upper:`mcl_${f.key}_door_top.png`,
+   sideLower:`mcl_${f.key}_door_bottom_side.png`,sideUpper:`mcl_${f.key}_door_top_side.png`
+  }:{
+   lower:`mcl_crimson_${f.key}_door_bottom.png`,upper:`mcl_crimson_${f.key}_door_top.png`,
+   sideLower:`mcl_doors_door_${f.key}_side_lower.png`,sideUpper:`mcl_doors_door_${f.key}_side_upper.png`
+  };
+  return byName(names[role])||null;
+ }
+ async function makeDoorHalf(front,side,size,thickness){
+  const c=document.createElement('div');c.className='preview3dCube preview3dDoorHalf';
+  c.style.setProperty('--s',size+'px');c.style.width=size+'px';c.style.height=size+'px';
+  const z=thickness/2,frontStyle=await faceStyle(front),sideStyle=await faceStyle(side||front);
+  const topStyle=sideStyle;
+  addFace(c,'front',`translateZ(${z}px)`,frontStyle,.04);
+  addFace(c,'back',`rotateY(180deg) translateZ(${z}px)`,frontStyle,.16);
+  const lr=`width:${thickness}px;left:${(size-thickness)/2}px;`;
+  const left=document.createElement('div');left.className='preview3dFace left';left.style.cssText+=lr;left.style.transform=`translateX(${-size/2}px) rotateY(-90deg)`;left.style.backgroundImage=sideStyle.backgroundImage;left.style.backgroundSize='100% 100%';c.appendChild(left);
+  const right=left.cloneNode(true);right.className='preview3dFace right';right.style.transform=`translateX(${size/2}px) rotateY(90deg)`;c.appendChild(right);
+  const tb=`height:${thickness}px;top:${(size-thickness)/2}px;`;
+  const top=document.createElement('div');top.className='preview3dFace top';top.style.cssText+=tb;top.style.transform=`translateY(${-size/2}px) rotateX(90deg)`;top.style.backgroundImage=topStyle.backgroundImage;top.style.backgroundSize='100% 100%';c.appendChild(top);
+  const bottom=top.cloneNode(true);bottom.className='preview3dFace bottom';bottom.style.transform=`translateY(${size/2}px) rotateX(-90deg)`;c.appendChild(bottom);
+  return c;
+ }
+ async function makeMultipart(meta,size=S){
+  const f=doorFamily(meta);if(!f)return null;
+  const lower=doorPart(f,'lower'),upper=doorPart(f,'upper');if(!lower||!upper)return null;
+  const sideLower=doorPart(f,'sideLower')||lower,sideUpper=doorPart(f,'sideUpper')||upper;
+  const group=document.createElement('div');group.className='preview3dMultipart preview3dDoor';group.style.transformStyle='preserve-3d';
+  const thickness=Math.max(8,Math.round(size*.18));
+  const lo=await makeDoorHalf(lower,sideLower,size,thickness),hi=await makeDoorHalf(upper,sideUpper,size,thickness);
+  lo.style.transform=`translateY(${size/2}px)`;hi.style.transform=`translateY(${-size/2}px)`;
+  group.append(lo,hi);return group;
+ }
  async function makeCube(meta,size=S){
   await loadLuaFaceManifest();
   const fromLua=await makeLuaCube(meta,size);if(fromLua)return fromLua;
@@ -301,7 +349,7 @@
  function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
  function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
  async function renderObject(meta){
-  scene.innerHTML='';const c=await makeCube(meta,S);scene.appendChild(c);
+  scene.innerHTML='';const multipart=await makeMultipart(meta);const c=multipart||await makeCube(meta,S);scene.appendChild(c);
  }
  async function renderWorld(meta){
   scene.innerHTML='';
