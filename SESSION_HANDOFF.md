@@ -1,3 +1,14 @@
+## Lua-derived 3D node-face architecture — 2026-10-06
+
+- 3D face mapping now prefers a normalized Lua-derived node manifest over filename heuristics.
+- Added js/data/node-faces.json schema: node -> textures, overlays, palette/color metadata; canonical face order top,bottom,right,left,back,front.
+- Added reusable scripts/extract-luanti-node-faces.mjs for static Luanti core/minetest.register_node definitions.
+- Tile cardinality expansion follows Luanti node conventions: 1 texture = all faces; 3 = top,bottom,sides; 6 = direct six-face mapping.
+- Texture composition expressions using ^ and overlay_tiles are resolved into base + overlay layers when catalog textures exist.
+- Palette-backed top faces can be preview-tinted without modifying stored texture data.
+- Renderer priority is now Lua manifest -> explicit runtime-composite behavior -> semantic/filename fallback.
+- The manifest/parser schema is mod-agnostic so additional Luanti mods can feed the same renderer without new per-mod rendering code.
+- Dynamic helper registrations such as register_wood remain conservative adapter/extraction work rather than being guessed.
 ## Automatic 3D face-family binding — 2026-10-06
 
 - Replaced repeated per-family face lookup with one compact catalog index keyed by mod + normalized texture family.
