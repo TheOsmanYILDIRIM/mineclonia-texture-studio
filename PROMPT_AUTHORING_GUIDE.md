@@ -183,6 +183,40 @@ Species identity may affect:
 - needle vs broadleaf structure
 - environmental aging
 
+## Runtime tint / grayscale mask rule
+
+Some Mineclonia textures are deliberately neutral, gray, desaturated, or mask-like because the engine applies their visible color later at runtime. This includes biome palettes, state/power palettes, dyes, and explicit texture `^[colorize]` composition.
+
+These assets must be identified before writing or generating the production prompt. They belong to the application's **Runtime Tint / Color Masks** technical category.
+
+For a runtime-tinted texture:
+
+- treat grayscale / neutral values as functional color-mask data, not as an unfinished color texture;
+- preserve luminance hierarchy, value relationships, material readability, transparency, and mask structure;
+- do **not** bake the final biome green, foliage hue, redstone power color, dye color, skin color, armor color, banner color, or other runtime hue into the texture;
+- avoid colored lighting, colored stains, or environmental hue casts that would contaminate later tint multiplication;
+- material realism is still allowed, but it must be expressed through neutral value, microstructure, roughness cues, wear, density, and luminance rather than final hue;
+- the runtime-applied color is authoritative.
+
+### Conflict rule
+
+Do not write contradictory instructions and rely on a final warning to override them.
+
+For runtime-tinted assets, rewrite ordinary color language throughout the prompt:
+
+- `characteristic color family` → `neutral grayscale/value structure suitable for runtime tinting`
+- `color relationships` → `value/luminance relationships`
+- `color variation` → `value/luminance variation`
+- `restrained in color` → neutral/tint-ready value language
+- `pigmentation` → neutral value patterning when pigmentation itself is supplied by runtime tint
+
+Image B may control material structure, micro-detail, roughness, weathering, local contrast, depth, and luminance hierarchy, but **must not donate its final hue** to a runtime-tinted asset.
+
+This rule applies equally to ordinary prompts, P0 reference-first prompts, Image A + Image B production prompts, entity/armor multi-stage prompts, and future prompt families.
+
+When a new runtime-tinted Mineclonia family is discovered in source code, add it to the runtime-tint detector/category rather than solving it only in one handwritten prompt.
+
+
 ## 11. Entity textures — special locked-UV rule
 
 **ENTITIES/** textures are structural UV atlases, not ordinary images and not animation strips.
