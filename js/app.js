@@ -1284,7 +1284,7 @@ function uvRefreshContours(){
  cv.width=uvMap.work.width;cv.height=uvMap.work.height;cv.style.display=uvMap.contours?'':'none';
  if(!uvMap.contours||!uvMap.autoTarget||!uvMap.autoSource){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);return}
  const view=uvMap.view,showTarget=view==='orig'||view==='overlay'||view==='work',showSource=view==='gen'||view==='overlay';
- window.MTSUvWarp?.draw?.(cv,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs||[],{showTarget,showSource});
+ window.MTSUvWarp?.draw?.(cv,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs||[],{showTarget,showSource,excludedTarget:uvMap.excludedTarget,excludedSource:uvMap.excludedSource});
  uvApplyTransform();
 }
 function uvAnalysisPoint(analysis,e){const wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(analysis.w-1,Math.floor(bx*analysis.w/wrap.clientWidth))),y:Math.max(0,Math.min(analysis.h-1,Math.floor(by*analysis.h/wrap.clientHeight)))}}
