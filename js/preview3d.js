@@ -12,7 +12,7 @@
  const entityPreviewRole=x=>String(runtimeRoleInfo?.(x)?.role||'');
  const canEntity=x=>{if(!x||assetTypeOf(x)!=='Entity'||!entityModelFile(x))return false;const r=entityPreviewRole(x);return /^Entity /.test(r)&&!/(Overlay|Layer|Marking|Equipment|Effect|Particle|Template|Mask)/.test(r)};
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
- let entityGL=null;
+ let entityGL=null,variantSession=null;
 
  const FACE_SUFFIX_RULES=[
   ['front',/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front)\.png$/],
@@ -367,6 +367,21 @@
   const e=entityGL;if(!e)return;const {gl,canvas}=e,dpr=Math.min(1.5,devicePixelRatio||1),w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
   if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
  }
+ async function swapEntityTexture(blob){
+  const e=entityGL;if(!e||!blob)return;
+  const gl=e.gl,bmp=await createImageBitmap(blob);gl.bindTexture(gl.TEXTURE_2D,e.tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();drawEntityGL();
+ }
+ function renderVariantStrip(){
+  const strip=document.getElementById('preview3dVariants');if(!strip)return;strip.innerHTML='';
+  const list=variantSession?.variants||[];strip.classList.toggle('show',!!list.length);
+  list.forEach((rec,i)=>{const b=document.createElement('button');b.className='preview3dVariant'+(i===variantSession.index?' active':'');b.dataset.i=i;
+   const im=document.createElement('img');im.src=rec.url||URL.createObjectURL(rec.blob);if(!rec.url)rec.url=im.src;im.alt=rec.name||('Varyant '+(i+1));
+   const s=document.createElement('span');s.textContent=(i+1)+' · '+(rec.name||'varyant');b.append(im,s);strip.appendChild(b)});
+ }
+ async function selectVariant3D(i){
+  if(!variantSession)return;const rec=variantSession.variants[i];if(!rec)return;variantSession.index=i;
+  await swapEntityTexture(rec.blob);document.getElementById('preview3dMeta').textContent=variantSession.meta.name+' · '+(i+1)+'/'+variantSession.variants.length+' · '+rec.name;renderVariantStrip();
+ }
  function cleanupEntityGL(){if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
  async function renderEntity(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';const model=entityModelFile(meta);if(!model)throw Error('Bu entity için Mineclonia mesh eşleşmesi yok');
@@ -412,7 +427,7 @@
   if(!canObject(active)&&!canEntity(active)){toast(assetTypeOf(active)==='Entity'?'Bu entity için henüz gerçek Mineclonia .b3d mesh eşleşmesi yok':'3D önizleme şu an blok ve eşleşmiş entity modelleri için');return}
   mode='object';root.classList.add('open');await render();
  }
- function close(){root.classList.remove('open');cleanupEntityGL();scene.innerHTML='';pointers.clear();lastPinch=0}
+ function close(){root.classList.remove('open');cleanupEntityGL();scene.innerHTML='';variantSession=null;renderVariantStrip();pointers.clear();lastPinch=0}
  document.getElementById('preview3dClose').addEventListener('click',close);
  document.getElementById('preview3dReset').addEventListener('click',resetView);
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
@@ -428,12 +443,14 @@
  const end=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinch=0};
  stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
  stage.addEventListener('wheel',e=>{e.preventDefault();zoom*=e.deltaY>0?.9:1.1;zoom=Math.max(.35,Math.min(2.4,zoom));applyView()},{passive:false});
- async function openVariant(meta,blob,label='Varyant'){
+ async function openVariant(meta,blob,label='Varyant',variants=null,index=0){
   if(!canEntity(meta))throw Error('Bu UV map için gerçek Mineclonia .b3d mesh eşleşmesi yok');
+  variantSession=Array.isArray(variants)&&variants.length?{meta,variants,index:Math.max(0,Math.min(index,variants.length-1))}:null;
   mode='object';root.classList.add('open');document.getElementById('preview3dMeta').textContent=meta.name+' · '+label;
   const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld');obj.textContent='Entity';w.style.display='none';
-  await renderEntity(meta,blob);resetView();
+  await renderEntity(meta,variantSession?variantSession.variants[variantSession.index].blob:blob);resetView();renderVariantStrip();
  }
  function canVariant3D(meta){return canEntity(meta)}
- window.MTSPreview3D={open,close,openVariant,canVariant3D};
+ document.getElementById('preview3dVariants')?.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)selectVariant3D(Number(b.dataset.i))});
+ window.MTSPreview3D={open,close,openVariant,canVariant3D,selectVariant3D};
 })();
