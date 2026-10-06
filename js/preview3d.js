@@ -70,8 +70,15 @@
   }
   return LUA_FACE_MANIFEST;
  }
- function expandLuaFaces(list){
-  const a=(list||[]).filter(Boolean);if(!a.length)return null;
+ function expandLuaFaces(list,{sparse=false}={}){
+  const a=Array.isArray(list)?list:[];
+  if(!a.length)return null;
+  if(sparse){
+   if(a.length===1)return [a[0],'','','','',''];
+   if(a.length===2)return [a[0],a[1],'','','',''];
+   if(a.length===3)return [a[0],a[1],a[2],a[2],a[2],a[2]];
+   return [a[0]||'',a[1]||'',a[2]||'',a[3]||'',a[4]||'',a[5]||''];
+  }
   if(a.length===1)return [a[0],a[0],a[0],a[0],a[0],a[0]];
   if(a.length===2)return [a[0],a[1],a[1],a[1],a[1],a[1]];
   if(a.length===3)return [a[0],a[1],a[2],a[2],a[2],a[2]];
@@ -145,14 +152,17 @@
  }
  async function makeLuaCube(meta,size=S){
   const hit=luaFaceDef(meta);if(!hit)return null;
-  const {def,faces}=hit,overlays=expandLuaFaces(def.overlays||[]);
+  const {def,faces}=hit,overlays=expandLuaFaces(def.overlays||[],{sparse:true});
   const styles=[];
   for(let i=0;i<6;i++){
    const parts=catalogTextureFromExpr(faces[i]),base=parts[0]||meta,extra=parts[1]||null;
    const overlay=overlays?catalogTextureFromExpr(overlays[i])[0]:null;
-   const tint=!!def.palette&&i===0;
-   let st=await faceStyle(base,{overlay:overlay||extra,tint});
-   if(tint)st.tint=true;styles.push(st);
+   const baseTint=!!def.palette&&i===0;
+   const overlayTint=!!def.palette&&!!overlay;
+   let st=await faceStyle(base,{overlay:overlay||extra,tint:baseTint});
+   if(baseTint)st.tint=true;
+   if((overlay||extra)&&!overlayTint&&extra)st.overlayTint=false;
+   styles.push(st);
   }
   const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
   addFace(c,'top',`rotateX(90deg) translateZ(${z}px)`,styles[0],0);
@@ -164,9 +174,9 @@
   return c;
  }
  async function makeCube(meta,size=S){
-  if(isGrassPreviewAsset(meta)){const grass=await makeGrassCube(size);if(grass)return grass}
   await loadLuaFaceManifest();
   const fromLua=await makeLuaCube(meta,size);if(fromLua)return fromLua;
+  if(isGrassPreviewAsset(meta)){const grass=await makeGrassCube(size);if(grass)return grass}
   const fam=faceFamily(meta);
   const grass=fam.special==='grass';
   const styles={
