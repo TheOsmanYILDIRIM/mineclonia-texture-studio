@@ -556,7 +556,7 @@ function mobPromptMeta(x){
  else if(/wolf|cat|rabbit|llama|polar|cow|sheep|horse|mule|donkey/.test(raw))material='species-appropriate fur, hair, hide and exposed biological surfaces';
  else if(/chicken|parrot/.test(raw))material='species-appropriate feathers, keratin, skin and beak or leg surfaces';
  else if(/skeleton|wither_skeleton/.test(raw))material='aged bone and any UV-mapped equipment or material surfaces';
- else if(/zombie|drowned|husk|zombified/.test(raw))material='weathered undead skin, damaged organic tissue and any UV-mapped clothing or material surfaces';
+ else if(/zombie|drowned|husk|zombified/.test(raw))material=/piglin/.test(raw)?'zombified fantasy piglin game-character skin with muted weathered coloration and any existing UV-mapped clothing or equipment materials':'zombified fantasy game-character skin with muted weathered coloration and any existing UV-mapped clothing or equipment materials';
  else if(/piglin/.test(raw))material='coarse porcine humanoid skin and UV-mapped clothing or equipment materials';
  else if(/creeper|slime|magmacube|enderman|endermite|shulker|blaze|vex|ghast|wither/.test(raw))material='creature-specific supernatural or organic material surfaces appropriate to this entity';
  return {name,role,model,material};
