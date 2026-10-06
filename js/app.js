@@ -1324,7 +1324,8 @@ function uvAutoMatchSmart(){
  uvRefreshContours();return uvMap.autoPairs.length>0;
 }
 function uvAutoWarpSmart(){
- if(!uvAutoMatchSmart())return;
+ if(!uvMap.edgePairs.length&&!uvAutoMatchSmart())return;
+ if(!uvMap.autoTarget||!uvMap.autoSource)if(!uvAnalyzeSmart())return;
  const g=uvMap.work.getContext('2d');
  if(!uvMap.autoBase)uvMap.autoBase=g.getImageData(0,0,uvMap.work.width,uvMap.work.height);
  if(!uvMap.autoApplied)uvMap.history.push(g.getImageData(0,0,uvMap.work.width,uvMap.work.height));
