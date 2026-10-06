@@ -192,13 +192,12 @@
   out.getContext('2d').putImageData(dst,0,0);return out
  }
 
- function draw(canvas,target,source,pairs,{showTarget=true,showSource=true}={}){
+ function draw(canvas,target,source,pairs,{showTarget=true,showSource=true,excludedTarget=new Set(),excludedSource=new Set()}={}){
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
-  const edge=(a,c,fill,label)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=fill;const sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)*.7));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz);ctx.font='bold 10px system-ui';ctx.fillText(label+(c.id+1),c.cx*sx+2,c.cy*sy-2)};
-  if(showTarget)for(const c of target.components)edge(target,c,'rgba(70,255,105,.98)','O');
-  if(showSource)for(const c of source.components)edge(source,c,'rgba(255,160,40,.98)','Ü');
-  ctx.lineWidth=2;ctx.strokeStyle='rgba(70,160,255,.95)';
-  let n=1;for(const p of pairs||[]){ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle='rgba(70,160,255,.98)';ctx.font='bold 11px system-ui';ctx.fillText(String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
+  const edge=(a,c,fill,label,excluded)=>{const sx=canvas.width/a.w,sy=canvas.height/a.h;ctx.fillStyle=excluded?'rgba(255,75,75,.78)':fill;const sz=Math.max(1.5,Math.min(3,Math.min(sx,sy)*.7));for(const p of c.boundary)ctx.fillRect(p.x*sx-sz/2,p.y*sy-sz/2,sz,sz);ctx.font='bold 10px system-ui';ctx.fillText((excluded?'×':label)+(c.id+1),c.cx*sx+2,c.cy*sy-2)};
+  if(showTarget)for(const c of target.components)edge(target,c,'rgba(70,255,105,.98)','O',excludedTarget.has(c.id));
+  if(showSource)for(const c of source.components)edge(source,c,'rgba(255,160,40,.98)','Ü',excludedSource.has(c.id));
+  let n=1;for(const p of pairs||[]){ctx.lineWidth=p.manual?3.5:1.5;ctx.strokeStyle=p.manual?'rgba(50,145,255,1)':'rgba(110,185,255,.72)';ctx.beginPath();ctx.moveTo(p.target.cx/target.w*canvas.width,p.target.cy/target.h*canvas.height);ctx.lineTo(p.source.cx/source.w*canvas.width,p.source.cy/source.h*canvas.height);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.font='bold 11px system-ui';ctx.fillText((p.manual?'M':'')+String(n++),p.target.cx/target.w*canvas.width+3,p.target.cy/target.h*canvas.height-3)}
  }
  function nearest(analysis,x,y,excluded=null,maxDistance=Infinity){
   let best=null,bd=maxDistance*maxDistance;
