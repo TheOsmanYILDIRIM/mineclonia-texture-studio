@@ -124,6 +124,24 @@
   const sh=document.createElement('div');sh.className='preview3dShade';sh.style.opacity=String(shade);f.appendChild(sh);
   cube.appendChild(f);
  }
+ function isGrassPreviewAsset(meta){
+  const n=String(meta?.name||'').toLowerCase();
+  return n==='mcl_core_grass_block_top.png'||n==='mcl_core_grass_block_side_overlay.png';
+ }
+ async function makeGrassCube(size=S){
+  const top=byName('mcl_core_grass_block_top.png'),dirt=byName('default_dirt.png'),overlay=byName('mcl_core_grass_block_side_overlay.png');
+  if(!top||!dirt||!overlay)return null;
+  const topStyle=await faceStyle(top,{tint:true}),bottomStyle=await faceStyle(dirt);
+  const sideStyle=await faceStyle(dirt,{overlay});
+  const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
+  addFace(c,'front',`translateZ(${z}px)`,sideStyle,.08);
+  addFace(c,'back',`rotateY(180deg) translateZ(${z}px)`,sideStyle,.22);
+  addFace(c,'right',`rotateY(90deg) translateZ(${z}px)`,sideStyle,.16);
+  addFace(c,'left',`rotateY(-90deg) translateZ(${z}px)`,sideStyle,.12);
+  addFace(c,'top',`rotateX(90deg) translateZ(${z}px)`,topStyle,0);
+  addFace(c,'bottom',`rotateX(-90deg) translateZ(${z}px)`,bottomStyle,.30);
+  return c;
+ }
  async function makeLuaCube(meta,size=S){
   const hit=luaFaceDef(meta);if(!hit)return null;
   const {def,faces}=hit,overlays=expandLuaFaces(def.overlays||[]);
@@ -145,6 +163,7 @@
   return c;
  }
  async function makeCube(meta,size=S){
+  if(isGrassPreviewAsset(meta)){const grass=await makeGrassCube(size);if(grass)return grass}
   await loadLuaFaceManifest();
   const fromLua=await makeLuaCube(meta,size);if(fromLua)return fromLua;
   const fam=faceFamily(meta);
