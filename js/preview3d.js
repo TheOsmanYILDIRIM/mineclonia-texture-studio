@@ -334,7 +334,7 @@
  stage.addEventListener('pointermove',e=>{
   const prev=pointers.get(e.pointerId);if(!prev)return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(pointers.size===1){ry+=e.clientX-prev.x;rx-=e.clientY-prev.y;rx=Math.max(-85,Math.min(85,rx));applyView();return}
+  if(pointers.size===1){ry-=e.clientX-prev.x;rx-=e.clientY-prev.y;rx=Math.max(-85,Math.min(85,rx));applyView();return}
   if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastPinch){zoom*=d/lastPinch;zoom=Math.max(.35,Math.min(2.4,zoom));applyView()}lastPinch=d}
  });
  const end=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinch=0};
