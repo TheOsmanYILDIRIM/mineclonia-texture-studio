@@ -1210,9 +1210,15 @@ function renderVariantStage(){
    $('variantStatus').textContent=`${variantSelectedIndex+1}/${list.length} · ${selected.name}`;
  }
 }
+async function ensurePreview3dLoaded(){
+ if(window.MTSPreview3D)return window.MTSPreview3D;
+ if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
+ await preview3dLoadPromise;return window.MTSPreview3D;
+}
 function updateVariant3dButton(){
  const x=variantSelectedMeta(),b=$('variant3dToggle');if(!b)return;
- const ok=!!window.MTSPreview3D?.canVariant3D?.(x);b.style.display=ok?'':'none';b.disabled=!ok||variantMixMode||!variantList()[variantSelectedIndex];
+ const entity=assetTypeOf(x)==='Entity',hasModel=!!String(runtimeRoleInfo?.(x)?.model||'').match(/\.b3d/i);
+ const eligible=entity&&hasModel;b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];
 }
 function renderVariantLab(){
  const x=variantSelectedMeta();if(!x)return;
@@ -1252,7 +1258,7 @@ $('activateSelectedVariant').onclick=activateSelectedVariant;
 $('variantMixToggle').onclick=()=>{variantMixMode=!variantMixMode;renderVariantLab()};
 $('variant3dToggle').onclick=async()=>{
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- try{await window.MTSPreview3D?.openVariant?.(x,rec.blob,rec.name)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
+ try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}
 };
 $('variantLab').addEventListener('click',e=>{
  const tile=e.target.closest('[data-vtile]');if(tile){variantTileN=Number(tile.dataset.vtile);renderVariantStage();return}
@@ -1895,7 +1901,7 @@ function open3dPreviewLazy(){
  if(!active)return;
  if(window.MTSPreview3D)return window.MTSPreview3D.open(active);
  if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{
-  const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-entity2';s.async=true;
+  const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d1';s.async=true;
   s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)
  });
  toast('3D önizleme hazırlanıyor…');
