@@ -695,3 +695,34 @@ Entity prompt authoring and processing is tracked separately from material Block
 - A Mob is only marked done when its intended two-pass prompt/reference configuration has been deliberately authored; do not create placeholder files merely to advance the counter.
 
 In short: **Blocks = reference-first material rebuild. Animated = lock Image A motion/frame structure. Mobs = strict HQ UV first, then HQ UV + entity reference for controlled appearance transfer.**
+
+
+## Item Creative → Composition Correction workflow
+
+True inventory/wield item sprites use a dedicated two-pass workflow. Do not apply entity UV-lock rules to ordinary item sprites.
+
+### Pass 1 — Creative item generation
+- No reference image.
+- Describe what the item is and its material/world identity.
+- Give broad creative freedom over design, construction, proportions, wear and surface character.
+- Keep only the minimum game-asset constraints: one isolated item, real alpha transparency, no scene/background/UI/cast shadow, complete object inside the canvas.
+- Do not force the original Mineclonia silhouette, angle or pixel geometry during this pass.
+- Shared art direction remains grounded dark-fantasy material realism.
+- Explicitly require REAL TRANSPARENCY (alpha = 0) and forbid a drawn checkerboard/transparency grid.
+
+### Pass 2 — Image A + Image B composition correction
+Use only when Pass 1 produced a good design that is compositionally too far from the source.
+
+- Image A = original Mineclonia item.
+- Image B = creative Pass 1 result.
+- Image A controls canvas position, occupied area/scale, orientation/viewing angle and approximate silhouette footprint.
+- Image B controls actual design, materials and details.
+- Do not repaint Image A or force pixel-level similarity.
+- Keep this correction prompt short; do not redundantly explain item readability or the item's identity when the images already communicate it.
+- Output must use real alpha transparency; never draw checkerboard/transparency-grid pixels.
+
+### Authoring/storage
+- Each true item gets its own prompt file.
+- Prompt files contain a creative Pass 1 prompt and a short Pass 2 correction prompt.
+- Author in ordered batches: first 30, then 60, then subsequent batches.
+- State/frame families such as clock and compass are treated as coherent families, not dozens of unrelated redesigns.
