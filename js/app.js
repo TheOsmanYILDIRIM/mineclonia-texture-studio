@@ -610,7 +610,7 @@ function promptFor(x,mode='classic'){
  if(!d)return null;
  return {id:x.id,label:d.label,text:applyPromptOutputRequirements(d.text,x),source:d.source};
 }
-function promptEntry(x,mode='classic'){const p=promptFor(x,mode);return {id:x.id,path:x.path,name:x.name,priority:x.priority,label:p.label,prompt:p.text,mode}}
+function promptEntry(x,mode='classic'){const p=promptFor(x,mode);return {id:x.id,path:x.path,name:x.name,priority:x.priority,label:p?.label||'',prompt:p?.text||'',mode}}
 function renderActivePrompt(){
  if(!active)return;
  promptViewMode='classic';
