@@ -14,6 +14,15 @@ Branch: `main` · Production: GitHub Pages.
 - Prompt authoring rules and AGENTS invariants were updated in `4353bec` and `78ab267`.
 - Immediate verification target: open `tex_626ae22e78` / `mcl_fishing_clownfish_raw.png`; it must resolve to canonical `stages.creative` ("Raw Tropical Fish") with no missing-prompt or source-alpha-lock fallback.
 
+## Runtime standardization and data preservation
+- Browser persistence was standardized without migrating or clearing user data. Storage identities remain unchanged: `MinecloniaTextureStudio` v1 / `edits`, local edit prefix `mts:`, `MinecloniaTextureStudioScaled` / `scaled`, prompt/recent/resolution keys, and `mts_uv_islands_v1:`.
+- Shadowed duplicate core functions were removed; each of `putEdit/getEdit/delEdit/allEdits/importPng/importZip/exportPack/importProjectBackup/normalizeTextureBlob/applyFilter/render` now has exactly one runtime implementation. Commits: `272cc7c`, `057538f`.
+- Storage literals were centralized into the stable edit-storage contract; no IndexedDB version bump, object-store rename, localStorage-key rename, wipe, or migration was performed.
+- UV launch paths now use one router, `js/uv-repair-router.js`; Variant Lab primary repair routes to Vertex UV Studio and optional island repair routes through the same router. The unused duplicate `js/uv-mapper.js` module was removed.
+- Prompt import is now family-agnostic through `.github/workflows/import-prompts.yml`; the old item-only importer was removed.
+- `scripts/check-standardization.mjs` plus Runtime Guards now fail CI if duplicate core functions, legacy prompt storage, multiple prompt loaders, UV-router regressions, or persistent browser-storage identity changes return.
+- No browser-stored edit, prompt override, resolution preference, recent-texture entry, scaled cache, or Island Studio mapping was intentionally deleted or renamed by this refactor.
+
 ## Current focus — Vertex UV Studio
 - Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` editor. This is the primary entity-atlas repair workflow.
 - Islands are the editor's segmentation/pairing model, not the retired automatic Island Studio restore experiment. Source/target island IDs remain stable during a session; used pairs are tracked as `Ü# → O#` and merged one-by-one into the final atlas.
