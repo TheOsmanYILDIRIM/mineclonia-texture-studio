@@ -161,10 +161,19 @@ function islandDetectObject(src,p,map){
 }
 
 function islandTargetMask(p,isl,density){
- const w=Math.max(1,Math.round(p.src.w*density)),h=Math.max(1,Math.round(p.src.h*density)),m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#fff';
- for(const rr of isl.rects||[]){const x=Math.round((rr.x-p.src.x)*density),y=Math.round((rr.y-p.src.y)*density),rw=Math.max(1,Math.round(rr.w*density)),rh=Math.max(1,Math.round(rr.h*density));g.fillRect(x,y,rw,rh)}
- return m
+ const w=Math.max(1,Math.round(p.src.w*density)),h=Math.max(1,Math.round(p.src.h*density)),m=document.createElement('canvas');m.width=w;m.height=h;
+ // Selection rectangles define membership only. The actual target contour comes from the
+ // original UV pixels inside those selections, not from rectangular selection geometry.
+ const native=document.createElement('canvas');native.width=p.src.w;native.height=p.src.h;const ng=native.getContext('2d');
+ ng.drawImage(islandStudio.orig,p.src.x,p.src.y,p.src.w,p.src.h,0,0,p.src.w,p.src.h);
+ const ni=ng.getImageData(0,0,p.src.w,p.src.h),d=ni.data,keep=new Uint8Array(p.src.w*p.src.h);
+ for(const rr of isl.rects||[]){const x0=Math.max(0,rr.x-p.src.x),y0=Math.max(0,rr.y-p.src.y),x1=Math.min(p.src.w,rr.x-p.src.x+rr.w),y1=Math.min(p.src.h,rr.y-p.src.y+rr.h);for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)keep[y*p.src.w+x]=1}
+ // Prefer true alpha. If original atlas is opaque/black-backed, treat near-black as empty.
+ let hasTransparent=false;for(let i=3;i<d.length;i+=4)if(d[i]<16){hasTransparent=true;break}
+ for(let i=0;i<keep.length;i++){const k=i*4,solid=hasTransparent?d[k+3]>=16:(d[k+3]>=16&&(d[k]>10||d[k+1]>10||d[k+2]>10));d[k+3]=(keep[i]&&solid)?255:0;if(!d[k+3])d[k]=d[k+1]=d[k+2]=0}
+ ng.putImageData(ni,0,0);m.getContext('2d').imageSmoothingEnabled=false;m.getContext('2d').drawImage(native,0,0,w,h);return m
 }
+
 function islandContourFit(source,targetMask){
  const W=window.MTSUvWarp;if(!W?.analyze||!W?.analyzeWithMask||!W?.match||!W?.warp||!W?.exactUvSnap)return source;
  try{
