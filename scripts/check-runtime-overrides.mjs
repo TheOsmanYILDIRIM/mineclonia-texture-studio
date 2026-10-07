@@ -23,11 +23,11 @@ function lastBlock(marker, span = 14000) {
 }
 
 const importPng = lastBlock('async function importPng(file,seam=false)');
-expect(importPng.includes('prepareImportedTextureBlob(file,target)'), 'runtime-winning importPng must normalize to the selected target');
+expect(importPng.includes('prepareStoredEditBlob(file,target)'), 'runtime-winning importPng must sanitize while preserving the imported native resolution');
 expect(importPng.includes('textureMatchesOriginal(b,target)'), 'runtime-winning importPng must ignore unchanged textures');
 
 const importZip = lastBlock('async function importZip(file)');
-expect(importZip.includes('prepareImportedTextureBlob(blob,meta)'), 'runtime-winning ZIP import must normalize imported PNGs');
+expect(importZip.includes('prepareStoredEditBlob(blob,meta)'), 'runtime-winning ZIP import must sanitize while preserving imported native resolution');
 expect(importZip.includes('textureMatchesOriginal(blob,meta)'), 'runtime-winning ZIP import must ignore unchanged textures');
 
 const exportPack = lastBlock('async function exportPack()');
@@ -55,8 +55,8 @@ expect(source.includes('<option value="64">64px</option>') && source.includes('<
 
 
 const init = lastBlock('async function init()');
-expect(init.includes("setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn')"), 'startup must immediately leave the indefinite preparing state');
-expect(init.includes('setTimeout(()=>bootstrapStorageInBackground(),0)'), 'storage bootstrap must run after the UI is interactive');
+expect(init.includes("$('stat').textContent='Arayüz hazır'") && init.includes("setSaveState('Kayıt açılıyor…','warn')"), 'startup must immediately expose an interactive UI while storage opens');
+expect(init.indexOf('await applyFilter()')>=0 && init.indexOf('bootstrapStorageInBackground()')>init.indexOf('await applyFilter()'), 'storage bootstrap must run after the initial interactive render');
 expect(!init.includes('await hydrateChangedPathsFast()'), 'startup must not synchronously wait for remote original-texture hydration');
 
 const storageBootstrap = lastBlock('async function bootstrapStorageInBackground()');
@@ -102,7 +102,7 @@ expect(source.includes('texturePixelsVisuallyEquivalent'), 'unchanged detection 
 const persistedInstall = lastBlock('function installPersistedEditFast(edit,{markChanged=false}={})');
 expect(persistedInstall.includes('hotEdits.set(edit.path,rec)'), 'late-loaded persisted edits must populate hot edit cache');
 expect(persistedInstall.includes('setFastEditUrl(edit.path,edit.blob)'), 'late-loaded persisted edits must replace stale edited-thumbnail cache');
-expect(persistedInstall.includes('if(ref)ref.img.src=url'), 'visible cards must refresh immediately when persisted edits load');
+expect(persistedInstall.includes('previewUrl(edit.path,true,THUMB_MAX_EDGE)') && persistedInstall.includes('ref.img.src=u') && persistedInstall.includes('ref.img.src=url'), 'visible cards must refresh immediately when persisted edits load');
 expect(persistedInstall.includes('else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path)'), 'unknown late-loaded records must stay pending while verified changed records may be counted immediately');
 
 const bootstrap = lastBlock('async function bootstrapStorageInBackground()');
