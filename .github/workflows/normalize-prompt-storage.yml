@@ -32,7 +32,12 @@ jobs:
               m=json.loads((base/"manifest.json").read_text())
               assert m["schema_version"]==2 and m["family"]==family and not m.get("batches")
               assert m["total"]==len(m["entries"])
+              assert m["done"]==sum(1 for e in m["entries"] if e.get("status")=="done")
+              assert m["pending"]==sum(1 for e in m["entries"] if e.get("status")!="done")
               for e in m["entries"]:
+                  if e.get("status")!="done":
+                      assert not e.get("file")
+                      continue
                   assert e["file"]==f"prompts/{family}/{e['id']}.json"
                   p=Path(e["file"]); assert p.is_file()
                   o=json.loads(p.read_text())
