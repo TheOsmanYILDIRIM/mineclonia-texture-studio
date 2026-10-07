@@ -41,7 +41,7 @@ jobs:
               for key in ("path","name","creative_prompt","correction_prompt"):
                   if not isinstance(obj.get(key),str) or not obj[key].strip():
                       raise SystemExit(f"{item_id}: invalid {key}")
-              record={"schema_version":1,"kind":"item_two_pass",**obj}
+              record={"schema_version":2,"family":"items","id":item_id,"path":obj["path"],"name":obj["name"],"stages":{"creative":obj["creative_prompt"],"correction":obj["correction_prompt"]}}
               (out/f"{item_id}.json").write_text(json.dumps(record,indent=2,ensure_ascii=False)+"\n")
           entries=[]
           records=[]
@@ -54,7 +54,7 @@ jobs:
           records.sort(key=lambda o:(o.get("path",""),o["id"]))
           for order,obj in enumerate(records,1):
               entries.append({"order":order,"id":obj["id"],"name":obj["name"],"texture_path":obj["path"],"status":"done","file":f"prompts/items/{obj['id']}.json"})
-          manifest={"schema_version":1,"kind":"item_two_pass_manifest","total":len(entries),"done":len(entries),"pending":0,"entries":entries,"batches":[]}
+          manifest={"schema_version":2,"kind":"canonical_prompt_manifest","family":"items","total":len(entries),"done":len(entries),"pending":0,"entries":entries,"batches":[]}
           (out/"manifest.json").write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n")
           PY
           rm -f prompts/items/batch_001_050.json
