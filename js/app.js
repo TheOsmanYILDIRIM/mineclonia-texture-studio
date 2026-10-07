@@ -1194,8 +1194,12 @@ function p0PromotableBlock(x){
  if(/^mcl_ocean_sea_pickle_\d+_off\.png$/.test(n))return false;
  return true;
 }
-for(const x of CATALOG){
- if(x.priority==='P1'&&p0PromotableBlock(x))x.priority='P0';
+function applyCanonicalPriorityPromotions(){
+ let promoted=0;
+ for(const x of CATALOG){
+   if(x.priority==='P1'&&p0PromotableBlock(x)){x.priority='P0';promoted++}
+ }
+ return promoted
 }
 const P0_REFERENCE_REQUIRED=[
  'default_acacia_leaves','default_acacia_tree','default_acacia_tree_top','default_acacia_wood','default_cobble','default_dirt','default_gravel','default_ice','default_jungleleaves','default_jungletree','default_jungletree_top','default_junglewood','default_lava_flowing_animated','default_lava_source_animated','default_leaves','default_sand','default_snow','default_stone','default_tree','default_tree_top','default_water_flowing_animated','default_water_source_animated','default_wood','mcl_core_bedrock','mcl_core_grass_block_side_overlay','mcl_core_grass_block_top','mcl_core_grass_side_snowed','mcl_core_leaves_big_oak','mcl_core_leaves_birch','mcl_core_leaves_spruce','mcl_core_log_big_oak','mcl_core_log_big_oak_top','mcl_core_log_birch','mcl_core_log_birch_top','mcl_core_log_spruce','mcl_core_log_spruce_top','mcl_core_planks_big_oak','mcl_core_planks_birch','mcl_core_planks_spruce','default_river_water_flowing_animated','default_river_water_source_animated'
@@ -2179,6 +2183,10 @@ async function init(){
   setTimeout(()=>Promise.allSettled([loadBlockReferencePrompts(),AUTHORED_UV_REF_PROMISES.mobs,AUTHORED_UV_REF_PROMISES.armor]).then(()=>{if(active?.priority==='P0')renderActivePrompt()}).catch(console.warn),0);
   bootstrapStorageInBackground();
 }
-CATALOG_READY.then(()=>init()).catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
+CATALOG_READY.then(()=>{
+ const promoted=applyCanonicalPriorityPromotions();
+ console.info('Canonical priorities ready · P1→P0 block promotions:',promoted,'· P0 total:',CATALOG.filter(x=>x.priority==='P0').length);
+ return init()
+}).catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
 
 
