@@ -13,7 +13,18 @@ async function hardReload(sha){
 function init(){
  const badge=$('buildBadge'),check=$('buildCheck');if(!badge||!check)return;
  badge.textContent='Build '+short(BUILD.sha);badge.title=BUILD.sha+' · '+BUILD.time;
- let pending=null;
+ let pending=null,autoChecking=false;
+ const autoCheck=async()=>{
+   if(autoChecking)return;autoChecking=true;
+   try{
+     const live=await deployedBuild();
+     if(live&&short(live)!==short(BUILD.sha)){badge.classList.add('stale');await hardReload(live)}
+   }catch(e){console.warn('automatic build check',e)}
+   finally{autoChecking=false}
+ };
+ // Every open verifies the actually deployed Pages build. A stale cached index/latest
+ // document automatically jumps to a unique latest.html URL for the live commit.
+ setTimeout(autoCheck,250);
  check.onclick=async()=>{
    if(pending){check.disabled=true;check.textContent='Yenileniyor…';await hardReload(pending);return}
    check.disabled=true;check.textContent='Pages kontrol…';
