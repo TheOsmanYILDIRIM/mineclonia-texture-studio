@@ -6,7 +6,8 @@ Branch: `main` · Production: GitHub Pages.
 - Authored prompt storage is now standardized to one file per texture: `prompts/<family>/tex_<id>.json`.
 - Canonical schema v2 is `{schema_version:2,family,id,path,name,stages}`; manifests are indexes only.
 - Production prompt payloads no longer use `.txt` or batch JSON. Migration commit `6bf9fed` converted existing ready prompts: blocks 202, mobs 30 ready (+211 pending metadata), armor 32, items 100.
-- Runtime uses one canonical `PROMPT_REGISTRY`; legacy txt/batch loaders and maps were removed in `7254bcd`.
+- Single runtime path: `js/prompt-registry.js` owns all manifest/file loading and exposes one registry API; `js/app.js` no longer fetches or parses family prompt files directly. Refactor commits: `4fd4c36`, `69113ab`, `623626b`.
+- Legacy txt/batch loaders and family-specific prompt registries are removed.
 - Missing authored prompt coverage no longer renders the old synthetic `PROMPT YOK + ALPHA/BACKGROUND LOCK` body. Missing stages are empty/disabled.
 - Item Creative → A+B Correction remains the item-only workflow; item Creative is not source-mask/silhouette locked.
 - Item import Action was upgraded to write schema v2 canonical files, so future 50-item batches must not reintroduce schema v1.
