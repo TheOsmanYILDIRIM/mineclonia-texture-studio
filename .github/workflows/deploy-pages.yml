@@ -23,12 +23,64 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
+      - name: Stamp deployed build and cache-bypass entry
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          cat > js/build-status.js <<EOF
+          window.MTS_BUILD_STATUS = {
+            sha: "${GITHUB_SHA}",
+            shortSha: "${GITHUB_SHA:0:7}",
+            builtAt: "${BUILD_TIME}"
+          };
+          EOF
+
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+
+          sha = os.environ["GITHUB_SHA"]
+          p = Path("index.html")
+          html = p.read_text(encoding="utf-8")
+
+          def stamp(match):
+              attr, url = match.group(1), match.group(2)
+              if url.startswith(("http://", "https://", "//", "data:")):
+                  return match.group(0)
+              if not re.search(r"\.(?:js|css)(?:\?[^\"']*)?$", url):
+                  return match.group(0)
+              base = url.split("?", 1)[0]
+              return f'{attr}="{base}?v={sha}"'
+
+          html = re.sub(r'(?:src|href)="([^"]+)"', lambda m: m.group(0), html)
+          html = re.sub(
+              r'(src|href)="([^"]+)"',
+              lambda m: (
+                  f'{m.group(1)}="{m.group(2).split("?",1)[0]}?v={sha}"'
+                  if not m.group(2).startswith(("http://","https://","//","data:"))
+                  and re.search(r"\.(?:js|css)(?:\?[^\"']*)?$", m.group(2))
+                  else m.group(0)
+              ),
+              html,
+          )
+          p.write_text(html, encoding="utf-8")
+          Path("latest.html").write_text(html, encoding="utf-8")
+          PY
+
+          test -s latest.html
+          grep -q "${GITHUB_SHA}" js/build-status.js
+          grep -q "?v=${GITHUB_SHA}" latest.html
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
