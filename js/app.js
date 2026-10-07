@@ -212,7 +212,7 @@ function textureTechnicalCategoriesOf(x){
 function minecloniaInventoryCategoryLabels(x){const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id)}
 async function buildFilters(){
  const sel=$('category');
- sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:item_authored">Item · '+ITEM_PROMPT_PATHS.size+'</option><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
+ sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:item_authored">Item · '+(window.MTSPromptStore?.authoredCount('items')||0)+'</option><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
  const vals=['ALL','P0','P1','P2','P3','P4','P5','P6'];
  const counts=Object.fromEntries(vals.map(v=>[v,v==='ALL'?CATALOG.length:CATALOG.filter(x=>x.priority===v).length]));
  $('filters').innerHTML=vals.map(v=>`<button class="chip ${v==='P0'?'active':''}" data-p="${v}">${v==='ALL'?'Tümü':v} · ${counts[v]}</button>`).join('');
@@ -563,12 +563,11 @@ function applyPromptOutputRequirements(text,x){
  if(!out.includes(TRANSPARENCY_OUTPUT_MARKER)) out+='\n\n'+TRANSPARENCY_OUTPUT_REQUIREMENT;
  return out;
 }
-const MOB_UV_PATHS=new Set();
-const ARMOR_UV_PATHS=new Set();
-fetch('prompts/armor/manifest.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(m=>{for(const e of (m?.entries||[]))ARMOR_UV_PATHS.add(e.texture_path)}).catch(e=>console.warn('Armor manifest yüklenemedi',e));
-fetch('prompts/mobs/manifest.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(m=>{for(const e of (m?.entries||[]))MOB_UV_PATHS.add(e.texture_path)}).catch(e=>console.warn('Mobs manifest yüklenemedi',e));
-function isMobUvTexture(x){return !!x&&MOB_UV_PATHS.has(x.path)}
-function isArmorUvTexture(x){return !!x&&ARMOR_UV_PATHS.has(x.path)}
+const PROMPT_STORE=window.MTSPromptStore;
+if(!PROMPT_STORE)throw new Error('Canonical prompt registry module is missing');
+const PROMPT_STORE_READY=PROMPT_STORE.ready;
+function isMobUvTexture(x){return !!x&&PROMPT_STORE.belongsTo(x,'mobs')}
+function isArmorUvTexture(x){return !!x&&PROMPT_STORE.belongsTo(x,'armor')}
 function isThreeStageUvTexture(x){return isMobUvTexture(x)||isArmorUvTexture(x)}
 function mobPromptMeta(x){
  const ri=runtimeRoleInfo(x),armor=isArmorUvTexture(x),raw=String(x.name||'').replace(/\.png$/i,'').replace(/^(extra_mobs_|mobs_mc_|mcl_armor_)/,'');
@@ -601,7 +600,7 @@ let promptViewMode='classic';
 function promptFor(x,mode='classic'){
  const row=promptRecord(x);
  if(row?.family==='items'){
-  const text=row.stages?.creative;
+  const text=promptStage(x,'creative');
   return text?{id:x.id,label:'Item · Creative',text,source:'canonical'}:null;
  }
  if(row?.family==='blocks'){
@@ -640,7 +639,7 @@ function renderActivePrompt(){
   $('copyPrompt').textContent='1 · Creative';
   $('savePrompt').textContent='2 · A+B Correction';
   $('copyPrompt').disabled=!p;
-  $('savePrompt').disabled=!rec?.stages?.correction;
+  $('savePrompt').disabled=!promptStage(active,'correction');
   $('savePrompt').title='Image A = original · Image B = creative result';
   return;
  }
@@ -702,7 +701,7 @@ const RECENT_TEXTURES_KEY='mts_recent_textures_v1';
 function recentTexturePaths(){try{const x=JSON.parse(localStorage.getItem(RECENT_TEXTURES_KEY)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}}
 function rememberRecentTexture(x){if(!x?.path)return;const list=[x.path,...recentTexturePaths().filter(p=>p!==x.path)].slice(0,10);try{localStorage.setItem(RECENT_TEXTURES_KEY,JSON.stringify(list))}catch(_){}renderRecentTextures()}
 async function renderRecentTextures(){const root=$('recentTextures'),strip=$('recentTextureStrip');if(!root||!strip)return;const items=recentTexturePaths().map(p=>CATALOG.find(x=>x.path===p)).filter(Boolean).slice(0,8);root.classList.toggle('show',items.length>0);strip.innerHTML='';for(const x of items){const b=document.createElement('button');b.className='recentTexture';b.title=x.path;b.innerHTML='<img><span></span>';b.querySelector('span').textContent=x.name||x.path.split('/').pop();b.onclick=()=>openDetail(x);strip.appendChild(b);try{b.querySelector('img').src=await previewUrl(x.path,true,96)}catch(_){}}}
-async function openDetail(x){active=x;await ITEM_PROMPTS_READY;rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;await PROMPT_STORE_READY;rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -1138,61 +1137,24 @@ function p0ReferenceSubject(x){
  const clean=n.replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
  return 'the game-world block material represented by '+clean;
 }
-const PROMPT_REGISTRY=new Map();
-const ITEM_PROMPT_PATHS=new Set();
-function promptRecord(x){return x?.id?PROMPT_REGISTRY.get(x.id)||null:null}
-async function loadCanonicalPromptFamily(family,manifestUrl){
- try{
-  const r=await fetch(manifestUrl,{cache:'no-cache'});if(!r.ok)throw new Error('manifest '+r.status);
-  const manifest=await r.json();
-  if(manifest?.schema_version!==2||manifest?.family!==family)throw new Error('non-canonical manifest');
-  const rows=(manifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  const records=await Promise.all(rows.map(async e=>{
-   const q=await fetch(e.file,{cache:'no-cache'});if(!q.ok)throw new Error(e.file+' '+q.status);
-   const j=await q.json();
-   if(j?.schema_version!==2||j?.family!==family||j?.id!==e.id||j?.path!==e.texture_path||!j?.stages)throw new Error('invalid canonical prompt '+e.id);
-   return j;
-  }));
-  for(const row of records){
-   PROMPT_REGISTRY.set(row.id,row);
-   if(family==='items')ITEM_PROMPT_PATHS.add(row.path);
-   if(family==='mobs')MOB_UV_PATHS.add(row.path);
-   if(family==='armor')ARMOR_UV_PATHS.add(row.path);
-  }
-  if(family==='items'){
-   const itemOpt=document.querySelector('#category option[value="special:item_authored"]');
-   if(itemOpt)itemOpt.textContent='Item · '+records.length;
-   if($('category')?.value==='special:item_authored')applyFilter();
-  }
-  if(active&&promptRecord(active))renderActivePrompt();
-  console.info('Canonical prompts loaded:',family,records.length);
-  return manifest;
- }catch(err){console.warn('Canonical prompt manifest unavailable',family,err);return null}
-}
-const CANONICAL_PROMPTS_READY=Promise.all([
- loadCanonicalPromptFamily('blocks','prompts/blocks/manifest.json'),
- loadCanonicalPromptFamily('mobs','prompts/mobs/manifest.json'),
- loadCanonicalPromptFamily('armor','prompts/armor/manifest.json'),
- loadCanonicalPromptFamily('items','prompts/items/manifest.json')
-]);
-const ITEM_PROMPTS_READY=CANONICAL_PROMPTS_READY;
-function isAuthoredItemTexture(x){return promptRecord(x)?.family==='items'}
-async function copyItemPrompt(kind){
+function promptRecord(x){return PROMPT_STORE.get(x)}
+function promptStage(x,stage){return PROMPT_STORE.stage(x,stage)}
+function isAuthoredItemTexture(x){return PROMPT_STORE.family(x)==='items'&&PROMPT_STORE.has(x)}
+async function copyCanonicalStage(stageName,successMessage){
  if(!active)return;
- await CANONICAL_PROMPTS_READY;
- const row=promptRecord(active),key=kind==='creative'?'creative':'correction',t=row?.family==='items'?row.stages?.[key]:null;
- if(!t)return toast('Hazır item promptu yok');
- try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
- toast(kind==='creative'?'Creative prompt kopyalandı':'A+B correction promptu kopyalandı')
+ await PROMPT_STORE_READY;
+ const text=promptStage(active,stageName);
+ if(!text)return toast('Hazır prompt yok');
+ try{await navigator.clipboard.writeText(text)}catch{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+ toast(successMessage)
 }
 function referencePromptFor(x){
  if(!x||!isThreeStageUvTexture(x))return null;
- const row=promptRecord(x);
- return (row&&(row.family==='mobs'||row.family==='armor')&&typeof row.stages?.reference==='string')?row.stages.reference:null;
+ return promptStage(x,'reference');
 }
 function p0ReferencePromptFor(x){
  const dependency=materialDependencyPromptBlock(x);
- const row=promptRecord(x),authored=row?.family==='blocks'?row.stages?.reference:null;
+ const row=promptRecord(x),authored=row?.family==='blocks'?promptStage(x,'reference'):null;
  if(typeof authored==='string'&&authored.length)return dependency?authored+'\n\n'+dependency:authored;
  const subject=p0ReferenceSubject(x);
  return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
@@ -1578,7 +1540,7 @@ $('mobFinalPrompt').onclick=()=>copyMobPrompt('final');
 $('copyPrompt').onclick=async()=>{
  if(!active)return;
  const rec=promptRecord(active);
- if(rec?.family==='items'){await copyItemPrompt('creative');return}
+ if(rec?.family==='items'){await copyCanonicalStage('creative','Creative prompt kopyalandı');return}
  const p=promptFor(active,'classic'),text=p?.text||'';
  if(!text)return toast('Hazır prompt yok');
  try{await navigator.clipboard.writeText(text)}catch{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
@@ -1587,7 +1549,7 @@ $('copyPrompt').onclick=async()=>{
 $('savePrompt').onclick=async()=>{
  if(!active)return;
  const rec=promptRecord(active);
- if(rec?.family==='items'){await copyItemPrompt('correction');return}
+ if(rec?.family==='items'){await copyCanonicalStage('correction','A+B correction promptu kopyalandı');return}
  if(active.priority==='P0'){
    try{await navigator.clipboard.writeText(p0ProductionPromptFor(active))}catch{const ta=document.createElement('textarea');ta.value=p0ProductionPromptFor(active);document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
    toast('Üretim promptu kopyalandı');return;
@@ -2235,6 +2197,7 @@ async function init(){
   $('stat').textContent='Arayüz hazır';
   setSaveState('Kayıt açılıyor…','warn');
   storageBootPromise=initStorage();
+  await PROMPT_STORE_READY;
   await buildFilters();
   await Promise.race([storageBootPromise,new Promise(r=>setTimeout(r,900))]);
   if(storageMode==='indexeddb')setSaveState('Hazır • kalıcı kayıt','ok');
@@ -2266,7 +2229,6 @@ async function init(){
   $('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);
 
   await applyFilter();
-  setTimeout(()=>CANONICAL_PROMPTS_READY.then(()=>{if(active)renderActivePrompt()}).catch(console.warn),0);
   bootstrapStorageInBackground();
 }
 CATALOG_READY.then(()=>{
