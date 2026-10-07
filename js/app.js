@@ -1,6 +1,6 @@
 const SOURCE_ZIPS={};
 
-const PAGE_SIZE=36; let filtered=[], page=0, active=null, changedOnly=false, promptedOnly=false, renderToken=0; const urlCache=new Map();
+const PAGE_SIZE=36; let filtered=[], page=0, active=null, changedOnly=false, promptedOnly=false, itemPromptedOnly=false, renderToken=0; const urlCache=new Map();
 const $=id=>document.getElementById(id);
 const toast=t=>{const e=$('toast'); if(!e){console.log(t);return} e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1700)};
 const sourceZips={};
@@ -2046,7 +2046,7 @@ async function putEdit(path,blob){
 }
 async function applyFilter(){
   const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();
-  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path)));
+  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)||isAuthoredItemTexture(x))&&(!itemPromptedOnly||isAuthoredItemTexture(x)));
   page=0; render();
 }
 async function render(){
@@ -2229,6 +2229,7 @@ async function init(){
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
   $('promptedOnly').onclick=()=>{promptedOnly=!promptedOnly;$('promptedOnly').classList.toggle('primary',promptedOnly);applyFilter()};
+ $('itemPromptedOnly').onclick=()=>{itemPromptedOnly=!itemPromptedOnly;$('itemPromptedOnly').classList.toggle('primary',itemPromptedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
   $('open3dPreview').onclick=open3dPreviewLazy;
