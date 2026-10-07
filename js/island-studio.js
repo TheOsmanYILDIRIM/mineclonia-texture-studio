@@ -175,15 +175,30 @@ function islandTargetMask(p,isl,density){
 }
 
 function islandContourFit(source,targetMask){
- const W=window.MTSUvWarp;if(!W?.analyze||!W?.analyzeWithMask||!W?.match||!W?.warp||!W?.exactUvSnap)return source;
+ const W=window.MTSUvWarp;if(!W?.analyze||!W?.analyzeWithMask||!W?.exactUvSnap)return source;
  try{
    const target=W.analyzeWithMask(targetMask,targetMask),src=W.analyze(source,{bgMode:'auto'});
-   if(!target.components?.length||!src.components?.length)return W.exactUvSnap(source,targetMask).canvas;
-   const pairs=W.match(target,src);if(!pairs.length)return W.exactUvSnap(source,targetMask).canvas;
-   const warped=W.warp(source,target,src,pairs);
-   return W.exactUvSnap(warped,targetMask).canvas
- }catch(e){console.warn('Island contour fit fallback',e);try{return W.exactUvSnap(source,targetMask).canvas}catch(_){return source}}
+   const tc=target.components?.[0],sc=src.components?.[0];if(!tc?.boundary?.length||!sc?.boundary?.length)return W.exactUvSnap(source,targetMask).canvas;
+   // Build dense target->source boundary constraints. Normalize by each component bbox first,
+   // so corresponding corners/indentations remain comparable after rough X/Y scaling.
+   const controls=[],tb=tc.bbox,sb=sc.bbox,tpts=tc.boundary,spts=sc.boundary,step=Math.max(1,Math.floor(tpts.length/96));
+   for(let i=0;i<tpts.length;i+=step){const t=tpts[i],nx=(t.x-tb.x)/Math.max(1,tb.w),ny=(t.y-tb.y)/Math.max(1,tb.h);let best=null,bd=Infinity;
+     for(const s of spts){const snx=(s.x-sb.x)/Math.max(1,sb.w),sny=(s.y-sb.y)/Math.max(1,sb.h),d=(snx-nx)*(snx-nx)+(sny-ny)*(sny-ny);if(d<bd){bd=d;best=s}}
+     if(best)controls.push({tx:t.x,ty:t.y,sx:best.x,sy:best.y})
+   }
+   if(controls.length<8)return W.exactUvSnap(source,targetMask).canvas;
+   const sw=source.width,sh=source.height,sg=source.getContext('2d',{willReadFrequently:true}),si=sg.getImageData(0,0,sw,sh),sd=si.data,out=document.createElement('canvas');out.width=sw;out.height=sh,og=out.getContext('2d'),oi=og.createImageData(sw,sh),od=oi.data;
+   const sample=(x,y)=>{x=Math.max(0,Math.min(sw-1,x));y=Math.max(0,Math.min(sh-1,y));const x0=Math.floor(x),y0=Math.floor(y),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=x-x0,fy=y-y0,r=[0,0,0,0];for(let k=0;k<4;k++){const a=sd[(y0*sw+x0)*4+k]*(1-fx)+sd[(y0*sw+x1)*4+k]*fx,b=sd[(y1*sw+x0)*4+k]*(1-fx)+sd[(y1*sw+x1)*4+k]*fx;r[k]=Math.round(a*(1-fy)+b*fy)}return r};
+   const radius=Math.max(10,Math.min(sw,sh)*.38),r2=radius*radius;
+   for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){let dx=0,dy=0,ws=0,nearest=Infinity,hard=null;
+     for(const q of controls){const ax=x-q.tx,ay=y-q.ty,d2=ax*ax+ay*ay;if(d2<nearest){nearest=d2;hard=q}if(d2>r2)continue;const wt=1/Math.pow(d2+.2,1.2);dx+=(q.sx-q.tx)*wt;dy+=(q.sy-q.ty)*wt;ws+=wt}
+     if(nearest<.3&&hard){dx=hard.sx-hard.tx;dy=hard.sy-hard.ty}else if(ws){dx/=ws;dy/=ws}else{dx=dy=0}
+     const p=sample(x+dx,y+dy),k=(y*sw+x)*4;od[k]=p[0];od[k+1]=p[1];od[k+2]=p[2];od[k+3]=p[3]
+   }
+   og.putImageData(oi,0,0);return W.exactUvSnap(out,targetMask).canvas
+ }catch(e){console.warn('Island dense contour fit fallback',e);try{return W.exactUvSnap(source,targetMask).canvas}catch(_){return source}}
 }
+
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
