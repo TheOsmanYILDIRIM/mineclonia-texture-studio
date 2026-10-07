@@ -1,18 +1,39 @@
+# ACTIVE HANDOFF — 2026-10-07
 
-## Pages update/cache path (2026-10-07)
-- Normal Chrome profile was confirmed capable of retaining stale `index.html` while Incognito showed the new Pages deployment.
-- Canonical update system is now: deploy stamps SHA/time into `js/build-status.js`, fingerprints JS/CSS with the deploy SHA, publishes `latest.html`, and the in-app update checker probes the actually deployed build with `cache: no-store`.
-- A ready update navigates to `latest.html?build=<full-sha>&_=<timestamp>` rather than repeatedly reloading cached `index.html`.
-- This refresh must preserve IndexedDB/localStorage edits/textures. Do not add storage clearing to cache refresh.
+Branch: `main` · Production: GitHub Pages.
 
+## Immediate next task — startup/performance
+User reports two long-standing startup issues that are now the next priority:
+1. Save/storage status often needs 3–4 page opens/reloads before it settles to the expected ready/saved state.
+2. Texture cards/images appear one-by-one slowly instead of the visible page becoming ready quickly.
+Do not clear or migrate user IndexedDB/localStorage while optimizing. Inspect `init()`, `bootstrapStorageInBackground()`, changed/edit hydration, `render()`, original/display blob loading and card URL creation. Goal: one-open deterministic storage readiness plus prioritized/batched visible texture loading. Measure/understand the boot path before patching.
 
-## Front-end modularization (2026-10-06)
-- Repository invariant is now documented in `AGENTS.md`: substantial independent screens/editors/labs must use isolated JS + CSS modules; optional feature failure must not block core catalog boot.
-- Island Studio: `js/island-studio.js` + `css/island-studio.css`.
-- Variant Lab: `js/variant-lab.js` + `css/variant-lab.css`.
-- Manual UV Mapper: `js/uv-mapper.js` + `css/uv-mapper.css`.
-- `js/app.js` now exposes narrow `MTSIslandBridge`, `MTSVariantBridge`, and `MTSUvBridge` APIs instead of owning those feature implementations.
-- Next: verify GitHub Pages boot plus Entity → Variant Lab → UV Eşle and Entity → Ada flows on mobile before further feature changes.
+## Island Studio — current canonical state
+- Dedicated files: `js/island-studio.js` + `css/island-studio.css`; opened from Entity detail next to Variant Lab.
+- Manual islands are intentionally user-defined groups. Export preserves original UV spatial composition while expanding canvas and separating islands proportionally.
+- AI import may change resolution. “Return to original UV” means original UV layout/geometry, NOT native pixel resolution. Restored output preserves AI pixel density.
+- Detection uses foreground objects: alpha when meaningful, otherwise border/background color inference. Connected components use strict 8-neighbor connectivity: diagonal pixel contact counts, real gaps do not. Do not reintroduce broad nearby-component absorption; it broke unrelated islands.
+- Restoration must fit the generated island to the real original UV contour, not only its rectangular bbox. Target contour comes from original texture alpha/foreground pixels inside the user selections; selection rectangles define membership only.
+- Current experimental contour fit uses dense source→target boundary constraints (~96 target samples), inverse-distance deformation of texture pixels, then exact target-mask alpha snap. Relevant commits: target-mask fix `269d6a9`, dense deformation `0c0b291`, refresh `e5ce17a`. This still needs visual validation; earlier contour attempts looked effectively unchanged to the user.
+- Island joystick is centered; four corner nodes + center/move node provide pixel adjustment.
+- Restored UV has direct 3D preview using the real entity B3D; preview must stay above Island Studio.
+- Do not auto-split by B3D face/chart/bone as the main workflow; earlier attempts fragmented the UV incorrectly. User-defined island grouping is canonical.
+
+## Pages build/cache system — preserve
+- Normal Chrome was confirmed to retain stale `index.html` while Incognito showed current deploy.
+- Deploy stamps SHA/time into `js/build-status.js`, fingerprints local JS/CSS URLs with `${GITHUB_SHA}`, and publishes `latest.html`.
+- Update check probes deployed Pages `js/build-status.js?probe=<timestamp>` with `cache: no-store`, not repository HEAD.
+- Ready updates navigate to `latest.html?build=<full-sha>&_=<timestamp>`; do not regress to repeated reloads of cached `index.html`.
+- Update/cache refresh must preserve user IndexedDB/localStorage texture/edit data.
+- Full invariant is also documented in `AGENTS.md`.
+
+## Front-end module boundary
+- Rule is in `AGENTS.md`: substantial independent screens/editors/labs get separate JS + CSS; feature failure must not block core catalog boot.
+- Island Studio and Variant Lab are isolated modules.
+- Manual UV Mapper currently remains inside `js/app.js`. A bulk extraction accidentally captured interleaved persistence/filter core functions and broke boot, so it was rolled back. A stale `js/uv-mapper.js` may exist but is not loaded. Future extraction must be dependency-by-dependency, not a contiguous cut.
+
+## Known workflow note
+- Runtime texture guards have had failures independent of successful Pages deploys. Check the relevant workflow/log rather than treating a guard failure as a Pages failure.
 
 # SESSION HANDOFF — Mineclonia Texture Studio
 
@@ -107,4 +128,4 @@ Variant Lab exposes `UV Eşle` for Entity textures. The mapper now has Orijinal 
 
 ## Next concrete step
 
-Open the deployed app after the latest Pages build and spot-check classic and modern door families (including edited upper/lower parts), then one simple entity skin (cow/cat), one multi-material entity (zombie/skeleton), grass/dirt block separation, and one ordinary top/side block. Fix incorrect mappings at the source-family/Lua/B3D interpretation layer before expanding multipart coverage to beds and other source-verified multipart objects.
+Optimize startup/storage readiness and visible texture loading as described in ACTIVE HANDOFF. After that, visually validate Island Studio dense contour restoration on the unchanged cat test before adding more UV algorithms.
