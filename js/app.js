@@ -304,10 +304,9 @@ function runtimeRoleInfo(x){
 }
 function runtimeRoleOf(x){return runtimeRoleInfo(x).role}
 function hasAuthoredPrompt(x){return !!(x&&(promptRecord(x)||PROMPT_OVERRIDES.has(x.id)))}
-async function countChanged(){return (await allEdits()).length}
 
-function b64bytes(s){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}
-const DB='MinecloniaTextureStudio', STORE='edits';
+const DB='MinecloniaTextureStudio', STORE='edits', EDIT_DB_VERSION=1, EDIT_LOCAL_PREFIX='mts:';
+const EDIT_STORAGE_CONTRACT=Object.freeze({db:DB,version:EDIT_DB_VERSION,store:STORE,localPrefix:EDIT_LOCAL_PREFIX});
 let dbp=null, storageMode='checking'; const memoryEdits=new Map();
 function blobToDataURL(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)})}
 function dataURLToBlob(s){const [h,b]=s.split(','),m=(h.match(/data:([^;]+)/)||[])[1]||'image/png',bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:m})}
@@ -316,7 +315,7 @@ async function initStorage(){
   try{
     dbp=await new Promise((res,rej)=>{
       let settled=false;
-      const r=indexedDB.open(DB,1);
+      const r=indexedDB.open(DB,EDIT_DB_VERSION);
       const finish=(fn,value)=>{if(settled)return;settled=true;clearTimeout(timer);fn(value)};
       const timer=setTimeout(()=>{settled=true;rej(Error('IndexedDB açılışı zaman aşımına uğradı'))},2500);
       r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE,{keyPath:'path'})};
@@ -328,7 +327,6 @@ async function initStorage(){
   }catch(e){console.warn('IndexedDB unavailable',e);storageMode='local';dbp=null}
 }
 function storageLabel(){return storageMode==='indexeddb'?'kalıcı':storageMode==='local'?'yerel fallback':'oturum'}
-async function localPut(path,blob){try{const data=await blobToDataURL(blob);localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now()}));return true}catch(e){console.warn('localStorage unavailable/full',e);storageMode='memory';memoryEdits.set(path,{path,blob,updatedAt:Date.now()});return false}}
 
 
 
@@ -831,14 +829,6 @@ async function textureMatchesOriginal(blob,meta,{throwOnError=false}={}){
    console.warn('Orijinal karşılaştırması yapılamadı',meta.path,err);
    return false;
  }
-}
-async function meaningfulEdits(){
- const raw=await allEdits(), out=[];
- for(const e of raw){
-   const meta=CATALOG.find(x=>x.path===e.path);if(!meta)continue;
-   try{const orig=await originalBlob(e.path);if(!(await blobsEqual(e.blob,orig)))out.push(e)}catch(err){console.warn('Değişiklik karşılaştırılamadı',e.path,err);out.push(e)}
- }
- return out
 }
 function catalogMatchForZipPath(zipPath){
  const clean=zipPath.replace(/^\/+/, '');
@@ -1499,7 +1489,7 @@ async function resetStoredEditsByPriorities(priorities){
    }
    for(const path of paths){
      hotEdits.delete(path);memoryEdits.delete(path);changedPathsFast.delete(path);pendingChangedPaths.delete(path);revoke(path);
-     try{localStorage.removeItem('mts:'+path)}catch(_){}
+     try{localStorage.removeItem(EDIT_LOCAL_PREFIX+path)}catch(_){}
      for(const size of [64,128,192,256,512])memoryScaled.delete(scaledMemKey(path,size));
    }
    await applyFilter();updateStatFast();
@@ -1751,42 +1741,13 @@ async function durableDbGet(path){
     r.onerror=()=>rej(r.error||new Error('Kayıt doğrulanamadı'));
   });
 }
-async function robustPersist(path,blob,verification='changed'){
-  hotEdits.set(path,{path,blob,updatedAt:Date.now()});
-  revoke(path);
-  setSaveState('Kaydediliyor…','warn');
-  if(storageMode==='indexeddb'&&dbp){
-    await durableDbPut(path,blob,verification);
-    const check=await durableDbGet(path);
-    if(!check || !check.blob || check.blob.size!==blob.size) throw new Error('Kayıt geri okuma doğrulaması başarısız');
-    hotEdits.set(path,check);
-    setSaveState('Kaydedildi • kalıcı','ok');
-    return;
-  }
-  // localStorage is unsafe for large PNGs. Use it only when it actually succeeds.
-  if(storageMode==='local'){
-    try{
-      const data=await blobToDataURL(blob);
-      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
-      const raw=localStorage.getItem('mts:'+path);
-      if(!raw) throw new Error('localStorage geri okuma başarısız');
-      setSaveState('Kaydedildi • yerel fallback','warn');
-      return;
-    }catch(e){
-      console.warn('local fallback failed',e);
-      storageMode='memory';
-    }
-  }
-  memoryEdits.set(path,{path,blob,updatedAt:Date.now(),verification});
-  setSaveState('Sadece oturumda • yedek al','bad');
-}
 async function getEdit(path){
   if(hotEdits.has(path)) return hotEdits.get(path);
   if(storageMode==='indexeddb'&&dbp){
     try{const v=await durableDbGet(path); if(v){hotEdits.set(path,v); return v}}catch(e){console.warn(e)}
   }
   if(storageMode==='local'){
-    try{const s=localStorage.getItem('mts:'+path); if(s){const o=JSON.parse(s);const v={path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'};hotEdits.set(path,v);return v}}catch(e){console.warn(e)}
+    try{const s=localStorage.getItem(EDIT_LOCAL_PREFIX+path); if(s){const o=JSON.parse(s);const v={path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'};hotEdits.set(path,v);return v}}catch(e){console.warn(e)}
   }
   return memoryEdits.get(path)||null;
 }
@@ -1798,7 +1759,7 @@ async function allEdits(){
       for(const v of arr) outByPath.set(v.path,v);
     }catch(e){console.warn('allEdits db',e)}
   } else if(storageMode==='local'){
-    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('mts:')){const o=JSON.parse(localStorage.getItem(k));outByPath.set(k.slice(4),{path:k.slice(4),blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'})}}}catch(e){console.warn(e)}
+    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(EDIT_LOCAL_PREFIX)){const o=JSON.parse(localStorage.getItem(k));outByPath.set(k.slice(EDIT_LOCAL_PREFIX.length),{path:k.slice(EDIT_LOCAL_PREFIX.length),blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'})}}}catch(e){console.warn(e)}
   }
   for(const [k,v] of memoryEdits) if(!outByPath.has(k)) outByPath.set(k,v);
   for(const [k,v] of hotEdits) outByPath.set(k,v);
@@ -1868,8 +1829,8 @@ async function persistBlobOnly(path,blob,verification='changed'){
   if(storageMode==='local'){
     try{
       const data=await blobToDataURL(blob);
-      localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
-      if(!localStorage.getItem('mts:'+path)) throw new Error('localStorage doğrulama başarısız');
+      localStorage.setItem(EDIT_LOCAL_PREFIX+path,JSON.stringify({data,updatedAt:Date.now(),verification}));
+      if(!localStorage.getItem(EDIT_LOCAL_PREFIX+path)) throw new Error('localStorage doğrulama başarısız');
       setSaveState('Kaydedildi • yerel fallback','warn');
       return;
     }catch(e){ console.warn('local save failed',e); storageMode='memory'; }
@@ -1947,7 +1908,7 @@ async function delEdit(path){
   editWriteQueue=editWriteQueue.catch(()=>{}).then(async()=>{
     setSaveState('Siliniyor…','warn');
     if(storageMode==='indexeddb'&&dbp){await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}
-    try{localStorage.removeItem('mts:'+path)}catch(_){}
+    try{localStorage.removeItem(EDIT_LOCAL_PREFIX+path)}catch(_){}
     await delScaledPath(path);
     setSaveState(storageMode==='indexeddb'?'Kaydedildi • kalıcı':storageMode==='local'?'Kaydedildi • yerel fallback':'Sadece oturumda • yedek al',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad');
   });
@@ -1964,7 +1925,7 @@ async function markPersistedVerification(path,verification){
     try{await durableDbPut(path,rec.blob,verification)}catch(err){console.warn('Doğrulama durumu kaydedilemedi',path,err)}
   }else if(storageMode==='local'){
     try{
-      const key='mts:'+path,raw=localStorage.getItem(key);
+      const key=EDIT_LOCAL_PREFIX+path,raw=localStorage.getItem(key);
       if(raw){const o=JSON.parse(raw);o.verification=verification;localStorage.setItem(key,JSON.stringify(o))}
     }catch(err){console.warn('Yerel doğrulama durumu kaydedilemedi',path,err)}
   }else{memoryEdits.set(path,rec)}
@@ -1975,7 +1936,7 @@ async function deletePersistedEditQuiet(path){
   if(storageMode==='indexeddb'&&dbp){
     try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)})}catch(err){console.warn('Eski edit kaydı silinemedi',path,err)}
   }
-  try{localStorage.removeItem('mts:'+path)}catch(_){}
+  try{localStorage.removeItem(EDIT_LOCAL_PREFIX+path)}catch(_){}
   await delScaledPath(path);
 }
 
