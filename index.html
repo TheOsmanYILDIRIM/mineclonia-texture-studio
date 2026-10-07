@@ -79,7 +79,11 @@
 <div class="vertexUvStudio" id="vertexUvStudio">
  <div class="vuvTop"><button class="btn" id="vuvClose">←</button><b>Vertex UV Studio</b><span class="stat" id="vuvTitle"></span><div class="spacer"></div><span class="stat" id="vuvPairCount">0 eşleşme</span><span class="stat" id="vuvZoom">100%</span></div>
  <div class="vuvBody">
-  <div class="vuvToolbar">
+  <div class="vuvWizard">
+   <div class="vuvProgress"><span id="vuvStepBadge">Adım 1 / 7</span><b id="vuvStepTitle">Düzelteceğin adayı seç</b></div>
+   <div class="vuvStepHelp" id="vuvStepHelp">Üretilen resimde düzeltmek istediğin parçaya dokun.</div>
+  </div>
+  <div class="vuvToolbar" id="vuvAdvancedTools">
    <button class="btn primary" id="vuvPickSource">1 · Üretilen ada</button><button class="btn" id="vuvPickTarget">2 · Orijinal hedef</button><button class="btn primary" id="vuvSnap">Tekrar Oturt</button><button class="btn" id="vuvScaleDownFine">Scale −1%</button><button class="btn" id="vuvScaleUpFine">Scale +1%</button><button class="btn" id="vuvScaleDown">−2.5%</button><button class="btn" id="vuvScaleUp">+2.5%</button>
    <span class="sep"></span><button class="btn" id="vuvAddSourceIsland">+ Kaynak Ada</button><button class="btn" id="vuvAddTargetIsland">+ Hedef Ada</button><button class="btn vuvDanger" id="vuvRedetect">Adaları Sıfırla</button>
    <span class="sep"></span><button class="btn primary" data-vuv-mode="vertex">Vertex</button><button class="btn" data-vuv-mode="move">Parçayı Taşı</button><button class="btn" data-vuv-mode="pan">Pan</button>
@@ -92,7 +96,8 @@
   <div class="vuvPairs" id="vuvPairs"><span class="stat">Henüz eşleşme yok</span></div>
   <div class="vuvStage" id="vuvStage"><div class="vuvStack" id="vuvStack"><canvas class="vuvWorkCanvas" id="vuvWorkCanvas"></canvas><canvas class="vuvGhostCanvas" id="vuvGhostCanvas"></canvas><canvas class="vuvMeshCanvas" id="vuvMeshCanvas"></canvas></div></div>
   <div class="vuvHint"><span id="vuvPickState">1/2 · Üretilen adaya dokun</span> · Sarı = source adalar, yeşil = orijinal hedef adalar, kesik çizgi = manuel oluşturulan ada. Otomatik tespit iki parçayı birleştirirse “+ Ada” ile ekranda ayrı dikdörtgen çiz.</div>
-  <div class="vuvFooter"><div class="vuvActions"><span class="stat" id="vuvStatus"></span><span class="stat" id="vuvNode">Node yok</span><button class="btn" data-vuv-step="0.1">0.10px</button><button class="btn primary" data-vuv-step="0.25">0.25px</button><button class="btn" data-vuv-step="0.5">0.50px</button><button class="btn" data-vuv-step="1">1px</button><button class="btn primary" id="vuvApply">Adayı Birleştir</button><button class="btn primary" id="vuvSave">✓ Varyanta Kaydet</button></div>
+  <div class="vuvWizardNav"><button class="btn" id="vuvBack">← Geri</button><button class="btn primary" id="vuvNext">İleri →</button></div>
+  <div class="vuvFooter" id="vuvFineTools"><div class="vuvActions"><span class="stat" id="vuvStatus"></span><span class="stat" id="vuvNode">Node yok</span><button class="btn" data-vuv-step="0.1">0.10px</button><button class="btn primary" data-vuv-step="0.25">0.25px</button><button class="btn" data-vuv-step="0.5">0.50px</button><button class="btn" data-vuv-step="1">1px</button><button class="btn primary" id="vuvApply">Adayı Birleştir</button><button class="btn primary" id="vuvSave">✓ Varyanta Kaydet</button></div>
    <div class="vuvDpad"><span></span><button class="btn" data-dy="-1">▲</button><span></span><button class="btn" data-dx="-1">◀</button><button class="btn center" type="button">D-pad</button><button class="btn" data-dx="1">▶</button><span></span><button class="btn" data-dy="1">▼</button><span></span></div>
   </div>
  </div>
@@ -117,4 +122,4 @@
 <script src="js/data/prompts-p0.js"></script>
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>
-<script src="js/app.js?v=20261007-uvscope2"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-slotsv3b"></script><script src="js/vertex-uv-studio.js?v=20261007-realcontour4"></script><script src="js/build-status.js?v=1"></script></body></html>
+<script src="js/app.js?v=20261007-uvscope2"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-slotsv3b"></script><script src="js/vertex-uv-studio.js?v=20261007-wizard1"></script><script src="js/build-status.js?v=1"></script></body></html>
