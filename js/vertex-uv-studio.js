@@ -53,15 +53,11 @@ function snapMeshBoundaryToRealIslands(){
  const srcPts=compBoundaryPoints(S.sourceAnalysis,S.sourceComp,1,1,srcB.x,srcB.y);
  const dstPts=compBoundaryPoints(S.targetAnalysis,S.targetComp,dstScaleX,dstScaleY,0,0);
  const rows=S.mesh.rows,cols=S.mesh.cols;
- const snap=(r,c)=>{
-   const p=S.mesh.points[r][c],fu=c/Math.max(1,cols),fv=r/Math.max(1,rows);
-   const sx=fu*S.sourceCrop.width,sy=fv*S.sourceCrop.height,dx=tr.x+fu*tr.w,dy=tr.y+fv*tr.h;
-   const sp=nearestBoundaryPoint(srcPts,sx,sy),dp=nearestBoundaryPoint(dstPts,dx,dy);
-   if(sp){p.u=sp.x;p.v=sp.y}
-   if(dp){p.x=dp.x;p.y=dp.y}
- };
- for(let c=0;c<=cols;c++){snap(0,c);snap(rows,c)}
- for(let r=1;r<rows;r++){snap(r,0);snap(r,cols)}
+ const sidePoint=(pts,side,t,b)=>{let cand=pts;if(side==='top'||side==='bottom'){const want=side==='top'?b.y:b.y+b.h-1;cand=pts.filter(p=>Math.abs(p.y-want)<=Math.max(1,b.h*.12));cand.sort((a,z)=>a.x-z.x)}else{const want=side==='left'?b.x:b.x+b.w-1;cand=pts.filter(p=>Math.abs(p.x-want)<=Math.max(1,b.w*.12));cand.sort((a,z)=>a.y-z.y)}if(!cand.length)cand=pts;return cand[Math.max(0,Math.min(cand.length-1,Math.round(t*(cand.length-1))))]||null};
+ const sb={x:0,y:0,w:S.sourceCrop.width,h:S.sourceCrop.height},db={x:tr.x,y:tr.y,w:tr.w,h:tr.h};
+ const snapSide=(r,c,side,t)=>{const p=S.mesh.points[r][c],sp=sidePoint(srcPts,side,t,sb),dp=sidePoint(dstPts,side,t,db);if(sp){p.u=sp.x;p.v=sp.y}if(dp){p.x=dp.x;p.y=dp.y}};
+ for(let c=0;c<=cols;c++){snapSide(0,c,'top',c/cols);snapSide(rows,c,'bottom',c/cols)}
+ for(let r=1;r<rows;r++){snapSide(r,0,'left',r/rows);snapSide(r,cols,'right',r/rows)}
  relaxMeshInteriorToBoundaries();
  for(const row of S.mesh.points)for(const p of row){p.ox=p.x;p.oy=p.y}
 }
