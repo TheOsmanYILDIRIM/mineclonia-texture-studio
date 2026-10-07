@@ -127,6 +127,13 @@ async function islandStudioImport(file){
      islandStudioStatus('Yeni V3 düzeni için önce Export PNG yap, sonra o dosyanın AI sürümünü import et.');
      toast('Önce yeni V3 Export PNG yap');return
    }
+   // The slot map is persisted, but the reference canvas lives only in memory.
+   // Rebuild it automatically after reload so Import/Düzelt never requires
+   // reopening the export wizard just to recreate the same sheet.
+   if(!islandStudio.template){
+     const rebuilt=await islandStudioBuildTemplate(false);
+     if(!rebuilt)throw Error('Kayıtlı export referansı yeniden oluşturulamadı');
+   }
    const c=await decodeBlobToCanvas(file),m=islandStudio.map;
    islandStudio.imported=c; // IMPORTANT: keep islandStudio.template as the original exported reference.
    const sx=c.width/Math.max(1,m.sheetW),sy=c.height/Math.max(1,m.sheetH);
