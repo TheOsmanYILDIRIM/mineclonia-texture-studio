@@ -1,0 +1,68 @@
+name: Import MTS item prompts
+
+on:
+  push:
+    paths:
+      - 'imports/mts-item-prompt-import.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Import bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="imports/mts-item-prompt-import.zip"
+          TMP="$(mktemp -d)"
+          test -f "$ZIP"
+          unzip -q "$ZIP" -d "$TMP"
+          test -f "$TMP/manifest.json"
+
+          python3 - "$TMP" <<'PY'
+          import json, pathlib, re, sys
+          root = pathlib.Path(sys.argv[1])
+          manifest = json.loads((root / "manifest.json").read_text())
+          seen = set()
+          for entry in manifest.get("entries", []):
+              item_id = entry.get("id", "")
+              assert re.fullmatch(r"tex_[0-9a-f]{10}", item_id)
+              assert item_id not in seen
+              seen.add(item_id)
+              path = root / f"{item_id}.json"
+              assert path.is_file()
+              obj = json.loads(path.read_text())
+              assert obj.get("id") == item_id
+              for key in ("path", "name", "creative_prompt", "correction_prompt"):
+                  assert isinstance(obj.get(key), str) and obj[key].strip()
+          assert seen
+          assert {p.stem for p in root.glob("tex_*.json")} == seen
+          PY
+
+          mkdir -p prompts/items
+          find prompts/items -maxdepth 1 -type f -name 'tex_*.json' -delete
+          cp "$TMP"/tex_*.json prompts/items/
+          cp "$TMP/manifest.json" prompts/items/manifest.json
+
+          rm -f prompts/items/batch_001_050.json
+          rm -rf prompts/items/batch_001_050
+          rm -f "$ZIP"
+
+      - name: Commit imported prompts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A prompts/items imports
+          git diff --cached --quiet && exit 0
+          git commit -m "prompts: import item prompt bundle"
+          git push
