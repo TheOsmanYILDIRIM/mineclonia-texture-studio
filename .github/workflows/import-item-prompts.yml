@@ -21,10 +21,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ZIP="imports/mts-item-prompt-import.zip"
+          TRIGGER="imports/mts-item-prompt-import.zip"
           TMP="$(mktemp -d)"
-          test -f "$ZIP"
-          unzip -q "$ZIP" -d "$TMP"
+          test -f "$TRIGGER"
+          cat imports/mts-item-prompt-import.part* | base64 -d > "$TMP/bundle.zip"
+          unzip -q "$TMP/bundle.zip" -d "$TMP/unpacked"
+          TMP="$TMP/unpacked"
           test -f "$TMP/manifest.json"
 
           python3 - "$TMP" <<'PY'
@@ -54,7 +56,7 @@ jobs:
 
           rm -f prompts/items/batch_001_050.json
           rm -rf prompts/items/batch_001_050
-          rm -f "$ZIP"
+          rm -f "$TRIGGER" imports/mts-item-prompt-import.part*
 
       - name: Commit imported prompts
         shell: bash
