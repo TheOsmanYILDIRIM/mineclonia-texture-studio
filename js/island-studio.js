@@ -7,6 +7,8 @@ const decodeBlobToCanvas=blob=>api().decodeBlobToCanvas(blob);
 const canvasPngBlob=canvas=>api().canvasPngBlob(canvas);
 const originalBlob=path=>api().originalBlob(path);
 const assetTypeOf=x=>api().assetTypeOf(x);
+const putEdit=(path,blob)=>api().putEdit?.(path,blob);
+const applyFilter=()=>api().applyFilter?.();
 const closeDetailSheet=()=>api().closeDetailSheet?.();
 let active=null;
 const CATALOG=new Proxy([], {get(_t,p){const a=api().catalog?.()||[];const v=a[p];return typeof v==='function'?v.bind(a):v}});
@@ -71,6 +73,8 @@ async function islandStudioOpen(preselect=null){
 async function islandStudioChoose(path){
  const x=CATALOG.find(a=>a.path===path);if(!x)return;
  islandStudio.meta=x;islandStudio.orig=await decodeBlobToCanvas(await originalBlob(x.path));islandStudio.template=null;islandStudio.imported=null;islandStudio.restored=null;islandStudio.sel={x:0,y:0,w:Math.max(2,Math.round(islandStudio.orig.width*.25)),h:Math.max(2,Math.round(islandStudio.orig.height*.25))};
+ if($('islandStudioApprove'))$('islandStudioApprove').disabled=true;
+ if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=true;
  islandStudioLoadMap();islandStudioSetHandle('move');islandStudioSetTab('edit')
 }
 function islandStudioNew(){islandStudio.islands.push({id:'island_'+Date.now().toString(36),rects:[]});islandStudio.index=islandStudio.islands.length-1;islandStudioSave()}
@@ -426,8 +430,33 @@ async function islandStudioRestore(){
  }
  if(!foundRects){islandStudio.restored=null;islandStudioStatus('Hiçbir AI UV alanı tespit edilemedi. AI Import görünümünü kontrol et.');return}
  islandStudio.restored=out;
- islandStudioStatus('Alan bazlı köşe eşleme · '+foundGroups+'/'+m.parts.length+' ada · '+foundRects+'/'+totalRects+' alan · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):''));
+ if($('islandStudioApprove'))$('islandStudioApprove').disabled=false;
+ if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
+ islandStudioStatus('Alan bazlı köşe eşleme · '+foundGroups+'/'+m.parts.length+' ada · '+foundRects+'/'+totalRects+' alan · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):'')+' · onay bekliyor');
  islandStudioSetTab('restored')
+}
+
+async function islandStudioExportRestored(){
+ if(!islandStudio.restored||!islandStudio.meta)return islandStudioStatus('Önce UV’ye Geri Topla.');
+ const blob=await canvasPngBlob(islandStudio.restored),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=(islandStudio.meta.id||islandStudio.meta.name||'texture').replace(/\.png$/i,'')+'_RESTORED.png';
+ a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ islandStudioStatus('Geri toplanmış PNG export edildi · onay verilmedi')
+}
+async function islandStudioApproveRestored(){
+ if(!islandStudio.restored||!islandStudio.meta)return islandStudioStatus('Önce UV’ye Geri Topla.');
+ const btn=$('islandStudioApprove');if(btn){btn.disabled=true;btn.textContent='Kaydediliyor…'}
+ try{
+   const blob=await canvasPngBlob(islandStudio.restored);
+   await putEdit(islandStudio.meta.path,blob);
+   await applyFilter();
+   islandStudioStatus('Onaylandı · aktif edit olarak kaydedildi · '+islandStudio.restored.width+'×'+islandStudio.restored.height);
+   toast('Geri toplanmış UV aktif texture olarak kaydedildi');
+   if(btn)btn.textContent='✓ Onaylandı'
+ }catch(e){
+   console.error(e);islandStudioStatus('Onay/kayıt başarısız: '+(e?.message||e));toast('UV kaydedilemedi');
+   if(btn){btn.disabled=false;btn.textContent='✓ Onayla / Aktif Yap'}
+ }
 }
 
 let islandPreview3dPromise=null;
@@ -473,6 +502,8 @@ function bindIslandStudioUi(){
    if(t.id==='islandStudioExport'){await islandStudioBuildTemplate(true);return}
    if(t.id==='islandStudioImport'){$('islandStudioFile')?.click();return}
    if(t.id==='islandStudioRestore'){await islandStudioRestore();return}
+   if(t.id==='islandStudioRestoredExport'){await islandStudioExportRestored();return}
+   if(t.id==='islandStudioApprove'){await islandStudioApproveRestored();return}
    if(t.id==='islandStudio3d'){await islandStudioPreview3d();return}
  });
  const tex=$('islandStudioTexture');if(tex)tex.addEventListener('change',e=>islandStudioChoose(e.target.value));
