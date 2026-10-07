@@ -3,7 +3,7 @@ name: Import MTS item prompts
 on:
   push:
     paths:
-      - 'imports/mts-item-prompt-import.zip'
+      - 'imports/mts-item-prompt-import.json'
 
 permissions:
   contents: write
@@ -21,42 +21,37 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TRIGGER="imports/mts-item-prompt-import.zip"
-          TMP="$(mktemp -d)"
-          test -f "$TRIGGER"
-          cat imports/mts-item-prompt-import.part* | base64 -d > "$TMP/bundle.zip"
-          unzip -q "$TMP/bundle.zip" -d "$TMP/unpacked"
-          TMP="$TMP/unpacked"
-          test -f "$TMP/manifest.json"
-
-          python3 - "$TMP" <<'PY'
+          BUNDLE="imports/mts-item-prompt-import.json"
+          test -f "$BUNDLE"
+          python3 - "$BUNDLE" <<'PY'
           import json, pathlib, re, sys
-          root = pathlib.Path(sys.argv[1])
-          manifest = json.loads((root / "manifest.json").read_text())
-          seen = set()
-          for entry in manifest.get("entries", []):
-              item_id = entry.get("id", "")
-              assert re.fullmatch(r"tex_[0-9a-f]{10}", item_id)
-              assert item_id not in seen
+          bundle_path=pathlib.Path(sys.argv[1])
+          bundle=json.loads(bundle_path.read_text())
+          rows=bundle.get("prompts",[])
+          if not rows:
+              raise SystemExit("bundle has no prompts")
+          out=pathlib.Path("prompts/items")
+          out.mkdir(parents=True,exist_ok=True)
+          for old in out.glob("tex_*.json"):
+              old.unlink()
+          entries=[]; seen=set()
+          for order,obj in enumerate(rows,1):
+              item_id=obj.get("id","")
+              if not re.fullmatch(r"tex_[0-9a-f]{10}",item_id) or item_id in seen:
+                  raise SystemExit(f"invalid/duplicate id: {item_id}")
               seen.add(item_id)
-              path = root / f"{item_id}.json"
-              assert path.is_file()
-              obj = json.loads(path.read_text())
-              assert obj.get("id") == item_id
-              for key in ("path", "name", "creative_prompt", "correction_prompt"):
-                  assert isinstance(obj.get(key), str) and obj[key].strip()
-          assert seen
-          assert {p.stem for p in root.glob("tex_*.json")} == seen
+              for key in ("path","name","creative_prompt","correction_prompt"):
+                  if not isinstance(obj.get(key),str) or not obj[key].strip():
+                      raise SystemExit(f"{item_id}: invalid {key}")
+              record={"schema_version":1,"kind":"item_two_pass",**obj}
+              (out/f"{item_id}.json").write_text(json.dumps(record,indent=2,ensure_ascii=False)+"\n")
+              entries.append({"order":order,"id":item_id,"name":obj["name"],"texture_path":obj["path"],"status":"done","file":f"prompts/items/{item_id}.json"})
+          manifest={"schema_version":1,"kind":"item_two_pass_manifest","total":len(entries),"done":len(entries),"pending":0,"entries":entries,"batches":[]}
+          (out/"manifest.json").write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n")
           PY
-
-          mkdir -p prompts/items
-          find prompts/items -maxdepth 1 -type f -name 'tex_*.json' -delete
-          cp "$TMP"/tex_*.json prompts/items/
-          cp "$TMP/manifest.json" prompts/items/manifest.json
-
           rm -f prompts/items/batch_001_050.json
           rm -rf prompts/items/batch_001_050
-          rm -f "$TRIGGER" imports/mts-item-prompt-import.part*
+          rm -f "$BUNDLE"
 
       - name: Commit imported prompts
         shell: bash
