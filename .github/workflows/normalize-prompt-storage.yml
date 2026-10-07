@@ -1,0 +1,54 @@
+name: Normalize prompt storage
+
+on:
+  push:
+    paths:
+      - 'imports/normalize-prompts.json'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Normalize legacy prompt storage
+        run: |
+          set -euo pipefail
+          python3 scripts/normalize_prompt_storage.py
+          rm -f imports/normalize-prompts.json
+      - name: Validate canonical prompt files
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          for family in ("blocks","mobs","armor","items"):
+              base=Path("prompts")/family
+              m=json.loads((base/"manifest.json").read_text())
+              assert m["schema_version"]==2 and m["family"]==family and not m.get("batches")
+              assert m["total"]==len(m["entries"])
+              for e in m["entries"]:
+                  assert e["file"]==f"prompts/{family}/{e['id']}.json"
+                  p=Path(e["file"]); assert p.is_file()
+                  o=json.loads(p.read_text())
+                  assert o["schema_version"]==2 and o["family"]==family and o["id"]==e["id"]
+                  assert o["path"]==e["texture_path"] and o["name"]==e["name"]
+                  assert isinstance(o["stages"],dict) and o["stages"]
+                  assert all(isinstance(v,str) and v.strip() for v in o["stages"].values())
+              assert not list(base.glob("*.txt"))
+              assert not list(base.glob("batch_*.json"))
+          PY
+      - name: Commit normalization
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A prompts imports
+          git diff --cached --quiet && exit 0
+          git commit -m "prompts: normalize all authored prompts to individual JSON"
+          git push
