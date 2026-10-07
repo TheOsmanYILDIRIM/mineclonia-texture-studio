@@ -162,16 +162,23 @@ function islandDetectObject(src,p,map){
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- const out=document.createElement('canvas');out.width=islandStudio.orig.width;out.height=islandStudio.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ // "Original UV" means original normalized layout, not original low pixel resolution.
+ // Preserve the AI generation density using its scale relative to the separated template.
+ const densityX=src.width/Math.max(1,m.sheetW),densityY=src.height/Math.max(1,m.sheetH);
+ const density=Math.max(densityX,densityY);
+ const outW=Math.max(1,Math.round(islandStudio.orig.width*density)),outH=Math.max(1,Math.round(islandStudio.orig.height*density));
+ const out=document.createElement('canvas');out.width=outW;out.height=outH;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
  let found=0;const missed=[];
  for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const obj=islandDetectObject(src,p,m);if(!obj){missed.push(p.ai+1);continue}
-   // One detected AI object -> one original island. Independent X/Y scaling deliberately
-   // absorbs aspect-ratio drift introduced by generation.
-   const tmp=document.createElement('canvas');tmp.width=p.src.w;tmp.height=p.src.h;tmp.getContext('2d').drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,p.src.w,p.src.h);
-   for(const rr of isl.rects||[])g.drawImage(tmp,rr.x-p.src.x,rr.y-p.src.y,rr.w,rr.h,rr.x,rr.y,rr.w,rr.h);found++
+   // Fit the detected generated object to the original island geometry at high resolution.
+   // X/Y are independent so generation aspect-ratio drift is intentionally corrected.
+   const targetX=Math.round(p.src.x*density),targetY=Math.round(p.src.y*density),targetW=Math.max(1,Math.round(p.src.w*density)),targetH=Math.max(1,Math.round(p.src.h*density));
+   const tmp=document.createElement('canvas');tmp.width=targetW;tmp.height=targetH;tmp.getContext('2d').drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,targetW,targetH);
+   for(const rr of isl.rects||[]){const rx=Math.round((rr.x-p.src.x)*density),ry=Math.round((rr.y-p.src.y)*density),rw=Math.max(1,Math.round(rr.w*density)),rh=Math.max(1,Math.round(rr.h*density)),dx=Math.round(rr.x*density),dy=Math.round(rr.y*density);g.drawImage(tmp,rx,ry,rw,rh,dx,dy,rw,rh)}
+   found++
  }
  if(!found){islandStudio.restored=null;islandStudioStatus('Hiçbir AI adası tespit edilemedi. Ayrılmış AI görünümünü kontrol et.');return}
- islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
+ islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+' · UV ölçeği '+density.toFixed(2)+'×'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
 
 function bindIslandStudioUi(){
