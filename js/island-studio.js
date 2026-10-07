@@ -402,6 +402,27 @@ function islandContourFit(source,targetMask){
  }catch(e){console.warn('corner matched UV fit fallback',e);return fallback()}
 }
 
+
+function islandMaskIoU(a,b){
+ if(!a||!b||a.length!==b.length)return 0;
+ let inter=0,uni=0;
+ for(let i=0;i<a.length;i++){const av=!!a[i],bv=!!b[i];if(av&&bv)inter++;if(av||bv)uni++}
+ return uni?inter/uni:1
+}
+function islandLocalRectFit(source,targetMask){
+ const sm=islandMaskInfo(source,{clean:true}),tm=islandMaskInfo(targetMask);
+ const iou=islandMaskIoU(sm.mask,tm.mask);
+ // Exact/near-exact round trip: preserve pixels, only enforce target alpha.
+ if(iou>.985){
+   const out=document.createElement('canvas');out.width=targetMask.width;out.height=targetMask.height;
+   const g=out.getContext('2d',{willReadFrequently:true});g.drawImage(source,0,0,out.width,out.height);
+   const im=g.getImageData(0,0,out.width,out.height),d=im.data,m=targetMask.getContext('2d').getImageData(0,0,targetMask.width,targetMask.height).data;
+   for(let i=0;i<d.length;i+=4)d[i+3]=m[i+3]>=16?255:0;
+   g.putImageData(im,0,0);return out
+ }
+ // Changed by AI: perform corner/edge fit, but only within this rect's own crop.
+ return islandContourFit(source,targetMask)
+}
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
@@ -430,7 +451,7 @@ async function islandStudioRestore(){
      rg.drawImage(src,srcX,srcY,srcW,srcH,0,0,dstW,dstH);
 
      const mask=islandRectTargetMask(rr,density);
-     const fitted=islandContourFit(rough,mask);
+     const fitted=islandLocalRectFit(rough,mask);
      g.drawImage(fitted,dstX,dstY);
      restoredRects++
    }
@@ -439,7 +460,7 @@ async function islandStudioRestore(){
  islandStudio.restored=out;
  if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioStatus('Kesin mapping ile UV geri toplama · '+restoredRects+'/'+totalRects+' alan · '+outW+'×'+outH+' · onay bekliyor');
+ islandStudioStatus('Kesin mapping + lokal AI düzeltme · '+restoredRects+'/'+totalRects+' alan · '+outW+'×'+outH+' · onay bekliyor');
  islandStudioSetTab('restored')
 }
 
