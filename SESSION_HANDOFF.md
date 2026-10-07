@@ -32,7 +32,8 @@ Branch: `main` · Production: GitHub Pages.
 ## Verification
 - Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
 - `7b293ac` fixes the reload/import continuity bug: the V3 slot map was persisted, but the exported reference sheet canvas was memory-only. Import now rebuilds that reference automatically from the saved island definitions, so the user no longer has to reopen the wizard and press Forward just to make Import/Düzelt remember the export.
+- `153ba16` fixes island-sheet detection: in Import/Düzelt mode, saved export slots now define logical island identity. Global connected-component detection no longer gets to split/merge exported islands across the sheet. Source and target objects are rebuilt per slot from the real foreground mask, so auto-overlap uses the correct source/target bbox inside that slot.
 - Final device visual validation is still required for the real-contour node placement, centered scale behavior, and the reload→Import/Düzelt path on problematic pig/cat AI atlases.
 
 ## Next concrete step
-On device, export an island sheet once, reload/leave the page, then choose `AI PNG Import / Düzelt` directly and verify it opens Vertex UV without reopening the export wizard. After that validate source island → target island auto-overlap, real-RGB/alpha contour nodes at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting, `Adayı Birleştir`, and save.
+On device, export an island sheet once, reload/leave the page, then choose `AI PNG Import / Düzelt` directly. Verify each saved slot appears as exactly one logical island, selecting a source auto-pairs the same slot target, and `Üst üste getir` visibly moves/warps the AI foreground bbox onto the original foreground bbox. Then validate contour nodes at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting, `Adayı Birleştir`, and save.
