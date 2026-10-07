@@ -77,7 +77,21 @@ function scaleMesh(factor){
  for(const row of S.mesh.points)for(const p of row){p.x=c.x+(p.x-c.x)*factor;p.y=c.y+(p.y-c.y)*factor}
  render();status('Merkezden scale ×'+factor.toFixed(3))
 }
-function makeMesh(snap=false){if(!S.sourceComp||!S.targetComp)return;S.sourceCrop=cropSource();const src=S.sourceComp.bbox,t=snap?targetWorkRect():{x:src.x,y:src.y,w:src.w,h:src.h},cols=S.grid,rows=S.grid,pts=[];for(let r=0;r<=rows;r++){const row=[];for(let c=0;c<=cols;c++){const u=c/cols,v=r/rows;row.push({x:t.x+u*t.w,y:t.y+v*t.h,u:u*S.sourceCrop.width,v:v*S.sourceCrop.height,ox:t.x+u*t.w,oy:t.y+v*t.h})}pts.push(row)}S.mesh={cols,rows,points:pts};S.selectedNode=null;S.meshHistory=[];S.meshRedo=[];S.meshBase=cloneCanvas(S.work);clearComponent(S.meshBase,S.sourceComp,S.sourceAnalysis,false);clearComponent(S.meshBase,S.targetComp,S.targetAnalysis,true);S.targetMaskWork=buildTargetMaskWork();if(snap)snapMeshBoundaryToRealIslands();render();status(snap?'Otomatik üst üste getirildi · dış node’lar gerçek ada sınırında':'Ada çifti hazır')}
+function focusMesh(){
+ if(!S.mesh||!S.work)return;
+ const stage=$('vuvStage'),stack=$('vuvStack');if(!stage||!stack)return;
+ fitStack();let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+ for(const row of S.mesh.points)for(const p of row){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}
+ const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY),baseW=Math.max(1,stack.offsetWidth),baseH=Math.max(1,stack.offsetHeight);
+ const boxPxW=bw/S.work.width*baseW,boxPxH=bh/S.work.height*baseH;
+ const wanted=Math.min(stage.clientWidth*.68/Math.max(1,boxPxW),stage.clientHeight*.58/Math.max(1,boxPxH));
+ S.zoom=Math.max(1,Math.min(12,wanted));
+ const cx=(minX+maxX)/2/S.work.width*baseW,cy=(minY+maxY)/2/S.work.height*baseH;
+ S.panX=stage.clientWidth/2-stack.offsetLeft-cx*S.zoom;
+ S.panY=stage.clientHeight/2-stack.offsetTop-cy*S.zoom;
+ applyView();
+}
+function makeMesh(snap=false){if(!S.sourceComp||!S.targetComp)return;S.sourceCrop=cropSource();const src=S.sourceComp.bbox,t=snap?targetWorkRect():{x:src.x,y:src.y,w:src.w,h:src.h},cols=S.grid,rows=S.grid,pts=[];for(let r=0;r<=rows;r++){const row=[];for(let c=0;c<=cols;c++){const u=c/cols,v=r/rows;row.push({x:t.x+u*t.w,y:t.y+v*t.h,u:u*S.sourceCrop.width,v:v*S.sourceCrop.height,ox:t.x+u*t.w,oy:t.y+v*t.h})}pts.push(row)}S.mesh={cols,rows,points:pts};S.selectedNode=null;S.meshHistory=[];S.meshRedo=[];S.meshBase=cloneCanvas(S.work);clearComponent(S.meshBase,S.sourceComp,S.sourceAnalysis,false);clearComponent(S.meshBase,S.targetComp,S.targetAnalysis,true);S.targetMaskWork=buildTargetMaskWork();if(snap)snapMeshBoundaryToRealIslands();render();if(snap)focusMesh();status(snap?'Otomatik üst üste getirildi · dış node’lar gerçek ada sınırında':'Ada çifti hazır')}
 function meshSnapshot(){return S.mesh?JSON.stringify(S.mesh.points):null}
 function pushMesh(){const x=meshSnapshot();if(!x)return;S.meshHistory.push(x);if(S.meshHistory.length>50)S.meshHistory.shift();S.meshRedo=[]}
 function captureWorkState(){return {canvas:cloneCanvas(S.work),pairs:S.pairs.map(x=>({...x})),usedSource:[...S.usedSource],usedTarget:[...S.usedTarget]}}
