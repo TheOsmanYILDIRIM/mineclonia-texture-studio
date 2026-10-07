@@ -434,22 +434,36 @@ function islandTargetComponentMask(groupMask,comp){
  const src=groupMask.getContext('2d',{willReadFrequently:true}).getImageData(comp.x,comp.y,comp.w,comp.h);
  const g=c.getContext('2d');g.putImageData(src,0,0);return c
 }
-function islandMatchSourceComponent(targetComp,sourceComps,used,expected,srcW,srcH,targetW,targetH){
+function islandComponentSignature(mask,w,h,c,n=20){
+ const out=new Float32Array(n*n);
+ for(let gy=0;gy<n;gy++)for(let gx=0;gx<n;gx++){
+   const x0=Math.floor(c.x+gx*c.w/n),x1=Math.max(x0+1,Math.ceil(c.x+(gx+1)*c.w/n));
+   const y0=Math.floor(c.y+gy*c.h/n),y1=Math.max(y0+1,Math.ceil(c.y+(gy+1)*c.h/n));
+   let on=0,total=0;
+   for(let y=Math.max(0,y0);y<Math.min(h,y1);y++)for(let x=Math.max(0,x0);x<Math.min(w,x1);x++){on+=mask[y*w+x]?1:0;total++}
+   out[gy*n+gx]=total?on/total:0
+ }
+ return out
+}
+function islandSignatureError(a,b){
+ let d=0;for(let i=0;i<a.length;i++)d+=Math.abs(a[i]-b[i]);return d/Math.max(1,a.length)
+}
+function islandMatchSourceComponent(targetComp,targetMask,sourceComps,sourceMask,used,expected,srcW,srcH,targetW,targetH){
  let best=null,bestScore=Infinity;
- const tarAR=targetComp.w/Math.max(1,targetComp.h),tarArea=Math.max(1,targetComp.count);
+ const tarAR=targetComp.w/Math.max(1,targetComp.h),tarFill=targetComp.count/Math.max(1,targetComp.w*targetComp.h);
+ const tsig=islandComponentSignature(targetMask,targetW,targetH,targetComp,20);
  for(let i=0;i<sourceComps.length;i++){
    if(used.has(i))continue;
-   const sc=sourceComps[i];
-   if(sc.count<8)continue;
-   const ar=sc.w/Math.max(1,sc.h);
-   const arErr=Math.abs(Math.log(Math.max(.03,ar)/Math.max(.03,tarAR)));
-   const areaNormS=sc.count/Math.max(1,srcW*srcH),areaNormT=tarArea/Math.max(1,targetW*targetH);
-   const areaErr=Math.abs(Math.log((areaNormS+1e-7)/(areaNormT+1e-7)));
+   const sc=sourceComps[i];if(sc.count<8)continue;
+   const ar=sc.w/Math.max(1,sc.h),arErr=Math.abs(Math.log(Math.max(.03,ar)/Math.max(.03,tarAR)));
+   const fill=sc.count/Math.max(1,sc.w*sc.h),fillErr=Math.abs(fill-tarFill);
+   const ssig=islandComponentSignature(sourceMask,srcW,srcH,sc,20),shapeErr=islandSignatureError(tsig,ssig);
    const dist=Math.hypot((sc.cx-expected.x)/Math.max(8,expected.w),(sc.cy-expected.y)/Math.max(8,expected.h));
-   const score=dist*1.15+arErr*1.8+areaErr*.32;
-   if(score<bestScore){bestScore=score;best={index:i,comp:sc,score}}
+   // Shape dominates. Position only breaks ties between similarly shaped islands.
+   const score=shapeErr*7.5+arErr*1.15+fillErr*2.0+dist*.22;
+   if(score<bestScore){bestScore=score;best={index:i,comp:sc,score,shapeErr}}
  }
- return best&&bestScore<5.2?best:null
+ return best&&bestScore<5.0?best:null
 }
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
@@ -462,7 +476,7 @@ async function islandStudioRestore(){
 
  // 1) Detect ALL generated islands first. Their current position is only a matching hint;
  // geometry identity comes from component shape/size, not from a hard crop.
- const srcMask=islandForegroundMask(src);
+ const srcMaskRaw=islandForegroundMask(src),srcMask=islandCleanGeometryMask(srcMaskRaw,src.width,src.height);
  const srcComps=islandComponents(srcMask,src.width,src.height,{x:0,y:0,w:src.width,h:src.height})
    .filter(c=>c.count>=Math.max(8,src.width*src.height*.00001))
    .sort((a,b)=>b.count-a.count);
@@ -486,7 +500,7 @@ async function islandStudioRestore(){
        w:Math.max(4,tc.w/groupMask.width*p.dst.w*scaleX),
        h:Math.max(4,tc.h/groupMask.height*p.dst.h*scaleY)
      };
-     const match=islandMatchSourceComponent(tc,srcComps,used,expected,src.width,src.height,groupMask.width,groupMask.height);
+     const match=islandMatchSourceComponent(tc,targetMaskArr,srcComps,srcMask,used,expected,src.width,src.height,groupMask.width,groupMask.height);
      if(!match){missed.push((p.ai+1)+'.'+(ti+1));continue}
      used.add(match.index);
 
@@ -510,7 +524,7 @@ async function islandStudioRestore(){
  islandStudio.restored=out;
  if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioStatus('Ada tespit → default şekle uydur → konumlandır · '+matchedCount+'/'+targetCount+' ada · '+outW+'×'+outH+(missed.length?' · eşleşmedi: '+missed.join(', '):'')+' · onay bekliyor');
+ islandStudioStatus('Silüet eşleme → default şekle uydur → konumlandır · '+matchedCount+'/'+targetCount+' ada · '+outW+'×'+outH+(missed.length?' · eşleşmedi: '+missed.join(', '):'')+' · onay bekliyor');
  islandStudioSetTab('restored')
 }
 
