@@ -71,7 +71,7 @@ async function islandStudioOpen(preselect=null){
  bindIslandStudioUi();const sel=$('islandStudioTexture');sel.innerHTML='';
  const entities=CATALOG.filter(x=>assetTypeOf(x)==='Entity');
  for(const x of entities){const o=document.createElement('option');o.value=x.path;o.textContent=x.name||x.id||x.path.split('/').pop();sel.appendChild(o)}
- if(preselect&&entities.some(x=>x.path===preselect))sel.value=preselect;$('islandStudio').classList.add('open');if(sel.value)await islandStudioChoose(sel.value)
+ if(preselect&&entities.some(x=>x.path===preselect))sel.value=preselect;$('islandStudio').classList.add('open');$('islandModeChooser')?.classList.remove('hidden');if(sel.value)await islandStudioChoose(sel.value)
 }
 async function islandStudioChoose(path){
  const x=CATALOG.find(a=>a.path===path);if(!x)return;
@@ -131,8 +131,14 @@ async function islandStudioImport(file){
    islandStudio.imported=c; // IMPORTANT: keep islandStudio.template as the original exported reference.
    const sx=c.width/Math.max(1,m.sheetW),sy=c.height/Math.max(1,m.sheetH);
    islandStudioStatus('AI Import · '+c.width+'×'+c.height+' · V3 slot ölçeği X '+sx.toFixed(2)+' / Y '+sy.toFixed(2));
-   islandStudioSetTab('imported')
+   islandStudioSetTab('imported');const blob=await canvasPngBlob(c);rootToVertex(blob)
  }catch(e){console.error(e);islandStudioStatus('Import başarısız: '+(e?.message||e));toast('AI PNG import edilemedi')}
+}
+
+async function rootToVertex(blob){
+ const meta=islandStudio.meta;if(!meta||!blob)return;
+ const root=$('islandStudio');root?.classList.remove('open');
+ try{if(!window.MTSVariantLab?.open)throw Error('Varyant ekranı yüklenmedi');await window.MTSVariantLab.open(meta);await window.MTSVariantLab.addExternalVariant?.(blob,'AI_IMPORT.png');setTimeout(()=>window.MTSVertexUvStudio?.open?.(),0)}catch(e){console.error(e);toast('AI düzeltme ekranı açılamadı')}
 }
 function islandForegroundMask(canvas){
  const ctx=canvas.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,canvas.width,canvas.height),d=im.data,w=canvas.width,h=canvas.height,n=w*h,mask=new Uint8Array(n);
@@ -287,7 +293,7 @@ function bindIslandStudioUi(){
  const root=$('islandStudio');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
  root.addEventListener('click',async e=>{
    const t=e.target.closest('button,[data-islandtab],[data-ih]');if(!t)return;
-   if(t.id==='islandStudioClose'){root.classList.remove('open');return}if(t.id==='islandWizardBack'){islandWizardBack();return}if(t.id==='islandWizardNext'){await islandWizardNext();return}
+   if(t.id==='islandStudioClose'){root.classList.remove('open');return}if(t.id==='islandChoosePrepare'){$('islandModeChooser')?.classList.add('hidden');islandWizardSet(islandStudio.islands.some(a=>a.rects?.length)?2:1);return}if(t.id==='islandChooseRepair'){$('islandModeChooser')?.classList.add('hidden');$('islandStudioFile')?.click();return}if(t.id==='islandWizardBack'){islandWizardBack();return}if(t.id==='islandWizardNext'){await islandWizardNext();return}
    if(t.dataset.islandtab){islandStudioSetTab(t.dataset.islandtab);return}
    if(t.dataset.ih){islandStudioSetHandle(t.dataset.ih);e.stopPropagation();return}
    if(t.id==='islandStudioNew'){islandStudioNew();return}
