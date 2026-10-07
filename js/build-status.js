@@ -8,7 +8,7 @@ async function deployedBuild(){
 }
 async function hardReload(sha){
  try{if('caches'in window){for(const k of await caches.keys())await caches.delete(k)}if(navigator.serviceWorker){for(const reg of await navigator.serviceWorker.getRegistrations())await reg.unregister()}}catch(e){console.warn('cache cleanup',e)}
- const u=new URL(location.href);u.searchParams.set('build',short(sha));u.searchParams.set('_',Date.now());location.replace(u.toString())
+ const u=new URL('latest.html',location.href);u.searchParams.set('build',String(sha));u.searchParams.set('_',Date.now());location.replace(u.toString())
 }
 function init(){
  const badge=$('buildBadge'),check=$('buildCheck');if(!badge||!check)return;
