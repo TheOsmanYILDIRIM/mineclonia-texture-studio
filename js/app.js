@@ -1276,7 +1276,7 @@ function uvApplyCurrentTransform(fit=false,lockMask=false){
  if(lockMask)uvApplyTargetMask(g,dst,p.orig);
  uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;
  if(movingObject){uvMap.selectedSourceComp=null;uvMap.selectedTargetComp=null;uvMap.objectPick=null;uvUpdateObjectPickUi()}
- uvRenderWork();uvTransformStatus();uvStatus();uvRefreshContours();
+ uvRenderWork();uvTransformStatus();uvStatus();if(lockMask)uvAnalyzeSmart();else uvRefreshContours();
  toast(lockMask?'Parça hedefe oturtuldu · orijinal UV maskesi kilitlendi':fit?'Parça hedef boyuta oturtuldu':'Parça canlı uygulandı')
 }
 
