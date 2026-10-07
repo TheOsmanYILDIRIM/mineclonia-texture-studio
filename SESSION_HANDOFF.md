@@ -6,8 +6,9 @@ Branch: `main` · Production: GitHub Pages.
 Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parallel thumbnail loading, and first paint no longer performs one IndexedDB lookup per card before persisted edits are hydrated. Relevant commits: `1bfd898`, `8575add`, `bb223d4`, publish/cache bump `0861bf8`.
 Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
 
-## Manual UV Studio — primary entity repair workflow
-- The automatic Island Studio restore experiments are no longer the primary path. Manual UV repair is canonical for AI-generated entity atlases; Island Studio remains optional for separated/export experiments only.
+## Vertex UV Studio — primary entity repair workflow
+- The automatic Island Studio restore experiments and the old rectangle-based UV mapper are no longer the primary path. The dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` tool is canonical for AI-generated entity atlases; Variant Lab → `UV Eşle` opens it directly.
+- The tool is based on the user's Vector Character Studio v5.7 workflow but simplified for atlas repair: detected source/target object boxes, original ghost overlay, piecewise-affine grid mesh deformation, draggable vertices, whole-mesh move, pan/zoom, 3×3/4×4/6×6 node grids, 0.10/0.25/0.50/1 px D-pad nudging, undo/redo/reset, target-mask locking, per-part bake, and final save back to Variant Lab.
 - The existing Manual UV Mapper in `js/app.js` was corrected on 2026-10-07:
   - original and generated canvases may have different resolutions; target rectangles are now scaled into work-canvas coordinates before apply,
   - generated/source detection uses real background inference (`auto/black/alpha`) instead of forcing `strictAlpha`,
