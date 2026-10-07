@@ -31,7 +31,8 @@ Branch: `main` · Production: GitHub Pages.
 
 ## Verification
 - Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
-- Final device visual validation is still required for the real-contour node placement and centered scale behavior on problematic pig/cat AI atlases.
+- `7b293ac` fixes the reload/import continuity bug: the V3 slot map was persisted, but the exported reference sheet canvas was memory-only. Import now rebuilds that reference automatically from the saved island definitions, so the user no longer has to reopen the wizard and press Forward just to make Import/Düzelt remember the export.
+- Final device visual validation is still required for the real-contour node placement, centered scale behavior, and the reload→Import/Düzelt path on problematic pig/cat AI atlases.
 
 ## Next concrete step
-Open a problematic entity in Variant Lab → `UV Eşle`. Validate: source island → target island auto-overlap, real-RGB/alpha contour node placement at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting for touching regions, then `Adayı Birleştir` and save. Fix interaction/geometry issues in this Vertex UV workflow before revisiting any automatic restore algorithm.
+On device, export an island sheet once, reload/leave the page, then choose `AI PNG Import / Düzelt` directly and verify it opens Vertex UV without reopening the export wizard. After that validate source island → target island auto-overlap, real-RGB/alpha contour nodes at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting, `Adayı Birleştir`, and save.
