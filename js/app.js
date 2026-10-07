@@ -58,6 +58,8 @@ function invalidatePreviewUrls(path){
 }
 async function invalidateDerivedCaches(path){
  invalidatePreviewUrls(path);
+ // Drop queued derived-cache work for the previous blob before deleting persisted entries.
+ for(let i=scaleQueue.length-1;i>=0;i--)if(scaleQueue[i]?.path===path){scaleQueued.delete(scaleQueue[i].qk);scaleQueue.splice(i,1)}
  await delScaledPath(path);
 }
 async function rebuildEditThumbnail(path,blob){
