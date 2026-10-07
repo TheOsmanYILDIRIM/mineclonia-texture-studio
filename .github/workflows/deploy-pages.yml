@@ -38,6 +38,8 @@ jobs:
             shortSha: "${GITHUB_SHA:0:7}",
             builtAt: "${BUILD_TIME}"
           };
+          // Keep the source module's BUILD literal aligned with the deployed artifact.
+          sed -i "s/BUILD_SHA_PLACEHOLDER/${GITHUB_SHA}/g; s/BUILD_TIME_PLACEHOLDER/${BUILD_TIME}/g" js/build-status.js
           EOF
 
           python3 - <<'PY'
