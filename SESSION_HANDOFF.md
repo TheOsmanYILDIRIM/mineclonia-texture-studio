@@ -20,6 +20,7 @@ Next: device-validate one fresh normal Chrome open. Confirm storage reaches “H
 ## Pages build/cache system — preserve
 - Normal Chrome was confirmed to retain stale `index.html` while Incognito showed current deploy.
 - Deploy stamps SHA/time into `js/build-status.js`, fingerprints local JS/CSS URLs with `${GITHUB_SHA}`, and publishes `latest.html`.
+- Workflow enforcement restored in commit `b4e4ef5`; do not remove the artifact-stamping step from `.github/workflows/deploy-pages.yml`.
 - Update check probes deployed Pages `js/build-status.js?probe=<timestamp>` with `cache: no-store`, not repository HEAD.
 - Ready updates navigate to `latest.html?build=<full-sha>&_=<timestamp>`; do not regress to repeated reloads of cached `index.html`.
 - Update/cache refresh must preserve user IndexedDB/localStorage texture/edit data.
