@@ -405,33 +405,41 @@ function islandContourFit(source,targetMask){
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- const densityX=src.width/Math.max(1,m.sheetW),densityY=src.height/Math.max(1,m.sheetH),density=Math.max(densityX,densityY);
+ const sx=src.width/Math.max(1,m.sheetW),sy=src.height/Math.max(1,m.sheetH);
+ const density=Math.max(sx,sy);
  const outW=Math.max(1,Math.round(islandStudio.orig.width*density)),outH=Math.max(1,Math.round(islandStudio.orig.height*density));
  const out=document.createElement('canvas');out.width=outW;out.height=outH;
  const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- let foundGroups=0,foundRects=0,totalRects=0;const missed=[];const used=new Set();
 
+ let restoredRects=0,totalRects=0;
  for(const p of m.parts){
    const isl=islandStudio.islands[p.ai];if(!isl)continue;
-   const rects=isl.rects||[];totalRects+=rects.length;let groupFound=0;
-   for(let ri=0;ri<rects.length;ri++){
-     const rr=rects[ri],obj=islandDetectRectObject(src,p,rr,m,used);
-     if(!obj){missed.push((p.ai+1)+'.'+(ri+1));continue}
-     const targetW=Math.max(1,Math.round(rr.w*density)),targetH=Math.max(1,Math.round(rr.h*density));
-     const rough=document.createElement('canvas');rough.width=targetW;rough.height=targetH;
+   const rects=isl.rects||[];totalRects+=rects.length;
+   for(const rr of rects){
+     // Export already records the exact template position of every original UV selection.
+     // Use that mapping directly. This guarantees export -> import -> restore is an identity
+     // transform (apart from requested resolution scaling) and avoids re-detecting geometry.
+     const srcX=(p.dst.x+(rr.x-p.src.x))*sx;
+     const srcY=(p.dst.y+(rr.y-p.src.y))*sy;
+     const srcW=rr.w*sx,srcH=rr.h*sy;
+     const dstX=Math.round(rr.x*density),dstY=Math.round(rr.y*density);
+     const dstW=Math.max(1,Math.round(rr.w*density)),dstH=Math.max(1,Math.round(rr.h*density));
+
+     const rough=document.createElement('canvas');rough.width=dstW;rough.height=dstH;
      const rg=rough.getContext('2d');rg.imageSmoothingEnabled=true;rg.imageSmoothingQuality='high';
-     rg.drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,targetW,targetH);
-     const mask=islandRectTargetMask(rr,density),fitted=islandContourFit(rough,mask);
-     g.drawImage(fitted,Math.round(rr.x*density),Math.round(rr.y*density));
-     foundRects++;groupFound++
+     rg.drawImage(src,srcX,srcY,srcW,srcH,0,0,dstW,dstH);
+
+     const mask=islandRectTargetMask(rr,density);
+     const fitted=islandContourFit(rough,mask);
+     g.drawImage(fitted,dstX,dstY);
+     restoredRects++
    }
-   if(groupFound)foundGroups++
  }
- if(!foundRects){islandStudio.restored=null;islandStudioStatus('Hiçbir AI UV alanı tespit edilemedi. AI Import görünümünü kontrol et.');return}
+ if(!restoredRects){islandStudio.restored=null;islandStudioStatus('Geri toplanacak kayıtlı UV alanı bulunamadı.');return}
  islandStudio.restored=out;
  if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioStatus('Alan bazlı köşe eşleme · '+foundGroups+'/'+m.parts.length+' ada · '+foundRects+'/'+totalRects+' alan · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):'')+' · onay bekliyor');
+ islandStudioStatus('Kesin mapping ile UV geri toplama · '+restoredRects+'/'+totalRects+' alan · '+outW+'×'+outH+' · onay bekliyor');
  islandStudioSetTab('restored')
 }
 
