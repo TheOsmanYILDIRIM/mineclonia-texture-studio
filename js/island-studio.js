@@ -423,44 +423,94 @@ function islandLocalRectFit(source,targetMask){
  // Changed by AI: perform corner/edge fit, but only within this rect's own crop.
  return islandContourFit(source,targetMask)
 }
+
+function islandComponentCanvas(src,comp){
+ const c=document.createElement('canvas');c.width=comp.w;c.height=comp.h;
+ c.getContext('2d').drawImage(src,comp.x,comp.y,comp.w,comp.h,0,0,comp.w,comp.h);
+ return c
+}
+function islandTargetComponentMask(groupMask,comp){
+ const c=document.createElement('canvas');c.width=comp.w;c.height=comp.h;
+ const src=groupMask.getContext('2d',{willReadFrequently:true}).getImageData(comp.x,comp.y,comp.w,comp.h);
+ const g=c.getContext('2d');g.putImageData(src,0,0);return c
+}
+function islandMatchSourceComponent(targetComp,sourceComps,used,expected,srcW,srcH,targetW,targetH){
+ let best=null,bestScore=Infinity;
+ const tarAR=targetComp.w/Math.max(1,targetComp.h),tarArea=Math.max(1,targetComp.count);
+ for(let i=0;i<sourceComps.length;i++){
+   if(used.has(i))continue;
+   const sc=sourceComps[i];
+   if(sc.count<8)continue;
+   const ar=sc.w/Math.max(1,sc.h);
+   const arErr=Math.abs(Math.log(Math.max(.03,ar)/Math.max(.03,tarAR)));
+   const areaNormS=sc.count/Math.max(1,srcW*srcH),areaNormT=tarArea/Math.max(1,targetW*targetH);
+   const areaErr=Math.abs(Math.log((areaNormS+1e-7)/(areaNormT+1e-7)));
+   const dist=Math.hypot((sc.cx-expected.x)/Math.max(8,expected.w),(sc.cy-expected.y)/Math.max(8,expected.h));
+   const score=dist*1.15+arErr*1.8+areaErr*.32;
+   if(score<bestScore){bestScore=score;best={index:i,comp:sc,score}}
+ }
+ return best&&bestScore<5.2?best:null
+}
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- const sx=src.width/Math.max(1,m.sheetW),sy=src.height/Math.max(1,m.sheetH);
- const density=Math.max(sx,sy);
+
+ const scaleX=src.width/Math.max(1,m.sheetW),scaleY=src.height/Math.max(1,m.sheetH),density=Math.max(scaleX,scaleY);
  const outW=Math.max(1,Math.round(islandStudio.orig.width*density)),outH=Math.max(1,Math.round(islandStudio.orig.height*density));
  const out=document.createElement('canvas');out.width=outW;out.height=outH;
  const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
 
- let restoredRects=0,totalRects=0;
+ // 1) Detect ALL generated islands first. Their current position is only a matching hint;
+ // geometry identity comes from component shape/size, not from a hard crop.
+ const srcMask=islandForegroundMask(src);
+ const srcComps=islandComponents(srcMask,src.width,src.height,{x:0,y:0,w:src.width,h:src.height})
+   .filter(c=>c.count>=Math.max(8,src.width*src.height*.00001))
+   .sort((a,b)=>b.count-a.count);
+ const used=new Set(),missed=[];let targetCount=0,matchedCount=0;
+
+ // 2) Build the REAL default islands from the original UV masks, then match each one.
  for(const p of m.parts){
    const isl=islandStudio.islands[p.ai];if(!isl)continue;
-   const rects=isl.rects||[];totalRects+=rects.length;
-   for(const rr of rects){
-     // Export already records the exact template position of every original UV selection.
-     // Use that mapping directly. This guarantees export -> import -> restore is an identity
-     // transform (apart from requested resolution scaling) and avoids re-detecting geometry.
-     const srcX=(p.dst.x+(rr.x-p.src.x))*sx;
-     const srcY=(p.dst.y+(rr.y-p.src.y))*sy;
-     const srcW=rr.w*sx,srcH=rr.h*sy;
-     const dstX=Math.round(rr.x*density),dstY=Math.round(rr.y*density);
-     const dstW=Math.max(1,Math.round(rr.w*density)),dstH=Math.max(1,Math.round(rr.h*density));
+   const groupMask=islandTargetMask(p,isl,density);
+   const targetMaskArr=islandForegroundMask(groupMask);
+   const targetComps=islandComponents(targetMaskArr,groupMask.width,groupMask.height,{x:0,y:0,w:groupMask.width,h:groupMask.height})
+     .filter(c=>c.count>=4)
+     .sort((a,b)=>b.count-a.count);
 
-     const rough=document.createElement('canvas');rough.width=dstW;rough.height=dstH;
-     const rg=rough.getContext('2d');rg.imageSmoothingEnabled=true;rg.imageSmoothingQuality='high';
-     rg.drawImage(src,srcX,srcY,srcW,srcH,0,0,dstW,dstH);
+   for(let ti=0;ti<targetComps.length;ti++){
+     const tc=targetComps[ti];targetCount++;
+     // Expected position in generated/template space is a hint only.
+     const expected={
+       x:(p.dst.x*scaleX)+(tc.cx/groupMask.width)*(p.dst.w*scaleX),
+       y:(p.dst.y*scaleY)+(tc.cy/groupMask.height)*(p.dst.h*scaleY),
+       w:Math.max(4,tc.w/groupMask.width*p.dst.w*scaleX),
+       h:Math.max(4,tc.h/groupMask.height*p.dst.h*scaleY)
+     };
+     const match=islandMatchSourceComponent(tc,srcComps,used,expected,src.width,src.height,groupMask.width,groupMask.height);
+     if(!match){missed.push((p.ai+1)+'.'+(ti+1));continue}
+     used.add(match.index);
 
-     const mask=islandRectTargetMask(rr,density);
-     const fitted=islandLocalRectFit(rough,mask);
+     // 3) Fit detected generated island to this default island, independently.
+     const sourceIsland=islandComponentCanvas(src,match.comp);
+     const targetMask=islandTargetComponentMask(groupMask,tc);
+     const targetW=tc.w,targetH=tc.h;
+     const normalized=document.createElement('canvas');normalized.width=targetW;normalized.height=targetH;
+     const ng=normalized.getContext('2d');ng.imageSmoothingEnabled=true;ng.imageSmoothingQuality='high';
+     ng.drawImage(sourceIsland,0,0,sourceIsland.width,sourceIsland.height,0,0,targetW,targetH);
+     const fitted=islandLocalRectFit(normalized,targetMask);
+
+     // 4) Only now place it at the DEFAULT/original UV position.
+     const dstX=Math.round(p.src.x*density+tc.x);
+     const dstY=Math.round(p.src.y*density+tc.y);
      g.drawImage(fitted,dstX,dstY);
-     restoredRects++
+     matchedCount++
    }
  }
- if(!restoredRects){islandStudio.restored=null;islandStudioStatus('Geri toplanacak kayıtlı UV alanı bulunamadı.');return}
+ if(!matchedCount){islandStudio.restored=null;islandStudioStatus('AI adaları default UV adalarıyla eşleşmedi.');return}
  islandStudio.restored=out;
  if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioStatus('Kesin mapping + lokal AI düzeltme · '+restoredRects+'/'+totalRects+' alan · '+outW+'×'+outH+' · onay bekliyor');
+ islandStudioStatus('Ada tespit → default şekle uydur → konumlandır · '+matchedCount+'/'+targetCount+' ada · '+outW+'×'+outH+(missed.length?' · eşleşmedi: '+missed.join(', '):'')+' · onay bekliyor');
  islandStudioSetTab('restored')
 }
 
