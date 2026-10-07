@@ -178,8 +178,28 @@ function islandTargetMask(p,isl,density){
 }
 
 
-function islandMaskInfo(canvas){
- const w=canvas.width,h=canvas.height,mask=islandForegroundMask(canvas);
+function islandCleanGeometryMask(mask,w,h){
+ // Geometry-only cleanup for AI imports. Remove 1px attached antialias fringes and
+ // micro-protrusions before corner tracing; never alter the actual RGB texture.
+ if(Math.min(w,h)<64)return mask;
+ const eroded=new Uint8Array(mask.length),opened=new Uint8Array(mask.length);
+ for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+   let all=1;
+   for(let yy=y-1;yy<=y+1&&all;yy++)for(let xx=x-1;xx<=x+1;xx++)if(!mask[yy*w+xx]){all=0;break}
+   if(all)eroded[y*w+x]=1
+ }
+ for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+   let any=0;
+   for(let yy=y-1;yy<=y+1&&!any;yy++)for(let xx=x-1;xx<=x+1;xx++)if(eroded[yy*w+xx]){any=1;break}
+   if(any)opened[y*w+x]=1
+ }
+ // If cleanup was too destructive, keep the original mask.
+ let before=0,after=0;for(const v of mask)before+=v;for(const v of opened)after+=v;
+ return after>before*.88?opened:mask
+}
+function islandMaskInfo(canvas,{clean=false}={}){
+ const w=canvas.width,h=canvas.height;let mask=islandForegroundMask(canvas);
+ if(clean)mask=islandCleanGeometryMask(mask,w,h);
  return {w,h,mask}
 }
 function islandDominantComponent(mask,w,h){
@@ -314,7 +334,7 @@ function islandContourFit(source,targetMask){
    og.putImageData(oi,0,0);return out
  };
  try{
-   const sm=islandMaskInfo(source),tm=islandMaskInfo(targetMask);
+   const sm=islandMaskInfo(source,{clean:true}),tm=islandMaskInfo(targetMask);
    const sp=islandTracePolygon(sm.mask,sm.w,sm.h),tp=islandTracePolygon(tm.mask,tm.w,tm.h);
    if(!sp?.length||!tp?.length)return fallback();
    const matched=islandMatchCornerCycles(tp,sp);if(!matched?.length)return fallback();
