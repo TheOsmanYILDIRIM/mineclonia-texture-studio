@@ -172,8 +172,13 @@ function islandGroupTargetMask(slot,density){
  ng.putImageData(ni,0,0);
  const out=document.createElement('canvas');out.width=w;out.height=h;const g=out.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(native,0,0,w,h);return out
 }
-function islandFillBackgroundNearest(canvas){
- const w=canvas.width,h=canvas.height,n=w*h,ctx=canvas.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,w,h),d=im.data,mask=islandForegroundMask(canvas);
+function islandCropMask(mask,w,bb){
+ const out=new Uint8Array(bb.w*bb.h);
+ for(let y=0;y<bb.h;y++)for(let x=0;x<bb.w;x++)out[y*bb.w+x]=mask[(bb.y+y)*w+(bb.x+x)];
+ return out
+}
+function islandFillBackgroundNearest(canvas,maskOverride=null){
+ const w=canvas.width,h=canvas.height,n=w*h,ctx=canvas.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,w,h),d=im.data,mask=maskOverride||islandForegroundMask(canvas);
  const nearest=new Int32Array(n);nearest.fill(-1);const q=new Int32Array(n);let head=0,tail=0;
  for(let i=0;i<n;i++)if(mask[i]){nearest[i]=i;q[tail++]=i}
  if(!tail)return canvas;
@@ -210,7 +215,8 @@ async function islandStudioRestore(){
    if(!bb){failed.push(slot.ai+1);continue}
    const detected=document.createElement('canvas');detected.width=bb.w;detected.height=bb.h;
    detected.getContext('2d').drawImage(cell,bb.x,bb.y,bb.w,bb.h,0,0,bb.w,bb.h);
-   islandFillBackgroundNearest(detected);
+   const detectedMask=islandCropMask(mask,cell.width,bb);
+   islandFillBackgroundNearest(detected,detectedMask);
    const targetMask=islandGroupTargetMask(slot,density),fitted=islandFitFilledToMask(detected,targetMask);
    g.drawImage(fitted,Math.round(slot.src.x*density),Math.round(slot.src.y*density));ok++
  }
