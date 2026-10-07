@@ -1834,11 +1834,12 @@ async function render(){
    b.title=x.path; b.onclick=()=>openDetail(x); $('grid').appendChild(b);
    const img=b.querySelector('img'); cardRefsFast.set(x.path,{card:b,img}); cards.push([x,img]);
  }
- for(let i=0;i<cards.length;i+=6){
-   if(token!==renderToken)return;
-   await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}}));
-   await new Promise(requestAnimationFrame);
- }
+ const loadOne=async([x,img])=>{if(token!==renderToken)return;try{img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}};
+ // Above-the-fold cards start together instead of waiting for six-item batches.
+ await Promise.all(cards.slice(0,Math.min(12,cards.length)).map(loadOne));
+ if(token!==renderToken)return;
+ let cursor=12;const workers=Array.from({length:Math.min(12,Math.max(0,cards.length-cursor))},async()=>{while(token===renderToken){const i=cursor++;if(i>=cards.length)return;await loadOne(cards[i])}});
+ Promise.allSettled(workers);
 }
 async function importPng(file,seam=false){
   if(!active||!file)return;
@@ -1938,9 +1939,11 @@ async function hydrateChangedPathsFast(seedEdits=null){
   if(same)console.info(`${same} sahte/eski edit kaydı temizlendi`);
   return {complete:failed===0,total:unknown.length,same,changed,failed,skippedKnown:edits.length-unknown.length};
 }
+let storageBootPromise=null;
 async function bootstrapStorageInBackground(){
   try{
-    await initStorage();
+    if(!storageBootPromise)storageBootPromise=initStorage();
+    await storageBootPromise;
     setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad');
     initScaledStorage().catch(err=>console.warn('scaled storage init',err));
     const edits=await allEdits();
@@ -1975,8 +1978,13 @@ function open3dPreviewLazy(){
 async function init(){
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
-  setSaveState('Hazır • kayıtlar arka planda yükleniyor','warn');
+  setSaveState('Kayıt açılıyor…','warn');
+  storageBootPromise=initStorage();
   await buildFilters();
+  await Promise.race([storageBootPromise,new Promise(r=>setTimeout(r,900))]);
+  if(storageMode==='indexeddb')setSaveState('Hazır • kalıcı kayıt','ok');
+  else if(storageMode==='local')setSaveState('Hazır • yerel fallback','warn');
+  else setSaveState('Kayıt hazırlanıyor…','warn');
   await new Promise(requestAnimationFrame);
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
 
@@ -2004,7 +2012,7 @@ async function init(){
 
   await applyFilter();
   setTimeout(()=>Promise.allSettled([loadBlockReferencePrompts(),AUTHORED_UV_REF_PROMISES.mobs,AUTHORED_UV_REF_PROMISES.armor]).then(()=>{if(active?.priority==='P0')renderActivePrompt()}).catch(console.warn),0);
-  setTimeout(()=>bootstrapStorageInBackground(),0);
+  bootstrapStorageInBackground();
 }
 CATALOG_READY.then(()=>init()).catch(e=>{console.error(e);$('stat').textContent='Başlatma sorunu';setSaveState('Arayüz hatası','bad');alert('Başlatma hatası: '+e.message)})
 
