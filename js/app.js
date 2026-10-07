@@ -1,6 +1,6 @@
 const SOURCE_ZIPS={};
 
-const PAGE_SIZE=36; let filtered=[], page=0, active=null, changedOnly=false, promptedOnly=false, itemPromptedOnly=false, renderToken=0; const urlCache=new Map();
+const PAGE_SIZE=36; let filtered=[], page=0, active=null, changedOnly=false, promptedOnly=false, renderToken=0; const urlCache=new Map();
 const $=id=>document.getElementById(id);
 const toast=t=>{const e=$('toast'); if(!e){console.log(t);return} e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1700)};
 const sourceZips={};
@@ -212,13 +212,13 @@ function textureTechnicalCategoriesOf(x){
 function minecloniaInventoryCategoryLabels(x){const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id)}
 async function buildFilters(){
  const sel=$('category');
- sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
+ sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:item_authored">Item · '+ITEM_PROMPT_PATHS.size+'</option><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
  const vals=['ALL','P0','P1','P2','P3','P4','P5','P6'];
  const counts=Object.fromEntries(vals.map(v=>[v,v==='ALL'?CATALOG.length:CATALOG.filter(x=>x.priority===v).length]));
  $('filters').innerHTML=vals.map(v=>`<button class="chip ${v==='P0'?'active':''}" data-p="${v}">${v==='ALL'?'Tümü':v} · ${counts[v]}</button>`).join('');
  $('filters').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const p=b.dataset.p;$('stat').textContent=(p==='ALL'?'Liste':p)+' hazırlanıyor…';applyFilter()}
 }
-function categoryMatches(x,cat){if(!cat)return true;if(cat==='special:armor_uv')return isArmorUvTexture(x);const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
+function categoryMatches(x,cat){if(!cat)return true;if(cat==='special:item_authored')return isAuthoredItemTexture(x);if(cat==='special:armor_uv')return isArmorUvTexture(x);const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
 function activePriority(){return document.querySelector('.chip.active')?.dataset.p||'P0'}
 function assetTypeOf(x){
  const p=x.path||'', n=(x.name||'').toLowerCase(), parts=p.split('/'), top=parts[0]||'', mod=parts[1]||'';
@@ -2046,7 +2046,7 @@ async function putEdit(path,blob){
 }
 async function applyFilter(){
   const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();
-  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)||isAuthoredItemTexture(x))&&(!itemPromptedOnly||isAuthoredItemTexture(x)));
+  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)||isAuthoredItemTexture(x)));
   page=0; render();
 }
 async function render(){
@@ -2229,7 +2229,6 @@ async function init(){
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
   $('promptedOnly').onclick=()=>{promptedOnly=!promptedOnly;$('promptedOnly').classList.toggle('primary',promptedOnly);applyFilter()};
- $('itemPromptedOnly').onclick=()=>{itemPromptedOnly=!itemPromptedOnly;$('itemPromptedOnly').classList.toggle('primary',itemPromptedOnly);applyFilter()};
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
   $('open3dPreview').onclick=open3dPreviewLazy;
