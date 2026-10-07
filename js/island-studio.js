@@ -329,12 +329,20 @@ window.MTSIslandStudio={
  choose:islandStudioChoose,
  acceptCorrectedSheet:async(blob)=>{
    if(!blob||!islandStudio.meta)return false;
-   islandStudio.imported=await decodeBlobToCanvas(blob);
-   await islandStudioRestore();
-   $('islandStudio')?.classList.add('open');
-   $('islandModeChooser')?.classList.add('hidden');
-   islandStudioSetTab('restored');
-   return true;
+   try{
+     islandStudio.imported=await decodeBlobToCanvas(blob);
+     await islandStudioRestore();
+     if(!islandStudio.restored)throw new Error('Düzeltilmiş adalar UV’ye geri toplanamadı');
+     const restoredBlob=await canvasPngBlob(islandStudio.restored);
+     const ok=await saveRestored(islandStudio.meta.path,restoredBlob);
+     if(!ok)throw new Error('Aktif texture kaydı başarısız');
+     islandStudioStatus('Düzeltilmiş UV aktif texture olarak kaydedildi · '+islandStudio.restored.width+'×'+islandStudio.restored.height);
+     $('islandStudio')?.classList.remove('open');
+     toast('Düzenlenmiş UV kaydedildi ve aktif yapıldı');
+     return true;
+   }catch(e){
+     console.error(e);islandStudioStatus('Kaydetme başarısız: '+(e?.message||e));toast('Düzenlenmiş UV kaydedilemedi');return false;
+   }
  }
 };
 const __bindIsland=()=>{try{bindIslandStudioUi()}catch(e){console.error('Island Studio bind',e)}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__bindIsland,{once:true});else __bindIsland();
