@@ -1106,12 +1106,12 @@ const ITEM_TWO_PASS_PROMPTS=new Map();
 const ITEM_PROMPT_PATHS=new Set();
 async function loadItemTwoPassPrompts(){
  try{
-  const r=await fetch('prompts/items/manifest.json',{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
+  const r=await fetch('prompts/items/manifest.json',{cache:'no-cache'});if(!r.ok)throw new Error('manifest '+r.status);
   const manifest=await r.json();
   const rows=(manifest.entries||[]).filter(e=>e.status==='done'&&e.file);
   for(const e of rows)ITEM_PROMPT_PATHS.add(e.texture_path);
   const results=await Promise.all(rows.map(async e=>{
-   try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}
+   try{const q=await fetch(e.file,{cache:'no-cache'});if(!q.ok)return null;return await q.json()}
    catch(err){console.warn('Item prompt unavailable',e.file,err);return null}
   }));
   for(const row of results)if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
