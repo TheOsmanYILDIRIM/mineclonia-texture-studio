@@ -239,11 +239,11 @@ async function islandStudioRestore(){
    const detectedMask=islandCropMask(mask,cell.width,bb);
    // Keep the corrected island's own high-resolution silhouette. The original
    // low-res UV mask is NOT reapplied here. slot.src controls placement only.
-   const targetW=Math.max(1,Math.round(slot.src.w*density)),targetH=Math.max(1,Math.round(slot.src.h*density));
+   const fr=islandStudio.finalRects?.[slot.slotId],targetW=Math.max(1,Math.round(fr?.w||slot.src.w*density)),targetH=Math.max(1,Math.round(fr?.h||slot.src.h*density));
    const fitted=document.createElement('canvas');fitted.width=targetW;fitted.height=targetH;
    const fg=fitted.getContext('2d');fg.imageSmoothingEnabled=true;fg.imageSmoothingQuality='high';
    fg.drawImage(detected,0,0,detected.width,detected.height,0,0,targetW,targetH);
-   g.drawImage(fitted,Math.round(slot.src.x*density),Math.round(slot.src.y*density));ok++
+   const frx=islandStudio.finalRects?.[slot.slotId];const dx=frx?Math.round(slot.src.x*density+(frx.x-slot.content.x*scaleX)):Math.round(slot.src.x*density),dy=frx?Math.round(slot.src.y*density+(frx.y-slot.content.y*scaleY)):Math.round(slot.src.y*density);g.drawImage(fitted,dx,dy);ok++
  }
  if(!ok){islandStudio.restored=null;islandStudioStatus('Slotlarda AI adası bulunamadı.');return}
  islandStudio.restored=out;
@@ -331,10 +331,11 @@ function bindIslandStudioUi(){
 window.MTSIslandStudio={
  open:async(path)=>islandStudioOpen(path),
  choose:islandStudioChoose,
- acceptCorrectedSheet:async(blob)=>{
+ acceptCorrectedSheet:async(blob,finalRects={})=>{
    if(!blob||!islandStudio.meta)return false;
    try{
      islandStudio.imported=await decodeBlobToCanvas(blob);
+     islandStudio.finalRects=finalRects||{};
      await islandStudioRestore();
      if(!islandStudio.restored)throw new Error('Düzeltilmiş adalar UV’ye geri toplanamadı');
      const restoredBlob=await canvasPngBlob(islandStudio.restored);
