@@ -32,10 +32,8 @@ jobs:
               raise SystemExit("bundle has no prompts")
           out=pathlib.Path("prompts/items")
           out.mkdir(parents=True,exist_ok=True)
-          for old in out.glob("tex_*.json"):
-              old.unlink()
-          entries=[]; seen=set()
-          for order,obj in enumerate(rows,1):
+          seen=set()
+          for obj in rows:
               item_id=obj.get("id","")
               if not re.fullmatch(r"tex_[0-9a-f]{10}",item_id) or item_id in seen:
                   raise SystemExit(f"invalid/duplicate id: {item_id}")
@@ -45,7 +43,17 @@ jobs:
                       raise SystemExit(f"{item_id}: invalid {key}")
               record={"schema_version":1,"kind":"item_two_pass",**obj}
               (out/f"{item_id}.json").write_text(json.dumps(record,indent=2,ensure_ascii=False)+"\n")
-              entries.append({"order":order,"id":item_id,"name":obj["name"],"texture_path":obj["path"],"status":"done","file":f"prompts/items/{item_id}.json"})
+          entries=[]
+          records=[]
+          for p in out.glob("tex_*.json"):
+              obj=json.loads(p.read_text())
+              item_id=obj.get("id","")
+              if not re.fullmatch(r"tex_[0-9a-f]{10}",item_id):
+                  raise SystemExit(f"invalid existing id: {item_id}")
+              records.append(obj)
+          records.sort(key=lambda o:(o.get("path",""),o["id"]))
+          for order,obj in enumerate(records,1):
+              entries.append({"order":order,"id":obj["id"],"name":obj["name"],"texture_path":obj["path"],"status":"done","file":f"prompts/items/{obj['id']}.json"})
           manifest={"schema_version":1,"kind":"item_two_pass_manifest","total":len(entries),"done":len(entries),"pending":0,"entries":entries,"batches":[]}
           (out/"manifest.json").write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+"\n")
           PY
