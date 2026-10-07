@@ -11,7 +11,7 @@
 .variantNone{font-size:12px;color:var(--muted);padding:28px;text-align:center;display:grid;place-items:center;height:100%}
 .variantFooter{display:flex;gap:7px;max-width:720px;margin:8px auto 0}.variantFooter .btn{flex:1}.variantStatus{font-size:11px;color:var(--muted);text-align:center;min-height:18px;margin-top:6px}
 
-.preview3d{position:fixed;z-index:95;inset:0;background:rgba(7,9,12,.96);display:none;flex-direction:column}
+.preview3d{position:fixed;z-index:20050;inset:0;background:rgba(7,9,12,.96);display:none;flex-direction:column}
 .preview3d.open{display:flex}.preview3dTop{display:flex;gap:7px;align-items:center;padding:10px;border-bottom:1px solid var(--line);background:rgba(13,15,18,.96)}
 .preview3dTop .spacer{flex:1}.preview3dStage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;perspective:850px;background:radial-gradient(circle at 50% 42%,#20252d 0,#11151a 44%,#080a0d 100%)}
 .preview3dScene{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;will-change:transform}
