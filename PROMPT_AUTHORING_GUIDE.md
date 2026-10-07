@@ -67,11 +67,41 @@ The desired result is realistic material information occupying the same gameplay
 
 Do not silently generate a generic prompt for an uncovered texture.
 
-The current project deliberately uses a **PROMPT YOK / missing prompt** state rather than treating a broad material guess as final.
+If an asset has no authored/canonical prompt, the prompt UI must remain empty/disabled for that stage. Do not synthesize a "PROMPT YOK" body, do not append a generic alpha/background lock, and do not make missing coverage look like a usable production prompt.
 
 Every production prompt should be intentionally authored for that texture or for a genuinely equivalent controlled variant.
 
 Related textures may share the common visual language, but the asset-specific instructions must remain appropriate to the exact asset.
+
+### Canonical prompt storage
+
+Every authored texture prompt is stored as exactly one individual JSON file:
+
+`prompts/<family>/tex_<id>.json`
+
+Canonical schema:
+
+```json
+{
+  "schema_version": 2,
+  "family": "blocks | mobs | armor | items",
+  "id": "tex_...",
+  "path": "...",
+  "name": "...png",
+  "stages": {
+    "...": "prompt text"
+  }
+}
+```
+
+Stage keys are workflow-specific while the outer storage format is not:
+
+- blocks: `stages.reference`
+- mobs: `stages.reference`
+- armor: `stages.reference`
+- items: `stages.creative` and `stages.correction`
+
+Manifest files are indexes only. Production prompt payloads must not be stored in batch JSON files or `.txt` files. New authored prompts must never introduce another storage format.
 
 ## 5. Mandatory inspection before writing a prompt
 
@@ -143,22 +173,29 @@ Do not let realism erase:
 
 Functional readability wins over surface richness.
 
-## 9. Items and HUD-like assets
+## 9. True inventory items — two-pass creative workflow
 
-Items are not ordinary tileable blocks.
+True inventory/wield sprites are not ordinary tileable blocks and are not UV atlases.
 
-Preserve:
+### Pass 1 — Creative
 
-- exact silhouette
-- transparent background
-- occupied vs empty regions
-- icon-scale readability
-- distinctive object identity
-- orientation
+- no source-image reference;
+- freely redesign shape, proportions, construction, materials, wear and detail;
+- keep only the intended item identity and shared art direction;
+- do not force the original sprite silhouette, angle, pixel geometry or alpha footprint;
+- output exactly one isolated item on real alpha transparency;
+- no checkerboard, scene, pedestal, UI, text, border or cast shadow.
 
-Do not turn an inventory item into a scene, product photo, floating object with cast shadow, or background composition.
+### Pass 2 — Composition correction
 
-Material detail must stay inside the original silhouette/mask.
+- Image A = original Mineclonia item;
+- Image B = creative result;
+- Image A controls only canvas position, occupied area/scale, orientation/viewing angle and approximate silhouette footprint;
+- Image B controls actual design, materials and details;
+- do not copy Image A's surface/pixel design;
+- keep real alpha transparency.
+
+This workflow applies only to true inventory/wield item sprites. It must not be applied to blocks, foliage masks, entity UV atlases, armor UV atlases or animation atlases.
 
 ## 10. Plant / foliage textures
 
@@ -354,7 +391,9 @@ Do not:
 - invent new large holes unless required by the asset
 - add halos
 - soften silhouettes so much that masks become ambiguous
-- paint outside entity/item/plant masks
+- paint outside locked entity/armor/foliage masks
+
+For true inventory items using the two-pass item workflow, Pass 1 is intentionally exempt from source-mask locking; only the final output background must be real transparency. Pass 2 uses the original only as a composition/pose guide, not as an exact alpha mask.
 
 Transparency is structural data, not empty canvas.
 
