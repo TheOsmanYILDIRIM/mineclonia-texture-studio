@@ -303,7 +303,7 @@ function runtimeRoleInfo(x){
  return info(broad||'Unresolved','','');
 }
 function runtimeRoleOf(x){return runtimeRoleInfo(x).role}
-function hasAuthoredPrompt(x){return !!(x&&(BLOCK_REFERENCE_PROMPTS.has(x.id)||AUTHORED_UV_REFS.has(x.id)||PROMPT_OVERRIDES.has(x.id)))}
+function hasAuthoredPrompt(x){return !!(x&&(promptRecord(x)||PROMPT_OVERRIDES.has(x.id)))}
 async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)));page=0;return render()}
 async function render(){
  const token=++renderToken,start=page*PAGE_SIZE,arr=filtered.slice(start,start+PAGE_SIZE);$('grid').innerHTML='';$('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPaths.size} değişti • ${storageLabel()}`;$('pageInfo').textContent=`${Math.min(page+1,Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)))} / ${Math.max(1,Math.ceil(filtered.length/PAGE_SIZE))}`;
@@ -467,14 +467,7 @@ Render it as ${material} in grounded dark-fantasy material realism. The material
 If realism conflicts with animation clarity, animation clarity wins. If detail conflicts with loop consistency, loop consistency wins. Keep the output flat, atlas-like, square-celled, and suitable for conversion back into a strip animation. ${avoid}`};
 }
 
-function missingPromptFor(x){return {label:'PROMPT YOK',text:`Bu texture için henüz özel prompt yazılmadı.
-
-Texture ID: ${x.id}
-File: ${x.name}
-Path: ${x.path}
-
-Fallback kaldırıldı. Bu asset için özel prompt eklenmeden kullanma.`,source:'eksik'}}
-function defaultPromptFor(x){const ap=animatedAtlasPromptFor(x);if(ap)return ap;const p0=P0_PROMPT_LIBRARY[x.id];if(p0)return {label:p0.label,text:p0.prompt,source:'P0 özel'};if(x.priority==='P1')return {label:materialHints(x).kind,text:generatedPromptFor(x),source:'P1 değişkenli'};return missingPromptFor(x)}
+function defaultPromptFor(x){const ap=animatedAtlasPromptFor(x);if(ap)return ap;const p0=P0_PROMPT_LIBRARY[x.id];if(p0)return {label:p0.label,text:p0.prompt,source:'P0 özel'};if(x.priority==='P1')return {label:materialHints(x).kind,text:generatedPromptFor(x),source:'P1 değişkenli'};return null}
 let animTimer=null, animPlaying=true;
 function stopAnim(){ if(animTimer){ clearInterval(animTimer); animTimer=null; } }
 function actualStripFrameInfo(src,spec){
@@ -599,30 +592,69 @@ async function copyMobPrompt(kind){if(!active||!isThreeStageUvTexture(active))re
 
 let promptViewMode='classic';
 function promptFor(x,mode='classic'){
+ const row=promptRecord(x);
+ if(row?.family==='items'){
+  const text=row.stages?.creative;
+  return text?{id:x.id,label:'Item · Creative',text,source:'canonical'}:null;
+ }
+ if(row?.family==='blocks'){
+  const text=p0ReferencePromptFor(x);
+  return text?{id:x.id,label:'Block · Reference',text,source:'canonical'}:null;
+ }
  if(mode==='creative'){
    const c=creativeP0PromptFor(x);
    if(c)return {id:x.id,label:c.label,text:applyCreativeOutputRequirements(c.text,x),source:c.source};
  }
- const d=defaultPromptFor(x),o=PROMPT_OVERRIDES.get(x.id);
- return {id:x.id,label:d.label,text:applyPromptOutputRequirements(o||d.text,x),source:o?'JSON/özel':d.source};
+ const o=PROMPT_OVERRIDES.get(x.id),d=defaultPromptFor(x);
+ if(o)return {id:x.id,label:'Özel prompt',text:applyPromptOutputRequirements(o,x),source:'JSON/özel'};
+ if(!d)return null;
+ return {id:x.id,label:d.label,text:applyPromptOutputRequirements(d.text,x),source:d.source};
 }
 function promptEntry(x,mode='classic'){const p=promptFor(x,mode);return {id:x.id,path:x.path,name:x.name,priority:x.priority,label:p.label,prompt:p.text,mode}}
 function renderActivePrompt(){
  if(!active)return;
  promptViewMode='classic';
- const p=promptFor(active,'classic');
- $('promptFamily').textContent=(p.label||p.family||'Prompt')+(p.source?' · '+p.source:'');
- $('promptText').value=p.text;
- const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isItem=isAuthoredItemTexture(active),isP0=active.priority==='P0'&&!isUv&&!isItem;
+ const rec=promptRecord(active),p=promptFor(active,'classic');
+ const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isItem=rec?.family==='items',isP0=active.priority==='P0'&&!isUv&&!isItem;
  $('normalPromptBtns').style.display=isUv?'none':'';
  $('mobPromptBtns').classList.toggle('show',isUv);
- if(isUv){$('promptFamily').textContent=isArmor?'Armor · 3 aşamalı UV üretimi':'Mobs · 3 aşamalı UV üretimi';$('mobRefPrompt').textContent=isArmor?'2 · Armor Ref':'2 · Creature Ref';}
- if(isItem){$('promptFamily').textContent='Item · 2 aşamalı üretim';$('copyPrompt').textContent='1 · Creative';$('savePrompt').textContent='2 · A+B Correction';$('promptText').style.display='';$('singlePromptJson').style.display='none';$('savePrompt').disabled=false;$('savePrompt').title='Image A = original · Image B = creative result';return;}
+ $('singlePromptJson').style.display='none';
+ if(isUv){
+  $('promptFamily').textContent=isArmor?'Armor · 3 aşamalı UV üretimi':'Mobs · 3 aşamalı UV üretimi';
+  $('mobRefPrompt').textContent=isArmor?'2 · Armor Ref':'2 · Creature Ref';
+  $('promptText').value=referencePromptFor(active)||'';
+  $('promptText').style.display='none';
+  return;
+ }
+ if(isItem){
+  $('promptFamily').textContent='Item · 2 aşamalı üretim';
+  $('promptText').value=p?.text||'';
+  $('promptText').style.display='';
+  $('copyPrompt').textContent='1 · Creative';
+  $('savePrompt').textContent='2 · A+B Correction';
+  $('copyPrompt').disabled=!p;
+  $('savePrompt').disabled=!rec?.stages?.correction;
+  $('savePrompt').title='Image A = original · Image B = creative result';
+  return;
+ }
+ if(!p){
+  $('promptFamily').textContent='Hazır prompt yok';
+  $('promptText').value='';
+  $('promptText').style.display='none';
+  $('copyPrompt').textContent='Kopyala';
+  $('savePrompt').textContent='Promptu kaydet';
+  $('copyPrompt').disabled=true;
+  $('savePrompt').disabled=true;
+  $('savePrompt').title='';
+  return;
+ }
+ $('promptFamily').textContent=(p.label||p.family||'Prompt')+(p.source?' · '+p.source:'');
+ $('promptText').value=p.text;
+ $('copyPrompt').disabled=false;
+ $('savePrompt').disabled=false;
  $('copyPrompt').textContent=isP0?'Ref prompt':'Kopyala';
  $('savePrompt').textContent=isP0?'Üretim prompt':'Promptu kaydet';
  $('promptText').style.display=isP0?'none':'';
- $('singlePromptJson').style.display=isP0?'none':'';
- $('savePrompt').disabled=false;
  $('savePrompt').title=isP0?'Image A + Image B standart üretim promptunu kopyala':'';
 }
 function downloadJson(obj,name){dl(new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),name)}
@@ -1099,93 +1131,62 @@ function p0ReferenceSubject(x){
  const clean=n.replace(/^(mcl|default|extra)_/i,'').replace(/_/g,' ');
  return 'the game-world block material represented by '+clean;
 }
-const BLOCK_PROMPT_MANIFEST_URL='prompts/blocks/manifest.json';
-const BLOCK_REFERENCE_PROMPTS=new Map();
-const AUTHORED_UV_REFS=new Map();
-const ITEM_TWO_PASS_PROMPTS=new Map();
+const PROMPT_REGISTRY=new Map();
 const ITEM_PROMPT_PATHS=new Set();
-async function loadItemTwoPassPrompts(){
+function promptRecord(x){return x?.id?PROMPT_REGISTRY.get(x.id)||null:null}
+async function loadCanonicalPromptFamily(family,manifestUrl){
  try{
-  const r=await fetch('prompts/items/manifest.json',{cache:'no-cache'});if(!r.ok)throw new Error('manifest '+r.status);
+  const r=await fetch(manifestUrl,{cache:'no-cache'});if(!r.ok)throw new Error('manifest '+r.status);
   const manifest=await r.json();
+  if(manifest?.schema_version!==2||manifest?.family!==family)throw new Error('non-canonical manifest');
   const rows=(manifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  for(const e of rows)ITEM_PROMPT_PATHS.add(e.texture_path);
-  const results=await Promise.all(rows.map(async e=>{
-   try{const q=await fetch(e.file,{cache:'no-cache'});if(!q.ok)return null;return await q.json()}
-   catch(err){console.warn('Item prompt unavailable',e.file,err);return null}
+  const records=await Promise.all(rows.map(async e=>{
+   const q=await fetch(e.file,{cache:'no-cache'});if(!q.ok)throw new Error(e.file+' '+q.status);
+   const j=await q.json();
+   if(j?.schema_version!==2||j?.family!==family||j?.id!==e.id||j?.path!==e.texture_path||!j?.stages)throw new Error('invalid canonical prompt '+e.id);
+   return j;
   }));
-  for(const row of results)if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
-  console.info('Item two-pass prompts loaded:',ITEM_TWO_PASS_PROMPTS.size);
-  const itemOpt=document.querySelector('#category option[value="special:item_authored"]');
-  if(itemOpt)itemOpt.textContent='Item · '+ITEM_PROMPT_PATHS.size;
-  if($('category')?.value==='special:item_authored')applyFilter();
-  if(active&&isAuthoredItemTexture(active))renderActivePrompt();
- }catch(err){console.warn('Item prompt manifest unavailable',err)}
+  for(const row of records){
+   PROMPT_REGISTRY.set(row.id,row);
+   if(family==='items')ITEM_PROMPT_PATHS.add(row.path);
+   if(family==='mobs')MOB_UV_PATHS.add(row.path);
+   if(family==='armor')ARMOR_UV_PATHS.add(row.path);
+  }
+  if(family==='items'){
+   const itemOpt=document.querySelector('#category option[value="special:item_authored"]');
+   if(itemOpt)itemOpt.textContent='Item · '+records.length;
+   if($('category')?.value==='special:item_authored')applyFilter();
+  }
+  if(active&&promptRecord(active))renderActivePrompt();
+  console.info('Canonical prompts loaded:',family,records.length);
+  return manifest;
+ }catch(err){console.warn('Canonical prompt manifest unavailable',family,err);return null}
 }
-const ITEM_PROMPTS_READY=loadItemTwoPassPrompts();
-function isAuthoredItemTexture(x){return !!(x&&(ITEM_TWO_PASS_PROMPTS.has(x.id)||ITEM_PROMPT_PATHS.has(x.path)))}
-async function copyItemPrompt(kind){if(!active)return;await ITEM_PROMPTS_READY;const row=ITEM_TWO_PASS_PROMPTS.get(active.id);if(!row)return toast('Item promptu henüz yüklenmedi');const t=kind==='creative'?row.creative_prompt:row.correction_prompt;try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast(kind==='creative'?'Creative prompt kopyalandı':'A+B correction promptu kopyalandı')}
-async function loadAuthoredReferenceSet(kind,manifestUrl){
- try{
-  const r=await fetch(manifestUrl,{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
-  const manifest=await r.json();
-  const batchFiles=new Set((manifest.batches||[]).map(b=>b.file).filter(Boolean));
-  const rows=(manifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  const batchResults=await Promise.all(Array.from(batchFiles).map(async file=>{
-   try{
-    const q=await fetch(file,{cache:'force-cache'});if(!q.ok)return null;
-    const j=await q.json();
-    return Object.values(j.prompts||{}).filter(x=>x?.id&&typeof x.reference_prompt==='string');
-   }catch(err){console.warn(kind+' authored batch unavailable',file,err);return null}
-  }));
-  for(const list of batchResults)for(const row of (list||[]))AUTHORED_UV_REFS.set(row.id,row.reference_prompt);
-  const fileRows=rows.filter(e=>!batchFiles.has(e.file));
-  const results=await Promise.all(fileRows.map(async e=>{
-   try{
-    const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;
-    const text=await q.text();
-    if(/\.txt$/i.test(e.file))return {id:e.id,prompt:text};
-    const j=JSON.parse(text);
-    return j?.id&&typeof j.reference_prompt==='string'?{id:j.id,prompt:j.reference_prompt}:null;
-   }catch(err){console.warn(kind+' authored prompt unavailable',e.file,err);return null}
-  }));
-  for(const row of results)if(row?.id&&typeof row.prompt==='string')AUTHORED_UV_REFS.set(row.id,row.prompt);
-  console.info(kind+' authored reference prompts loaded:',Array.from(AUTHORED_UV_REFS.keys()).length);
-  return true;
- }catch(err){
-  console.warn(kind+' authored reference manifest unavailable; dynamic fallback remains active',err);
-  return false;
- }
-}
-const AUTHORED_UV_REF_PROMISES={
- mobs:loadAuthoredReferenceSet('Mobs','prompts/mobs/manifest.json'),
- armor:loadAuthoredReferenceSet('Armor','prompts/armor/manifest.json')
-};
-function dynamicArmorRefPromptFor(x){
- const m=mobPromptMeta(x);
- return 'Create a high-quality visual MATERIAL REFERENCE for the worn player armor represented by "'+m.name+'".\n\nThis is reference art for a later UV-material transfer, NOT a UV map, texture atlas, inventory icon, item sprite, voxel render or game screenshot.\n\nARMOR IDENTITY:\n'+m.name+'\nRuntime role: '+m.role+'.\n\nMATERIAL:\n'+m.material+'. Preserve the practical identity of this exact armor piece and material. Show believable manufacturing character, wear, edge behavior, articulation/contact wear where appropriate, and restrained age without inventing new armor geometry, ornament, engravings, spikes, gems, straps or major components.\n\nART DIRECTION:\nGrounded dark-fantasy realism: ancient, weathered, somber, tactile and physically believable. Restrained saturation, soft neutral diffuse lighting, controlled micro-detail and honest material response. Avoid dramatic scene lighting, glossy toy finish, cartoon/anime styling, pixel art, voxel styling, text, UI and decorative props.\n\nREFERENCE FUNCTION:\nPrioritize readable material information, color relationships, manufacturing character and wear. Use a simple neutral unobtrusive background. The image must function as a clean appearance/material reference for transfer onto an already structurally correct player-armor UV atlas.';
+const CANONICAL_PROMPTS_READY=Promise.all([
+ loadCanonicalPromptFamily('blocks','prompts/blocks/manifest.json'),
+ loadCanonicalPromptFamily('mobs','prompts/mobs/manifest.json'),
+ loadCanonicalPromptFamily('armor','prompts/armor/manifest.json'),
+ loadCanonicalPromptFamily('items','prompts/items/manifest.json')
+]);
+const ITEM_PROMPTS_READY=CANONICAL_PROMPTS_READY;
+function isAuthoredItemTexture(x){return promptRecord(x)?.family==='items'}
+async function copyItemPrompt(kind){
+ if(!active)return;
+ await CANONICAL_PROMPTS_READY;
+ const row=promptRecord(active),key=kind==='creative'?'creative':'correction',t=row?.family==='items'?row.stages?.[key]:null;
+ if(!t)return toast('Hazır item promptu yok');
+ try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+ toast(kind==='creative'?'Creative prompt kopyalandı':'A+B correction promptu kopyalandı')
 }
 function referencePromptFor(x){
  if(!x||!isThreeStageUvTexture(x))return null;
- const authored=AUTHORED_UV_REFS.get(x.id);
- if(typeof authored==='string'&&authored.length)return authored;
- return isArmorUvTexture(x)?dynamicArmorRefPromptFor(x):mobCreatureRefPromptFor(x);
-}
-let blockPromptManifest=null;
-async function loadBlockReferencePrompts(){
- try{
-  const r=await fetch(BLOCK_PROMPT_MANIFEST_URL,{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
-  blockPromptManifest=await r.json();
-  const done=(blockPromptManifest.entries||[]).filter(e=>e.status==='done'&&e.file);
-  const batchRows=[];for(const batch of (blockPromptManifest.batches||[])){try{const q=await fetch(batch.file,{cache:'force-cache'});if(!q.ok)continue;const j=await q.json();batchRows.push(...Object.values(j.prompts||{}))}catch{}}
-  for(const row of batchRows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
-  const rows=await Promise.all(done.filter(e=>e.file&&!String(e.file).includes('batch_')).map(async e=>{try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}catch{return null}}));
-  for(const row of rows)if(row?.id&&row?.reference_prompt)BLOCK_REFERENCE_PROMPTS.set(row.id,row.reference_prompt);
- }catch(e){console.warn('Block prompt manifest unavailable; inline fallback active',e)}
+ const row=promptRecord(x);
+ return (row&&(row.family==='mobs'||row.family==='armor')&&typeof row.stages?.reference==='string')?row.stages.reference:null;
 }
 function p0ReferencePromptFor(x){
  const dependency=materialDependencyPromptBlock(x);
- if(x?.id&&BLOCK_REFERENCE_PROMPTS.has(x.id)){const authored=BLOCK_REFERENCE_PROMPTS.get(x.id);return dependency?authored+'\n\n'+dependency:authored;}
+ const row=promptRecord(x),authored=row?.family==='blocks'?row.stages?.reference:null;
+ if(typeof authored==='string'&&authored.length)return dependency?authored+'\n\n'+dependency:authored;
  const subject=p0ReferenceSubject(x);
  return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
 
@@ -1253,6 +1254,7 @@ const P0_REFERENCE_REQUIRED=[
 if(P0_REFERENCE_REQUIRED.some(k=>!P0_REFERENCE_SUBJECT_EXACT[k]))console.error('P0 reference subject map incomplete');
 const __legacyPromptForP0Ref=promptFor;
 promptFor=function(x,mode='classic'){
+ if(promptRecord(x))return __legacyPromptForP0Ref(x,mode);
  if(x&&x.priority==='P0'){let text=tintPromptText(p0ReferencePromptFor(x),x);if(isRuntimeTintTexture(x)&&!text.includes('RUNTIME TINT / COLOR MASK LOCK:'))text+='\n\n'+RUNTIME_TINT_PROMPT_LOCK;return {text,family:'P0 · Reference-first'}};
  return __legacyPromptForP0Ref(x,mode);
 };
@@ -1568,16 +1570,22 @@ $('mobRefPrompt').onclick=()=>copyMobPrompt('ref');
 $('mobFinalPrompt').onclick=()=>copyMobPrompt('final');
 $('copyPrompt').onclick=async()=>{
  if(!active)return;
- const text=active.priority==='P0'?p0ReferencePromptFor(active):$('promptText').value;
+ const rec=promptRecord(active);
+ if(rec?.family==='items'){await copyItemPrompt('creative');return}
+ const p=promptFor(active,'classic'),text=p?.text||'';
+ if(!text)return toast('Hazır prompt yok');
  try{await navigator.clipboard.writeText(text)}catch{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
  toast(active.priority==='P0'?'Ref prompt kopyalandı':'Prompt kopyalandı');
 };
 $('savePrompt').onclick=async()=>{
  if(!active)return;
+ const rec=promptRecord(active);
+ if(rec?.family==='items'){await copyItemPrompt('correction');return}
  if(active.priority==='P0'){
    try{await navigator.clipboard.writeText(p0ProductionPromptFor(active))}catch{const ta=document.createElement('textarea');ta.value=p0ProductionPromptFor(active);document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
    toast('Üretim promptu kopyalandı');return;
  }
+ if(!$('promptText').value.trim())return toast('Hazır prompt yok');
  PROMPT_OVERRIDES.set(active.id,$('promptText').value);savePromptOverrides();renderActivePrompt();toast("Prompt bu texture ID'sine kaydedildi");
 };
 $('singlePromptJson').onclick=()=>{if(!active)return;const suffix=promptViewMode==='creative'?'_creative_prompt.json':'_prompt.json';downloadJson(promptEntry(active,promptViewMode),active.id+suffix)};
@@ -2251,7 +2259,7 @@ async function init(){
   $('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);
 
   await applyFilter();
-  setTimeout(()=>Promise.allSettled([loadBlockReferencePrompts(),AUTHORED_UV_REF_PROMISES.mobs,AUTHORED_UV_REF_PROMISES.armor]).then(()=>{if(active?.priority==='P0')renderActivePrompt()}).catch(console.warn),0);
+  setTimeout(()=>CANONICAL_PROMPTS_READY.then(()=>{if(active)renderActivePrompt()}).catch(console.warn),0);
   bootstrapStorageInBackground();
 }
 CATALOG_READY.then(()=>{
