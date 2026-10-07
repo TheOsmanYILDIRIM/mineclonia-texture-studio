@@ -130,15 +130,48 @@ async function islandStudioImport(file){
   islandStudioSetTab('imported')
  }catch(e){console.error(e);islandStudioStatus('Import başarısız: '+(e?.message||e));toast('AI PNG import edilemedi')}
 }
+
+function islandForegroundMask(canvas){
+ const ctx=canvas.getContext('2d'),im=ctx.getImageData(0,0,canvas.width,canvas.height),d=im.data,w=canvas.width,h=canvas.height,n=w*h,mask=new Uint8Array(n);
+ let amin=255,amax=0;for(let i=3;i<d.length;i+=4){amin=Math.min(amin,d[i]);amax=Math.max(amax,d[i])}
+ if(amax-amin>80&&amin<40){for(let i=0;i<n;i++)mask[i]=d[i*4+3]>40?1:0;return mask}
+ // Opaque AI output: estimate background from border pixels, robust median RGB.
+ const rs=[],gs=[],bs=[];const take=(x,y)=>{const k=(y*w+x)*4;rs.push(d[k]);gs.push(d[k+1]);bs.push(d[k+2])};
+ for(let x=0;x<w;x+=Math.max(1,Math.floor(w/128))){take(x,0);take(x,h-1)}
+ for(let y=0;y<h;y+=Math.max(1,Math.floor(h/128))){take(0,y);take(w-1,y)}
+ const med=a=>{a.sort((x,y)=>x-y);return a[Math.floor(a.length/2)]||0},br=med(rs),bg=med(gs),bb=med(bs);
+ for(let i=0;i<n;i++){const k=i*4,dr=d[k]-br,dg=d[k+1]-bg,db=d[k+2]-bb;mask[i]=(dr*dr+dg*dg+db*db)>28*28?1:0}
+ return mask
+}
+function islandComponents(mask,w,h,roi){
+ const x0=Math.max(0,Math.floor(roi.x)),y0=Math.max(0,Math.floor(roi.y)),x1=Math.min(w,Math.ceil(roi.x+roi.w)),y1=Math.min(h,Math.ceil(roi.y+roi.h)),seen=new Uint8Array(w*h),out=[],q=[];
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const idx=y*w+x;if(!mask[idx]||seen[idx])continue;seen[idx]=1;q.length=0;q.push(idx);let qi=0,minx=x,maxx=x,miny=y,maxy=y,count=0;
+  while(qi<q.length){const z=q[qi++],cy=Math.floor(z/w),cx=z-cy*w;count++;if(cx<minx)minx=cx;if(cx>maxx)maxx=cx;if(cy<miny)miny=cy;if(cy>maxy)maxy=cy;
+   for(const [nx,ny] of [[cx-1,cy],[cx+1,cy],[cx,cy-1],[cx,cy+1]]){if(nx<x0||nx>=x1||ny<y0||ny>=y1)continue;const ni=ny*w+nx;if(mask[ni]&&!seen[ni]){seen[ni]=1;q.push(ni)}}}
+  if(count>=Math.max(4,Math.round(w*h*.00001)))out.push({x:minx,y:miny,w:maxx-minx+1,h:maxy-miny+1,count,cx:(minx+maxx+1)/2,cy:(miny+maxy+1)/2})
+ }
+ return out
+}
+function islandDetectObject(src,p,map){
+ const sx=src.width/(map.sheetW||src.width),sy=src.height/(map.sheetH||src.height),ex=(p.dst.x+p.dst.w/2)*sx,ey=(p.dst.y+p.dst.h/2)*sy,ew=Math.max(2,p.dst.w*sx),eh=Math.max(2,p.dst.h*sy);
+ const roi={x:ex-ew*1.6,y:ey-eh*1.6,w:ew*3.2,h:eh*3.2},mask=islandForegroundMask(src),comps=islandComponents(mask,src.width,src.height,roi);
+ let best=null,bestScore=1e9;const targetAR=p.src.w/Math.max(1,p.src.h),targetArea=ew*eh;
+ for(const o of comps){const ar=o.w/Math.max(1,o.h),dist=Math.hypot((o.cx-ex)/Math.max(ew,1),(o.cy-ey)/Math.max(eh,1)),arErr=Math.abs(Math.log(Math.max(.05,ar)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea)));const score=dist*.9+arErr*1.8+areaErr*.55;if(score<bestScore){bestScore=score;best=o}}
+ return best&&bestScore<4.2?{...best,score:bestScore}:null
+}
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- const baseW=m.sheetW||m.sourceW||src.width,baseH=m.sheetH||m.sourceH||src.height,scaleX=src.width/baseW,scaleY=src.height/baseH;
- const out=document.createElement('canvas');out.width=islandStudio.orig.width;out.height=islandStudio.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';let restoredParts=0;
- for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const sx=Math.max(0,Math.round(p.dst.x*scaleX)),sy=Math.max(0,Math.round(p.dst.y*scaleY)),sw=Math.max(1,Math.round(p.dst.w*scaleX)),sh=Math.max(1,Math.round(p.dst.h*scaleY)),cw=Math.min(sw,src.width-sx),ch=Math.min(sh,src.height-sy);if(cw<=0||ch<=0)continue;const tmp=document.createElement('canvas');tmp.width=p.src.w;tmp.height=p.src.h;tmp.getContext('2d').drawImage(src,sx,sy,cw,ch,0,0,p.src.w,p.src.h);for(const rr of isl.rects||[])g.drawImage(tmp,rr.x-p.src.x,rr.y-p.src.y,rr.w,rr.h,rr.x,rr.y,rr.w,rr.h);restoredParts++}
- const pixels=g.getImageData(0,0,out.width,out.height).data;let alpha=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])alpha++;
- if(!alpha){islandStudio.restored=null;islandStudioStatus('Geri toplama başarısız · AI '+src.width+'×'+src.height+' · şablon '+baseW+'×'+baseH);return}
- islandStudio.restored=out;islandStudioStatus('Geri toplandı · '+restoredParts+'/'+m.parts.length+' ada · import ölçeği '+scaleX.toFixed(2)+'×'+scaleY.toFixed(2));islandStudioSetTab('restored')
+ const out=document.createElement('canvas');out.width=islandStudio.orig.width;out.height=islandStudio.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ let found=0;const missed=[];
+ for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const obj=islandDetectObject(src,p,m);if(!obj){missed.push(p.ai+1);continue}
+   // One detected AI object -> one original island. Independent X/Y scaling deliberately
+   // absorbs aspect-ratio drift introduced by generation.
+   const tmp=document.createElement('canvas');tmp.width=p.src.w;tmp.height=p.src.h;tmp.getContext('2d').drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,p.src.w,p.src.h);
+   for(const rr of isl.rects||[])g.drawImage(tmp,rr.x-p.src.x,rr.y-p.src.y,rr.w,rr.h,rr.x,rr.y,rr.w,rr.h);found++
+ }
+ if(!found){islandStudio.restored=null;islandStudioStatus('Hiçbir AI adası tespit edilemedi. Ayrılmış AI görünümünü kontrol et.');return}
+ islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
 
 function bindIslandStudioUi(){
