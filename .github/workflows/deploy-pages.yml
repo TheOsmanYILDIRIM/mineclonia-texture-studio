@@ -65,11 +65,14 @@ jobs:
           )
           p.write_text(html, encoding="utf-8")
           Path("latest.html").write_text(html, encoding="utf-8")
+          Path("fresh.html").write_text(html, encoding="utf-8")
           PY
 
           test -s latest.html
+          test -s fresh.html
           grep -q "${GITHUB_SHA}" js/build-status.js
           grep -q "?v=${GITHUB_SHA}" latest.html
+          grep -q "?v=${GITHUB_SHA}" fresh.html
 
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
