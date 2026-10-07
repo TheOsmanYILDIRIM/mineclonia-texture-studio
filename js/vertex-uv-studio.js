@@ -32,6 +32,21 @@ function nearestBoundaryPoint(points,x,y){
  for(const p of points){const dx=p.x-x,dy=p.y-y,d=dx*dx+dy*dy;if(d<bd){bd=d;best=p}}
  return best?{x:best.x,y:best.y}:null
 }
+function relaxMeshInteriorToBoundaries(){
+ if(!S.mesh)return;const rows=S.mesh.rows,cols=S.mesh.cols;
+ const tl=S.mesh.points[0][0],tr=S.mesh.points[0][cols],bl=S.mesh.points[rows][0],br=S.mesh.points[rows][cols];
+ for(let r=1;r<rows;r++)for(let c=1;c<cols;c++){
+   const u=c/cols,v=r/rows,p=S.mesh.points[r][c],top=S.mesh.points[0][c],bot=S.mesh.points[rows][c],left=S.mesh.points[r][0],right=S.mesh.points[r][cols];
+   const cornerX=(1-u)*(1-v)*tl.x+u*(1-v)*tr.x+(1-u)*v*bl.x+u*v*br.x;
+   const cornerY=(1-u)*(1-v)*tl.y+u*(1-v)*tr.y+(1-u)*v*bl.y+u*v*br.y;
+   p.x=(1-v)*top.x+v*bot.x+(1-u)*left.x+u*right.x-cornerX;
+   p.y=(1-v)*top.y+v*bot.y+(1-u)*left.y+u*right.y-cornerY;
+   const cornerU=(1-u)*(1-v)*tl.u+u*(1-v)*tr.u+(1-u)*v*bl.u+u*v*br.u;
+   const cornerV=(1-u)*(1-v)*tl.v+u*(1-v)*tr.v+(1-u)*v*bl.v+u*v*br.v;
+   p.u=(1-v)*top.u+v*bot.u+(1-u)*left.u+u*right.u-cornerU;
+   p.v=(1-v)*top.v+v*bot.v+(1-u)*left.v+u*right.v-cornerV;
+ }
+}
 function snapMeshBoundaryToRealIslands(){
  if(!S.mesh||!S.sourceComp||!S.targetComp||!S.sourceCrop)return;
  const srcB=S.sourceComp.bbox,tr=targetWorkRect(),dstScaleX=S.work.width/S.orig.width,dstScaleY=S.work.height/S.orig.height;
@@ -43,15 +58,17 @@ function snapMeshBoundaryToRealIslands(){
    const sx=fu*S.sourceCrop.width,sy=fv*S.sourceCrop.height,dx=tr.x+fu*tr.w,dy=tr.y+fv*tr.h;
    const sp=nearestBoundaryPoint(srcPts,sx,sy),dp=nearestBoundaryPoint(dstPts,dx,dy);
    if(sp){p.u=sp.x;p.v=sp.y}
-   if(dp){p.x=dp.x;p.y=dp.y;p.ox=dp.x;p.oy=dp.y}
+   if(dp){p.x=dp.x;p.y=dp.y}
  };
  for(let c=0;c<=cols;c++){snap(0,c);snap(rows,c)}
  for(let r=1;r<rows;r++){snap(r,0);snap(r,cols)}
+ relaxMeshInteriorToBoundaries();
+ for(const row of S.mesh.points)for(const p of row){p.ox=p.x;p.oy=p.y}
 }
 function meshCenter(){
- if(!S.mesh)return null;let sx=0,sy=0,n=0;
- for(const row of S.mesh.points)for(const p of row){sx+=p.x;sy+=p.y;n++}
- return n?{x:sx/n,y:sy/n}:null
+ if(!S.mesh)return null;let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+ for(const row of S.mesh.points)for(const p of row){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}
+ return Number.isFinite(minX)?{x:(minX+maxX)/2,y:(minY+maxY)/2}:null
 }
 function scaleMesh(factor){
  if(!S.mesh)return toast('Önce ada çiftini seç');
@@ -73,7 +90,7 @@ function buildPreview(){if(!S.mesh||!S.sourceCrop||!S.meshBase)return S.work;con
 function applyPart(){if(!S.mesh||!S.sourceComp||!S.targetComp)return toast('Önce bir source ada ve target ada eşleştir');S.workHistory.push(captureWorkState());if(S.workHistory.length>30)S.workHistory.shift();S.workRedo=[];const src=S.sourceComp,tar=S.targetComp,c=buildPreview();S.work=c;S.pairs.push({sourceId:src.id,targetId:tar.id,source:islandLabel(src,'Ü'),target:islandLabel(tar,'O')});S.usedSource.add(src.id);S.usedTarget.add(tar.id);S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.sourceComp=null;S.targetComp=null;S.selectedNode=null;S.pick='source';render();status(`Ada birleştirildi · ${S.pairs.length} eşleşme · sıradaki Ü adayı seç`)}
 function beginManualIsland(kind){S.addIslandMode=kind;S.pick=null;S.rectStart=null;S.rectPreview=null;S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.selectedNode=null;render();toast(kind==='source'?'Kaynak adanın çevresine dikdörtgen çiz':'Hedef adanın çevresine dikdörtgen çiz')}
 function rectNorm(a,b){return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(a.x-b.x),h:Math.abs(a.y-b.y)}}
-function finishManualIsland(){if(!S.addIslandMode||!S.rectPreview)return;const kind=S.addIslandMode,r=S.rectPreview,a=kind==='source'?S.sourceAnalysis:S.targetAnalysis,ar=kind==='source'?r:{x:r.x/S.work.width*S.orig.width,y:r.y/S.work.height*S.orig.height,w:r.w/S.work.width*S.orig.width,h:r.h/S.work.height*S.orig.height};S.addIslandMode=null;S.rectStart=null;S.rectPreview=null;if(ar.w<1||ar.h<1){render();return toast('Ada seçimi çok küçük')}if(kind==='source'){const c=componentFromRect(a,ar,'Ü',++S.manualSourceSeq);if(!c){render();return toast('Bu alanda source foreground bulunamadı')}S.sourceComp=c;S.pick='target';status(`${c.label} manuel ada oluşturuldu · hedefini seç`);toast('Manuel source ada hazır · şimdi orijinal hedefe dokun')}else{const c=componentFromRect(a,ar,'O',++S.manualTargetSeq);if(!c){render();return toast('Bu alanda target foreground bulunamadı')}S.targetComp=c;S.pick=null;if(S.sourceComp)makeMesh(false);status(`${c.label} manuel hedef ada oluşturuldu`);toast('Manuel target ada hazır')}render()}
+function finishManualIsland(){if(!S.addIslandMode||!S.rectPreview)return;const kind=S.addIslandMode,r=S.rectPreview,a=kind==='source'?S.sourceAnalysis:S.targetAnalysis,ar=kind==='source'?r:{x:r.x/S.work.width*S.orig.width,y:r.y/S.work.height*S.orig.height,w:r.w/S.work.width*S.orig.width,h:r.h/S.work.height*S.orig.height};S.addIslandMode=null;S.rectStart=null;S.rectPreview=null;if(ar.w<1||ar.h<1){render();return toast('Ada seçimi çok küçük')}if(kind==='source'){const c=componentFromRect(a,ar,'Ü',++S.manualSourceSeq);if(!c){render();return toast('Bu alanda source foreground bulunamadı')}S.sourceComp=c;S.pick='target';status(`${c.label} manuel ada oluşturuldu · hedefini seç`);toast('Manuel source ada hazır · şimdi orijinal hedefe dokun')}else{const c=componentFromRect(a,ar,'O',++S.manualTargetSeq);if(!c){render();return toast('Bu alanda target foreground bulunamadı')}S.targetComp=c;S.pick=null;if(S.sourceComp)makeMesh(true);status(`${c.label} manuel hedef ada oluşturuldu · otomatik oturtuldu`);toast('Manuel target ada hazır · otomatik üst üste getirildi')}render()}
 function resetIslands(){S.work=cloneCanvas(S.sourceAtlas);S.pairs=[];S.usedSource=new Set();S.usedTarget=new Set();S.manualSourceSeq=0;S.manualTargetSeq=0;S.sourceComp=null;S.targetComp=null;S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.selectedNode=null;S.pick='source';S.workHistory=[];S.workRedo=[];analyze();render();status('Ada tespiti ve eşleşmeler sıfırlandı')}
 function fitStack(){const stage=$('vuvStage'),stack=$('vuvStack');if(!stage||!stack||!S.work)return;const sw=stage.clientWidth,sh=stage.clientHeight,ar=S.work.width/S.work.height;let w=sw,h=w/ar;if(h>sh){h=sh;w=h*ar}stack.style.width=w+'px';stack.style.height=h+'px';stack.style.left=((sw-w)/2)+'px';stack.style.top=((sh-h)/2)+'px'}
 function screenToWork(e){const stage=$('vuvStage'),stack=$('vuvStack'),r=stage.getBoundingClientRect(),bw=stack.offsetWidth,bh=stack.offsetHeight,lx=(e.clientX-r.left-stack.offsetLeft-S.panX)/S.zoom,ly=(e.clientY-r.top-stack.offsetTop-S.panY)/S.zoom;return{x:lx/bw*S.work.width,y:ly/bh*S.work.height}}
