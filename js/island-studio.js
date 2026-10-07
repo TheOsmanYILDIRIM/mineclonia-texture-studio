@@ -181,6 +181,19 @@ async function islandStudioRestore(){
  islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+' · UV ölçeği '+density.toFixed(2)+'×'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
 
+async function islandStudioPreview3d(){
+ if(!islandStudio.restored)return islandStudioStatus('Önce UV’ye Geri Topla.');
+ if(!islandStudio.meta)return islandStudioStatus('Entity seçili değil.');
+ try{
+   islandStudioStatus('3D önizleme hazırlanıyor…');
+   const preview=await api().ensurePreview3dLoaded?.();if(!preview?.openVariant)throw Error('3D renderer hazır değil');
+   const restoredBlob=await canvasPngBlob(islandStudio.restored),origBlob=await originalBlob(islandStudio.meta.path);
+   const variants=[{blob:origBlob,name:'Orijinal',system:true},{blob:restoredBlob,name:'Geri Toplanmış',system:true}];
+   await preview.openVariant(islandStudio.meta,restoredBlob,'Geri Toplanmış UV',variants,1);
+   islandStudioStatus('3D · Geri Toplanmış UV · '+islandStudio.restored.width+'×'+islandStudio.restored.height)
+ }catch(e){console.error(e);islandStudioStatus('3D önizleme açılamadı: '+(e?.message||e));toast(e?.message||'3D önizleme açılamadı')}
+}
+
 function bindIslandStudioUi(){
  const root=$('islandStudio');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
  root.addEventListener('click',async e=>{
@@ -196,6 +209,7 @@ function bindIslandStudioUi(){
    if(t.id==='islandStudioExport'){await islandStudioBuildTemplate(true);return}
    if(t.id==='islandStudioImport'){$('islandStudioFile')?.click();return}
    if(t.id==='islandStudioRestore'){await islandStudioRestore();return}
+   if(t.id==='islandStudio3d'){await islandStudioPreview3d();return}
  });
  const tex=$('islandStudioTexture');if(tex)tex.addEventListener('change',e=>islandStudioChoose(e.target.value));
  const file=$('islandStudioFile');if(file)file.addEventListener('change',e=>islandStudioImport(e.target.files?.[0]));
