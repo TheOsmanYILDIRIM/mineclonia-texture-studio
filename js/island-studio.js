@@ -181,12 +181,28 @@ async function islandStudioRestore(){
  islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+' · UV ölçeği '+density.toFixed(2)+'×'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
 
+
+let islandPreview3dPromise=null;
+async function islandEnsurePreview3d(){
+ if(window.MTSPreview3D?.openVariant)return window.MTSPreview3D;
+ if(!islandPreview3dPromise)islandPreview3dPromise=new Promise((resolve,reject)=>{
+   const ready=()=>window.MTSPreview3D?.openVariant?resolve(window.MTSPreview3D):reject(Error('3D renderer dosyası yüklendi fakat başlatılamadı'));
+   const existing=[...document.scripts].find(s=>/\/preview3d\.js(?:\?|$)/.test(s.src));
+   if(existing){
+     if(window.MTSPreview3D?.openVariant)return resolve(window.MTSPreview3D);
+     existing.addEventListener('load',ready,{once:true});existing.addEventListener('error',()=>reject(Error('3D renderer dosyası yüklenemedi')),{once:true});
+     setTimeout(()=>{if(window.MTSPreview3D?.openVariant)resolve(window.MTSPreview3D)},50);return
+   }
+   const s=document.createElement('script');s.src='js/preview3d.js?v=20261007-island3d1';s.async=true;s.onload=ready;s.onerror=()=>reject(Error('3D renderer dosyası yüklenemedi'));document.body.appendChild(s)
+ });
+ try{return await islandPreview3dPromise}catch(e){islandPreview3dPromise=null;throw e}
+}
 async function islandStudioPreview3d(){
  if(!islandStudio.restored)return islandStudioStatus('Önce UV’ye Geri Topla.');
  if(!islandStudio.meta)return islandStudioStatus('Entity seçili değil.');
  try{
    islandStudioStatus('3D önizleme hazırlanıyor…');
-   const preview=await api().ensurePreview3dLoaded?.();if(!preview?.openVariant)throw Error('3D renderer hazır değil');
+   const preview=await islandEnsurePreview3d();
    const restoredBlob=await canvasPngBlob(islandStudio.restored),origBlob=await originalBlob(islandStudio.meta.path);
    const variants=[{blob:origBlob,name:'Orijinal',system:true},{blob:restoredBlob,name:'Geri Toplanmış',system:true}];
    await preview.openVariant(islandStudio.meta,restoredBlob,'Geri Toplanmış UV',variants,1);
