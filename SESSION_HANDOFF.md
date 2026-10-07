@@ -2,136 +2,36 @@
 
 Branch: `main` · Production: GitHub Pages.
 
-## Immediate next task — startup/performance
-Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parallel thumbnail loading, and first paint no longer performs one IndexedDB lookup per card before persisted edits are hydrated. Relevant commits: `1bfd898`, `8575add`, `bb223d4`, publish/cache bump `0861bf8`.
-Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
+## Current focus — Vertex UV Studio
+- Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` editor. This is the primary entity-atlas repair workflow.
+- Islands are the editor's segmentation/pairing model, not the retired automatic Island Studio restore experiment. Source/target island IDs remain stable during a session; used pairs are tracked as `Ü# → O#` and merged one-by-one into the final atlas.
+- Automatic detection can be overridden with `+ Kaynak Ada` / `+ Hedef Ada` by drawing a rectangle around merged/touching regions. Manual islands disable overlapping automatic parents.
+- Source crops preserve real detected foreground/alpha. Never fill bbox background by pulling nearest edge RGB.
+- Mesh density supports 3×3 through 15×15 nodes; D-pad precision is 0.10/0.25/0.50/1 px.
+- After source→target selection, the pair auto-fits immediately. Outer source UV sampling and destination mesh nodes snap to real detected island contours; interior nodes conform between those boundaries instead of remaining a rectangular grid.
+- Centered scale controls are ±1% and ±2.5%; scaling must not shift the island center.
+- Undo/redo tracks mesh edits plus committed canvas/pair state. `Adayı Birleştir` bakes one pair; `✓ Varyanta Kaydet` returns the repaired atlas to Variant Lab.
+- Key commits: `c0af865` mask-preserving island core, `3cf1b88` pair history/manual split, `9058c98` manual island rectangles, `87eb1b1` pair UI, `7f7c4b3` 15×15 controls, `9358327` auto-fit/real contour perimeter, `db001a7` centered scale UI, `b512f06` contour-conforming interior mesh, `5804803` publish bump.
+- Old Island Studio and legacy rectangle UV mapper remain optional/experimental. Do not route primary `UV Eşle` back to them unless explicitly requested.
 
-## Vertex UV Studio — primary entity repair workflow
-- Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` editor.
-- Islands are now a **manual editing/segmentation layer**, not the old automatic restore pipeline. Source and target atlases are analyzed once; island IDs remain stable while editing.
-- Workflow: detect source/target islands → select one source island → select one target island → optionally coarse-fit → vertex-edit that pair → `Adayı Birleştir` → repeat. Applied pairs are tracked as stable `Ü# → O#` records and merged into the final atlas.
-- Source crop preserves the actual detected foreground/alpha. Do **not** reintroduce nearest-edge RGB filling of empty bbox space; transparent/background pixels must stay empty.
-- Automatic detection can be overridden with `+ Kaynak Ada` / `+ Hedef Ada`: draw a rectangle around a region to create a manual island when AI output has merged/touching components. Manual islands disable overlapping automatic parent components.
-- Mesh density is selectable from **3×3 through 15×15 nodes**. Fine D-pad steps remain 0.10/0.25/0.50/1 px. After source→target selection, the pair auto-fits immediately; source UV perimeter and destination mesh perimeter snap to the real detected island contours, interior nodes are relaxed inside those boundaries, and centered scale controls provide ±1% / ±2.5% adjustments without shifting the island center.
-- Undo/redo tracks both canvas state and island-pair state; used source/target islands are marked and cannot be accidentally paired twice.
-- Key commits: `c0af865` mask-preserving island core, `3cf1b88` pair history/manual split, `9058c98` rectangle island creation, `87eb1b1` pairing UI/render flow, `7f7c4b3` 15×15 controls.
-- Old Island Studio and legacy rectangle UV mapper remain optional/experimental; do not route the primary `UV Eşle` workflow back to them.
+## Catalog / thumbnail state
+- P1→P0 material-block promotion must run only after async `CATALOG_READY`; commit `3c5d462` fixed the prior order bug.
+- Thumbnail cache is edit-versioned and visible cards switch immediately to the new edit blob before the 192px derived thumbnail is rebuilt. Relevant commit: `42ac030`.
+- Device validation of these cache/catalog fixes is still useful if symptoms recur; do not assume old P0=41/cache diagnoses without checking current runtime.
 
+## Pages build/cache invariant
+- Normal Chrome can retain stale `index.html`; Pages deploy stamps `js/build-status.js`, fingerprints local JS/CSS, and publishes `latest.html`.
+- Update checks probe deployed Pages with `cache: no-store`; ready updates navigate to `latest.html?build=<sha>&_=<timestamp>`.
+- Never clear user IndexedDB/localStorage texture/edit data as part of update/cache handling.
 
-## Island Studio — optional helper
-- `js/island-studio.js` remains available as **Ada (opsiyonel)**. It is not required for the final manual repair workflow.
-- Do not spend the next session trying new global island matching/warp algorithms unless the user explicitly returns to automatic restoration.
-- Existing V3 slot work can remain as an experimental separated-export helper, but Manual UV Studio outranks it for production repair.
+## Architecture constraints
+- Keep substantial editors/labs in separate JS + CSS modules. `js/app.js` is the shared application core/orchestrator.
+- Variant Lab and Vertex UV Studio communicate through explicit public bridges; optional feature failure must not block catalog boot.
+- GitHub `main` is canonical; current code outranks stale prose.
 
-
-## Pages build/cache system — preserve
-- Normal Chrome was confirmed to retain stale `index.html` while Incognito showed current deploy.
-- Deploy stamps SHA/time into `js/build-status.js`, fingerprints local JS/CSS URLs with `${GITHUB_SHA}`, and publishes `latest.html`.
-- Workflow enforcement restored in commit `b4e4ef5`; do not remove the artifact-stamping step from `.github/workflows/deploy-pages.yml`.
-- Update check probes deployed Pages `js/build-status.js?probe=<timestamp>` with `cache: no-store`, not repository HEAD.
-- Ready updates navigate to `latest.html?build=<full-sha>&_=<timestamp>`; do not regress to repeated reloads of cached `index.html`.
-- Update/cache refresh must preserve user IndexedDB/localStorage texture/edit data.
-- Full invariant is also documented in `AGENTS.md`.
-
-## Front-end module boundary
-- Rule is in `AGENTS.md`: substantial independent screens/editors/labs get separate JS + CSS; feature failure must not block core catalog boot.
-- Island Studio and Variant Lab are isolated modules.
-- Manual UV Mapper currently remains inside `js/app.js`. A bulk extraction accidentally captured interleaved persistence/filter core functions and broke boot, so it was rolled back. A stale `js/uv-mapper.js` may exist but is not loaded. Future extraction must be dependency-by-dependency, not a contiguous cut.
-
-## Known workflow note
-- Runtime texture guards have had failures independent of successful Pages deploys. Check the relevant workflow/log rather than treating a guard failure as a Pages failure.
-
-# SESSION HANDOFF — Mineclonia Texture Studio
-
-Updated: 2026-10-06
-Canonical branch: `main`
-Production: GitHub Pages from `main`
-
-## Current architecture
-
-The app edits the Mineclonia texture catalog while keeping browser edits backward-compatible. Existing IndexedDB/localStorage edit records remain authoritative for the user's `Değiştirildi` state. Prompt status is separate from technical asset metadata.
-
-Static technical tags are computed cheaply at catalog load. A texture may carry multiple simultaneous tags such as `animated`, `face:side`, `runtime-tint`, `composite`, `ore`, and `lua:node`. These tags are additive metadata only; they do not replace the proven animation, prompt, edit-storage, or 3D fallbacks.
-
-## Prompt system
-
-`PROMPT_AUTHORING_GUIDE.md` is canonical.
-
-Important current decisions:
-- P0 material flow is reference-first: Ref image, then Image A structural master + Image B appearance/material reference.
-- Runtime-tinted grayscale/mask assets must stay neutral/value-driven; final biome/dye/state hue must not be baked into generated texture data.
-- Tint-aware prompt rewriting removes contradictory color-language rather than relying only on a final warning.
-- Material dependencies are Mineclonia-source verified, not inferred from Minecraft. Examples include grass continuity and ore host-rock references.
-- Entity UV atlases keep source UV/alpha geometry locked. Entity imports reapply the source alpha mask.
-- Variant Lab drafts are temporary; only the activated winner is persisted as the normal edit. For entity UV maps with a real `.b3d` mapping, Variant Lab exposes a 3D button that opens the real mesh with the whole temporary variant gallery. The 2D Variant Lab and the in-place 3D UV strip both prepend two fixed comparison sources: `Orijinal` (pack source PNG) and `Aktif` (current persisted edit, or original when no edit exists). These are comparison-only system entries, not user variants. The 3D view keeps the same camera/zoom while its thumbnail strip hot-swaps all sources/variants directly on the existing WebGL texture.
-
-## 3D preview
-
-The 3D module is lazy-loaded only when opened.
-
-### Blocks
-- Preferred source: `js/data/node-faces.json`, derived from Mineclonia/Luanti node semantics.
-- Renderer understands 1/2/3/6-tile face expansion, `overlay_tiles`, palette/tint behavior and `^` texture composition.
-- Shared/base textures must not accidentally claim a composite node. If a strong Lua node match is unavailable, semantic/name face-family fallback remains.
-- Grass behavior was used to harden the generic Lua interpretation: top is palette-tinted grass, bottom is dirt, and four sides are dirt/composition plus alpha-preserving tintable overlay.
-- Filename/semantic fallback remains for assets not yet covered by the Lua manifest.
-- Object mode supports Block/Functional Block. World mode is only for true Block assets and clones one prepared cube into a small 5x5 context patch.
-
-### Entities
-- Supported full/base/variant/coat entity skins use Mineclonia's real `.b3d` meshes, not guessed cuboids.
-- `runtimeRoleInfo()` supplies the real mesh filename.
-- A small built-in B3D static-mesh parser reads vertices, UVs and triangle/material groups; rendering uses lightweight WebGL and the active edited texture.
-- Parser was validated on real zombie, cow, pig and cat B3D files.
-- Multi-material meshes are respected. Known Mineclonia skin slots include zombie=1, skeleton=2, wither skeleton=1, horse=1; ordinary simple models default to slot 0.
-- Standalone collar/eye/marking/equipment/effect overlays are deliberately excluded from entity 3D rather than rendered misleadingly.
-- Entity preview is static/bind pose only; animation playback is not implemented.
-- Drag rotates, pinch/wheel zooms. Horizontal drag direction was corrected in commit `f488262`.
-
-## Asset/source analysis
-
-- `scripts/extract-luanti-node-faces.mjs` is the reusable static Luanti node extractor foundation.
-- `scripts/analyze-assets.mjs` documents the unified technical-tag model, but runtime catalog tagging is now computed directly at load to avoid a large generated `asset-tags.json`.
-- Prompt state, edit/change state, verification state, variant winners and timestamps must never be encoded into static tags.
-- Runtime guards protect this separation and preserve existing browser-storage compatibility.
-
-## Current verification
-
-- Current JavaScript changes were syntax-checked before commit.
-- GitHub Pages deploy for the Lua face fixes completed successfully.
-- Real Mineclonia B3D files parse into vertex/UV/triangle data.
-- 3D lazy-load cache key is currently `preview3d.js?v=20261006-entity1`.
-- No external Three.js/game-engine dependency was added.
-
-## Manual UV fallback
-
-Variant Lab exposes `UV Eşle` for Entity textures. The mapper now has Orijinal / Üretilen / Düzeltilmiş / Üst üste views, fixed-viewport pan/pinch zoom, pixel-grid snapping, global X/Y alignment, live rectangular correction, sizing/fit tools, joystick nudging, and live 3D comparison. It also includes a contour-based smart repair engine: source/target UV islands are extracted from alpha when available, otherwise opaque black/dark backgrounds are identified by edge-connected background flood-fill so interior dark texture detail is preserved. Green target and orange source boundaries are drawn with visible boxes/IDs and can be auto-matched or manually linked; blue links visualize correspondences. `Elle Eşle` is input-locked so selecting a contour does not trigger pan/selection/global movement. `Oto Bük` uses minimum-displacement local boundary correction: near-matching alpha contours (including 1–2 px errors) only deform a narrow neighborhood around the boundary, with compact support and a hard displacement cap. Interior texture is preserved instead of receiving a full-field Gaussian warp. Re-running the same auto warp is non-compounding/idempotent from its stored pre-warp baseline. Tool groups are collapsible to keep the mobile workspace uncluttered. Only `Bitti → Varyant` exports one temporary `_UV_FIXED` candidate back to Variant Lab.
-
-## Open work
-
-1. Device-test several entity families in the live Android UI: cow/pig/cat, zombie/skeleton, horse, wolf/spider/creeper where runtime mesh mapping exists.
-2. Multipart object preview now composes two-node doors (including bamboo), Mineclonia double-plant top/bottom families, and normal/trapped double-chest atlas families. Beds are not yet implemented because the current catalog contains no bed texture family to map safely; resolve their actual Mineclonia runtime asset/model source before adding them.
-3. Expand `node-faces.json` coverage from Mineclonia source. Keep Lua/source mapping authoritative and filename matching as fallback.
-4. If a composite/tinted block renders incorrectly, fix the generic Lua render-plan interpretation first. Add a manual override only as a safe fallback for a genuinely exceptional runtime behavior.
-5. Keep runtime guards green; the recent guard failure around metadata migration should be inspected before treating guards as fully healthy.
-
-## Non-regression constraints
-
-- Work directly on `main` for this project unless the user explicitly changes that workflow.
-- Do not break existing browser edits or require a storage migration merely for technical tags.
-- Do not merge prompt status or `Değiştirildi` state into static tags.
-- Do not infer Mineclonia runtime behavior from Minecraft.
-- Do not classify entity UV atlases as animations from dimensions alone.
-- Do not persist Variant Lab non-winners.
-- Keep 3D lazy; normal browsing should pay no entity/WebGL rendering cost.
-- Preserve fallback behavior when Lua/source metadata is incomplete.
-
-## Voxel Model Studio sidecar
-
-- Added a deliberately isolated `model-studio/` prototype for fast cuboid creature editing.
-- It starts with a Komodo draft and now loads Mineclonia upstream's actual `mobs_mc_cat.b3d` at runtime as a geometry reference using the same lightweight B3D vertex/triangle parser approach as the main 3D preview. The real mesh can be toggled behind the editable cuboids; the old hand-authored cat cuboids are not presented as the authoritative Mineclonia model. The sidecar B3D parser's root identity matrix was corrected after the first live load failed; load failures now expose the actual HTTP/parser reason and disable the misleading reference toggle.
-- Mobile-first controls: select a box, resize/move/rotate on XYZ, choose 1/4, 1/2 or 1-voxel steps, duplicate/delete/add boxes, and save/load a standalone JSON project.
-- The editor now has a higher-quality Model/Animation workspace, orthographic view shortcuts, improved mobile UI, and procedural Komodo animation previews for idle/breathing, walk, attack and tail motion. Animation is role/name driven so proportion edits continue to animate, and the current procedural pose can be baked into the cuboid model.\n- This remains a cuboid project editor: it does **not** rewrite Mineclonia B3D files, preserve/import the original B3D skeleton, or export a game-ready animated mesh yet. Procedural animation is an authoring preview until a verified Luanti exporter is added.
+## Verification
+- Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
+- Final device visual validation is still required for the real-contour node placement and centered scale behavior on problematic pig/cat AI atlases.
 
 ## Next concrete step
-
-Optimize startup/storage readiness and visible texture loading as described in ACTIVE HANDOFF. After that, visually validate Island Studio dense contour restoration on the unchanged cat test before adding more UV algorithms.
+Open a problematic entity in Variant Lab → `UV Eşle`. Validate: source island → target island auto-overlap, real-RGB/alpha contour node placement at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting for touching regions, then `Adayı Birleştir` and save. Fix interaction/geometry issues in this Vertex UV workflow before revisiting any automatic restore algorithm.
