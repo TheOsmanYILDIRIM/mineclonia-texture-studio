@@ -1,258 +1,417 @@
 {
-  "version": 1,
-  "workflow": "item-creative-composition-correction",
-  "batch": 1,
-  "count": 50,
-  "items": [
+  "schema_version": 1,
+  "kind": "item_two_pass_manifest",
+  "total": 50,
+  "done": 50,
+  "pending": 0,
+  "entries": [
     {
       "order": 1,
-      "texture": "mcl_beds_bed_black_inv.png",
-      "file": "prompts/items/batch_001_050/001_mcl_beds_bed_black_inv.md"
+      "id": "tex_1d30353a35",
+      "name": "mcl_beds_bed_black_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_black_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 2,
-      "texture": "mcl_beds_bed_blue_inv.png",
-      "file": "prompts/items/batch_001_050/002_mcl_beds_bed_blue_inv.md"
+      "id": "tex_79ca32934f",
+      "name": "mcl_beds_bed_blue_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_blue_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 3,
-      "texture": "mcl_beds_bed_brown_inv.png",
-      "file": "prompts/items/batch_001_050/003_mcl_beds_bed_brown_inv.md"
+      "id": "tex_3f4ab9fc2f",
+      "name": "mcl_beds_bed_brown_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_brown_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 4,
-      "texture": "mcl_beds_bed_cyan_inv.png",
-      "file": "prompts/items/batch_001_050/004_mcl_beds_bed_cyan_inv.md"
+      "id": "tex_4fb25a0a1e",
+      "name": "mcl_beds_bed_cyan_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_cyan_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 5,
-      "texture": "mcl_beds_bed_green_inv.png",
-      "file": "prompts/items/batch_001_050/005_mcl_beds_bed_green_inv.md"
+      "id": "tex_57a8fbb2ef",
+      "name": "mcl_beds_bed_green_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_green_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 6,
-      "texture": "mcl_beds_bed_grey_inv.png",
-      "file": "prompts/items/batch_001_050/006_mcl_beds_bed_grey_inv.md"
+      "id": "tex_716ae48da9",
+      "name": "mcl_beds_bed_grey_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_grey_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 7,
-      "texture": "mcl_beds_bed_light_blue_inv.png",
-      "file": "prompts/items/batch_001_050/007_mcl_beds_bed_light_blue_inv.md"
+      "id": "tex_f1bc3f8f1f",
+      "name": "mcl_beds_bed_light_blue_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_light_blue_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 8,
-      "texture": "mcl_beds_bed_lime_inv.png",
-      "file": "prompts/items/batch_001_050/008_mcl_beds_bed_lime_inv.md"
+      "id": "tex_b08af9ddc0",
+      "name": "mcl_beds_bed_lime_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_lime_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 9,
-      "texture": "mcl_beds_bed_magenta_inv.png",
-      "file": "prompts/items/batch_001_050/009_mcl_beds_bed_magenta_inv.md"
+      "id": "tex_7c68e81a03",
+      "name": "mcl_beds_bed_magenta_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_magenta_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 10,
-      "texture": "mcl_beds_bed_orange_inv.png",
-      "file": "prompts/items/batch_001_050/010_mcl_beds_bed_orange_inv.md"
+      "id": "tex_51df20186d",
+      "name": "mcl_beds_bed_orange_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_orange_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 11,
-      "texture": "mcl_beds_bed_pink_inv.png",
-      "file": "prompts/items/batch_001_050/011_mcl_beds_bed_pink_inv.md"
+      "id": "tex_d401565805",
+      "name": "mcl_beds_bed_pink_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_pink_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 12,
-      "texture": "mcl_beds_bed_purple_inv.png",
-      "file": "prompts/items/batch_001_050/012_mcl_beds_bed_purple_inv.md"
+      "id": "tex_87127a038f",
+      "name": "mcl_beds_bed_purple_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_purple_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 13,
-      "texture": "mcl_beds_bed_red_inv.png",
-      "file": "prompts/items/batch_001_050/013_mcl_beds_bed_red_inv.md"
+      "id": "tex_e475be9375",
+      "name": "mcl_beds_bed_red_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_red_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 14,
-      "texture": "mcl_beds_bed_silver_inv.png",
-      "file": "prompts/items/batch_001_050/014_mcl_beds_bed_silver_inv.md"
+      "id": "tex_7481e0d0f9",
+      "name": "mcl_beds_bed_silver_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_silver_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 15,
-      "texture": "mcl_beds_bed_white_inv.png",
-      "file": "prompts/items/batch_001_050/015_mcl_beds_bed_white_inv.md"
+      "id": "tex_5e2100e5a6",
+      "name": "mcl_beds_bed_white_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_white_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 16,
-      "texture": "mcl_beds_bed_yellow_inv.png",
-      "file": "prompts/items/batch_001_050/016_mcl_beds_bed_yellow_inv.md"
+      "id": "tex_aad12445d8",
+      "name": "mcl_beds_bed_yellow_inv.png",
+      "texture_path": "ITEMS/mcl_beds/mcl_beds_bed_yellow_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 17,
-      "texture": "mcl_farming_pumpkin_pie.png",
-      "file": "prompts/items/batch_001_050/017_mcl_farming_pumpkin_pie.md"
+      "id": "tex_26dd0e482f",
+      "name": "mcl_farming_pumpkin_pie.png",
+      "texture_path": "ITEMS/mcl_farming/mcl_farming_pumpkin_pie.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 18,
-      "texture": "mcl_farming_pumpkin_seeds.png",
-      "file": "prompts/items/batch_001_050/018_mcl_farming_pumpkin_seeds.md"
+      "id": "tex_3ba3a1ba26",
+      "name": "mcl_farming_pumpkin_seeds.png",
+      "texture_path": "ITEMS/mcl_farming/mcl_farming_pumpkin_seeds.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 19,
-      "texture": "mcl_ocean_sea_pickle_item.png",
-      "file": "prompts/items/batch_001_050/019_mcl_ocean_sea_pickle_item.md"
+      "id": "tex_38cd189e4e",
+      "name": "mcl_ocean_sea_pickle_item.png",
+      "texture_path": "ITEMS/mcl_ocean/mcl_ocean_sea_pickle_item.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 20,
-      "texture": "default_tool_netheritepick.png",
-      "file": "prompts/items/batch_001_050/020_default_tool_netheritepick.md"
+      "id": "tex_f22d13d2f8",
+      "name": "default_tool_netheritepick.png",
+      "texture_path": "ITEMS/mcl_tools/default_tool_netheritepick.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 21,
-      "texture": "default_tool_steelpick.png",
-      "file": "prompts/items/batch_001_050/021_default_tool_steelpick.md"
+      "id": "tex_167b732d90",
+      "name": "default_tool_steelpick.png",
+      "texture_path": "ITEMS/mcl_tools/default_tool_steelpick.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 22,
-      "texture": "axolotl_bucket.png",
-      "file": "prompts/items/batch_001_050/022_axolotl_bucket.md"
+      "id": "tex_23766b178e",
+      "name": "axolotl_bucket.png",
+      "texture_path": "ITEMS/mcl_buckets/axolotl_bucket.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 23,
-      "texture": "bucket.png",
-      "file": "prompts/items/batch_001_050/023_bucket.md"
+      "id": "tex_2c7c13afa4",
+      "name": "bucket.png",
+      "texture_path": "ITEMS/mcl_buckets/bucket.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 24,
-      "texture": "mcl_cherry_blossom_pink_petals_inv.png",
-      "file": "prompts/items/batch_001_050/024_mcl_cherry_blossom_pink_petals_inv.md"
+      "id": "tex_1fd4ef3fa1",
+      "name": "mcl_cherry_blossom_pink_petals_inv.png",
+      "texture_path": "ITEMS/mcl_cherry_blossom/mcl_cherry_blossom_pink_petals_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 25,
-      "texture": "mcl_end_chorus_fruit.png",
-      "file": "prompts/items/batch_001_050/025_mcl_end_chorus_fruit.md"
+      "id": "tex_b43c9ae8c7",
+      "name": "mcl_end_chorus_fruit.png",
+      "texture_path": "ITEMS/mcl_end/mcl_end_chorus_fruit.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 26,
-      "texture": "mcl_end_chorus_fruit_popped.png",
-      "file": "prompts/items/batch_001_050/026_mcl_end_chorus_fruit_popped.md"
+      "id": "tex_b42cc577fe",
+      "name": "mcl_end_chorus_fruit_popped.png",
+      "texture_path": "ITEMS/mcl_end/mcl_end_chorus_fruit_popped.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 27,
-      "texture": "mcl_end_ender_eye.png",
-      "file": "prompts/items/batch_001_050/027_mcl_end_ender_eye.md"
+      "id": "tex_1afd579023",
+      "name": "mcl_end_ender_eye.png",
+      "texture_path": "ITEMS/mcl_end/mcl_end_ender_eye.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 28,
-      "texture": "mcl_hoppers_item.png",
-      "file": "prompts/items/batch_001_050/028_mcl_hoppers_item.md"
+      "id": "tex_86abe646db",
+      "name": "mcl_hoppers_item.png",
+      "texture_path": "ITEMS/mcl_hoppers/mcl_hoppers_item.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 29,
-      "texture": "mcl_lanterns_chain_inv.png",
-      "file": "prompts/items/batch_001_050/029_mcl_lanterns_chain_inv.md"
+      "id": "tex_1451eb5316",
+      "name": "mcl_lanterns_chain_inv.png",
+      "texture_path": "ITEMS/mcl_lanterns/mcl_lanterns_chain_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 30,
-      "texture": "mcl_lanterns_lantern_inv.png",
-      "file": "prompts/items/batch_001_050/030_mcl_lanterns_lantern_inv.md"
+      "id": "tex_92b6026c15",
+      "name": "mcl_lanterns_lantern_inv.png",
+      "texture_path": "ITEMS/mcl_lanterns/mcl_lanterns_lantern_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 31,
-      "texture": "mcl_lanterns_soul_lantern_inv.png",
-      "file": "prompts/items/batch_001_050/031_mcl_lanterns_soul_lantern_inv.md"
+      "id": "tex_1b6bcea347",
+      "name": "mcl_lanterns_soul_lantern_inv.png",
+      "texture_path": "ITEMS/mcl_lanterns/mcl_lanterns_soul_lantern_inv.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 32,
-      "texture": "mcl_lush_caves_glow_berries.png",
-      "file": "prompts/items/batch_001_050/032_mcl_lush_caves_glow_berries.md"
+      "id": "tex_cf303d0cb9",
+      "name": "mcl_lush_caves_glow_berries.png",
+      "texture_path": "ITEMS/mcl_lush_caves/mcl_lush_caves_glow_berries.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 33,
-      "texture": "mcl_lush_caves_hanging_roots.png",
-      "file": "prompts/items/batch_001_050/033_mcl_lush_caves_hanging_roots.md"
+      "id": "tex_a3c348f7d6",
+      "name": "mcl_lush_caves_hanging_roots.png",
+      "texture_path": "ITEMS/mcl_lush_caves/mcl_lush_caves_hanging_roots.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 34,
-      "texture": "mcl_mangrove_propagule_item.png",
-      "file": "prompts/items/batch_001_050/034_mcl_mangrove_propagule_item.md"
+      "id": "tex_88dee481a3",
+      "name": "mcl_mangrove_propagule_item.png",
+      "texture_path": "ITEMS/mcl_mangrove/mcl_mangrove_propagule_item.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 35,
-      "texture": "default_gunpowder.png",
-      "file": "prompts/items/batch_001_050/035_default_gunpowder.md"
+      "id": "tex_f19c49b5eb",
+      "name": "default_gunpowder.png",
+      "texture_path": "ITEMS/mcl_mobitems/default_gunpowder.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 36,
-      "texture": "extra_mobs_glow_ink_sac.png",
-      "file": "prompts/items/batch_001_050/036_extra_mobs_glow_ink_sac.md"
+      "id": "tex_0aa5242648",
+      "name": "extra_mobs_glow_ink_sac.png",
+      "texture_path": "ITEMS/mcl_mobitems/extra_mobs_glow_ink_sac.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 37,
-      "texture": "mcl_mobitems_blaze_powder.png",
-      "file": "prompts/items/batch_001_050/037_mcl_mobitems_blaze_powder.md"
+      "id": "tex_7fea60a5a2",
+      "name": "mcl_mobitems_blaze_powder.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_blaze_powder.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 38,
-      "texture": "mcl_mobitems_blaze_rod.png",
-      "file": "prompts/items/batch_001_050/038_mcl_mobitems_blaze_rod.md"
+      "id": "tex_0de96e810a",
+      "name": "mcl_mobitems_blaze_rod.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_blaze_rod.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 39,
-      "texture": "mcl_mobitems_bone.png",
-      "file": "prompts/items/batch_001_050/039_mcl_mobitems_bone.md"
+      "id": "tex_3da4c57acf",
+      "name": "mcl_mobitems_bone.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_bone.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 40,
-      "texture": "mcl_mobitems_breeze_rod.png",
-      "file": "prompts/items/batch_001_050/040_mcl_mobitems_breeze_rod.md"
+      "id": "tex_d8c74477e2",
+      "name": "mcl_mobitems_breeze_rod.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_breeze_rod.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 41,
-      "texture": "mcl_mobitems_bucket_milk.png",
-      "file": "prompts/items/batch_001_050/041_mcl_mobitems_bucket_milk.md"
+      "id": "tex_a2828a46b4",
+      "name": "mcl_mobitems_bucket_milk.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_bucket_milk.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 42,
-      "texture": "mcl_mobitems_ghast_tear.png",
-      "file": "prompts/items/batch_001_050/042_mcl_mobitems_ghast_tear.md"
+      "id": "tex_aeb1927f92",
+      "name": "mcl_mobitems_ghast_tear.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_ghast_tear.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 43,
-      "texture": "mcl_mobitems_ink_sac.png",
-      "file": "prompts/items/batch_001_050/043_mcl_mobitems_ink_sac.md"
+      "id": "tex_e7293845f2",
+      "name": "mcl_mobitems_ink_sac.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_ink_sac.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 44,
-      "texture": "mcl_mobitems_magma_cream.png",
-      "file": "prompts/items/batch_001_050/044_mcl_mobitems_magma_cream.md"
+      "id": "tex_f3e09a7684",
+      "name": "mcl_mobitems_magma_cream.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_magma_cream.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 45,
-      "texture": "mcl_mobitems_nametag.png",
-      "file": "prompts/items/batch_001_050/045_mcl_mobitems_nametag.md"
+      "id": "tex_d6d7b0d8de",
+      "name": "mcl_mobitems_nametag.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_nametag.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 46,
-      "texture": "mcl_mobitems_nautilus_shell.png",
-      "file": "prompts/items/batch_001_050/046_mcl_mobitems_nautilus_shell.md"
+      "id": "tex_4019addd12",
+      "name": "mcl_mobitems_nautilus_shell.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_nautilus_shell.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 47,
-      "texture": "mcl_mobitems_nether_star.png",
-      "file": "prompts/items/batch_001_050/047_mcl_mobitems_nether_star.md"
+      "id": "tex_d47c720085",
+      "name": "mcl_mobitems_nether_star.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_nether_star.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 48,
-      "texture": "mcl_mobitems_rotten_flesh.png",
-      "file": "prompts/items/batch_001_050/048_mcl_mobitems_rotten_flesh.md"
+      "id": "tex_b9cc04ffaa",
+      "name": "mcl_mobitems_rotten_flesh.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_rotten_flesh.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 49,
-      "texture": "mcl_mobitems_saddle.png",
-      "file": "prompts/items/batch_001_050/049_mcl_mobitems_saddle.md"
+      "id": "tex_125f7483cc",
+      "name": "mcl_mobitems_saddle.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_saddle.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
     },
     {
       "order": 50,
-      "texture": "mcl_mobitems_shulker_shell.png",
-      "file": "prompts/items/batch_001_050/050_mcl_mobitems_shulker_shell.md"
+      "id": "tex_fddfd0ac49",
+      "name": "mcl_mobitems_shulker_shell.png",
+      "texture_path": "ITEMS/mcl_mobitems/mcl_mobitems_shulker_shell.png",
+      "status": "done",
+      "file": "prompts/items/batch_001_050.json"
+    }
+  ],
+  "batches": [
+    {
+      "start": 1,
+      "end": 50,
+      "count": 50,
+      "file": "prompts/items/batch_001_050.json"
     }
   ]
 }
