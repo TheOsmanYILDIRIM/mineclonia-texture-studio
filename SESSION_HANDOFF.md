@@ -7,20 +7,16 @@ Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parall
 Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
 
 ## Vertex UV Studio — primary entity repair workflow
-- The automatic Island Studio restore experiments and the old rectangle-based UV mapper are no longer the primary path. The dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` tool is canonical for AI-generated entity atlases; Variant Lab → `UV Eşle` opens it directly.
-- The tool is based on the user's Vector Character Studio v5.7 workflow but simplified for atlas repair: detected source/target object boxes, original ghost overlay, piecewise-affine grid mesh deformation, draggable vertices, whole-mesh move, pan/zoom, 3×3/4×4/6×6 node grids, 0.10/0.25/0.50/1 px D-pad nudging, undo/redo/reset, target-mask locking, per-part bake, and final save back to Variant Lab.
-- The existing Manual UV Mapper in `js/app.js` was corrected on 2026-10-07:
-  - original and generated canvases may have different resolutions; target rectangles are now scaled into work-canvas coordinates before apply,
-  - generated/source detection uses real background inference (`auto/black/alpha`) instead of forcing `strictAlpha`,
-  - detected original/generated objects are drawn as labeled boxes and can be selected directly by tapping,
-  - workflow is: **1 · generated object → 2 · original target → 3 · fit + lock original UV mask**,
-  - source-object background inside its bbox is nearest-filled before scaling, so black/transparent AI wedges are not stretched into the target,
-  - moving a detected object clears its old source bbox, applies the filled texture to the scaled target, then locks final alpha to the authoritative original mask,
-  - free rectangular manual selection now also converts coordinates correctly between original and generated resolutions,
-  - joystick cycles Generated → Target → Whole image and supports 1/4/16 px nudge steps,
-  - advanced auto-warp/edge matching remains available but collapsed and optional.
-- Key commits: `1bf0ed5` resolution-aware manual mapper + direct object picking, `61e8a5a` detected-object overlay, `859caf4` nearest-filled source placement, `78df345` coordinate/joystick fixes, `55e68e0` re-detection after placement, `21d6a52` publish/UI.
-- Next validation: use the problematic pig AI atlas in Variant Lab → UV Eşle. Confirm object boxes are sensible, select one generated component and its original target, apply masked fit, then inspect 3D. Fix manual interaction/selection precision before revisiting any automatic Island Studio restore.
+- Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` editor.
+- Islands are now a **manual editing/segmentation layer**, not the old automatic restore pipeline. Source and target atlases are analyzed once; island IDs remain stable while editing.
+- Workflow: detect source/target islands → select one source island → select one target island → optionally coarse-fit → vertex-edit that pair → `Adayı Birleştir` → repeat. Applied pairs are tracked as stable `Ü# → O#` records and merged into the final atlas.
+- Source crop preserves the actual detected foreground/alpha. Do **not** reintroduce nearest-edge RGB filling of empty bbox space; transparent/background pixels must stay empty.
+- Automatic detection can be overridden with `+ Kaynak Ada` / `+ Hedef Ada`: draw a rectangle around a region to create a manual island when AI output has merged/touching components. Manual islands disable overlapping automatic parent components.
+- Mesh density is selectable from **3×3 through 15×15 nodes**. Fine D-pad steps remain 0.10/0.25/0.50/1 px.
+- Undo/redo tracks both canvas state and island-pair state; used source/target islands are marked and cannot be accidentally paired twice.
+- Key commits: `c0af865` mask-preserving island core, `3cf1b88` pair history/manual split, `9058c98` rectangle island creation, `87eb1b1` pairing UI/render flow, `7f7c4b3` 15×15 controls.
+- Old Island Studio and legacy rectangle UV mapper remain optional/experimental; do not route the primary `UV Eşle` workflow back to them.
+
 
 ## Island Studio — optional helper
 - `js/island-studio.js` remains available as **Ada (opsiyonel)**. It is not required for the final manual repair workflow.
