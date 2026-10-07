@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 const rootDir=fileURLToPath(new URL('..',import.meta.url));
 const app=fs.readFileSync(new URL('../js/app.js',import.meta.url),'utf8');
 const index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const islandSource=fs.readFileSync(new URL('../js/island-studio.js',import.meta.url),'utf8');
 
 function fail(msg){console.error('FAIL:',msg);process.exitCode=1}
 function expect(cond,msg){if(!cond)fail(msg)}
@@ -21,6 +22,12 @@ expect(app.includes("const DB='MinecloniaTextureStudio', STORE='edits', EDIT_DB_
 expect(app.includes("indexedDB.open(DB,EDIT_DB_VERSION)"),'edit IndexedDB must use the stable version constant');
 expect(app.includes("k.startsWith(EDIT_LOCAL_PREFIX)"),'legacy localStorage edit records must remain discoverable by stable prefix');
 expect(app.includes("o.verification||'unknown'"),'old browser edit records without verification must remain readable');
+expect(app.includes("const SCALED_DB='MinecloniaTextureStudioScaled';") && app.includes("const SCALED_STORE='scaled';"),
+  'scaled-cache storage identity must remain stable');
+expect(app.includes("const PROMPT_KEY='mts:promptOverrides:v1';"),'local prompt-override key must remain backward-compatible');
+expect(app.includes("const RECENT_TEXTURES_KEY='mts_recent_textures_v1';"),'recent-texture key must remain backward-compatible');
+expect(app.includes("const RESOLUTION_KEY='mineclonia_texture_target_resolution_v1';"),'resolution preference key must remain backward-compatible');
+expect(islandSource.includes("'mts_uv_islands_v1:'"),'island editor localStorage prefix must remain backward-compatible');
 
 expect(index.includes('js/prompt-registry.js'),'canonical prompt registry must load before app runtime');
 expect(app.includes('const PROMPT_STORE=window.MTSPromptStore'),'app must use the single canonical prompt registry');
