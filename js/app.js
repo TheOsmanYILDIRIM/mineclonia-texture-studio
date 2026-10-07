@@ -1194,8 +1194,13 @@ window.MTSIslandBridge={
  canvasPngBlob,
  originalBlob,
  assetTypeOf,
- putEdit,
- applyFilter,
+ saveRestored:async(path,blob)=>{
+   if(!path||!blob)throw new Error('Geri toplanmış UV kaydı eksik');
+   await putEdit(path,blob);
+   await editWriteQueue.catch(()=>{});
+   await applyFilter();
+   return true;
+ },
  closeDetailSheet,
  ensurePreview3dLoaded:async()=>{if(window.MTSPreview3D)return window.MTSPreview3D;if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});await preview3dLoadPromise;return window.MTSPreview3D}
 };
