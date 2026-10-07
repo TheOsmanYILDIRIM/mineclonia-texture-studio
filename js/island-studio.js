@@ -237,8 +237,12 @@ async function islandStudioRestore(){
    const detected=document.createElement('canvas');detected.width=bb.w;detected.height=bb.h;
    detected.getContext('2d').drawImage(cell,bb.x,bb.y,bb.w,bb.h,0,0,bb.w,bb.h);
    const detectedMask=islandCropMask(mask,cell.width,bb);
-   islandFillBackgroundNearest(detected,detectedMask);
-   const targetMask=islandGroupTargetMask(slot,density),fitted=islandFitFilledToMask(detected,targetMask);
+   // Keep the corrected island's own high-resolution silhouette. The original
+   // low-res UV mask is NOT reapplied here. slot.src controls placement only.
+   const targetW=Math.max(1,Math.round(slot.src.w*density)),targetH=Math.max(1,Math.round(slot.src.h*density));
+   const fitted=document.createElement('canvas');fitted.width=targetW;fitted.height=targetH;
+   const fg=fitted.getContext('2d');fg.imageSmoothingEnabled=true;fg.imageSmoothingQuality='high';
+   fg.drawImage(detected,0,0,detected.width,detected.height,0,0,targetW,targetH);
    g.drawImage(fitted,Math.round(slot.src.x*density),Math.round(slot.src.y*density));ok++
  }
  if(!ok){islandStudio.restored=null;islandStudioStatus('Slotlarda AI adası bulunamadı.');return}
