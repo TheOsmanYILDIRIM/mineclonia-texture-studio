@@ -80,6 +80,14 @@ async function islandStudioChoose(path){
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
  islandStudioLoadMap();islandStudioSetHandle('move');islandWizardSet(islandStudio.islands.some(a=>a.rects?.length)?2:1)
 }
+function islandStudioSavedData(){
+ const w=Math.max(1,islandStudio.orig?.width||islandStudio.meta?.w||1),h=Math.max(1,islandStudio.orig?.height||islandStudio.meta?.h||1);
+ return {version:1,texture:islandStudio.meta?.path||'',width:w,height:h,islands:islandStudio.islands.map((a,i)=>({index:i,id:a.id,rects:(a.rects||[]).map(r=>({x:r.x,y:r.y,w:r.w,h:r.h,nx:+(r.x/w).toFixed(6),ny:+(r.y/h).toFixed(6),nw:+(r.w/w).toFixed(6),nh:+(r.h/h).toFixed(6)}))}))};
+}
+function islandStudioShowData(){
+ const panel=$('islandDataPanel'),txt=$('islandDataText');if(!panel||!txt)return;
+ txt.value=JSON.stringify(islandStudioSavedData(),null,2);panel.hidden=false;$('islandModeChooser')?.classList.add('hidden');
+}
 function islandStudioNew(){islandStudio.islands.push({id:'island_'+Date.now().toString(36),rects:[]});islandStudio.index=islandStudio.islands.length-1;islandStudioSave()}
 async function islandStudioAdd(){if(islandStudio.index<0)islandStudioNew();if(!islandStudio.sel)return;islandStudio.islands[islandStudio.index].rects.push({...islandStudio.sel});islandStudioSave();await islandStudioBuildTemplate(false);islandStudioSetTab('template')}
 function islandStudioCycle(d){if(!islandStudio.islands.length)return;islandStudio.index=(islandStudio.index+d+islandStudio.islands.length)%islandStudio.islands.length;islandStudioStatus()}
@@ -308,7 +316,7 @@ function bindIslandStudioUi(){
  const root=$('islandStudio');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
  root.addEventListener('click',async e=>{
    const t=e.target.closest('button,[data-islandtab],[data-ih]');if(!t)return;
-   if(t.id==='islandStudioClose'){root.classList.remove('open');return}if(t.id==='islandChoosePrepare'){$('islandModeChooser')?.classList.add('hidden');islandWizardSet(islandStudio.islands.some(a=>a.rects?.length)?2:1);return}if(t.id==='islandChooseRepair'){const file=$('islandStudioFile');if(!file)return toast('Import seçici bulunamadı');file.dataset.repairLaunch='1';file.click();return}if(t.id==='islandWizardBack'){islandWizardBack();return}if(t.id==='islandWizardNext'){await islandWizardNext();return}
+   if(t.id==='islandStudioClose'){root.classList.remove('open');return}if(t.id==='islandChooseData'){islandStudioShowData();return}if(t.id==='islandDataClose'){$('islandDataPanel').hidden=true;$('islandModeChooser')?.classList.remove('hidden');return}if(t.id==='islandDataCopy'){const txt=$('islandDataText')?.value||'';try{await navigator.clipboard.writeText(txt);toast('Ada verisi kopyalandı')}catch(_){$('islandDataText')?.select?.();toast('Metni seçtim · kopyalayabilirsin')}return}if(t.id==='islandChoosePrepare'){$('islandModeChooser')?.classList.add('hidden');islandWizardSet(islandStudio.islands.some(a=>a.rects?.length)?2:1);return}if(t.id==='islandChooseRepair'){const file=$('islandStudioFile');if(!file)return toast('Import seçici bulunamadı');file.dataset.repairLaunch='1';file.click();return}if(t.id==='islandWizardBack'){islandWizardBack();return}if(t.id==='islandWizardNext'){await islandWizardNext();return}
    if(t.dataset.islandtab){islandStudioSetTab(t.dataset.islandtab);return}
    if(t.dataset.ih){islandStudioSetHandle(t.dataset.ih);e.stopPropagation();return}
    if(t.id==='islandStudioNew'){islandStudioNew();return}
