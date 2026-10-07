@@ -1,6 +1,6 @@
 # Mineclonia Texture Studio — Prompt Authoring Guide
 
-Updated: 2026-10-06
+Updated: 2026-10-07
 Purpose: persistent instruction for future sessions that prepare AI texture-edit prompts for this project.
 
 This document is about **prompt authoring only**. It does not define application architecture or 3D preview work.
@@ -185,26 +185,47 @@ Species identity may affect:
 
 ## Mineclonia material-reference dependencies
 
-Some textures must visually inherit a material from another Mineclonia texture. These relationships must be established from Mineclonia's own runtime/source definitions, not inferred from Minecraft naming or Minecraft asset structure.
+Some textures depend on an already-finished parent/host material. Verify every dependency from Mineclonia runtime/source; do not infer it only from Minecraft naming.
 
-When a dependency is verified:
+### Locked Parent Material workflow
 
-1. generate/finish the authoritative base or host material first;
-2. use that finished Mineclonia texture while generating the target texture's **reference image**;
-3. use the dependency-aware reference image as Image B for the target's final production pass;
-4. keep Image A authoritative for the target's own geometry, gameplay function, mask, face role and layout.
+When the target must literally retain another finished texture as its substrate/background, the parent is **not merely a style reference**. It is a locked canonical material.
 
-The referenced texture controls only the physically shared material language: host/base material identity, scale, microstructure, roughness, weathering and value behavior. It must not overwrite the target's distinct functional structure.
+Use a two-stage workflow:
 
-Current verified families include:
-- `mcl_core_grass_block_side_overlay.png` → `mcl_core_grass_block_top.png` for grass material continuity; Mineclonia composites the side overlay over dirt and applies grass palette tinting.
-- Mineclonia stone ore textures (`mcl_core_*_ore.png`) → `default_stone.png` as host-rock appearance where source definitions register them as stone-with-ore nodes.
-- `mcl_copper_ore.png` → `default_stone.png`; Mineclonia explicitly composes this at runtime as `default_stone.png ^ mcl_copper_ore.png`.
-- `mcl_deepslate_*_ore.png` → `mcl_deepslate_deepslate.png`; these are created by Mineclonia's deepslate-ore registration path.
-- Nether quartz/gold ore → Mineclonia netherrack where the corresponding catalog texture exists.
+1. **Derived reference pass — Parent → target reference**
+   - Input the finished canonical parent material alone, for example the finished Stone.
+   - Preserve that parent exactly everywhere unaffected by the new embedded material.
+   - Creatively imagine the target material forming inside, through, or on that exact parent.
+   - The added material may be bold and materially rich: substantial veins, pockets, clusters, fractures, cavities, branching deposits, broken boundaries, depth, displacement and local geological interaction are allowed.
+   - Do not make the addition timid merely because the parent is locked.
+   - Local parent pixels may change where direct physical interaction with the added material requires it.
+   - Outside those local interaction regions, do not regenerate, reinterpret, recolor, relight, rearrange, weather or replace the parent.
 
-Do not add a dependency merely because Minecraft has the same relationship. Verify the Mineclonia texture name and Mineclonia runtime/source usage first. Lua/runtime composition is authoritative when it conflicts with filename or visual intuition.
+2. **Production pass — Original target + derived reference**
+   - **Image A** = original Mineclonia target texture. It controls target gameplay structure: distribution, frequency/coverage, recognizable placement, broad spatial organization, functional identity and tile behavior.
+   - **Image B** = derived reference from stage 1. It contains the locked canonical parent plus the desired appearance of the added material.
+   - Preserve the canonical parent from Image B unchanged wherever Image A does not call for the target material.
+   - Transfer the added-material language from Image B into the target regions structurally indicated by Image A.
+   - Do not generate a merely similar parent/background.
 
+The governing distinction is:
+
+**Parent material = globally locked. Added/dependent material = creatively unconstrained locally.**
+
+For ore-like assets this means the ore may substantially replace, break, or interact with stone locally, while untouched stone must remain the actual canonical Stone rather than a newly generated stone in the same family.
+
+If prompt-only generation cannot preserve the parent closely enough, prefer mask/compositing or another structural application method instead of weakening the locked-parent requirement.
+
+### Verified dependency families
+
+- mcl_core_grass_block_side_overlay.png → mcl_core_grass_block_top.png for grass material continuity. This does not automatically imply pixel-locked parent behavior.
+- Mineclonia stone ore textures → default_stone.png as host rock where source definitions register them as stone-with-ore nodes. These are candidates for **Locked Parent Material** when the pack requires the finished Stone substrate to remain literally consistent.
+- mcl_copper_ore.png → default_stone.png; respect Mineclonia explicit runtime composition semantics.
+- mcl_deepslate ore textures → mcl_deepslate_deepslate.png through the deepslate-ore registration path.
+- Nether quartz/gold ore → Mineclonia netherrack where the catalog texture and runtime relationship are verified.
+
+Do not add a dependency merely because Minecraft has the same relationship. Mineclonia Lua/runtime composition is authoritative.
 
 ## Runtime tint / grayscale mask rule
 
