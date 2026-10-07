@@ -153,12 +153,32 @@ function islandComponents(mask,w,h,roi){
  return out
 }
 function islandDetectObject(src,p,map){
- const sx=src.width/(map.sheetW||src.width),sy=src.height/(map.sheetH||src.height),ex=(p.dst.x+p.dst.w/2)*sx,ey=(p.dst.y+p.dst.h/2)*sy,ew=Math.max(2,p.dst.w*sx),eh=Math.max(2,p.dst.h*sy);
- const roi={x:ex-ew*1.6,y:ey-eh*1.6,w:ew*3.2,h:eh*3.2},mask=islandForegroundMask(src),comps=islandComponents(mask,src.width,src.height,roi);
- let best=null,bestScore=1e9;const targetAR=p.src.w/Math.max(1,p.src.h),targetArea=ew*eh;
- for(const o of comps){const ar=o.w/Math.max(1,o.h),dist=Math.hypot((o.cx-ex)/Math.max(ew,1),(o.cy-ey)/Math.max(eh,1)),arErr=Math.abs(Math.log(Math.max(.05,ar)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea)));const score=dist*.9+arErr*1.8+areaErr*.55;if(score<bestScore){bestScore=score;best=o}}
- return best&&bestScore<4.2?{...best,score:bestScore}:null
+ const sx=src.width/(map.sheetW||src.width),sy=src.height/(map.sheetH||src.height),mask=islandForegroundMask(src);
+ const ex=(p.dst.x+p.dst.w/2)*sx,ey=(p.dst.y+p.dst.h/2)*sy,ew=Math.max(2,p.dst.w*sx),eh=Math.max(2,p.dst.h*sy);
+ // Broad search: generation can shift/scale an island substantially.
+ const roi={x:ex-ew*2.2,y:ey-eh*2.2,w:ew*4.4,h:eh*4.4},comps=islandComponents(mask,src.width,src.height,roi);
+ if(!comps.length)return null;
+ // Each manually selected sub-rect is an expected sub-object/region. Match independently,
+ // then union the matches so disconnected nose/eye/etc pieces remain part of one island.
+ const chosen=[],used=new Set(),rects=p.rects?.length?p.rects:[{x:p.src.x,y:p.src.y,w:p.src.w,h:p.src.h}];
+ for(const rr of rects){
+   const relX=(rr.x-p.src.x)/Math.max(1,p.src.w),relY=(rr.y-p.src.y)/Math.max(1,p.src.h),relW=rr.w/Math.max(1,p.src.w),relH=rr.h/Math.max(1,p.src.h);
+   const rx=(p.dst.x+relX*p.dst.w)*sx,ry=(p.dst.y+relY*p.dst.h)*sy,rw=Math.max(2,relW*p.dst.w*sx),rh=Math.max(2,relH*p.dst.h*sy),rcx=rx+rw/2,rcy=ry+rh/2,targetAR=rw/rh,targetArea=rw*rh;
+   let best=-1,bestScore=1e9;
+   for(let i=0;i<comps.length;i++){if(used.has(i))continue;const o=comps[i],dist=Math.hypot((o.cx-rcx)/Math.max(rw,1),(o.cy-rcy)/Math.max(rh,1)),arErr=Math.abs(Math.log(Math.max(.05,o.w/o.h)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea)));const score=dist*.75+arErr*1.15+areaErr*.35;if(score<bestScore){bestScore=score;best=i}}
+   if(best>=0&&bestScore<6.5){used.add(best);chosen.push(comps[best])}
+ }
+ // Also absorb small components lying inside/near the union envelope. AI often disconnects thin bridges.
+ if(!chosen.length){
+   const targetAR=p.src.w/Math.max(1,p.src.h),targetArea=ew*eh;let best=null,score0=1e9;
+   for(const o of comps){const dist=Math.hypot((o.cx-ex)/Math.max(ew,1),(o.cy-ey)/Math.max(eh,1)),arErr=Math.abs(Math.log(Math.max(.05,o.w/o.h)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea))),score=dist*.75+arErr*1.15+areaErr*.35;if(score<score0){score0=score;best=o}}if(best)chosen.push(best)
+ }
+ if(!chosen.length)return null;
+ let x0=Math.min(...chosen.map(o=>o.x)),y0=Math.min(...chosen.map(o=>o.y)),x1=Math.max(...chosen.map(o=>o.x+o.w)),y1=Math.max(...chosen.map(o=>o.y+o.h));
+ for(const o of comps){if(chosen.includes(o))continue;const padX=(x1-x0)*.35,padY=(y1-y0)*.35;if(o.cx>=x0-padX&&o.cx<=x1+padX&&o.cy>=y0-padY&&o.cy<=y1+padY&&o.count<=Math.max(...chosen.map(x=>x.count))*1.2){chosen.push(o);x0=Math.min(x0,o.x);y0=Math.min(y0,o.y);x1=Math.max(x1,o.x+o.w);y1=Math.max(y1,o.y+o.h)}}
+ return{x:x0,y:y0,w:x1-x0,h:y1-y0,count:chosen.reduce((s,o)=>s+o.count,0),components:chosen.length}
 }
+
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
