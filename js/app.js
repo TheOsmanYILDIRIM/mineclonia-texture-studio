@@ -749,19 +749,37 @@ async function prepareVariantTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
  out=await normalizeTextureBlob(out,meta,targetRes);
  return out
 }
+async function removeConnectedBlackBackground(blob){
+ const c=await decodeBlobToCanvas(blob),w=c.width,h=c.height,g=c.getContext('2d',{willReadFrequently:true}),im=g.getImageData(0,0,w,h),d=im.data,n=w*h;
+ let hasTransparency=false;for(let i=3;i<d.length;i+=4)if(d[i]<245){hasTransparency=true;break}
+ if(hasTransparency)return blob;
+ const lum=i=>{const k=i*4;return Math.max(d[k],d[k+1],d[k+2])};
+ const seed=[];for(let x=0;x<w;x++){seed.push(x,(h-1)*w+x)}for(let y=1;y<h-1;y++){seed.push(y*w,y*w+w-1)}
+ const borderVals=seed.map(lum).sort((a,b)=>a-b),med=borderVals[Math.floor(borderVals.length/2)]||0;
+ if(med>42)return blob;
+ const hard=Math.min(58,Math.max(18,med+28)),soft=Math.min(92,hard+28),seen=new Uint8Array(n),q=new Int32Array(n);let head=0,tail=0;
+ const add=i=>{if(i<0||i>=n||seen[i]||lum(i)>soft)return;seen[i]=1;q[tail++]=i};
+ for(const i of seed)add(i);
+ while(head<tail){const p=q[head++],x=p%w,y=(p/w)|0;if(x)add(p-1);if(x<w-1)add(p+1);if(y)add(p-w);if(y<h-1)add(p+w)}
+ if(tail<n*.005)return blob;
+ for(let i=0;i<n;i++)if(seen[i]){
+   const v=lum(i),k=i*4;
+   if(v<=hard)d[k+3]=0;
+   else d[k+3]=Math.round(255*(v-hard)/Math.max(1,soft-hard));
+   if(d[k+3]===0)d[k]=d[k+1]=d[k+2]=0;
+ }
+ g.putImageData(im,0,0);return await canvasPngBlob(c)
+}
 async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
- let out=await autoRemoveBorderBlackBackground(blob,meta);
+ let out=await removeConnectedBlackBackground(blob);
  out=await normalizeTextureBlob(out,meta,targetRes);
- if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
  return out
 }
 async function prepareStoredEditBlob(blob,meta){
- let out=await autoRemoveBorderBlackBackground(blob,meta);
- if(meta&&assetTypeOf(meta)==='Entity')out=await lockEntityAlphaToSource(out,meta);
- return out
+ return await removeConnectedBlackBackground(blob)
 }
 async function imageBlobTransform(blob, offset=false){return await new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.imageSmoothingEnabled=false;if(!offset){g.drawImage(im,0,0)}else{const w=c.width,h=c.height,dx=Math.floor(w/2),dy=Math.floor(h/2);g.drawImage(im, dx,dy);g.drawImage(im,dx-w,dy);g.drawImage(im,dx,dy-h);g.drawImage(im,dx-w,dy-h)}c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(Error('PNG oluşturulamadı'))},'image/png')};im.onerror=()=>rej(Error('PNG okunamadı'));im.src=u})}
-async function importPng(file,seam=false){if(!active||!file)return;toast(assetTypeOf(active)==='Entity'?'UV maskesi kaynaktan kilitleniyor…':'Yüksek kaliteli küçültme…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+(assetTypeOf(active)==='Entity'?' · kaynak alpha kilitli':' · '+TARGET_RESOLUTION+'px Lanczos-3 kaydedildi'));await openDetail(active);await applyFilter();setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
+async function importPng(file,seam=false){if(!active||!file)return;toast('PNG hazırlanıyor · siyah arka plan varsa temizleniyor…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+' · kendi yüksek çözünürlüklü silüeti korundu');await openDetail(active);await applyFilter();setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
 async function blobsEqual(a,b){
  if(!a||!b||a.size!==b.size)return false;
  const [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]);
