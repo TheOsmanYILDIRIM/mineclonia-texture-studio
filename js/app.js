@@ -613,10 +613,11 @@ function renderActivePrompt(){
  const p=promptFor(active,'classic');
  $('promptFamily').textContent=(p.label||p.family||'Prompt')+(p.source?' · '+p.source:'');
  $('promptText').value=p.text;
- const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isP0=active.priority==='P0'&&!isUv;
+ const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isItem=isAuthoredItemTexture(active),isP0=active.priority==='P0'&&!isUv&&!isItem;
  $('normalPromptBtns').style.display=isUv?'none':'';
  $('mobPromptBtns').classList.toggle('show',isUv);
  if(isUv){$('promptFamily').textContent=isArmor?'Armor · 3 aşamalı UV üretimi':'Mobs · 3 aşamalı UV üretimi';$('mobRefPrompt').textContent=isArmor?'2 · Armor Ref':'2 · Creature Ref';}
+ if(isItem){$('promptFamily').textContent='Item · 2 aşamalı üretim';$('copyPrompt').textContent='1 · Creative';$('savePrompt').textContent='2 · A+B Correction';$('promptText').style.display='none';$('singlePromptJson').style.display='none';$('savePrompt').disabled=false;$('savePrompt').title='Image A = original · Image B = creative result';return;}
  $('copyPrompt').textContent=isP0?'Ref prompt':'Kopyala';
  $('savePrompt').textContent=isP0?'Üretim prompt':'Promptu kaydet';
  $('promptText').style.display=isP0?'none':'';
@@ -1083,6 +1084,22 @@ function p0ReferenceSubject(x){
 const BLOCK_PROMPT_MANIFEST_URL='prompts/blocks/manifest.json';
 const BLOCK_REFERENCE_PROMPTS=new Map();
 const AUTHORED_UV_REFS=new Map();
+const ITEM_TWO_PASS_PROMPTS=new Map();
+const ITEM_PROMPT_PATHS=new Set();
+async function loadItemTwoPassPrompts(){
+ try{
+  const r=await fetch('prompts/items/manifest.json',{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
+  const manifest=await r.json();
+  for(const e of (manifest.entries||[]))if(e.status==='done')ITEM_PROMPT_PATHS.add(e.texture_path);
+  const files=[...new Set((manifest.batches||[]).map(b=>b.file).filter(Boolean))];
+  const batches=await Promise.all(files.map(async file=>{const q=await fetch(file,{cache:'force-cache'});return q.ok?q.json():null}));
+  for(const b of batches)for(const row of Object.values(b?.prompts||{}))if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
+  console.info('Item two-pass prompts loaded:',ITEM_TWO_PASS_PROMPTS.size);
+ }catch(err){console.warn('Item prompt manifest unavailable',err)}
+}
+const ITEM_PROMPTS_READY=loadItemTwoPassPrompts();
+function isAuthoredItemTexture(x){return !!(x&&(ITEM_TWO_PASS_PROMPTS.has(x.id)||ITEM_PROMPT_PATHS.has(x.path)))}
+async function copyItemPrompt(kind){if(!active)return;await ITEM_PROMPTS_READY;const row=ITEM_TWO_PASS_PROMPTS.get(active.id);if(!row)return toast('Item promptu henüz yüklenmedi');const t=kind==='creative'?row.creative_prompt:row.correction_prompt;try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast(kind==='creative'?'Creative prompt kopyalandı':'A+B correction promptu kopyalandı')}
 async function loadAuthoredReferenceSet(kind,manifestUrl){
  try{
   const r=await fetch(manifestUrl,{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
