@@ -151,5 +151,5 @@ expect(preview3dSource.includes('if(fromLua)return fromLua'), '3D must prefer Lu
 const analyzerSource = fs.readFileSync(new URL('../scripts/analyze-assets.mjs', import.meta.url), 'utf8');
 expect(!/prompted|hasPrompt|changedPaths|edited|verification|indexedDB|localStorage/.test(analyzerSource.replace(/\/\/.*$/gm,'')), 'static asset analyzer must not encode prompt/edit/browser state');
 expect(appSource.includes('function hasAuthoredPrompt(x)'), 'prompted status must remain a separate runtime prompt-store concern');
-expect(appSource.includes('changedPaths.has(x.path)'), 'changed status must remain a separate runtime edit-store concern');
-expect(appSource.includes("indexedDB.open(DB,1)"), 'existing IndexedDB v1 records must remain readable without a tag migration');
+expect(appSource.includes('changedPathsFast.has(x.path)'), 'changed status must remain a separate runtime edit-store concern');
+expect(appSource.includes("EDIT_DB_VERSION=1") && appSource.includes("indexedDB.open(DB,EDIT_DB_VERSION)"), 'existing IndexedDB v1 records must remain readable without a migration');
