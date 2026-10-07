@@ -1,4 +1,11 @@
 
+## Pages update/cache path (2026-10-07)
+- Normal Chrome profile was confirmed capable of retaining stale `index.html` while Incognito showed the new Pages deployment.
+- Canonical update system is now: deploy stamps SHA/time into `js/build-status.js`, fingerprints JS/CSS with the deploy SHA, publishes `latest.html`, and the in-app update checker probes the actually deployed build with `cache: no-store`.
+- A ready update navigates to `latest.html?build=<full-sha>&_=<timestamp>` rather than repeatedly reloading cached `index.html`.
+- This refresh must preserve IndexedDB/localStorage edits/textures. Do not add storage clearing to cache refresh.
+
+
 ## Front-end modularization (2026-10-06)
 - Repository invariant is now documented in `AGENTS.md`: substantial independent screens/editors/labs must use isolated JS + CSS modules; optional feature failure must not block core catalog boot.
 - Island Studio: `js/island-studio.js` + `css/island-studio.css`.
