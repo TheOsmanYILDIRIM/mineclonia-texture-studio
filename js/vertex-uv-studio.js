@@ -13,6 +13,34 @@ function targetWorkRect(c=S.targetComp){if(!c)return null;const sx=S.work.width/
 function compContains(c,a,x,y){if(!c||!a||x<c.bbox.x||x>=c.bbox.x+c.bbox.w||y<c.bbox.y||y>=c.bbox.y+c.bbox.h)return false;const p=y*a.w+x;if(!a.mask[p])return false;const ry=y-c.bbox.y;if(ry<0||ry>=c.rowL.length)return false;const l=c.rowL[ry],r=c.rowR[ry];return l!==2147483647&&r>=0&&x>=l&&x<=r}
 function compAt(a,x,y,used=new Set()){const hits=(a?.components||[]).filter(c=>!c.disabled&&!used.has(c.id)&&x>=c.bbox.x&&x<c.bbox.x+c.bbox.w&&y>=c.bbox.y&&y<c.bbox.y+c.bbox.h&&compContains(c,a,Math.floor(x),Math.floor(y))).sort((a,b)=>a.area-b.area);if(hits.length)return hits[0];let best=null,bd=Infinity;for(const c of a?.components||[]){if(c.disabled||used.has(c.id))continue;const dx=x-c.cx,dy=y-c.cy,d=dx*dx+dy*dy;if(d<bd){bd=d;best=c}}return Math.sqrt(bd)<Math.max(8,Math.min(a.w,a.h)*.08)?best:null}
 function componentFromRect(a,rect,prefix,seq){let x0=Math.max(0,Math.floor(rect.x)),y0=Math.max(0,Math.floor(rect.y)),x1=Math.min(a.w,Math.ceil(rect.x+rect.w)),y1=Math.min(a.h,Math.ceil(rect.y+rect.h));let minX=a.w,minY=a.h,maxX=-1,maxY=-1,area=0,sx=0,sy=0;for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(a.mask[y*a.w+x]){area++;sx+=x;sy+=y;minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y)}if(area<2)return null;const h=maxY-minY+1,rowL=new Int32Array(h),rowR=new Int32Array(h);rowL.fill(2147483647);rowR.fill(-1);for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(a.mask[y*a.w+x]&&x>=x0&&x<x1&&y>=y0&&y<y1){const ry=y-minY;if(x<rowL[ry])rowL[ry]=x;if(x>rowR[ry])rowR[ry]=x}const id=Math.max(-1,...a.components.map(c=>Number(c.id)||0))+1;const c={id,bbox:{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1},area,cx:sx/area,cy:sy/area,rowL,rowR,boundary:[],manual:true,label:prefix+'M'+seq};for(const p of a.components){if(p.manual||p.disabled)continue;const ix=Math.max(0,Math.min(p.bbox.x+p.bbox.w,x1)-Math.max(p.bbox.x,x0)),iy=Math.max(0,Math.min(p.bbox.y+p.bbox.h,y1)-Math.max(p.bbox.y,y0));if(ix*iy>0)p.disabled=true}a.components.push(c);return c}
+function slotComponent(a,rect,label,slotId){
+ const x0=Math.max(0,Math.floor(rect.x)),y0=Math.max(0,Math.floor(rect.y)),x1=Math.min(a.w,Math.ceil(rect.x+rect.w)),y1=Math.min(a.h,Math.ceil(rect.y+rect.h));
+ let minX=a.w,minY=a.h,maxX=-1,maxY=-1,area=0,sx=0,sy=0;
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(a.mask[y*a.w+x]){area++;sx+=x;sy+=y;minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y)}
+ if(area<2)return null;
+ const h=maxY-minY+1,rowL=new Int32Array(h),rowR=new Int32Array(h);rowL.fill(2147483647);rowR.fill(-1);const boundary=[];
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+   if(x<x0||x>=x1||y<y0||y>=y1||!a.mask[y*a.w+x])continue;
+   const ry=y-minY;if(x<rowL[ry])rowL[ry]=x;if(x>rowR[ry])rowR[ry]=x;
+   const edge=x===x0||x===x1-1||y===y0||y===y1-1||!a.mask[y*a.w+x-1]||!a.mask[y*a.w+x+1]||!a.mask[(y-1)*a.w+x]||!a.mask[(y+1)*a.w+x];
+   if(edge)boundary.push({x,y});
+ }
+ return{id:slotId,bbox:{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1},area,cx:sx/area,cy:sy/area,rowL,rowR,boundary,manual:false,slotScoped:true,label,slotId};
+}
+function applyIslandSlotComponents(){
+ if(!S.islandSheetMode||!S.islandMap?.slots?.length||!S.sourceAnalysis||!S.targetAnalysis)return;
+ const map=S.islandMap,srcSX=S.sourceAnalysis.w/Math.max(1,map.sheetW),srcSY=S.sourceAnalysis.h/Math.max(1,map.sheetH),tarSX=S.targetAnalysis.w/Math.max(1,map.sheetW),tarSY=S.targetAnalysis.h/Math.max(1,map.sheetH);
+ const src=[],tar=[];
+ for(const slot of map.slots){
+   const sr={x:slot.cell.x*srcSX,y:slot.cell.y*srcSY,w:slot.cell.w*srcSX,h:slot.cell.h*srcSY};
+   const tr={x:slot.cell.x*tarSX,y:slot.cell.y*tarSY,w:slot.cell.w*tarSX,h:slot.cell.h*tarSY};
+   const sc=slotComponent(S.sourceAnalysis,sr,'Ü'+(slot.slotId+1),slot.slotId);
+   const tc=slotComponent(S.targetAnalysis,tr,'O'+(slot.slotId+1),slot.slotId);
+   if(sc)src.push(sc);if(tc)tar.push(tc);
+ }
+ S.sourceAnalysis.components=src;S.targetAnalysis.components=tar;
+ status(`Slot tabanlı: Orijinal ${tar.length} ada · Üretilen ${src.length} ada`);
+}
 function cropSource(){const c=S.sourceComp;if(!c)return null;const src=S.sourceAtlas||S.work,out=document.createElement('canvas');out.width=c.bbox.w;out.height=c.bbox.h;const g=out.getContext('2d',{willReadFrequently:true});g.drawImage(src,c.bbox.x,c.bbox.y,c.bbox.w,c.bbox.h,0,0,c.bbox.w,c.bbox.h);const im=g.getImageData(0,0,out.width,out.height),d=im.data;for(let y=0;y<out.height;y++)for(let x=0;x<out.width;x++){const gx=c.bbox.x+x,gy=c.bbox.y+y;if(!compContains(c,S.sourceAnalysis,gx,gy))d[(y*out.width+x)*4+3]=0}g.putImageData(im,0,0);return out}
 function clearComponent(canvas,c,a,target=false){if(!canvas||!c||!a)return;const g=canvas.getContext('2d',{willReadFrequently:true}),sx=target?canvas.width/a.w:1,sy=target?canvas.height/a.h:1,x0=Math.max(0,Math.floor(c.bbox.x*sx)),y0=Math.max(0,Math.floor(c.bbox.y*sy)),x1=Math.min(canvas.width,Math.ceil((c.bbox.x+c.bbox.w)*sx)),y1=Math.min(canvas.height,Math.ceil((c.bbox.y+c.bbox.h)*sy)),im=g.getImageData(x0,y0,x1-x0,y1-y0),d=im.data;for(let y=0;y<im.height;y++)for(let x=0;x<im.width;x++){const wx=x0+x,wy=y0+y,ax=target?Math.min(a.w-1,Math.floor(wx/sx)):wx,ay=target?Math.min(a.h-1,Math.floor(wy/sy)):wy;if(compContains(c,a,ax,ay))d[(y*im.width+x)*4+3]=0}g.putImageData(im,x0,y0)}
 function buildTargetMaskWork(){if(!S.targetComp)return null;const out=document.createElement('canvas');out.width=S.work.width;out.height=S.work.height;const tr=targetWorkRect(),x0=Math.max(0,Math.floor(tr.x)),y0=Math.max(0,Math.floor(tr.y)),x1=Math.min(out.width,Math.ceil(tr.x+tr.w)),y1=Math.min(out.height,Math.ceil(tr.y+tr.h)),g=out.getContext('2d',{willReadFrequently:true}),im=g.createImageData(x1-x0,y1-y0),d=im.data;for(let y=0;y<im.height;y++)for(let x=0;x<im.width;x++){const wx=x0+x,wy=y0+y,ox=Math.max(0,Math.min(S.orig.width-1,Math.floor(wx/S.work.width*S.orig.width))),oy=Math.max(0,Math.min(S.orig.height-1,Math.floor(wy/S.work.height*S.orig.height)));if(compContains(S.targetComp,S.targetAnalysis,ox,oy))d[(y*im.width+x)*4+3]=255}g.putImageData(im,x0,y0);return out}
@@ -101,7 +129,7 @@ function applyPart(){if(!S.mesh||!S.sourceComp||!S.targetComp)return toast('Önc
 function beginManualIsland(kind){S.addIslandMode=kind;S.pick=null;S.rectStart=null;S.rectPreview=null;S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.selectedNode=null;render();toast(kind==='source'?'Kaynak adanın çevresine dikdörtgen çiz':'Hedef adanın çevresine dikdörtgen çiz')}
 function rectNorm(a,b){return{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),w:Math.abs(a.x-b.x),h:Math.abs(a.y-b.y)}}
 function finishManualIsland(){if(!S.addIslandMode||!S.rectPreview)return;const kind=S.addIslandMode,r=S.rectPreview,a=kind==='source'?S.sourceAnalysis:S.targetAnalysis,ar=kind==='source'?r:{x:r.x/S.work.width*S.orig.width,y:r.y/S.work.height*S.orig.height,w:r.w/S.work.width*S.orig.width,h:r.h/S.work.height*S.orig.height};S.addIslandMode=null;S.rectStart=null;S.rectPreview=null;if(ar.w<1||ar.h<1){render();return toast('Ada seçimi çok küçük')}if(kind==='source'){const c=componentFromRect(a,ar,'Ü',++S.manualSourceSeq);if(!c){render();return toast('Bu alanda source foreground bulunamadı')}S.sourceComp=c;S.pick='target';status(`${c.label} manuel ada oluşturuldu · hedefini seç`);toast('Manuel source ada hazır · şimdi orijinal hedefe dokun')}else{const c=componentFromRect(a,ar,'O',++S.manualTargetSeq);if(!c){render();return toast('Bu alanda target foreground bulunamadı')}S.targetComp=c;S.pick=null;if(S.sourceComp)makeMesh(true);status(`${c.label} manuel hedef ada oluşturuldu · otomatik oturtuldu`);toast('Manuel target ada hazır · otomatik üst üste getirildi')}render()}
-function resetIslands(){S.work=cloneCanvas(S.sourceAtlas);S.pairs=[];S.usedSource=new Set();S.usedTarget=new Set();S.manualSourceSeq=0;S.manualTargetSeq=0;S.sourceComp=null;S.targetComp=null;S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.selectedNode=null;S.pick='source';S.workHistory=[];S.workRedo=[];analyze();render();status('Ada tespiti ve eşleşmeler sıfırlandı')}
+function resetIslands(){S.work=cloneCanvas(S.sourceAtlas);S.pairs=[];S.usedSource=new Set();S.usedTarget=new Set();S.manualSourceSeq=0;S.manualTargetSeq=0;S.sourceComp=null;S.targetComp=null;S.mesh=null;S.sourceCrop=null;S.meshBase=null;S.targetMaskWork=null;S.selectedNode=null;S.pick='source';S.workHistory=[];S.workRedo=[];analyze();if(S.islandSheetMode)applyIslandSlotComponents();render();status(S.islandSheetMode?'Slot tabanlı ada tespiti sıfırlandı':'Ada tespiti ve eşleşmeler sıfırlandı')}
 function fitStack(){const stage=$('vuvStage'),stack=$('vuvStack');if(!stage||!stack||!S.work)return;const sw=stage.clientWidth,sh=stage.clientHeight,ar=S.work.width/S.work.height;let w=sw,h=w/ar;if(h>sh){h=sh;w=h*ar}stack.style.width=w+'px';stack.style.height=h+'px';stack.style.left=((sw-w)/2)+'px';stack.style.top=((sh-h)/2)+'px'}
 function screenToWork(e){const stage=$('vuvStage'),stack=$('vuvStack'),r=stage.getBoundingClientRect(),bw=stack.offsetWidth,bh=stack.offsetHeight,lx=(e.clientX-r.left-stack.offsetLeft-S.panX)/S.zoom,ly=(e.clientY-r.top-stack.offsetTop-S.panY)/S.zoom;return{x:lx/bw*S.work.width,y:ly/bh*S.work.height}}
 function nearestNode(x,y){if(!S.mesh)return null;let best=null,bd=Infinity;const scale=$('vuvStack').offsetWidth/S.work.width*S.zoom,thr=28/Math.max(scale,.001);for(let r=0;r<=S.mesh.rows;r++)for(let c=0;c<=S.mesh.cols;c++){const p=S.mesh.points[r][c],d=Math.hypot(x-p.x,y-p.y);if(d<bd&&d<thr){bd=d;best={r,c,p}}}return best}
@@ -154,18 +182,10 @@ async function openIslandSheet(ctx){
    Object.assign(S,{meta:ctx.meta,rec:{name:'AI_IMPORT.png'},orig:targetSheet,sourceAtlas:cloneCanvas(sourceSheet),work:cloneCanvas(sourceSheet),sourceComp:null,targetComp:null,mesh:null,sourceCrop:null,meshBase:null,targetMaskWork:null,preview:null,selectedNode:null,mode:'vertex',pick:'source',grid:3,step:.25,ghost:.42,zoom:1,panX:0,panY:0,pointers:new Map(),pinch:0,drag:null,meshHistory:[],meshRedo:[],workHistory:[],workRedo:[],pairs:[],usedSource:new Set(),usedTarget:new Set(),manualSourceSeq:0,manualTargetSeq:0,addIslandMode:null,rectStart:null,rectPreview:null,wizardStep:1,islandSheetMode:true,islandMap:ctx.map});
    $('vuvTitle').textContent=(ctx.meta?.name||'Entity')+' · Ayrılmış Adalar';
    analyze();
-   // Slot konumlarına göre kaynak/hedef adalarını otomatik eşleştirilebilir hale getir.
-   const slots=ctx.map?.slots||[];
-   if(slots.length){
-     const sx=sourceSheet.width/Math.max(1,ctx.map.sheetW),sy=sourceSheet.height/Math.max(1,ctx.map.sheetH);
-     for(const slot of slots){
-       const cx=(slot.cell.x+slot.cell.w/2)*sx,cy=(slot.cell.y+slot.cell.h/2)*sy;
-       const tx=slot.content.x+slot.content.w/2,ty=slot.content.y+slot.content.h/2;
-       const sc=compAt(S.sourceAnalysis,cx,cy,new Set());
-       const tc=compAt(S.targetAnalysis,tx,ty,new Set());
-       if(sc)sc.slotId=slot.slotId;if(tc)tc.slotId=slot.slotId;
-     }
-   }
+   // Export already defines the island identity. In island-sheet mode never let
+   // global connected-component detection redefine those objects: each saved
+   // slot is exactly one logical source/target island.
+   applyIslandSlotComponents();
    setWizardStep(1);applyView();render();status('Export sheet referansı kullanılıyor · base UV değil');
    toast('Bir AI adası seç · aynı slotta orijinali otomatik eşleşecek');
  }catch(e){console.error(e);status('Açılış hatası: '+e.message);toast('Ada obje editörü açılamadı')}
