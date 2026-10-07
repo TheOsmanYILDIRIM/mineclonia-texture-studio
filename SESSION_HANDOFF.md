@@ -3,10 +3,8 @@
 Branch: `main` · Production: GitHub Pages.
 
 ## Immediate next task — startup/performance
-User reports two long-standing startup issues that are now the next priority:
-1. Save/storage status often needs 3–4 page opens/reloads before it settles to the expected ready/saved state.
-2. Texture cards/images appear one-by-one slowly instead of the visible page becoming ready quickly.
-Do not clear or migrate user IndexedDB/localStorage while optimizing. Inspect `init()`, `bootstrapStorageInBackground()`, changed/edit hydration, `render()`, original/display blob loading and card URL creation. Goal: one-open deterministic storage readiness plus prioritized/batched visible texture loading. Measure/understand the boot path before patching.
+Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parallel thumbnail loading, and first paint no longer performs one IndexedDB lookup per card before persisted edits are hydrated. Relevant commits: `1bfd898`, `8575add`, `bb223d4`, publish/cache bump `0861bf8`.
+Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
 
 ## Island Studio — current canonical state
 - Dedicated files: `js/island-studio.js` + `css/island-studio.css`; opened from Entity detail next to Variant Lab.
