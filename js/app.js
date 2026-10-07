@@ -2111,9 +2111,15 @@ async function bootstrapStorageInBackground(){
       installPersistedEditFast(e,{markChanged:(e.verification||'unknown')==='changed'});
     }
     updateStatFast();
-    await applyFilter();
+    // Do not rebuild the whole grid after storage opens. installPersistedEditFast already
+    // patches visible cards in place; a second applyFilter caused the visible double-load.
     changedHydrationPromise=hydrateChangedPathsFast(edits)
-      .then(async result=>{await applyFilter();return result})
+      .then(async result=>{
+        updateStatFast();
+        // Only a filter whose membership depends on changed-state needs a full rerender.
+        if(changedOnly)await applyFilter();
+        return result
+      })
       .catch(err=>{console.warn('background changed-state hydration',err);return {complete:false,total:edits.length,same:0,failed:edits.length}});
   }catch(e){
     console.warn('storage bootstrap',e);
