@@ -16,7 +16,7 @@ function staticAssetTags(x){
  if(x.w!==x.h)t.add('non-square');if(x.w>16||x.h>16)t.add('atlas-or-hires');
  return [...t].sort();
 }
-const NODE_TAGS_READY=fetch('js/data/node-faces.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(j=>{
+const NODE_TAGS_READY=fetch('js/data/node-faces.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
  NODE_TAG_INDEX=new Map();
  for(const [node,def] of Object.entries(j?.nodes||{})){
   for(const expr of [...(def.textures||[]),...(def.overlays||[])]){
@@ -29,4 +29,4 @@ const NODE_TAGS_READY=fetch('js/data/node-faces.json',{cache:'force-cache'}).the
   }
  }
 }).catch(()=>{NODE_TAG_INDEX=new Map()});
-const CATALOG_READY=Promise.all([NODE_TAGS_READY,...CATALOG_TECH_FILES.map(async id=>{const r=await fetch('js/data/catalog/'+id+'.json',{cache:'force-cache'});if(!r.ok)throw new Error('catalog '+id+' '+r.status);return await r.json()})]).then(parts=>{const rows=parts.slice(1).flat();rows.sort((a,b)=>a[6]-b[6]);CATALOG=rows.map(r=>{const category=CATALOG_META.c[r[0]],mod=CATALOG_META.m[r[1]],priority=CATALOG_META.p[r[2]],name=r[8];return {path:category+'/'+mod+'/'+name,name,category,mod,priority,w:r[3],h:r[4],animated:!!r[5],rank:r[6],id:'tex_'+r[7],tags:staticAssetTags({category,mod,priority,w:r[3],h:r[4],animated:!!r[5],name})}});return CATALOG});
+const CATALOG_READY=Promise.all([NODE_TAGS_READY,...CATALOG_TECH_FILES.map(async id=>{const r=await fetch('js/data/catalog/'+id+'.json',{cache:'no-store'});if(!r.ok)throw new Error('catalog '+id+' '+r.status);return await r.json()})]).then(parts=>{const rows=parts.slice(1).flat();rows.sort((a,b)=>a[6]-b[6]);CATALOG=rows.map(r=>{const category=CATALOG_META.c[r[0]],mod=CATALOG_META.m[r[1]],priority=CATALOG_META.p[r[2]],name=r[8];return {path:category+'/'+mod+'/'+name,name,category,mod,priority,w:r[3],h:r[4],animated:!!r[5],rank:r[6],id:'tex_'+r[7],tags:staticAssetTags({category,mod,priority,w:r[3],h:r[4],animated:!!r[5],name})}});return CATALOG});
