@@ -156,7 +156,10 @@ function islandDetectObject(src,p,map){
  const sx=src.width/(map.sheetW||src.width),sy=src.height/(map.sheetH||src.height),ex=(p.dst.x+p.dst.w/2)*sx,ey=(p.dst.y+p.dst.h/2)*sy,ew=Math.max(2,p.dst.w*sx),eh=Math.max(2,p.dst.h*sy);
  const roi={x:ex-ew*1.6,y:ey-eh*1.6,w:ew*3.2,h:eh*3.2},mask=islandForegroundMask(src),comps=islandComponents(mask,src.width,src.height,roi);
  let best=null,bestScore=1e9;const targetAR=p.src.w/Math.max(1,p.src.h),targetArea=ew*eh;
- for(const o of comps){const ar=o.w/Math.max(1,o.h),dist=Math.hypot((o.cx-ex)/Math.max(ew,1),(o.cy-ey)/Math.max(eh,1)),arErr=Math.abs(Math.log(Math.max(.05,ar)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea)));const score=dist*.9+arErr*1.8+areaErr*.55;if(score<bestScore){bestScore=score;best=o}}
+ // Detached AI specks can be several output pixels even when they represent only a 1–2 px
+ // source artifact. Reject components that are tiny relative to THIS expected UV island.
+ const minObjectArea=Math.max(4,targetArea*.035);
+ for(const o of comps){if(o.count<minObjectArea)continue;const ar=o.w/Math.max(1,o.h),dist=Math.hypot((o.cx-ex)/Math.max(ew,1),(o.cy-ey)/Math.max(eh,1)),arErr=Math.abs(Math.log(Math.max(.05,ar)/Math.max(.05,targetAR))),areaErr=Math.abs(Math.log(Math.max(1,o.w*o.h)/Math.max(1,targetArea)));const score=dist*.9+arErr*1.8+areaErr*.55;if(score<bestScore){bestScore=score;best=o}}
  return best&&bestScore<4.2?{...best,score:bestScore}:null
 }
 
@@ -178,7 +181,12 @@ function islandContourFit(source,targetMask){
  const W=window.MTSUvWarp;if(!W?.analyze||!W?.analyzeWithMask||!W?.exactUvSnap)return source;
  try{
    const target=W.analyzeWithMask(targetMask,targetMask),src=W.analyze(source,{bgMode:'auto'});
-   const tc=target.components?.[0],sc=src.components?.[0];if(!tc?.boundary?.length||!sc?.boundary?.length)return W.exactUvSnap(source,targetMask).canvas;
+   const tc=target.components?.[0];
+   // Use the dominant generated component and ignore detached micro-specks for contour fitting.
+   // The target mask remains authoritative in the final exact snap.
+   const minSrcArea=Math.max(4,(tc?.area||source.width*source.height)*.035);
+   const sc=(src.components||[]).find(c=>c.area>=minSrcArea);
+   if(!tc?.boundary?.length||!sc?.boundary?.length)return W.exactUvSnap(source,targetMask).canvas;
    // Build dense target->source boundary constraints. Normalize by each component bbox first,
    // so corresponding corners/indentations remain comparable after rough X/Y scaling.
    const controls=[],tb=tc.bbox,sb=sc.bbox,tpts=tc.boundary,spts=sc.boundary,step=Math.max(1,Math.floor(tpts.length/96));
