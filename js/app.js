@@ -1204,7 +1204,7 @@ window.MTSIslandBridge={
  closeDetailSheet,
  ensurePreview3dLoaded:async()=>{if(window.MTSPreview3D)return window.MTSPreview3D;if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-variant3d1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});await preview3dLoadPromise;return window.MTSPreview3D}
 };
-const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target',islands:[],islandIndex:-1,islandTemplate:null,islandTemplateMap:null,islandMode:false};
+const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target',islands:[],islandIndex:-1,islandTemplate:null,islandTemplateMap:null,islandMode:false,objectPick:null,selectedSourceComp:null,selectedTargetComp:null,maskLock:true};
 
 function uvClampSel(s,w,h){s.x=Math.max(0,Math.min(w-1,s.x));s.y=Math.max(0,Math.min(h-1,s.y));s.w=Math.max(1,Math.min(w-s.x,s.w));s.h=Math.max(1,Math.min(h-s.y,s.h));return s}
 function uvDrawSelection(kind){const canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas'),el=$(kind==='orig'?'uvOrigSel':'uvGenSel'),s=uvMap[kind+'Sel'];if(!canvas||!s)return;const wrap=$('uvLiveWrap'),rx=wrap.clientWidth/canvas.width*uvMap.zoom,ry=wrap.clientHeight/canvas.height*uvMap.zoom;el.style.left=(uvMap.panX+s.x*rx)+'px';el.style.top=(uvMap.panY+s.y*ry)+'px';el.style.width=(s.w*rx)+'px';el.style.height=(s.h*ry)+'px'}
@@ -1216,9 +1216,40 @@ function uvSetZoom(z,cx=null,cy=null){const old=uvMap.zoom,nz=Math.max(1,Math.mi
 function uvFocusSelection(){const kind=uvMap.target,s=uvMap[kind+'Sel'],wrap=$('uvLiveWrap'),canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas');if(!s||!canvas)return;const z=Math.max(2,Math.min(8,Math.min(canvas.width/Math.max(1,s.w),canvas.height/Math.max(1,s.h))*.55));uvMap.zoom=z;const baseW=wrap.clientWidth,baseH=wrap.clientHeight,cx=(s.x+s.w/2)*baseW/canvas.width,cy=(s.y+s.h/2)*baseH/canvas.height;uvMap.panX=baseW/2-cx*z;uvMap.panY=baseH/2-cy*z;uvApplyTransform()}
 function uvRenderGlobal(){$('uvGlobalOffset').textContent='X '+uvMap.globalX+' · Y '+uvMap.globalY;uvApplyTransform()}
 function uvShiftGlobal(dx,dy){uvMap.globalX+=dx;uvMap.globalY+=dy;uvRenderGlobal()}
-function uvTransformStatus(){const a=uvMap.origSel,b=uvMap.genSel;if($('uvTransformMeta'))$('uvTransformMeta').textContent=a&&b?'Hedef '+a.w+'×'+a.h+' · Kaynak '+b.w+'×'+b.h:'Hedef ve kaynak alanını seç'}
+function uvTargetWorkRect(sel=uvMap.origSel){
+ if(!sel||!uvMap.orig||!uvMap.work)return null;
+ const sx=uvMap.work.width/Math.max(1,uvMap.orig.width),sy=uvMap.work.height/Math.max(1,uvMap.orig.height);
+ const x=Math.round(sel.x*sx),y=Math.round(sel.y*sy);
+ const x2=Math.round((sel.x+sel.w)*sx),y2=Math.round((sel.y+sel.h)*sy);
+ return {x,y,w:Math.max(1,x2-x),h:Math.max(1,y2-y),sx,sy}
+}
+function uvTransformStatus(){const a=uvMap.origSel,b=uvMap.genSel,wr=uvTargetWorkRect(a);if($('uvTransformMeta'))$('uvTransformMeta').textContent=a&&b&&wr?'Hedef '+a.w+'×'+a.h+' → '+wr.w+'×'+wr.h+' · Kaynak '+b.w+'×'+b.h:'Hedef ve kaynak alanını seç'}
 function uvResizeSource(dw,dh){const s=uvMap.genSel,c=$('uvGenCanvas');if(!s||!c)return;s.w=Math.max(1,Math.min(c.width-s.x,s.w+dw));s.h=Math.max(1,Math.min(c.height-s.y,s.h+dh));uvDrawSelection('gen');uvTransformStatus();uvStatus()}
-function uvApplyCurrentTransform(fit=false){if(!uvMap.origSel||!uvMap.genSel||!uvMap.work)return;const before=uvMap.work.getContext('2d').getImageData(0,0,uvMap.work.width,uvMap.work.height),p={orig:{...uvMap.origSel},gen:{...uvMap.genSel}},snap=document.createElement('canvas');snap.width=uvMap.work.width;snap.height=uvMap.work.height;snap.getContext('2d').putImageData(before,0,0);uvMap.history.push(before);const g=uvMap.work.getContext('2d');g.clearRect(p.orig.x,p.orig.y,p.orig.w,p.orig.h);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(snap,p.gen.x,p.gen.y,p.gen.w,p.gen.h,p.orig.x,p.orig.y,p.orig.w,p.orig.h);uvRenderWork();uvTransformStatus();uvStatus();toast(fit?'Parça hedef boyuta oturtuldu':'Parça canlı uygulandı')}
+function uvApplyTargetMask(g,rect,origSel){
+ if(!uvMap.orig||!uvMap.work||!rect||!origSel)return;
+ if(!uvMap.autoTarget)uvAnalyzeSmart();
+ const a=uvMap.autoTarget;if(!a?.mask)return;
+ const im=g.getImageData(rect.x,rect.y,rect.w,rect.h),d=im.data;
+ for(let y=0;y<rect.h;y++)for(let x=0;x<rect.w;x++){
+   const ox=Math.max(0,Math.min(a.w-1,Math.floor(origSel.x+(x+.5)*origSel.w/rect.w)));
+   const oy=Math.max(0,Math.min(a.h-1,Math.floor(origSel.y+(y+.5)*origSel.h/rect.h)));
+   d[(y*rect.w+x)*4+3]=a.mask[oy*a.w+ox]?255:0;
+ }
+ g.putImageData(im,rect.x,rect.y)
+}
+function uvApplyCurrentTransform(fit=false,lockMask=false){
+ if(!uvMap.origSel||!uvMap.genSel||!uvMap.work)return;
+ const before=uvMap.work.getContext('2d').getImageData(0,0,uvMap.work.width,uvMap.work.height),p={orig:{...uvMap.origSel},gen:{...uvMap.genSel}},dst=uvTargetWorkRect(p.orig);
+ if(!dst)return;
+ const snap=document.createElement('canvas');snap.width=uvMap.work.width;snap.height=uvMap.work.height;snap.getContext('2d').putImageData(before,0,0);
+ uvMap.history.push(before);
+ const g=uvMap.work.getContext('2d');g.clearRect(dst.x,dst.y,dst.w,dst.h);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ g.drawImage(snap,p.gen.x,p.gen.y,p.gen.w,p.gen.h,dst.x,dst.y,dst.w,dst.h);
+ if(lockMask)uvApplyTargetMask(g,dst,p.orig);
+ uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;
+ uvRenderWork();uvTransformStatus();uvStatus();uvRefreshContours();
+ toast(lockMask?'Parça hedefe oturtuldu · orijinal UV maskesi kilitlendi':fit?'Parça hedef boyuta oturtuldu':'Parça canlı uygulandı')
+}
 
 function uvRefreshContours(){
  const cv=$('uvContourCanvas');if(!cv||!uvMap.orig||!uvMap.work)return;
@@ -1243,15 +1274,53 @@ function uvManualLinkPick(e){
  }
  uvRefreshContours();return true
 }
+function uvComponentAt(analysis,e){
+ if(!analysis)return null;const p=uvAnalysisPoint(analysis,e);
+ const inside=(analysis.components||[]).filter(c=>p.x>=c.bbox.x&&p.x<c.bbox.x+c.bbox.w&&p.y>=c.bbox.y&&p.y<c.bbox.y+c.bbox.h).sort((a,b)=>a.area-b.area);
+ return inside[0]||window.MTSUvWarp?.nearest?.(analysis,p.x,p.y,null,Math.max(3,Math.min(analysis.w,analysis.h)*.08))||null
+}
+function uvUpdateObjectPickUi(){
+ const src=$('uvPickGenerated'),tar=$('uvPickOriginal'),meta=$('uvObjectMeta');
+ src?.classList.toggle('primary',uvMap.objectPick==='source');tar?.classList.toggle('primary',uvMap.objectPick==='target');
+ if(meta){
+   const s=uvMap.selectedSourceComp,t=uvMap.selectedTargetComp;
+   meta.textContent=(s?'Ü #'+(s.id+1)+' '+s.bbox.w+'×'+s.bbox.h:'Ü seçilmedi')+' · '+(t?'O #'+(t.id+1)+' '+t.bbox.w+'×'+t.bbox.h:'O seçilmedi')
+ }
+}
+function uvSetObjectPick(kind){
+ if(!uvMap.autoTarget||!uvMap.autoSource)if(!uvAnalyzeSmart())return;
+ uvMap.objectPick=uvMap.objectPick===kind?null:kind;uvMap.panMode=false;uvMap.manualLink=false;uvMap.excludeMode=false;
+ $('uvPanToggle')?.classList.remove('primary');$('uvLiveWrap')?.classList.remove('panMode');
+ uvSetView('overlay');uvUpdateObjectPickUi();uvRefreshContours();
+ if(uvMap.objectPick)toast(uvMap.objectPick==='source'?'Üretilen parçaya dokun':'Orijinal hedef parçaya dokun')
+}
+function uvManualObjectPick(e){
+ if(!uvMap.objectPick)return false;
+ if(!uvMap.autoTarget||!uvMap.autoSource)if(!uvAnalyzeSmart())return true;
+ const kind=uvMap.objectPick,analysis=kind==='source'?uvMap.autoSource:uvMap.autoTarget,comp=uvComponentAt(analysis,e);
+ if(!comp){toast('Bir nesnenin içine veya kenarına dokun');return true}
+ if(kind==='source'){
+   uvMap.selectedSourceComp=comp;uvMap.genSel={x:comp.bbox.x,y:comp.bbox.y,w:comp.bbox.w,h:comp.bbox.h};uvMap.target='gen';uvMap.objectPick='target';
+   $('uvGenSel').style.display='block';uvDrawSelection('gen');toast('Kaynak seçildi · şimdi orijinal hedefe dokun')
+ }else{
+   uvMap.selectedTargetComp=comp;uvMap.origSel={x:comp.bbox.x,y:comp.bbox.y,w:comp.bbox.w,h:comp.bbox.h};uvMap.target='orig';uvMap.objectPick=null;
+   $('uvOrigSel').style.display='block';uvDrawSelection('orig');toast('Hedef seçildi · Oturt + Maske ile uygula')
+ }
+ uvTransformStatus();uvStatus();uvUpdateObjectPickUi();uvRefreshContours();return true
+}
+function uvClearObjectPick(){
+ uvMap.objectPick=null;uvMap.selectedSourceComp=null;uvMap.selectedTargetComp=null;uvUpdateObjectPickUi();uvRefreshContours()
+}
+
 function uvAnalyzeSmart(){
  if(!window.MTSUvWarp||!uvMap.orig||!uvMap.work)return false;
  try{
-  uvMap.autoTarget=window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'alpha',role:'target',strictAlpha:true});
-  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:'alpha',role:'source',strictAlpha:true});
+  uvMap.autoTarget=window.MTSUvWarp.analyze(uvMap.orig,{bgMode:'auto',role:'target'});
+  uvMap.autoSource=window.MTSUvWarp.analyze(uvMap.work,{bgMode:uvMap.bgMode||'auto',role:'source'});
   uvMap.autoPairs=[];
-  const tb=uvMap.autoTarget.bg,sb=uvMap.autoSource.bg;
-  $('uvAutoMeta').textContent='Alpha · O '+uvMap.autoTarget.components.length+' ada ('+tb.transparent+' boş) · Ü '+uvMap.autoSource.components.length+' ada ('+sb.transparent+' boş)';
-  uvRefreshContours();return true;
+  const tb=uvMap.autoTarget.bg||{},sb=uvMap.autoSource.bg||{};
+  $('uvAutoMeta').textContent='O '+uvMap.autoTarget.components.length+' nesne ['+(tb.mode||'auto')+'] · Ü '+uvMap.autoSource.components.length+' nesne ['+(sb.mode||'auto')+']';
+  uvRefreshContours();uvUpdateObjectPickUi();return true;
  }catch(err){console.error('UV analyze',err);toast('Sınır analizi başarısız');return false}
 }
 function uvAutoMatchSmart(){
@@ -1290,13 +1359,17 @@ function uvAutoWarpSmart(){
 function uvSetView(mode){uvMap.view=mode;const o=$('uvOrigCanvas'),g=$('uvGenCanvas'),wrap=$('uvLiveWrap'),range=$('uvOverlayRange'),v=Number(range.value)/100;wrap.classList.toggle('linesOnly',mode==='lines');document.querySelectorAll('[data-uvview]').forEach(b=>b.classList.toggle('primary',b.dataset.uvview===mode));if(mode==='orig'){o.style.opacity='1';g.style.opacity='0'}else if(mode==='gen'){o.style.opacity='0';g.style.opacity='1';const ctx=g.getContext('2d');g.width=uvMap.gen.width;g.height=uvMap.gen.height;ctx.drawImage(uvMap.gen,0,0)}else if(mode==='work'){o.style.opacity='0';g.style.opacity='1';uvRenderWorkCanvasOnly()}else if(mode==='lines'){o.style.opacity='0';g.style.opacity='0'}else{o.style.opacity='1';g.style.opacity=String(v);uvRenderWorkCanvasOnly()}requestAnimationFrame(()=>{uvRenderGlobal();uvDrawSelection('orig');uvDrawSelection('gen');uvRefreshContours()})}
 function uvRenderWorkCanvasOnly(){if(!uvMap.work)return;const d=$('uvGenCanvas');d.width=uvMap.work.width;d.height=uvMap.work.height;d.getContext('2d').drawImage(uvMap.work,0,0)}
 function uvPoint(e){const canvas=$('uvGenCanvas'),wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(canvas.width-1,Math.floor(bx*canvas.width/wrap.clientWidth))),y:Math.max(0,Math.min(canvas.height-1,Math.floor(by*canvas.height/wrap.clientHeight)))}}
-function bindUvWorkspace(){const wrap=$('uvLiveWrap');let start=null,pid=null;wrap.addEventListener('pointerdown',e=>{if(uvManualLinkPick(e)){e.preventDefault();return}if(uvMap.panMode||uvMap.pointers.size){return}if(e.target.closest('.uvSelection'))return;pid=e.pointerId;wrap.setPointerCapture?.(pid);start=uvPoint(e);uvMap.handle='move';if(uvMap.islandMode){uvMap.target='orig';uvMap.origSel={x:start.x,y:start.y,w:1,h:1};$('uvOrigSel').style.display='block';$('uvGenSel').style.display='none';uvDrawSelection('orig')}else{uvMap.target='gen';uvMap.genSel={x:start.x,y:start.y,w:1,h:1};uvMap.origSel={...uvMap.genSel};uvDrawSelection('orig');uvDrawSelection('gen')}e.preventDefault()});wrap.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=uvPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y),sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};if(uvMap.islandMode){uvMap.origSel={...sel};$('uvOrigSel').style.display='block';uvDrawSelection('orig')}else{uvMap.genSel={...sel};uvMap.origSel={...sel};uvDrawSelection('orig');uvDrawSelection('gen')}uvStatus();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end)}
-async function openUvMapper(){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec)return;const ob=await originalBlob(x.path),oc=await decodeBlobToCanvas(ob),gc=await decodeBlobToCanvas(rec.blob),wc=document.createElement('canvas');wc.width=gc.width;wc.height=gc.height;wc.getContext('2d').drawImage(gc,0,0);uvMap.meta=x;uvMap.rec=rec;uvMap.orig=oc;uvMap.gen=gc;uvMap.work=wc;uvMap.history=[];uvMap.target='gen';uvMap.handle='move';uvMap.globalX=0;uvMap.globalY=0;uvMap.globalMode=false;uvMap.zoom=1;uvMap.panX=uvMap.panY=0;uvMap.panMode=false;uvMap.pointers.clear();uvMap.grid=true;uvMap.autoTarget=null;uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.contours=true;uvMap.manualLink=false;uvMap.manualTarget=null;uvMap.autoBase=null;uvMap.autoApplied=false;uvMap.bgMode=$('uvBgMode')?.value||'auto';uvMap.excludeMode=false;uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.manualSource=null;uvMap.islandMode=false;const d=$('uvOrigCanvas');d.width=oc.width;d.height=oc.height;d.getContext('2d').drawImage(oc,0,0);const base={x:0,y:0,w:Math.max(1,Math.floor(oc.width/8)),h:Math.max(1,Math.floor(oc.height/8))};uvMap.origSel={...base};uvMap.genSel={...base};$('uvMapMeta').textContent=x.name;uvIslandLoad();$('uvMapper').classList.add('open');if($('uvManualTools'))$('uvManualTools').open=false;$('uvOrigSel').style.display='none';$('uvGenSel').style.display='none';uvRenderWork();uvSetView('work');uvSetZoom(1);uvSetHandle('gen','move');uvStatus();setTimeout(()=>{uvAnalyzeSmart();$('uvContourToggle').classList.toggle('primary',uvMap.contours)},0)}
+function bindUvWorkspace(){const wrap=$('uvLiveWrap');let start=null,pid=null;wrap.addEventListener('pointerdown',e=>{if(uvManualObjectPick(e)){e.preventDefault();return}if(uvManualLinkPick(e)){e.preventDefault();return}if(uvMap.panMode||uvMap.pointers.size){return}if(e.target.closest('.uvSelection'))return;pid=e.pointerId;wrap.setPointerCapture?.(pid);start=uvPoint(e);uvMap.handle='move';if(uvMap.islandMode){uvMap.target='orig';uvMap.origSel={x:start.x,y:start.y,w:1,h:1};$('uvOrigSel').style.display='block';$('uvGenSel').style.display='none';uvDrawSelection('orig')}else{uvMap.target='gen';uvMap.genSel={x:start.x,y:start.y,w:1,h:1};uvMap.origSel={...uvMap.genSel};uvDrawSelection('orig');uvDrawSelection('gen')}e.preventDefault()});wrap.addEventListener('pointermove',e=>{if(e.pointerId!==pid||!start)return;const p=uvPoint(e),x=Math.min(start.x,p.x),y=Math.min(start.y,p.y),sel={x,y,w:Math.abs(p.x-start.x)+1,h:Math.abs(p.y-start.y)+1};if(uvMap.islandMode){uvMap.origSel={...sel};$('uvOrigSel').style.display='block';uvDrawSelection('orig')}else{uvMap.genSel={...sel};uvMap.origSel={...sel};uvDrawSelection('orig');uvDrawSelection('gen')}uvStatus();e.preventDefault()});const end=e=>{if(e.pointerId===pid){pid=null;start=null}};wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end)}
+async function openUvMapper(){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec)return;const ob=await originalBlob(x.path),oc=await decodeBlobToCanvas(ob),gc=await decodeBlobToCanvas(rec.blob),wc=document.createElement('canvas');wc.width=gc.width;wc.height=gc.height;wc.getContext('2d').drawImage(gc,0,0);uvMap.meta=x;uvMap.rec=rec;uvMap.orig=oc;uvMap.gen=gc;uvMap.work=wc;uvMap.history=[];uvMap.target='gen';uvMap.handle='move';uvMap.globalX=0;uvMap.globalY=0;uvMap.globalMode=false;uvMap.zoom=1;uvMap.panX=uvMap.panY=0;uvMap.panMode=false;uvMap.pointers.clear();uvMap.grid=true;uvMap.autoTarget=null;uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.contours=true;uvMap.manualLink=false;uvMap.manualTarget=null;uvMap.autoBase=null;uvMap.autoApplied=false;uvMap.bgMode=$('uvBgMode')?.value||'auto';uvMap.excludeMode=false;uvMap.excludedTarget.clear();uvMap.excludedSource.clear();uvMap.manualSource=null;uvMap.islandMode=false;uvMap.objectPick=null;uvMap.selectedSourceComp=null;uvMap.selectedTargetComp=null;uvMap.maskLock=true;const d=$('uvOrigCanvas');d.width=oc.width;d.height=oc.height;d.getContext('2d').drawImage(oc,0,0);const base={x:0,y:0,w:Math.max(1,Math.floor(oc.width/8)),h:Math.max(1,Math.floor(oc.height/8))};uvMap.origSel={...base};uvMap.genSel={...base};$('uvMapMeta').textContent=x.name;uvIslandLoad();$('uvMapper').classList.add('open');if($('uvManualTools'))$('uvManualTools').open=true;$('uvOrigSel').style.display='none';$('uvGenSel').style.display='none';uvRenderWork();uvSetView('overlay');uvSetZoom(1);uvSetHandle('gen','move');uvStatus();uvUpdateObjectPickUi();setTimeout(()=>{uvAnalyzeSmart();$('uvContourToggle').classList.toggle('primary',uvMap.contours)},0)}
 function uvSetHandle(kind,handle){uvMap.target=kind;uvMap.handle=handle;document.querySelectorAll('.uvHandle,.uvMoveCenter').forEach(x=>x.classList.remove('active'));const root=$(kind==='orig'?'uvOrigSel':'uvGenSel'),h=root?.querySelector('[data-corner="'+handle+'"]');h?.classList.add('active');$('uvTargetToggle').textContent='Joystick: '+(kind==='orig'?'Hedef':'Kaynak')+' · '+(handle==='move'?'Taşı':handle.toUpperCase())}
 function uvMoveTarget(dx,dy){const kind=uvMap.target,s=uvMap[kind+'Sel'],canvas=$(kind==='orig'?'uvOrigCanvas':'uvGenCanvas');if(!s||!canvas)return;const right=s.x+s.w-1,bottom=s.y+s.h-1,h=uvMap.handle;if(h==='move'){s.x+=dx;s.y+=dy}else if(h==='tl'){const nx=Math.max(0,Math.min(right,s.x+dx)),ny=Math.max(0,Math.min(bottom,s.y+dy));s.w=right-nx+1;s.h=bottom-ny+1;s.x=nx;s.y=ny}else if(h==='tr'){const nr=Math.max(s.x,Math.min(canvas.width-1,right+dx)),ny=Math.max(0,Math.min(bottom,s.y+dy));s.w=nr-s.x+1;s.h=bottom-ny+1;s.y=ny}else if(h==='bl'){const nx=Math.max(0,Math.min(right,s.x+dx)),nb=Math.max(s.y,Math.min(canvas.height-1,bottom+dy));s.w=right-nx+1;s.h=nb-s.y+1;s.x=nx}else if(h==='br'){const nr=Math.max(s.x,Math.min(canvas.width-1,right+dx)),nb=Math.max(s.y,Math.min(canvas.height-1,bottom+dy));s.w=nr-s.x+1;s.h=nb-s.y+1}uvClampSel(s,canvas.width,canvas.height);uvDrawSelection(kind);uvStatus()}
 
 document.querySelectorAll('[data-uvsize]').forEach(b=>b.onclick=()=>{const p=b.dataset.uvsize.split(',').map(Number);uvResizeSource(p[0],p[1])});
-$('uvFitTarget').onclick=()=>uvApplyCurrentTransform(true);
+$('uvFitTarget').onclick=()=>uvApplyCurrentTransform(true,true);
+$('uvPickGenerated').onclick=()=>uvSetObjectPick('source');
+$('uvPickOriginal').onclick=()=>uvSetObjectPick('target');
+$('uvApplyMaskedFit').onclick=()=>uvApplyCurrentTransform(true,true);
+$('uvClearObjectPick').onclick=()=>uvClearObjectPick();
 $('uvPreview3dLive').onclick=async()=>{if(!uvMap.meta||!uvMap.work)return;try{const p=await ensurePreview3dLoaded(),workBlob=await canvasPngBlob(uvMap.work),origBlob=await originalBlob(uvMap.meta.path),live=[{blob:origBlob,name:'Orijinal',system:true},{blob:workBlob,name:'Canlı UV',system:true}];await p?.openVariant?.(uvMap.meta,workBlob,'Canlı UV',live,1)}catch(err){console.error(err);toast(err?.message||'3D karşılaştırma açılamadı')}};
 
 
@@ -1328,8 +1401,8 @@ document.querySelectorAll('[data-uvshift]').forEach(b=>b.onclick=()=>{const p=b.
 $('uvGlobalReset').onclick=()=>{uvMap.globalX=uvMap.globalY=0;uvRenderGlobal()};
 $('uvGlobalApply').onclick=()=>{if(!uvMap.work||(!uvMap.globalX&&!uvMap.globalY))return;const before=uvMap.work.getContext('2d').getImageData(0,0,uvMap.work.width,uvMap.work.height),tmp=document.createElement('canvas');tmp.width=uvMap.work.width;tmp.height=uvMap.work.height;tmp.getContext('2d').drawImage(uvMap.work,uvMap.globalX,uvMap.globalY);uvMap.history.push(before);uvMap.work.getContext('2d').clearRect(0,0,uvMap.work.width,uvMap.work.height);uvMap.work.getContext('2d').drawImage(tmp,0,0);uvMap.globalX=uvMap.globalY=0;uvRenderWork();uvStatus();toast('Global kaydırma canlı çalışmaya uygulandı')};
 
-$('uvAddPair').onclick=()=>uvApplyCurrentTransform(false);
-$('uvUndoPair').onclick=()=>{const prev=uvMap.history.pop();if(!prev)return;uvMap.work.getContext('2d').putImageData(prev,0,0);uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;uvRenderWork();uvRefreshContours();uvStatus()};
+$('uvAddPair').onclick=()=>uvApplyCurrentTransform(false,true);
+$('uvUndoPair').onclick=()=>{const prev=uvMap.history.pop();if(!prev)return;uvMap.work.getContext('2d').putImageData(prev,0,0);uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;uvMap.selectedSourceComp=null;uvMap.selectedTargetComp=null;uvRenderWork();uvAnalyzeSmart();uvRefreshContours();uvUpdateObjectPickUi();uvStatus()};
 $('uvTargetToggle').onclick=()=>{if(!uvMap.globalMode){uvMap.globalMode=true;$('uvTargetToggle').textContent='Joystick: Tüm resim'}else{uvMap.globalMode=false;uvSetHandle('gen','move')}};
 function bindModularIslandLauncher(){const b=$('detailIslandStudio');if(!b)return;b.onclick=()=>{const x=active;if(!x||assetTypeOf(x)!=='Entity')return toast('Ada yalnız Entity için');const path=x.path;closeDetailSheet();if(window.MTSIslandStudio?.open)window.MTSIslandStudio.open(path);else toast('Ada modülü yüklenemedi')}}
 bindModularIslandLauncher();
