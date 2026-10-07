@@ -1237,16 +1237,45 @@ function uvApplyTargetMask(g,rect,origSel){
  }
  g.putImageData(im,rect.x,rect.y)
 }
+function uvBuildFilledSourceCrop(snap,sel){
+ const c=document.createElement('canvas');c.width=sel.w;c.height=sel.h;const ctx=c.getContext('2d',{willReadFrequently:true});
+ ctx.drawImage(snap,sel.x,sel.y,sel.w,sel.h,0,0,sel.w,sel.h);
+ const a=uvMap.autoSource;if(!a?.mask||a.w!==uvMap.work.width||a.h!==uvMap.work.height)return c;
+ const n=sel.w*sel.h,nearest=new Int32Array(n);nearest.fill(-1),q=new Int32Array(n);let head=0,tail=0;
+ for(let y=0;y<sel.h;y++)for(let x=0;x<sel.w;x++){
+   const gx=sel.x+x,gy=sel.y+y;if(gx<0||gy<0||gx>=a.w||gy>=a.h)continue;
+   const p=y*sel.w+x;if(a.mask[gy*a.w+gx]){nearest[p]=p;q[tail++]=p}
+ }
+ if(!tail)return c;
+ while(head<tail){
+   const p=q[head++],x=p%sel.w,y=(p/sel.w)|0,seed=nearest[p];
+   if(x>0&&nearest[p-1]<0){nearest[p-1]=seed;q[tail++]=p-1}
+   if(x<sel.w-1&&nearest[p+1]<0){nearest[p+1]=seed;q[tail++]=p+1}
+   if(y>0&&nearest[p-sel.w]<0){nearest[p-sel.w]=seed;q[tail++]=p-sel.w}
+   if(y<sel.h-1&&nearest[p+sel.w]<0){nearest[p+sel.w]=seed;q[tail++]=p+sel.w}
+ }
+ const im=ctx.getImageData(0,0,sel.w,sel.h),d=im.data;
+ for(let p=0;p<n;p++){
+   const x=p%sel.w,y=(p/sel.w)|0,gx=sel.x+x,gy=sel.y+y,on=gx>=0&&gy>=0&&gx<a.w&&gy<a.h&&a.mask[gy*a.w+gx];
+   if(on||nearest[p]<0)continue;const si=nearest[p]*4,di=p*4;d[di]=d[si];d[di+1]=d[si+1];d[di+2]=d[si+2];d[di+3]=255
+ }
+ ctx.putImageData(im,0,0);return c
+}
 function uvApplyCurrentTransform(fit=false,lockMask=false){
  if(!uvMap.origSel||!uvMap.genSel||!uvMap.work)return;
  const before=uvMap.work.getContext('2d').getImageData(0,0,uvMap.work.width,uvMap.work.height),p={orig:{...uvMap.origSel},gen:{...uvMap.genSel}},dst=uvTargetWorkRect(p.orig);
  if(!dst)return;
  const snap=document.createElement('canvas');snap.width=uvMap.work.width;snap.height=uvMap.work.height;snap.getContext('2d').putImageData(before,0,0);
  uvMap.history.push(before);
- const g=uvMap.work.getContext('2d');g.clearRect(dst.x,dst.y,dst.w,dst.h);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- g.drawImage(snap,p.gen.x,p.gen.y,p.gen.w,p.gen.h,dst.x,dst.y,dst.w,dst.h);
+ const g=uvMap.work.getContext('2d'),source=lockMask?uvBuildFilledSourceCrop(snap,p.gen):snap;
+ const movingObject=lockMask&&!!uvMap.selectedSourceComp&&!!uvMap.selectedTargetComp;
+ if(movingObject)g.clearRect(p.gen.x,p.gen.y,p.gen.w,p.gen.h);
+ g.clearRect(dst.x,dst.y,dst.w,dst.h);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ if(lockMask)g.drawImage(source,0,0,source.width,source.height,dst.x,dst.y,dst.w,dst.h);
+ else g.drawImage(source,p.gen.x,p.gen.y,p.gen.w,p.gen.h,dst.x,dst.y,dst.w,dst.h);
  if(lockMask)uvApplyTargetMask(g,dst,p.orig);
  uvMap.autoSource=null;uvMap.autoPairs=[];uvMap.autoBase=null;uvMap.autoApplied=false;
+ if(movingObject){uvMap.selectedSourceComp=null;uvMap.selectedTargetComp=null;uvMap.objectPick=null;uvUpdateObjectPickUi()}
  uvRenderWork();uvTransformStatus();uvStatus();uvRefreshContours();
  toast(lockMask?'Parça hedefe oturtuldu · orijinal UV maskesi kilitlendi':fit?'Parça hedef boyuta oturtuldu':'Parça canlı uygulandı')
 }
