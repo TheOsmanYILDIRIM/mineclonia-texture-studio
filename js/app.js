@@ -1116,6 +1116,9 @@ async function loadItemTwoPassPrompts(){
   }));
   for(const row of results)if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
   console.info('Item two-pass prompts loaded:',ITEM_TWO_PASS_PROMPTS.size);
+  const itemOpt=document.querySelector('#category option[value="special:item_authored"]');
+  if(itemOpt)itemOpt.textContent='Item · '+ITEM_PROMPT_PATHS.size;
+  if($('category')?.value==='special:item_authored')applyFilter();
  }catch(err){console.warn('Item prompt manifest unavailable',err)}
 }
 const ITEM_PROMPTS_READY=loadItemTwoPassPrompts();
