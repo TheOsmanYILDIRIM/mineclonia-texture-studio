@@ -133,9 +133,12 @@ async function islandStudioImport(file){
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- const out=document.createElement('canvas');out.width=islandStudio.orig.width;out.height=islandStudio.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const tmp=document.createElement('canvas');tmp.width=p.src.w;tmp.height=p.src.h;tmp.getContext('2d').drawImage(src,p.dst.x,p.dst.y,p.dst.w,p.dst.h,0,0,p.src.w,p.src.h);for(const r of isl.rects||[])g.drawImage(tmp,r.x-p.src.x,r.y-p.src.y,r.w,r.h,r.x,r.y,r.w,r.h)}
- islandStudio.restored=out;islandStudioStatus('Geri toplandı · '+m.parts.length+' ada · '+out.width+'×'+out.height);islandStudioSetTab('restored')
+ const baseW=m.sheetW||m.sourceW||src.width,baseH=m.sheetH||m.sourceH||src.height,scaleX=src.width/baseW,scaleY=src.height/baseH;
+ const out=document.createElement('canvas');out.width=islandStudio.orig.width;out.height=islandStudio.orig.height;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';let restoredParts=0;
+ for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const sx=Math.max(0,Math.round(p.dst.x*scaleX)),sy=Math.max(0,Math.round(p.dst.y*scaleY)),sw=Math.max(1,Math.round(p.dst.w*scaleX)),sh=Math.max(1,Math.round(p.dst.h*scaleY)),cw=Math.min(sw,src.width-sx),ch=Math.min(sh,src.height-sy);if(cw<=0||ch<=0)continue;const tmp=document.createElement('canvas');tmp.width=p.src.w;tmp.height=p.src.h;tmp.getContext('2d').drawImage(src,sx,sy,cw,ch,0,0,p.src.w,p.src.h);for(const rr of isl.rects||[])g.drawImage(tmp,rr.x-p.src.x,rr.y-p.src.y,rr.w,rr.h,rr.x,rr.y,rr.w,rr.h);restoredParts++}
+ const pixels=g.getImageData(0,0,out.width,out.height).data;let alpha=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i])alpha++;
+ if(!alpha){islandStudio.restored=null;islandStudioStatus('Geri toplama başarısız · AI '+src.width+'×'+src.height+' · şablon '+baseW+'×'+baseH);return}
+ islandStudio.restored=out;islandStudioStatus('Geri toplandı · '+restoredParts+'/'+m.parts.length+' ada · import ölçeği '+scaleX.toFixed(2)+'×'+scaleY.toFixed(2));islandStudioSetTab('restored')
 }
 
 function bindIslandStudioUi(){
