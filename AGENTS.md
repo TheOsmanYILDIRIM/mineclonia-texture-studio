@@ -76,6 +76,7 @@ Key non-negotiables:
 - Animated textures preserve frame topology while edited resolution may increase.
 - Runtime role and gameplay function outrank decorative realism.
 - Authored prompt storage is canonical and singular: `prompts/<family>/tex_<id>.json`, schema v2 with `family/id/path/name/stages`. Manifests are indexes only. Do not add production prompt `.txt` files or batch prompt payloads.
+- `js/prompt-registry.js` is the only runtime loader/resolver for authored prompts. All families use the same registry API (`get`, `stage`, `has`, `family`, `belongsTo`); do not add family-specific manifest fetchers, registries, or file parsers back into `js/app.js`.
 - Missing authored prompt coverage is represented by no usable prompt, not by a generated "PROMPT YOK" body or generic alpha-lock fallback.
 - True inventory items use the two-pass Creative → A+B Correction workflow from `PROMPT_AUTHORING_GUIDE.md`; their first pass is not source-silhouette/alpha locked.
 
