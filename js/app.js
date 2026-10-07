@@ -1251,12 +1251,25 @@ function uvApplyCurrentTransform(fit=false,lockMask=false){
  toast(lockMask?'Parça hedefe oturtuldu · orijinal UV maskesi kilitlendi':fit?'Parça hedef boyuta oturtuldu':'Parça canlı uygulandı')
 }
 
+function uvDrawObjectBoxes(cv,analysis,prefix,selected){
+ const ctx=cv.getContext('2d'),sx=cv.width/Math.max(1,analysis.w),sy=cv.height/Math.max(1,analysis.h);
+ ctx.save();ctx.font='bold 11px system-ui';ctx.textBaseline='top';
+ for(const c of analysis.components||[]){
+   const x=c.bbox.x*sx,y=c.bbox.y*sy,w=c.bbox.w*sx,h=c.bbox.h*sy,isSel=selected?.id===c.id;
+   ctx.lineWidth=isSel?3:1;ctx.strokeStyle=prefix==='O'?(isSel?'#d9ff9d':'rgba(143,209,79,.85)'):(isSel?'#fff0a6':'rgba(255,190,80,.9)');
+   ctx.strokeRect(x+.5,y+.5,w,h);
+   const label=prefix+(c.id+1),tw=ctx.measureText(label).width+6;ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(x,y,tw,15);ctx.fillStyle='#fff';ctx.fillText(label,x+3,y+2)
+ }
+ ctx.restore()
+}
 function uvRefreshContours(){
  const cv=$('uvContourCanvas');if(!cv||!uvMap.orig||!uvMap.work)return;
  cv.width=uvMap.work.width;cv.height=uvMap.work.height;cv.style.display=uvMap.contours?'':'none';
  if(!uvMap.contours||!uvMap.autoTarget||!uvMap.autoSource){cv.getContext('2d').clearRect(0,0,cv.width,cv.height);return}
  const view=uvMap.view,showTarget=view==='orig'||view==='overlay'||view==='work'||view==='lines',showSource=view==='gen'||view==='overlay'||view==='lines';
  window.MTSUvWarp?.draw?.(cv,uvMap.autoTarget,uvMap.autoSource,uvMap.autoPairs||[],{showTarget,showSource,excludedTarget:uvMap.excludedTarget,excludedSource:uvMap.excludedSource,segmentPairs:uvMap.edgePairs,selectedTargetSegment:uvMap.selectedTargetSegment,selectedSourceSegment:uvMap.selectedSourceSegment});
+ if(showTarget)uvDrawObjectBoxes(cv,uvMap.autoTarget,'O',uvMap.selectedTargetComp);
+ if(showSource)uvDrawObjectBoxes(cv,uvMap.autoSource,'Ü',uvMap.selectedSourceComp);
  uvApplyTransform();
 }
 function uvAnalysisPoint(analysis,e){const wrap=$('uvLiveWrap'),r=wrap.getBoundingClientRect(),bx=(e.clientX-r.left-uvMap.panX)/uvMap.zoom,by=(e.clientY-r.top-uvMap.panY)/uvMap.zoom;return{x:Math.max(0,Math.min(analysis.w-1,Math.floor(bx*analysis.w/wrap.clientWidth))),y:Math.max(0,Math.min(analysis.h-1,Math.floor(by*analysis.h/wrap.clientHeight)))}}
