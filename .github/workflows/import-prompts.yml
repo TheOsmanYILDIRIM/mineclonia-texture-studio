@@ -1,0 +1,138 @@
+name: Import canonical prompts
+
+on:
+  push:
+    paths:
+      - 'imports/mts-prompt-import.json'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Import canonical prompt bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE="imports/mts-prompt-import.json"
+          test -f "$BUNDLE"
+          python3 - "$BUNDLE" <<'PY'
+          import json, pathlib, re, sys
+
+          bundle_path=pathlib.Path(sys.argv[1])
+          bundle=json.loads(bundle_path.read_text())
+          if bundle.get("schema_version") != 2:
+              raise SystemExit("bundle schema_version must be 2")
+          family=bundle.get("family")
+          if family not in {"blocks","mobs","armor","items"}:
+              raise SystemExit(f"invalid family: {family}")
+          rows=bundle.get("prompts")
+          if not isinstance(rows,list) or not rows:
+              raise SystemExit("bundle has no prompts")
+
+          base=pathlib.Path("prompts")/family
+          base.mkdir(parents=True,exist_ok=True)
+          manifest_path=base/"manifest.json"
+          if manifest_path.exists():
+              manifest=json.loads(manifest_path.read_text())
+          else:
+              manifest={"schema_version":2,"kind":"canonical_prompt_manifest","family":family,"entries":[]}
+
+          existing={e.get("id"):dict(e) for e in manifest.get("entries",[]) if e.get("id")}
+          incoming=[]
+          seen=set()
+          for obj in rows:
+              item_id=obj.get("id","")
+              if not re.fullmatch(r"tex_[0-9a-f]{10}",item_id) or item_id in seen:
+                  raise SystemExit(f"invalid/duplicate id: {item_id}")
+              seen.add(item_id)
+              path=obj.get("path"); name=obj.get("name"); stages=obj.get("stages")
+              if not isinstance(path,str) or not path.strip():
+                  raise SystemExit(f"{item_id}: invalid path")
+              if not isinstance(name,str) or not name.strip():
+                  raise SystemExit(f"{item_id}: invalid name")
+              if not isinstance(stages,dict) or not stages:
+                  raise SystemExit(f"{item_id}: invalid stages")
+              if not all(isinstance(v,str) and v.strip() for v in stages.values()):
+                  raise SystemExit(f"{item_id}: empty stage")
+
+              record={"schema_version":2,"family":family,"id":item_id,"path":path,"name":name,"stages":stages}
+              out=base/f"{item_id}.json"
+              out.write_text(json.dumps(record,ensure_ascii=False,indent=2)+"\n")
+
+              entry=existing.get(item_id,{})
+              entry.update({"id":item_id,"name":name,"texture_path":path,"status":"done","file":out.as_posix()})
+              existing[item_id]=entry
+              incoming.append(item_id)
+
+          ordered=[]
+          already=set()
+          for old in manifest.get("entries",[]):
+              item_id=old.get("id")
+              if item_id in existing and item_id not in already:
+                  ordered.append(existing[item_id]); already.add(item_id)
+          for item_id in incoming:
+              if item_id not in already:
+                  ordered.append(existing[item_id]); already.add(item_id)
+
+          for index,e in enumerate(ordered,1):
+              e["order"]=index
+              if e.get("status")!="done":
+                  e["status"]="pending"
+                  e.pop("file",None)
+
+          manifest={
+              **manifest,
+              "schema_version":2,
+              "kind":"canonical_prompt_manifest",
+              "family":family,
+              "total":len(ordered),
+              "done":sum(1 for e in ordered if e.get("status")=="done"),
+              "pending":sum(1 for e in ordered if e.get("status")!="done"),
+              "entries":ordered,
+              "batches":[]
+          }
+          manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n")
+          PY
+          rm -f "$BUNDLE"
+
+      - name: Validate canonical prompt storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for family in ("blocks","mobs","armor","items"):
+              base=Path("prompts")/family
+              m=json.loads((base/"manifest.json").read_text())
+              assert m["schema_version"]==2 and m["family"]==family and not m.get("batches")
+              for e in m.get("entries",[]):
+                  if e.get("status")!="done":
+                      assert not e.get("file")
+                      continue
+                  assert e["file"]==f"prompts/{family}/{e['id']}.json"
+                  p=Path(e["file"]); assert p.is_file()
+                  o=json.loads(p.read_text())
+                  assert o["schema_version"]==2 and o["family"]==family and o["id"]==e["id"]
+                  assert o["path"]==e["texture_path"] and o["name"]==e["name"]
+                  assert isinstance(o["stages"],dict) and o["stages"]
+          PY
+
+      - name: Commit imported prompts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A prompts imports
+          git diff --cached --quiet && exit 0
+          git commit -m "prompts: import canonical prompt bundle"
+          git push
