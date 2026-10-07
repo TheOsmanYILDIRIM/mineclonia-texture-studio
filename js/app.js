@@ -62,14 +62,16 @@ async function invalidateDerivedCaches(path){
  for(let i=scaleQueue.length-1;i>=0;i--)if(scaleQueue[i]?.path===path){scaleQueued.delete(scaleQueue[i].qk);scaleQueue.splice(i,1)}
  await delScaledPath(path);
 }
-async function rebuildEditThumbnail(path,blob){
+async function rebuildEditThumbnail(path,blob,sourceUpdatedAt){
  try{
    const small=await previewBlob(blob,THUMB_MAX_EDGE);
-   await putScaled(path,THUMB_CACHE_RES,small);
-   invalidatePreviewUrls(path);
-   const u=URL.createObjectURL(small),key=`p:${THUMB_MAX_EDGE}:e:${path}`;
-   urlCache.set(key,u);
-   const ref=cardRefsFast.get(path);if(ref?.img)ref.img.src=u;
+   const current=hotEdits.get(path);
+   if(!current||Number(current.updatedAt)!==Number(sourceUpdatedAt))return null;
+   await putScaled(path,THUMB_CACHE_RES,small,sourceUpdatedAt);
+   const key=`p:${THUMB_MAX_EDGE}:e:${path}`,old=urlCache.get(key);
+   if(old){try{URL.revokeObjectURL(old)}catch(_){}}
+   const u=URL.createObjectURL(small);urlCache.set(key,u);
+   const ref=cardRefsFast.get(path);if(ref?.img&&hotEdits.get(path)?.updatedAt===sourceUpdatedAt)ref.img.src=u;
    return u
  }catch(e){console.warn('thumbnail rebuild failed',path,e);return null}
 }
@@ -77,12 +79,13 @@ async function previewUrl(path,preferEdit=true,maxEdge=EDITOR_PREVIEW_MAX_EDGE){
  const key=`p:${maxEdge}:${preferEdit?'e':'o'}:${path}`;
  if(urlCache.has(key))return urlCache.get(key);
  if(preferEdit&&maxEdge===THUMB_MAX_EDGE){
-   const cached=await getScaled(path,THUMB_CACHE_RES);
-   if(cached?.blob){const u=URL.createObjectURL(cached.blob);urlCache.set(key,u);return u}
+   const edit=hotEdits.get(path)||await getEdit(path),cached=await getScaled(path,THUMB_CACHE_RES);
+   if(cached?.blob&&edit&&Number(cached.sourceUpdatedAt||0)===Number(edit.updatedAt||0)){const u=URL.createObjectURL(cached.blob);urlCache.set(key,u);return u}
  }
- const source=preferEdit?await displayBlob(path):await originalBlob(path);
+ const edit=preferEdit?(hotEdits.get(path)||await getEdit(path)):null;
+ const source=preferEdit?(edit?.blob||await displayBlob(path)):await originalBlob(path);
  const small=await previewBlob(source,maxEdge);
- if(preferEdit&&maxEdge===THUMB_MAX_EDGE)putScaled(path,THUMB_CACHE_RES,small).catch(e=>console.warn('thumbnail cache write',e));
+ if(preferEdit&&maxEdge===THUMB_MAX_EDGE&&edit)putScaled(path,THUMB_CACHE_RES,small,edit.updatedAt).catch(e=>console.warn('thumbnail cache write',e));
  const u=URL.createObjectURL(small);urlCache.set(key,u);return u;
 }
 function priorityColor(p){return {P0:'#ff6b6b',P1:'#ffad5a',P2:'#ffd65a',P3:'#71a7ff',P4:'#a98cff',P5:'#84909f',P6:'#616a75'}[p]||'#999'}
@@ -1564,19 +1567,19 @@ async function initScaledStorage(){
     });
   }catch(e){ console.warn('scaled storage unavailable',e); scaledDbp=null; }
 }
-async function putScaled(path,res,blob){
-  const key = scaledMemKey(path,res);
+async function putScaled(path,res,blob,sourceUpdatedAt=0){
+  const key = scaledMemKey(path,res),rec={key,path,res,blob,updatedAt:Date.now(),sourceUpdatedAt:Number(sourceUpdatedAt)||0};
   if(scaledDbp){
     try{
       await new Promise((resolve,reject)=>{
         const tx=scaledDbp.transaction(SCALED_STORE,'readwrite');
-        tx.objectStore(SCALED_STORE).put({key,path,res,blob,updatedAt:Date.now()});
+        tx.objectStore(SCALED_STORE).put(rec);
         tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error);
       });
-      return;
+      memoryScaled.set(key,rec);return;
     }catch(e){ console.warn('putScaled failed',e); }
   }
-  memoryScaled.set(key,{key,path,res,blob,updatedAt:Date.now()});
+  memoryScaled.set(key,rec);
 }
 async function getScaled(path,res){
   const key = scaledMemKey(path,res);
@@ -1909,7 +1912,7 @@ function setFastEditUrl(path,blob){
 function updateCardFast(path,url){
   const ref=cardRefsFast.get(path);
   if(ref){
-    previewUrl(path,true,THUMB_MAX_EDGE).then(u=>{if(cardRefsFast.get(path)===ref)ref.img.src=u}).catch(()=>{ref.img.src=url});
+    ref.img.src=url;
     if(!ref.card.querySelector('.changed')){
       const d=document.createElement('span'); d.className='changed'; ref.card.appendChild(d);
     }
@@ -1967,7 +1970,7 @@ async function putEdit(path,blob){
   hotEdits.set(path,rec); changedPathsFast.add(path); pendingChangedPaths.delete(path);
   const u=setFastEditUrl(path,blob); updateCardFast(path,u); updateStatFast();
   queuePersistFast(path,blob,'changed');
-  rebuildEditThumbnail(path,blob);
+  rebuildEditThumbnail(path,blob,rec.updatedAt);
   return rec;
 }
 async function applyFilter(){
