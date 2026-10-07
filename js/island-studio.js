@@ -160,28 +160,35 @@ function islandDetectObject(src,p,map){
  return best&&bestScore<4.2?{...best,score:bestScore}:null
 }
 
+function islandTargetMask(p,isl,density){
+ const w=Math.max(1,Math.round(p.src.w*density)),h=Math.max(1,Math.round(p.src.h*density)),m=document.createElement('canvas');m.width=w;m.height=h;const g=m.getContext('2d');g.fillStyle='#fff';
+ for(const rr of isl.rects||[]){const x=Math.round((rr.x-p.src.x)*density),y=Math.round((rr.y-p.src.y)*density),rw=Math.max(1,Math.round(rr.w*density)),rh=Math.max(1,Math.round(rr.h*density));g.fillRect(x,y,rw,rh)}
+ return m
+}
+function islandContourFit(source,targetMask){
+ const W=window.MTSUvWarp;if(!W?.analyze||!W?.analyzeWithMask||!W?.match||!W?.warp||!W?.exactUvSnap)return source;
+ try{
+   const target=W.analyzeWithMask(targetMask,targetMask),src=W.analyze(source,{bgMode:'auto'});
+   if(!target.components?.length||!src.components?.length)return W.exactUvSnap(source,targetMask).canvas;
+   const pairs=W.match(target,src);if(!pairs.length)return W.exactUvSnap(source,targetMask).canvas;
+   const warped=W.warp(source,target,src,pairs);
+   return W.exactUvSnap(warped,targetMask).canvas
+ }catch(e){console.warn('Island contour fit fallback',e);try{return W.exactUvSnap(source,targetMask).canvas}catch(_){return source}}
+}
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.parts?.length)return islandStudioStatus('Bu model için export mapping bulunamadı.');
- // "Original UV" means original normalized layout, not original low pixel resolution.
- // Preserve the AI generation density using its scale relative to the separated template.
- const densityX=src.width/Math.max(1,m.sheetW),densityY=src.height/Math.max(1,m.sheetH);
- const density=Math.max(densityX,densityY);
- const outW=Math.max(1,Math.round(islandStudio.orig.width*density)),outH=Math.max(1,Math.round(islandStudio.orig.height*density));
- const out=document.createElement('canvas');out.width=outW;out.height=outH;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- let found=0;const missed=[];
+ const densityX=src.width/Math.max(1,m.sheetW),densityY=src.height/Math.max(1,m.sheetH),density=Math.max(densityX,densityY);
+ const outW=Math.max(1,Math.round(islandStudio.orig.width*density)),outH=Math.max(1,Math.round(islandStudio.orig.height*density)),out=document.createElement('canvas');out.width=outW;out.height=outH;const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+ let found=0,warpedCount=0;const missed=[];
  for(const p of m.parts){const isl=islandStudio.islands[p.ai];if(!isl)continue;const obj=islandDetectObject(src,p,m);if(!obj){missed.push(p.ai+1);continue}
-   // Fit the detected generated object to the original island geometry at high resolution.
-   // X/Y are independent so generation aspect-ratio drift is intentionally corrected.
-   const targetX=Math.round(p.src.x*density),targetY=Math.round(p.src.y*density),targetW=Math.max(1,Math.round(p.src.w*density)),targetH=Math.max(1,Math.round(p.src.h*density));
-   const tmp=document.createElement('canvas');tmp.width=targetW;tmp.height=targetH;tmp.getContext('2d').drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,targetW,targetH);
-   for(const rr of isl.rects||[]){const rx=Math.round((rr.x-p.src.x)*density),ry=Math.round((rr.y-p.src.y)*density),rw=Math.max(1,Math.round(rr.w*density)),rh=Math.max(1,Math.round(rr.h*density)),dx=Math.round(rr.x*density),dy=Math.round(rr.y*density);g.drawImage(tmp,rx,ry,rw,rh,dx,dy,rw,rh)}
-   found++
+   const targetW=Math.max(1,Math.round(p.src.w*density)),targetH=Math.max(1,Math.round(p.src.h*density)),rough=document.createElement('canvas');rough.width=targetW;rough.height=targetH;rough.getContext('2d').drawImage(src,obj.x,obj.y,obj.w,obj.h,0,0,targetW,targetH);
+   const mask=islandTargetMask(p,isl,density),fitted=islandContourFit(rough,mask);if(fitted!==rough)warpedCount++;
+   g.drawImage(fitted,Math.round(p.src.x*density),Math.round(p.src.y*density));found++
  }
  if(!found){islandStudio.restored=null;islandStudioStatus('Hiçbir AI adası tespit edilemedi. Ayrılmış AI görünümünü kontrol et.');return}
- islandStudio.restored=out;islandStudioStatus('Obje bazlı geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+' · UV ölçeği '+density.toFixed(2)+'×'+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
+ islandStudio.restored=out;islandStudioStatus('Kontur UV oturtma · '+found+'/'+m.parts.length+' ada · '+warpedCount+' warp · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
-
 
 let islandPreview3dPromise=null;
 async function islandEnsurePreview3d(){
