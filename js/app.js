@@ -51,6 +51,26 @@ async function previewBlob(blob,maxEdge){
  const g=canvas.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(source,0,0,dw,dh);
  return await canvasPngBlob(canvas);
 }
+function invalidatePreviewUrls(path){
+ for(const [key,url] of [...urlCache.entries()]){
+   if(key.endsWith(':'+path)){try{URL.revokeObjectURL(url)}catch(_){}urlCache.delete(key)}
+ }
+}
+async function invalidateDerivedCaches(path){
+ invalidatePreviewUrls(path);
+ await delScaledPath(path);
+}
+async function rebuildEditThumbnail(path,blob){
+ try{
+   const small=await previewBlob(blob,THUMB_MAX_EDGE);
+   await putScaled(path,THUMB_CACHE_RES,small);
+   invalidatePreviewUrls(path);
+   const u=URL.createObjectURL(small),key=`p:${THUMB_MAX_EDGE}:e:${path}`;
+   urlCache.set(key,u);
+   const ref=cardRefsFast.get(path);if(ref?.img)ref.img.src=u;
+   return u
+ }catch(e){console.warn('thumbnail rebuild failed',path,e);return null}
+}
 async function previewUrl(path,preferEdit=true,maxEdge=EDITOR_PREVIEW_MAX_EDGE){
  const key=`p:${maxEdge}:${preferEdit?'e':'o'}:${path}`;
  if(urlCache.has(key))return urlCache.get(key);
@@ -731,7 +751,7 @@ async function prepareStoredEditBlob(blob,meta){
  return out
 }
 async function imageBlobTransform(blob, offset=false){return await new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.imageSmoothingEnabled=false;if(!offset){g.drawImage(im,0,0)}else{const w=c.width,h=c.height,dx=Math.floor(w/2),dy=Math.floor(h/2);g.drawImage(im, dx,dy);g.drawImage(im,dx-w,dy);g.drawImage(im,dx,dy-h);g.drawImage(im,dx-w,dy-h)}c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(Error('PNG oluşturulamadı'))},'image/png')};im.onerror=()=>rej(Error('PNG okunamadı'));im.src=u})}
-async function importPng(file,seam=false){if(!active||!file)return;toast(assetTypeOf(active)==='Entity'?'UV maskesi kaynaktan kilitleniyor…':'Yüksek kaliteli küçültme…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+(assetTypeOf(active)==='Entity'?' · kaynak alpha kilitli':' · '+TARGET_RESOLUTION+'px Lanczos-3 kaydedildi'));await openDetail(active);await applyFilter(); setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
+async function importPng(file,seam=false){if(!active||!file)return;toast(assetTypeOf(active)==='Entity'?'UV maskesi kaynaktan kilitleniyor…':'Yüksek kaliteli küçültme…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+(assetTypeOf(active)==='Entity'?' · kaynak alpha kilitli':' · '+TARGET_RESOLUTION+'px Lanczos-3 kaydedildi'));await openDetail(active);await applyFilter();setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
 async function blobsEqual(a,b){
  if(!a||!b||a.size!==b.size)return false;
  const [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]);
@@ -1941,9 +1961,11 @@ function queuePersistFast(path,blob,verification='changed'){
 }
 async function putEdit(path,blob){
   const rec={path,blob,updatedAt:Date.now()};
+  await invalidateDerivedCaches(path);
   hotEdits.set(path,rec); changedPathsFast.add(path); pendingChangedPaths.delete(path);
   const u=setFastEditUrl(path,blob); updateCardFast(path,u); updateStatFast();
   queuePersistFast(path,blob,'changed');
+  rebuildEditThumbnail(path,blob);
   return rec;
 }
 async function applyFilter(){
