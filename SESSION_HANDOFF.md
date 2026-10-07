@@ -2,6 +2,17 @@
 
 Branch: `main` · Production: GitHub Pages.
 
+## Current focus — Canonical prompt system
+- Authored prompt storage is now standardized to one file per texture: `prompts/<family>/tex_<id>.json`.
+- Canonical schema v2 is `{schema_version:2,family,id,path,name,stages}`; manifests are indexes only.
+- Production prompt payloads no longer use `.txt` or batch JSON. Migration commit `6bf9fed` converted existing ready prompts: blocks 202, mobs 30 ready (+211 pending metadata), armor 32, items 100.
+- Runtime uses one canonical `PROMPT_REGISTRY`; legacy txt/batch loaders and maps were removed in `7254bcd`.
+- Missing authored prompt coverage no longer renders the old synthetic `PROMPT YOK + ALPHA/BACKGROUND LOCK` body. Missing stages are empty/disabled.
+- Item Creative → A+B Correction remains the item-only workflow; item Creative is not source-mask/silhouette locked.
+- Item import Action was upgraded to write schema v2 canonical files, so future 50-item batches must not reintroduce schema v1.
+- Prompt authoring rules and AGENTS invariants were updated in `4353bec` and `78ab267`.
+- Immediate verification target: open `tex_626ae22e78` / `mcl_fishing_clownfish_raw.png`; it must resolve to canonical `stages.creative` ("Raw Tropical Fish") with no missing-prompt or source-alpha-lock fallback.
+
 ## Current focus — Vertex UV Studio
 - Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` editor. This is the primary entity-atlas repair workflow.
 - Islands are the editor's segmentation/pairing model, not the retired automatic Island Studio restore experiment. Source/target island IDs remain stable during a session; used pairs are tracked as `Ü# → O#` and merged one-by-one into the final atlas.
