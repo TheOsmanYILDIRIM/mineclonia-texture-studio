@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 
-const source = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const indexSource = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const appSource = fs.readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
+const source = indexSource + '\n' + appSource;
 
 function fail(message) {
   console.error('FAIL:', message);
@@ -139,7 +141,6 @@ const loaderSource = fs.readFileSync(new URL('../js/data/catalog-loader.js', imp
 expect(loaderSource.includes('function staticAssetTags(x)'), 'asset tags must be derived as additive static metadata during catalog load');
 expect(loaderSource.includes("fetch('js/data/node-faces.json'"), 'Lua/node tag enrichment must come from the small optional node-face manifest');
 expect(loaderSource.includes(".catch(()=>{NODE_TAG_INDEX=new Map()})"), 'missing node-face metadata must preserve catalog loading through an empty fallback index');
-const appSource = fs.readFileSync(new URL('../js/app.js', import.meta.url), 'utf8');
 expect(appSource.includes('function runtimeTintInfo'), 'legacy runtime-tint detector must remain available while tag metadata is additive');
 expect(appSource.includes('.animated') || appSource.includes('animated:'), 'legacy catalog animated metadata must remain available while tag metadata is additive');
 const preview3dSource = fs.readFileSync(new URL('../js/preview3d.js', import.meta.url), 'utf8');
