@@ -7,15 +7,17 @@ Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parall
 Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
 
 ## Island Studio — current canonical state
-- Dedicated files: `js/island-studio.js` + `css/island-studio.css`; opened from Entity detail next to Variant Lab.
-- Manual islands are intentionally user-defined groups. Export preserves original UV spatial composition while expanding canvas and separating islands proportionally.
-- AI import may change resolution. “Return to original UV” means original UV layout/geometry, NOT native pixel resolution. Restored output preserves AI pixel density.
-- Detection uses foreground objects: alpha when meaningful, otherwise border/background color inference. Connected components use strict 8-neighbor connectivity: diagonal pixel contact counts, real gaps do not. Do not reintroduce broad nearby-component absorption; it broke unrelated islands.
-- Restoration must fit the generated island to the real original UV contour, not only its rectangular bbox. Target contour comes from original texture alpha/foreground pixels inside the user selections; selection rectangles define membership only.
-- UV restore now uses explicit imported-vs-original polygon corner/edge matching with cyclic alignment, dense edge controls, inverse warp, and authoritative original-mask alpha. It ignores tiny detached AI specks and falls back to mask-locked normalized sampling if matching fails. Current commits: `6208dd2` (corner/edge matching) and `1dd477e` (publish/cache bump). Visual validation on the pig/cat cases is still required.
-- Island joystick is centered; four corner nodes + center/move node provide pixel adjustment.
-- Restored UV has direct 3D preview using the real entity B3D; preview must stay above Island Studio.
-- Do not auto-split by B3D face/chart/bone as the main workflow; earlier attempts fragmented the UV incorrectly. User-defined island grouping is canonical.
+- Dedicated files: `js/island-studio.js` + `css/island-studio.css`; manual island groups remain user-defined and persisted in localStorage.
+- 2026-10-07 root-cause review retired the experimental radial/global-detection restore stack. The old component matching, silhouette matching, polygon/corner IDW warp and per-rect heuristics are no longer on the restore path.
+- Canonical format is now mapping **V3 / `group-slots-v3`**. Every manual island group is exported into its own fixed padded slot. Slot index carries island identity; restore must never guess island identity globally from AI connected components.
+- V3 import preserves the original separated template reference; it no longer overwrites `islandStudio.template` with the AI import.
+- Restore crops each known slot, detects foreground only inside that slot, fills background from nearest foreground color, fits the result deterministically to the authoritative default/original island mask, then places it at the original UV coordinates.
+- Output resolution follows the AI sheet scale while preserving the original texture aspect ratio.
+- Old V2/radial exports are intentionally incompatible with V3. After this change the user must create a fresh **Export PNG** and use the AI result from that V3 sheet.
+- Round-trip invariant remains mandatory: unmodified V3 export → import → restore must reproduce the original layout/content apart from intended resolution scaling.
+- Restore is preview-only until `✓ Onayla / Aktif Yap`; `Geri Toplanmış PNG` exports without persisting. 3D preview continues to use the real entity B3D.
+- V3 implementation commits: `b67458a` (core refactor), `f694ec8` (publish/cache bump).
+
 
 ## Pages build/cache system — preserve
 - Normal Chrome was confirmed to retain stale `index.html` while Incognito showed current deploy.
