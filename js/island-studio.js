@@ -136,9 +136,13 @@ async function islandStudioImport(file){
 }
 
 async function rootToVertex(blob){
- const meta=islandStudio.meta;if(!meta||!blob)return;
+ const meta=islandStudio.meta;if(!meta||!blob||!islandStudio.template||!islandStudio.map)return toast('Export sheet bilgisi bulunamadı');
  const root=$('islandStudio');root?.classList.remove('open');
- try{if(!window.MTSVariantLab?.open)throw Error('Varyant ekranı yüklenmedi');await window.MTSVariantLab.open(meta);await window.MTSVariantLab.addExternalVariant?.(blob,'AI_IMPORT.png');setTimeout(()=>window.MTSVertexUvStudio?.open?.(),0)}catch(e){console.error(e);toast('AI düzeltme ekranı açılamadı')}
+ try{
+   const templateBlob=await canvasPngBlob(islandStudio.template);
+   if(!window.MTSVertexUvStudio?.openIslandSheet)throw Error('Ada obje editörü yüklenmedi');
+   await window.MTSVertexUvStudio.openIslandSheet({meta,importedBlob:blob,templateBlob,map:islandStudio.map});
+ }catch(e){console.error(e);toast('AI ada düzeltme ekranı açılamadı')}
 }
 function islandForegroundMask(canvas){
  const ctx=canvas.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,canvas.width,canvas.height),d=im.data,w=canvas.width,h=canvas.height,n=w*h,mask=new Uint8Array(n);
