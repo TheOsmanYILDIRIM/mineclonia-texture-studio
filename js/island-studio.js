@@ -11,7 +11,7 @@ const saveRestored=(path,blob)=>api().saveRestored?.(path,blob);
 const closeDetailSheet=()=>api().closeDetailSheet?.();
 let active=null;
 const CATALOG=new Proxy([], {get(_t,p){const a=api().catalog?.()||[];const v=a[p];return typeof v==='function'?v.bind(a):v}});
-const islandStudio={meta:null,orig:null,islands:[],index:-1,tab:'edit',template:null,map:null,imported:null,restored:null,sel:null,drawing:false,start:null,handle:'move'};
+const islandStudio={meta:null,orig:null,islands:[],index:-1,tab:'edit',template:null,map:null,imported:null,restored:null,sel:null,drawing:false,start:null,handle:'move',wizardStep:1};
 function islandStudioKey(){return 'mts_uv_islands_v1:'+(islandStudio.meta?.path||islandStudio.meta?.id||'unknown')}
 function islandStudioLoadMap(){
  try{const x=JSON.parse(localStorage.getItem(islandStudioKey())||'null');islandStudio.islands=Array.isArray(x?.islands)?x.islands:[]}catch(_){islandStudio.islands=[]}
@@ -20,6 +20,10 @@ function islandStudioLoadMap(){
  islandStudioStatus()
 }
 function islandStudioSave(){try{localStorage.setItem(islandStudioKey(),JSON.stringify({v:1,islands:islandStudio.islands,updatedAt:Date.now()}))}catch(_){}islandStudioStatus()}
+const ISLAND_WIZARD=[['Adaları belirle','UV üzerinde bir parçayı seç. + Ada ile yeni ada aç, “Seçimi Adaya Ekle” ile alanı kaydet.'],['Kontrol et','Kaydettiğin adaları ileri/geri ile kontrol et. Gerekirse düzelt.'],['Ayrılmış halini gör','Export edilecek ayrılmış PNG’yi kontrol et.'],['Export et','Hazır. İleri dediğinde PNG export edilir ve ada düzeni cihazda kayıtlı kalır.']];
+function islandWizardSet(n){islandStudio.wizardStep=Math.max(1,Math.min(4,n));const d=ISLAND_WIZARD[islandStudio.wizardStep-1],root=$('islandStudio');if(root)root.dataset.wizardStep=String(islandStudio.wizardStep);$('islandWizardBadge').textContent='Adım '+islandStudio.wizardStep+' / 4';$('islandWizardTitle').textContent=d[0];$('islandWizardHelp').textContent=d[1];$('islandWizardBack').disabled=islandStudio.wizardStep===1;$('islandWizardNext').textContent=islandStudio.wizardStep===4?'Export PNG':'İleri →';if(islandStudio.wizardStep<=2)islandStudioSetTab('edit');else islandStudioSetTab('template')}
+async function islandWizardNext(){if(islandStudio.wizardStep===1&&!islandStudio.islands.some(a=>a.rects?.length))return toast('Önce en az bir ada kaydet');if(islandStudio.wizardStep===4){await islandStudioBuildTemplate(true);return toast('Export hazır · ada düzeni kaydedildi')}islandWizardSet(islandStudio.wizardStep+1)}
+function islandWizardBack(){if(islandStudio.wizardStep>1)islandWizardSet(islandStudio.wizardStep-1)}
 function islandStudioStatus(extra=''){
  const n=islandStudio.islands.length,a=islandStudio.index>=0?islandStudio.islands[islandStudio.index]:null;
  $('islandStudioMeta').textContent=n?'Ada '+(islandStudio.index+1)+'/'+n+' · '+(a?.rects?.length||0)+' alan':'Ada yok';
@@ -74,7 +78,7 @@ async function islandStudioChoose(path){
  islandStudio.meta=x;islandStudio.orig=await decodeBlobToCanvas(await originalBlob(x.path));islandStudio.template=null;islandStudio.imported=null;islandStudio.restored=null;islandStudio.sel={x:0,y:0,w:Math.max(2,Math.round(islandStudio.orig.width*.25)),h:Math.max(2,Math.round(islandStudio.orig.height*.25))};
  if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
  if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioLoadMap();islandStudioSetHandle('move');islandStudioSetTab('edit')
+ islandStudioLoadMap();islandStudioSetHandle('move');islandWizardSet(islandStudio.islands.some(a=>a.rects?.length)?2:1)
 }
 function islandStudioNew(){islandStudio.islands.push({id:'island_'+Date.now().toString(36),rects:[]});islandStudio.index=islandStudio.islands.length-1;islandStudioSave()}
 async function islandStudioAdd(){if(islandStudio.index<0)islandStudioNew();if(!islandStudio.sel)return;islandStudio.islands[islandStudio.index].rects.push({...islandStudio.sel});islandStudioSave();await islandStudioBuildTemplate(false);islandStudioSetTab('template')}
@@ -283,7 +287,7 @@ function bindIslandStudioUi(){
  const root=$('islandStudio');if(!root||root.dataset.delegateBound==='1')return;root.dataset.delegateBound='1';
  root.addEventListener('click',async e=>{
    const t=e.target.closest('button,[data-islandtab],[data-ih]');if(!t)return;
-   if(t.id==='islandStudioClose'){root.classList.remove('open');return}
+   if(t.id==='islandStudioClose'){root.classList.remove('open');return}if(t.id==='islandWizardBack'){islandWizardBack();return}if(t.id==='islandWizardNext'){await islandWizardNext();return}
    if(t.dataset.islandtab){islandStudioSetTab(t.dataset.islandtab);return}
    if(t.dataset.ih){islandStudioSetHandle(t.dataset.ih);e.stopPropagation();return}
    if(t.id==='islandStudioNew'){islandStudioNew();return}
