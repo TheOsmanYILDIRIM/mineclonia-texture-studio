@@ -6,17 +6,25 @@ Branch: `main` · Production: GitHub Pages.
 Startup fixes are now on `main`: early shared IndexedDB boot, prioritized/parallel thumbnail loading, and first paint no longer performs one IndexedDB lookup per card before persisted edits are hydrated. Relevant commits: `1bfd898`, `8575add`, `bb223d4`, publish/cache bump `0861bf8`.
 Next: device-validate one fresh normal Chrome open. Confirm storage reaches “Hazır • kalıcı kayıt” without 3–4 reloads and the first visible texture page fills quickly. Persisted edits may briefly begin from original thumbnails but must be replaced after hydration without data loss. Do not clear/migrate IndexedDB/localStorage. If this is good, move to the unchanged cat Island Studio dense-contour visual validation.
 
-## Island Studio — current canonical state
-- Dedicated files: `js/island-studio.js` + `css/island-studio.css`; manual island groups remain user-defined and persisted in localStorage.
-- 2026-10-07 root-cause review retired the experimental radial/global-detection restore stack. The old component matching, silhouette matching, polygon/corner IDW warp and per-rect heuristics are no longer on the restore path.
-- Canonical format is now mapping **V3 / `group-slots-v3`**. Every manual island group is exported into its own fixed padded slot. Slot index carries island identity; restore must never guess island identity globally from AI connected components.
-- V3 import preserves the original separated template reference; it no longer overwrites `islandStudio.template` with the AI import.
-- Restore crops each known slot, detects foreground only inside that slot, fills background from nearest foreground color, fits the result deterministically to the authoritative default/original island mask, then places it at the original UV coordinates.
-- Output resolution follows the AI sheet scale while preserving the original texture aspect ratio.
-- Old V2/radial exports are intentionally incompatible with V3. After this change the user must create a fresh **Export PNG** and use the AI result from that V3 sheet.
-- Round-trip invariant remains mandatory: unmodified V3 export → import → restore must reproduce the original layout/content apart from intended resolution scaling.
-- Restore is preview-only until `✓ Onayla / Aktif Yap`; `Geri Toplanmış PNG` exports without persisting. 3D preview continues to use the real entity B3D.
-- V3 implementation commits: `b67458a` (core refactor), `91655fb` (preserve detected slot mask through crop), `62332de` (publish/cache bump).
+## Manual UV Studio — primary entity repair workflow
+- The automatic Island Studio restore experiments are no longer the primary path. Manual UV repair is canonical for AI-generated entity atlases; Island Studio remains optional for separated/export experiments only.
+- The existing Manual UV Mapper in `js/app.js` was corrected on 2026-10-07:
+  - original and generated canvases may have different resolutions; target rectangles are now scaled into work-canvas coordinates before apply,
+  - generated/source detection uses real background inference (`auto/black/alpha`) instead of forcing `strictAlpha`,
+  - detected original/generated objects are drawn as labeled boxes and can be selected directly by tapping,
+  - workflow is: **1 · generated object → 2 · original target → 3 · fit + lock original UV mask**,
+  - source-object background inside its bbox is nearest-filled before scaling, so black/transparent AI wedges are not stretched into the target,
+  - moving a detected object clears its old source bbox, applies the filled texture to the scaled target, then locks final alpha to the authoritative original mask,
+  - free rectangular manual selection now also converts coordinates correctly between original and generated resolutions,
+  - joystick cycles Generated → Target → Whole image and supports 1/4/16 px nudge steps,
+  - advanced auto-warp/edge matching remains available but collapsed and optional.
+- Key commits: `1bf0ed5` resolution-aware manual mapper + direct object picking, `61e8a5a` detected-object overlay, `859caf4` nearest-filled source placement, `78df345` coordinate/joystick fixes, `55e68e0` re-detection after placement, `21d6a52` publish/UI.
+- Next validation: use the problematic pig AI atlas in Variant Lab → UV Eşle. Confirm object boxes are sensible, select one generated component and its original target, apply masked fit, then inspect 3D. Fix manual interaction/selection precision before revisiting any automatic Island Studio restore.
+
+## Island Studio — optional helper
+- `js/island-studio.js` remains available as **Ada (opsiyonel)**. It is not required for the final manual repair workflow.
+- Do not spend the next session trying new global island matching/warp algorithms unless the user explicitly returns to automatic restoration.
+- Existing V3 slot work can remain as an experimental separated-export helper, but Manual UV Studio outranks it for production repair.
 
 
 ## Pages build/cache system — preserve
