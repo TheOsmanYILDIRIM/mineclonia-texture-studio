@@ -12,7 +12,7 @@ Next: device-validate one fresh normal Chrome open. Confirm storage reaches “H
 - Workflow: detect source/target islands → select one source island → select one target island → optionally coarse-fit → vertex-edit that pair → `Adayı Birleştir` → repeat. Applied pairs are tracked as stable `Ü# → O#` records and merged into the final atlas.
 - Source crop preserves the actual detected foreground/alpha. Do **not** reintroduce nearest-edge RGB filling of empty bbox space; transparent/background pixels must stay empty.
 - Automatic detection can be overridden with `+ Kaynak Ada` / `+ Hedef Ada`: draw a rectangle around a region to create a manual island when AI output has merged/touching components. Manual islands disable overlapping automatic parent components.
-- Mesh density is selectable from **3×3 through 15×15 nodes**. Fine D-pad steps remain 0.10/0.25/0.50/1 px.
+- Mesh density is selectable from **3×3 through 15×15 nodes**. Fine D-pad steps remain 0.10/0.25/0.50/1 px. After source→target selection, the pair auto-fits immediately; source UV perimeter and destination mesh perimeter snap to the real detected island contours, interior nodes are relaxed inside those boundaries, and centered scale controls provide ±1% / ±2.5% adjustments without shifting the island center.
 - Undo/redo tracks both canvas state and island-pair state; used source/target islands are marked and cannot be accidentally paired twice.
 - Key commits: `c0af865` mask-preserving island core, `3cf1b88` pair history/manual split, `9058c98` rectangle island creation, `87eb1b1` pairing UI/render flow, `7f7c4b3` 15×15 controls.
 - Old Island Studio and legacy rectangle UV mapper remain optional/experimental; do not route the primary `UV Eşle` workflow back to them.
