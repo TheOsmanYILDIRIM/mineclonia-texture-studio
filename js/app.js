@@ -28,6 +28,7 @@ async function displayBlob(path){const e=await getEdit(path);return e?.blob || a
 async function blobUrl(path,preferEdit=true){const key=(preferEdit?'e:':'o:')+path;if(urlCache.has(key))return urlCache.get(key);const b=preferEdit?await displayBlob(path):await originalBlob(path);const u=URL.createObjectURL(b);urlCache.set(key,u);return u}
 
 const THUMB_MAX_EDGE=192;
+const THUMB_CACHE_RES=192;
 const EDITOR_PREVIEW_MAX_EDGE=1024;
 async function previewBlob(blob,maxEdge){
  if(!blob||!maxEdge)return blob;
@@ -53,8 +54,13 @@ async function previewBlob(blob,maxEdge){
 async function previewUrl(path,preferEdit=true,maxEdge=EDITOR_PREVIEW_MAX_EDGE){
  const key=`p:${maxEdge}:${preferEdit?'e':'o'}:${path}`;
  if(urlCache.has(key))return urlCache.get(key);
+ if(preferEdit&&maxEdge===THUMB_MAX_EDGE){
+   const cached=await getScaled(path,THUMB_CACHE_RES);
+   if(cached?.blob){const u=URL.createObjectURL(cached.blob);urlCache.set(key,u);return u}
+ }
  const source=preferEdit?await displayBlob(path):await originalBlob(path);
  const small=await previewBlob(source,maxEdge);
+ if(preferEdit&&maxEdge===THUMB_MAX_EDGE)putScaled(path,THUMB_CACHE_RES,small).catch(e=>console.warn('thumbnail cache write',e));
  const u=URL.createObjectURL(small);urlCache.set(key,u);return u;
 }
 function priorityColor(p){return {P0:'#ff6b6b',P1:'#ffad5a',P2:'#ffd65a',P3:'#71a7ff',P4:'#a98cff',P5:'#84909f',P6:'#616a75'}[p]||'#999'}
@@ -1377,7 +1383,7 @@ async function resetStoredEditsByPriorities(priorities){
    for(const path of paths){
      hotEdits.delete(path);memoryEdits.delete(path);changedPathsFast.delete(path);pendingChangedPaths.delete(path);revoke(path);
      try{localStorage.removeItem('mts:'+path)}catch(_){}
-     for(const size of [64,128,256,512])memoryScaled.delete(scaledMemKey(path,size));
+     for(const size of [64,128,192,256,512])memoryScaled.delete(scaledMemKey(path,size));
    }
    await applyFilter();updateStatFast();
    setSaveState('Kayıt temizliği tamamlandı','ok');toast(`${priorities.join(', ')} temizlendi`);
@@ -1440,7 +1446,7 @@ async function getScaled(path,res){
   return memoryScaled.get(key)||null;
 }
 async function delScaledPath(path){
-  const keys=[64,128,256,512].map(res=>scaledMemKey(path,res));
+  const keys=[64,128,192,256,512].map(res=>scaledMemKey(path,res));
   if(scaledDbp){
     try{
       await new Promise((resolve,reject)=>{
