@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "workflow": "item-creative-composition-correction",
+  "batch": 1,
+  "count": 50,
+  "items": [
+    {
+      "order": 1,
+      "texture": "mcl_beds_bed_black_inv.png",
+      "file": "prompts/items/batch_001_050/001_mcl_beds_bed_black_inv.md"
+    },
+    {
+      "order": 2,
+      "texture": "mcl_beds_bed_blue_inv.png",
+      "file": "prompts/items/batch_001_050/002_mcl_beds_bed_blue_inv.md"
+    },
+    {
+      "order": 3,
+      "texture": "mcl_beds_bed_brown_inv.png",
+      "file": "prompts/items/batch_001_050/003_mcl_beds_bed_brown_inv.md"
+    },
+    {
+      "order": 4,
+      "texture": "mcl_beds_bed_cyan_inv.png",
+      "file": "prompts/items/batch_001_050/004_mcl_beds_bed_cyan_inv.md"
+    },
+    {
+      "order": 5,
+      "texture": "mcl_beds_bed_green_inv.png",
+      "file": "prompts/items/batch_001_050/005_mcl_beds_bed_green_inv.md"
+    },
+    {
+      "order": 6,
+      "texture": "mcl_beds_bed_grey_inv.png",
+      "file": "prompts/items/batch_001_050/006_mcl_beds_bed_grey_inv.md"
+    },
+    {
+      "order": 7,
+      "texture": "mcl_beds_bed_light_blue_inv.png",
+      "file": "prompts/items/batch_001_050/007_mcl_beds_bed_light_blue_inv.md"
+    },
+    {
+      "order": 8,
+      "texture": "mcl_beds_bed_lime_inv.png",
+      "file": "prompts/items/batch_001_050/008_mcl_beds_bed_lime_inv.md"
+    },
+    {
+      "order": 9,
+      "texture": "mcl_beds_bed_magenta_inv.png",
+      "file": "prompts/items/batch_001_050/009_mcl_beds_bed_magenta_inv.md"
+    },
+    {
+      "order": 10,
+      "texture": "mcl_beds_bed_orange_inv.png",
+      "file": "prompts/items/batch_001_050/010_mcl_beds_bed_orange_inv.md"
+    },
+    {
+      "order": 11,
+      "texture": "mcl_beds_bed_pink_inv.png",
+      "file": "prompts/items/batch_001_050/011_mcl_beds_bed_pink_inv.md"
+    },
+    {
+      "order": 12,
+      "texture": "mcl_beds_bed_purple_inv.png",
+      "file": "prompts/items/batch_001_050/012_mcl_beds_bed_purple_inv.md"
+    },
+    {
+      "order": 13,
+      "texture": "mcl_beds_bed_red_inv.png",
+      "file": "prompts/items/batch_001_050/013_mcl_beds_bed_red_inv.md"
+    },
+    {
+      "order": 14,
+      "texture": "mcl_beds_bed_silver_inv.png",
+      "file": "prompts/items/batch_001_050/014_mcl_beds_bed_silver_inv.md"
+    },
+    {
+      "order": 15,
+      "texture": "mcl_beds_bed_white_inv.png",
+      "file": "prompts/items/batch_001_050/015_mcl_beds_bed_white_inv.md"
+    },
+    {
+      "order": 16,
+      "texture": "mcl_beds_bed_yellow_inv.png",
+      "file": "prompts/items/batch_001_050/016_mcl_beds_bed_yellow_inv.md"
+    },
+    {
+      "order": 17,
+      "texture": "mcl_farming_pumpkin_pie.png",
+      "file": "prompts/items/batch_001_050/017_mcl_farming_pumpkin_pie.md"
+    },
+    {
+      "order": 18,
+      "texture": "mcl_farming_pumpkin_seeds.png",
+      "file": "prompts/items/batch_001_050/018_mcl_farming_pumpkin_seeds.md"
+    },
+    {
+      "order": 19,
+      "texture": "mcl_ocean_sea_pickle_item.png",
+      "file": "prompts/items/batch_001_050/019_mcl_ocean_sea_pickle_item.md"
+    },
+    {
+      "order": 20,
+      "texture": "default_tool_netheritepick.png",
+      "file": "prompts/items/batch_001_050/020_default_tool_netheritepick.md"
+    },
+    {
+      "order": 21,
+      "texture": "default_tool_steelpick.png",
+      "file": "prompts/items/batch_001_050/021_default_tool_steelpick.md"
+    },
+    {
+      "order": 22,
+      "texture": "axolotl_bucket.png",
+      "file": "prompts/items/batch_001_050/022_axolotl_bucket.md"
+    },
+    {
+      "order": 23,
+      "texture": "bucket.png",
+      "file": "prompts/items/batch_001_050/023_bucket.md"
+    },
+    {
+      "order": 24,
+      "texture": "mcl_cherry_blossom_pink_petals_inv.png",
+      "file": "prompts/items/batch_001_050/024_mcl_cherry_blossom_pink_petals_inv.md"
+    },
+    {
+      "order": 25,
+      "texture": "mcl_end_chorus_fruit.png",
+      "file": "prompts/items/batch_001_050/025_mcl_end_chorus_fruit.md"
+    },
+    {
+      "order": 26,
+      "texture": "mcl_end_chorus_fruit_popped.png",
+      "file": "prompts/items/batch_001_050/026_mcl_end_chorus_fruit_popped.md"
+    },
+    {
+      "order": 27,
+      "texture": "mcl_end_ender_eye.png",
+      "file": "prompts/items/batch_001_050/027_mcl_end_ender_eye.md"
+    },
+    {
+      "order": 28,
+      "texture": "mcl_hoppers_item.png",
+      "file": "prompts/items/batch_001_050/028_mcl_hoppers_item.md"
+    },
+    {
+      "order": 29,
+      "texture": "mcl_lanterns_chain_inv.png",
+      "file": "prompts/items/batch_001_050/029_mcl_lanterns_chain_inv.md"
+    },
+    {
+      "order": 30,
+      "texture": "mcl_lanterns_lantern_inv.png",
+      "file": "prompts/items/batch_001_050/030_mcl_lanterns_lantern_inv.md"
+    },
+    {
+      "order": 31,
+      "texture": "mcl_lanterns_soul_lantern_inv.png",
+      "file": "prompts/items/batch_001_050/031_mcl_lanterns_soul_lantern_inv.md"
+    },
+    {
+      "order": 32,
+      "texture": "mcl_lush_caves_glow_berries.png",
+      "file": "prompts/items/batch_001_050/032_mcl_lush_caves_glow_berries.md"
+    },
+    {
+      "order": 33,
+      "texture": "mcl_lush_caves_hanging_roots.png",
+      "file": "prompts/items/batch_001_050/033_mcl_lush_caves_hanging_roots.md"
+    },
+    {
+      "order": 34,
+      "texture": "mcl_mangrove_propagule_item.png",
+      "file": "prompts/items/batch_001_050/034_mcl_mangrove_propagule_item.md"
+    },
+    {
+      "order": 35,
+      "texture": "default_gunpowder.png",
+      "file": "prompts/items/batch_001_050/035_default_gunpowder.md"
+    },
+    {
+      "order": 36,
+      "texture": "extra_mobs_glow_ink_sac.png",
+      "file": "prompts/items/batch_001_050/036_extra_mobs_glow_ink_sac.md"
+    },
+    {
+      "order": 37,
+      "texture": "mcl_mobitems_blaze_powder.png",
+      "file": "prompts/items/batch_001_050/037_mcl_mobitems_blaze_powder.md"
+    },
+    {
+      "order": 38,
+      "texture": "mcl_mobitems_blaze_rod.png",
+      "file": "prompts/items/batch_001_050/038_mcl_mobitems_blaze_rod.md"
+    },
+    {
+      "order": 39,
+      "texture": "mcl_mobitems_bone.png",
+      "file": "prompts/items/batch_001_050/039_mcl_mobitems_bone.md"
+    },
+    {
+      "order": 40,
+      "texture": "mcl_mobitems_breeze_rod.png",
+      "file": "prompts/items/batch_001_050/040_mcl_mobitems_breeze_rod.md"
+    },
+    {
+      "order": 41,
+      "texture": "mcl_mobitems_bucket_milk.png",
+      "file": "prompts/items/batch_001_050/041_mcl_mobitems_bucket_milk.md"
+    },
+    {
+      "order": 42,
+      "texture": "mcl_mobitems_ghast_tear.png",
+      "file": "prompts/items/batch_001_050/042_mcl_mobitems_ghast_tear.md"
+    },
+    {
+      "order": 43,
+      "texture": "mcl_mobitems_ink_sac.png",
+      "file": "prompts/items/batch_001_050/043_mcl_mobitems_ink_sac.md"
+    },
+    {
+      "order": 44,
+      "texture": "mcl_mobitems_magma_cream.png",
+      "file": "prompts/items/batch_001_050/044_mcl_mobitems_magma_cream.md"
+    },
+    {
+      "order": 45,
+      "texture": "mcl_mobitems_nametag.png",
+      "file": "prompts/items/batch_001_050/045_mcl_mobitems_nametag.md"
+    },
+    {
+      "order": 46,
+      "texture": "mcl_mobitems_nautilus_shell.png",
+      "file": "prompts/items/batch_001_050/046_mcl_mobitems_nautilus_shell.md"
+    },
+    {
+      "order": 47,
+      "texture": "mcl_mobitems_nether_star.png",
+      "file": "prompts/items/batch_001_050/047_mcl_mobitems_nether_star.md"
+    },
+    {
+      "order": 48,
+      "texture": "mcl_mobitems_rotten_flesh.png",
+      "file": "prompts/items/batch_001_050/048_mcl_mobitems_rotten_flesh.md"
+    },
+    {
+      "order": 49,
+      "texture": "mcl_mobitems_saddle.png",
+      "file": "prompts/items/batch_001_050/049_mcl_mobitems_saddle.md"
+    },
+    {
+      "order": 50,
+      "texture": "mcl_mobitems_shulker_shell.png",
+      "file": "prompts/items/batch_001_050/050_mcl_mobitems_shulker_shell.md"
+    }
+  ]
+}
