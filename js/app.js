@@ -1090,10 +1090,13 @@ async function loadItemTwoPassPrompts(){
  try{
   const r=await fetch('prompts/items/manifest.json',{cache:'force-cache'});if(!r.ok)throw new Error('manifest '+r.status);
   const manifest=await r.json();
-  for(const e of (manifest.entries||[]))if(e.status==='done')ITEM_PROMPT_PATHS.add(e.texture_path);
-  const files=[...new Set((manifest.batches||[]).map(b=>b.file).filter(Boolean))];
-  const batches=await Promise.all(files.map(async file=>{const q=await fetch(file,{cache:'force-cache'});return q.ok?q.json():null}));
-  for(const b of batches)for(const row of Object.values(b?.prompts||{}))if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
+  const rows=(manifest.entries||[]).filter(e=>e.status==='done'&&e.file);
+  for(const e of rows)ITEM_PROMPT_PATHS.add(e.texture_path);
+  const results=await Promise.all(rows.map(async e=>{
+   try{const q=await fetch(e.file,{cache:'force-cache'});if(!q.ok)return null;return await q.json()}
+   catch(err){console.warn('Item prompt unavailable',e.file,err);return null}
+  }));
+  for(const row of results)if(row?.id&&row.creative_prompt&&row.correction_prompt)ITEM_TWO_PASS_PROMPTS.set(row.id,row);
   console.info('Item two-pass prompts loaded:',ITEM_TWO_PASS_PROMPTS.size);
  }catch(err){console.warn('Item prompt manifest unavailable',err)}
 }
