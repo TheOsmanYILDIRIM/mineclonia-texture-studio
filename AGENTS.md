@@ -120,6 +120,19 @@ After meaningful changes:
 
 Do not store private chain-of-thought or raw tool logs in the repository.
 
+
+## Development build / cache update invariant
+
+- Chrome may keep the GitHub Pages `index.html` document cached in the normal profile even when a newer deployment is live; Incognito showing the new build while the normal profile shows the old build is the known symptom.
+- Do not rely on a plain `location.reload()`, repeated cache-bust query changes on the same `index.html`, or comparison against repository `main` alone.
+- The Pages workflow stamps the deployed commit SHA and UTC time into `js/build-status.js` and fingerprints local JS/CSS `?v=` URLs with `${GITHUB_SHA}`.
+- The Pages artifact also publishes `latest.html`, copied from the stamped/fingerprinted `index.html`.
+- The visible Build badge reports the SHA embedded in the actually loaded deployed artifact.
+- “Güncellemeyi kontrol et” probes the deployed Pages `js/build-status.js?probe=<timestamp>` with `cache: no-store`; it compares against the build actually available on Pages, not merely the newest repository commit.
+- When a newer deployed build exists, refresh through `latest.html?build=<full-sha>&_=<timestamp>`. This different document URL is intentional and is the canonical cache-bypass path.
+- Before that navigation, clearing Cache Storage / unregistering a service worker is allowed as defensive cleanup, but user IndexedDB/localStorage texture/edit data must never be cleared by the update mechanism.
+- Preserve this system when changing deployment or cache behavior. Do not regress to repeatedly reopening cached `index.html`.
+
 ## Deployment discipline
 
 Production is GitHub Pages. Netlify configuration may remain as legacy/supporting project material, but Netlify is not the production source of truth unless the user explicitly changes that decision.
