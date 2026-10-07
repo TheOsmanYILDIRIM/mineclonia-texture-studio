@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_660eec246a",
-  "label": "default_coal_block",
-  "texture_path": "ITEMS/mcl_core/default_coal_block.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for a block of densely compacted coal in a harsh grounded dark-fantasy world. It should read as carbon-rich mineral matter compressed into a heavy mass: layered black and charcoal fracture planes, dull satin carbon surfaces, brittle chipped edges and occasional faint earthy impurities. Local highlights may reveal coal's subtle luster but must never turn it into polished obsidian. Avoid featureless black, charcoal briquettes, shiny plastic, glowing embers or metallic ore. Build richness through layered carbon structure, pressure, fracture and restrained reflectivity so the darkness retains physical information."
+  "path": "ITEMS/mcl_core/default_coal_block.png",
+  "name": "default_coal_block.png",
+  "stages": {
+    "reference": "Create a close visual reference for a block of densely compacted coal in a harsh grounded dark-fantasy world. It should read as carbon-rich mineral matter compressed into a heavy mass: layered black and charcoal fracture planes, dull satin carbon surfaces, brittle chipped edges and occasional faint earthy impurities. Local highlights may reveal coal's subtle luster but must never turn it into polished obsidian. Avoid featureless black, charcoal briquettes, shiny plastic, glowing embers or metallic ore. Build richness through layered carbon structure, pressure, fracture and restrained reflectivity so the darkness retains physical information."
+  }
 }

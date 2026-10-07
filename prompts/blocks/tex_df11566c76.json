@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_df11566c76",
-  "label": "mcl_core_leaves_spruce",
-  "texture_path": "ITEMS/mcl_core/mcl_core_leaves_spruce.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for spruce foliage in a cold grounded dark-fantasy forest. The foliage consists of dense needle-bearing sprays built around tough narrow twigs. Needles should feel short, stiff and numerous, forming layered shadowy masses with subtle differences between older deep green growth and slightly lighter exposed tips. Cold, wind and age leave restrained dry needles and weathered twig surfaces within the living canopy. Favor deep muted blue-green, forest green and cool gray-green. Avoid fluffy pine-needle brushes, Christmas-tree brightness, snow decoration, giant individual needles or uniform synthetic branching. Establish the compact, cold-resistant material language of spruce foliage—dark, sharp, layered and resilient—without copying branch composition into the eventual texture."
+  "path": "ITEMS/mcl_core/mcl_core_leaves_spruce.png",
+  "name": "mcl_core_leaves_spruce.png",
+  "stages": {
+    "reference": "Create a close visual reference for spruce foliage in a cold grounded dark-fantasy forest. The foliage consists of dense needle-bearing sprays built around tough narrow twigs. Needles should feel short, stiff and numerous, forming layered shadowy masses with subtle differences between older deep green growth and slightly lighter exposed tips. Cold, wind and age leave restrained dry needles and weathered twig surfaces within the living canopy. Favor deep muted blue-green, forest green and cool gray-green. Avoid fluffy pine-needle brushes, Christmas-tree brightness, snow decoration, giant individual needles or uniform synthetic branching. Establish the compact, cold-resistant material language of spruce foliage—dark, sharp, layered and resilient—without copying branch composition into the eventual texture."
+  }
 }

@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_2d824a5622",
-  "label": "default_junglewood",
-  "texture_path": "ITEMS/mcl_core/default_junglewood.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for hand-worked jungle hardwood planks from an ancient humid dark-fantasy settlement. The boards come from enormous moisture-grown trees. Their grain should feel long, dense and slightly unruly, with deep warm brown fibers, darker water-aged streaks, occasional knots and hand-planed irregularity. Years of humid air have dulled the timber, softened exposed fibers and darkened seams without making the wood rotten. Avoid polished tropical furniture, glossy exotic hardwood, perfectly machined boards, repeated knots or saturated orange-red color. This is practical old construction timber surviving in a wet climate. Build a distinctive authored language of heavy jungle lumber: rich grain, subdued color, hand-worked wear and persistent humidity. Leave final board arrangement to the structural source texture."
+  "path": "ITEMS/mcl_core/default_junglewood.png",
+  "name": "default_junglewood.png",
+  "stages": {
+    "reference": "Create a close material reference for hand-worked jungle hardwood planks from an ancient humid dark-fantasy settlement. The boards come from enormous moisture-grown trees. Their grain should feel long, dense and slightly unruly, with deep warm brown fibers, darker water-aged streaks, occasional knots and hand-planed irregularity. Years of humid air have dulled the timber, softened exposed fibers and darkened seams without making the wood rotten. Avoid polished tropical furniture, glossy exotic hardwood, perfectly machined boards, repeated knots or saturated orange-red color. This is practical old construction timber surviving in a wet climate. Build a distinctive authored language of heavy jungle lumber: rich grain, subdued color, hand-worked wear and persistent humidity. Leave final board arrangement to the structural source texture."
+  }
 }

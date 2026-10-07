@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_5266cc7540",
-  "label": "mcl_core_andesite",
-  "texture_path": "ITEMS/mcl_core/mcl_core_andesite.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for natural andesite from an old grounded dark-fantasy volcanic region. It is a dense intermediate volcanic stone: fine-grained gray matrix with restrained darker mineral grains, subtle cooled-flow variation and blunt natural fracture. The rock should feel tougher and more homogeneous than granite yet richer than generic gray stone. Use muted medium gray with faint cool green-gray and charcoal mineral variation. Avoid concrete, speckled countertop granite, porous basalt holes, polished slabs or huge cracks. Establish andesite through compact volcanic texture, understated mineral diversity and geological solidity."
+  "path": "ITEMS/mcl_core/mcl_core_andesite.png",
+  "name": "mcl_core_andesite.png",
+  "stages": {
+    "reference": "Create a close material reference for natural andesite from an old grounded dark-fantasy volcanic region. It is a dense intermediate volcanic stone: fine-grained gray matrix with restrained darker mineral grains, subtle cooled-flow variation and blunt natural fracture. The rock should feel tougher and more homogeneous than granite yet richer than generic gray stone. Use muted medium gray with faint cool green-gray and charcoal mineral variation. Avoid concrete, speckled countertop granite, porous basalt holes, polished slabs or huge cracks. Establish andesite through compact volcanic texture, understated mineral diversity and geological solidity."
+  }
 }

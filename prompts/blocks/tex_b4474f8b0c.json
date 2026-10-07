@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_b4474f8b0c",
-  "label": "default_acacia_tree_top",
-  "texture_path": "ITEMS/mcl_core/default_acacia_tree_top.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for the freshly exposed but weathered end-grain of an acacia trunk in a grounded dark-fantasy world.\n\nShow the character of hard drought-grown wood: tight uneven growth rings, a dense darker heartwood, lighter dry sapwood, small radial checks and subtle staining from age and exposure. The tree should read as slow-grown and resilient, its history visible in compressed irregular rings rather than perfect concentric decoration.\n\nUse restrained warm ochre, dusty orange-brown and deep muted heartwood tones. Avoid a clean sawmill sample, perfectly circular rings, giant cracks, glossy varnish or ornamental target-like geometry.\n\nThe reference should establish believable acacia end-grain as an aged game-world material. Do not reproduce any source composition; concentrate on material identity, growth history and physical depth."
+  "path": "ITEMS/mcl_core/default_acacia_tree_top.png",
+  "name": "default_acacia_tree_top.png",
+  "stages": {
+    "reference": "Create a close visual reference for the freshly exposed but weathered end-grain of an acacia trunk in a grounded dark-fantasy world.\n\nShow the character of hard drought-grown wood: tight uneven growth rings, a dense darker heartwood, lighter dry sapwood, small radial checks and subtle staining from age and exposure. The tree should read as slow-grown and resilient, its history visible in compressed irregular rings rather than perfect concentric decoration.\n\nUse restrained warm ochre, dusty orange-brown and deep muted heartwood tones. Avoid a clean sawmill sample, perfectly circular rings, giant cracks, glossy varnish or ornamental target-like geometry.\n\nThe reference should establish believable acacia end-grain as an aged game-world material. Do not reproduce any source composition; concentrate on material identity, growth history and physical depth."
+  }
 }

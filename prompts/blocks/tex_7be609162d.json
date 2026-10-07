@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_7be609162d",
-  "label": "mcl_core_crying_obsidian",
-  "texture_path": "ITEMS/mcl_core/mcl_core_crying_obsidian.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for ancient obsidian altered by a strange persistent violet mineral exudation in a grounded dark-fantasy world. The base remains dense volcanic glass with dark conchoidal fracture and subtle frozen flow, but narrow internal fissures hold a saturated yet restrained purple-violet substance that appears to seep from within the stone. The phenomenon should feel mineral and uncanny, not neon circuitry or painted cracks. Preserve rich black glass detail around it. Avoid bright magical glow washing out the surface, lava-orange cracks, amethyst crystals or uniform purple veins. Make the material mysterious because something within the obsidian slowly weeps through real fractures."
+  "path": "ITEMS/mcl_core/mcl_core_crying_obsidian.png",
+  "name": "mcl_core_crying_obsidian.png",
+  "stages": {
+    "reference": "Create a close visual reference for ancient obsidian altered by a strange persistent violet mineral exudation in a grounded dark-fantasy world. The base remains dense volcanic glass with dark conchoidal fracture and subtle frozen flow, but narrow internal fissures hold a saturated yet restrained purple-violet substance that appears to seep from within the stone. The phenomenon should feel mineral and uncanny, not neon circuitry or painted cracks. Preserve rich black glass detail around it. Avoid bright magical glow washing out the surface, lava-orange cracks, amethyst crystals or uniform purple veins. Make the material mysterious because something within the obsidian slowly weeps through real fractures."
+  }
 }

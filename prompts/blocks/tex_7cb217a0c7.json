@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_7cb217a0c7",
-  "label": "default_mossycobble",
-  "texture_path": "ITEMS/mcl_core/default_mossycobble.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for ancient cobblestone slowly colonized by moss in a damp grounded dark-fantasy environment. The underlying stones remain distinct, worn and mineral-rich, while moss occupies protected joints, pits and persistently moist faces according to believable growth conditions. Some areas are velvety and dark green; others expose dry stone, old dirt and dead brown-green growth. Avoid covering every stone uniformly, bright emerald carpet, decorative vines or simply tinting cobble green. The material should tell a long relationship between masonry, moisture and living growth, with stone still dominant enough to read as cobblestone."
+  "path": "ITEMS/mcl_core/default_mossycobble.png",
+  "name": "default_mossycobble.png",
+  "stages": {
+    "reference": "Create a close visual reference for ancient cobblestone slowly colonized by moss in a damp grounded dark-fantasy environment. The underlying stones remain distinct, worn and mineral-rich, while moss occupies protected joints, pits and persistently moist faces according to believable growth conditions. Some areas are velvety and dark green; others expose dry stone, old dirt and dead brown-green growth. Avoid covering every stone uniformly, bright emerald carpet, decorative vines or simply tinting cobble green. The material should tell a long relationship between masonry, moisture and living growth, with stone still dominant enough to read as cobblestone."
+  }
 }

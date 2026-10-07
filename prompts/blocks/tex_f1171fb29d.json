@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_f1171fb29d",
-  "label": "mcl_core_diamond_ore",
-  "texture_path": "ITEMS/mcl_core/mcl_core_diamond_ore.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for rare diamond-bearing native stone in a grounded dark-fantasy geology. The ordinary dense gray host rock should dominate. Within it, small hard crystalline diamond-bearing zones emerge along pressure fractures and mineral pockets: pale icy cyan, near-colorless translucent facets and subtle internal depth caught inside rough stone. The crystals should feel grown under immense pressure, partly buried and structurally integrated with the matrix. Avoid evenly scattered cyan pixels, large jewelry diamonds, neon turquoise glow or a surface covered in gems. Rarity should be visible through sparse, convincing crystalline interruptions in otherwise ordinary stone."
+  "path": "ITEMS/mcl_core/mcl_core_diamond_ore.png",
+  "name": "mcl_core_diamond_ore.png",
+  "stages": {
+    "reference": "Create a close material reference for rare diamond-bearing native stone in a grounded dark-fantasy geology. The ordinary dense gray host rock should dominate. Within it, small hard crystalline diamond-bearing zones emerge along pressure fractures and mineral pockets: pale icy cyan, near-colorless translucent facets and subtle internal depth caught inside rough stone. The crystals should feel grown under immense pressure, partly buried and structurally integrated with the matrix. Avoid evenly scattered cyan pixels, large jewelry diamonds, neon turquoise glow or a surface covered in gems. Rarity should be visible through sparse, convincing crystalline interruptions in otherwise ordinary stone."
+  }
 }

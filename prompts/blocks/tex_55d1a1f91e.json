@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_55d1a1f91e",
-  "label": "default_steel_block",
-  "texture_path": "ITEMS/mcl_core/default_steel_block.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close visual reference for a large mass of old worked iron or steel in a grounded dark-fantasy industrial world. The metal should feel forged and repeatedly handled: dense gray body metal, subtle hammer-scale variation, fine scratches, shallow dents, dark oxide in recesses and restrained brown oxidation where moisture lingered. Keep broad areas metallic and solid rather than uniformly rusty. Avoid stainless-steel polish, brushed modern appliance texture, chrome reflections, diamond plate or orange rust covering everything. Establish practical heavy ferrous metal shaped by forge heat, tools and years of exposure."
+  "path": "ITEMS/mcl_core/default_steel_block.png",
+  "name": "default_steel_block.png",
+  "stages": {
+    "reference": "Create a close visual reference for a large mass of old worked iron or steel in a grounded dark-fantasy industrial world. The metal should feel forged and repeatedly handled: dense gray body metal, subtle hammer-scale variation, fine scratches, shallow dents, dark oxide in recesses and restrained brown oxidation where moisture lingered. Keep broad areas metallic and solid rather than uniformly rusty. Avoid stainless-steel polish, brushed modern appliance texture, chrome reflections, diamond plate or orange rust covering everything. Establish practical heavy ferrous metal shaped by forge heat, tools and years of exposure."
+  }
 }

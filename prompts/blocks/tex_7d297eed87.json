@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_7d297eed87",
-  "label": "mcl_core_planks_big_oak",
-  "texture_path": "ITEMS/mcl_core/mcl_core_planks_big_oak.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for planks cut from ancient dark oak and used in a grounded dark-fantasy stronghold. The timber is exceptionally dense, tannin-rich and old. Broad grain lines, dark heartwood streaks, occasional tight knots and hand-tool undulation should survive beneath years of handling, soot and damp air. Board surfaces are worn smoother on high areas while pores and seams retain near-black grime. Keep the palette deep brown, cool umber and muted charcoal-brown without making it black. Avoid glossy luxury wood, gothic ornament, giant cracks or artificial distressing. Make this feel like formidable structural timber whose darkness comes from species, age and use, not paint."
+  "path": "ITEMS/mcl_core/mcl_core_planks_big_oak.png",
+  "name": "mcl_core_planks_big_oak.png",
+  "stages": {
+    "reference": "Create a close material reference for planks cut from ancient dark oak and used in a grounded dark-fantasy stronghold. The timber is exceptionally dense, tannin-rich and old. Broad grain lines, dark heartwood streaks, occasional tight knots and hand-tool undulation should survive beneath years of handling, soot and damp air. Board surfaces are worn smoother on high areas while pores and seams retain near-black grime. Keep the palette deep brown, cool umber and muted charcoal-brown without making it black. Avoid glossy luxury wood, gothic ornament, giant cracks or artificial distressing. Make this feel like formidable structural timber whose darkness comes from species, age and use, not paint."
+  }
 }

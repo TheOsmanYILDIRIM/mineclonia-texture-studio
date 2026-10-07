@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "kind": "item_two_pass_manifest",
+  "schema_version": 2,
+  "kind": "canonical_prompt_manifest",
   "total": 100,
   "done": 100,
   "pending": 0,
@@ -806,5 +806,6 @@
       "file": "prompts/items/tex_9cc6a3bd5e.json"
     }
   ],
-  "batches": []
+  "batches": [],
+  "family": "items"
 }

@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_6f99a18f0e",
-  "label": "mcl_core_coarse_dirt",
-  "texture_path": "ITEMS/mcl_core/mcl_core_coarse_dirt.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for coarse, poor soil in a harsh grounded dark-fantasy landscape. Compared with ordinary dirt, this earth contains noticeably more grit, small angular stones, dry clods and fibrous debris, with less fine organic material binding it together. The surface should feel compact but inhospitable, breaking into uneven granular masses under weather. Use muted brown, dusty umber, gray-tan grit and restrained mineral flecks. Avoid full gravel, fertile black garden soil, giant rocks, cracked desert clay or noisy random speckles. Establish the material as recognizably dirt made rougher and leaner by stone content and erosion."
+  "path": "ITEMS/mcl_core/mcl_core_coarse_dirt.png",
+  "name": "mcl_core_coarse_dirt.png",
+  "stages": {
+    "reference": "Create a close material reference for coarse, poor soil in a harsh grounded dark-fantasy landscape. Compared with ordinary dirt, this earth contains noticeably more grit, small angular stones, dry clods and fibrous debris, with less fine organic material binding it together. The surface should feel compact but inhospitable, breaking into uneven granular masses under weather. Use muted brown, dusty umber, gray-tan grit and restrained mineral flecks. Avoid full gravel, fertile black garden soil, giant rocks, cracked desert clay or noisy random speckles. Establish the material as recognizably dirt made rougher and leaner by stone content and erosion."
+  }
 }

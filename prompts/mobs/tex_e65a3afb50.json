@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "family": "mobs",
+  "id": "tex_e65a3afb50",
+  "path": "ENTITIES/mobs_mc/mobs_mc_cat_siamese.png",
+  "name": "mobs_mc_cat_siamese.png",
+  "stages": {
+    "reference": "# Siamese Cat — Creature Reference\n\nCreate a high-quality visual material reference for the entity/variant described below. This reference will be used in a second pass to transfer appearance onto an already structurally correct UV atlas; do not create a UV map, texture atlas, Minecraft render, voxel model, diagram, or game screenshot.\n\nSUBJECT:\nA Siamese colorpoint cat with warm ivory/cream body and distinctly dark seal-brown face, ears, legs and tail. Smooth short fur, strong but natural point contrast, cool blue eye character where visible.\n\nART DIRECTION:\nGrounded dark-fantasy realism: ancient, weathered, somber, tactile and physically believable. Use restrained saturation, soft neutral diffuse lighting, controlled micro-detail and natural material transitions. Preserve the recognizable source identity and variant; do not redesign anatomy, add accessories, exaggerate horror, cute-ify the subject, or turn it into a different species.\n\nREFERENCE FUNCTION:\nMake pigmentation, markings, surface materials, age/wear and color relationships easy to read across the important visible body/material regions. Prefer a clear neutral three-quarter presentation or similarly informative view over dramatic action. Avoid heavy shadows, colored cinematic lighting, strong depth of field, glossy toy surfaces, cartoon/anime styling, pixel art, text, UI and decorative scene clutter.\n\nUse a simple neutral unobtrusive background. The image should be useful primarily as a clean appearance/material reference for later UV transfer."
+  }
+}

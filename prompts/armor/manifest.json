@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "kind": "armor_uv_prompt_manifest",
+  "schema_version": 2,
+  "kind": "canonical_prompt_manifest",
   "workflow": "three_stage_hq_uv_reference_transfer",
   "total": 32,
   "done": 32,
@@ -24,7 +24,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_84a83caec5.json"
     },
     {
       "order": 2,
@@ -34,7 +34,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_c271a9dbf1.json"
     },
     {
       "order": 3,
@@ -44,7 +44,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_a97e0bfa6e.json"
     },
     {
       "order": 4,
@@ -54,7 +54,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_4cc2c1f9ba.json"
     },
     {
       "order": 5,
@@ -64,7 +64,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_459055bde9.json"
     },
     {
       "order": 6,
@@ -74,7 +74,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_2a33f6bb01.json"
     },
     {
       "order": 7,
@@ -84,7 +84,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_57b0426674.json"
     },
     {
       "order": 8,
@@ -94,7 +94,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_d2fac86849.json"
     },
     {
       "order": 9,
@@ -104,7 +104,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_f9d46510d0.json"
     },
     {
       "order": 10,
@@ -114,7 +114,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_f98465371b.json"
     },
     {
       "order": 11,
@@ -124,7 +124,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_4ee587d7eb.json"
     },
     {
       "order": 12,
@@ -134,7 +134,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_1ef1b952ca.json"
     },
     {
       "order": 13,
@@ -144,7 +144,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_7aed472c0a.json"
     },
     {
       "order": 14,
@@ -154,7 +154,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_1cf3c09993.json"
     },
     {
       "order": 15,
@@ -164,7 +164,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_5f97bf19fa.json"
     },
     {
       "order": 16,
@@ -174,7 +174,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_b3a9a24f8e.json"
     },
     {
       "order": 17,
@@ -184,7 +184,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_7ff15ade04.json"
     },
     {
       "order": 18,
@@ -194,7 +194,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_a545e31f29.json"
     },
     {
       "order": 19,
@@ -204,7 +204,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_11c998901f.json"
     },
     {
       "order": 20,
@@ -214,7 +214,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_5c012266f6.json"
     },
     {
       "order": 21,
@@ -224,7 +224,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_ed9f065608.json"
     },
     {
       "order": 22,
@@ -234,7 +234,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_52339ba119.json"
     },
     {
       "order": 23,
@@ -244,7 +244,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_fe07858c16.json"
     },
     {
       "order": 24,
@@ -254,7 +254,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_80b5489262.json"
     },
     {
       "order": 25,
@@ -264,7 +264,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_84de4f9334.json"
     },
     {
       "order": 26,
@@ -274,7 +274,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_90e123276d.json"
     },
     {
       "order": 27,
@@ -284,7 +284,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_6d51567db2.json"
     },
     {
       "order": 28,
@@ -294,7 +294,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_b1fd250c67.json"
     },
     {
       "order": 29,
@@ -304,7 +304,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_eb654689e0.json"
     },
     {
       "order": 30,
@@ -314,7 +314,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_0a0fc32079.json"
     },
     {
       "order": 31,
@@ -324,7 +324,7 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_b29be90a2d.json"
     },
     {
       "order": 32,
@@ -334,15 +334,9 @@
       "priority": "P2",
       "workflow_role": "armor_uv",
       "status": "done",
-      "file": "prompts/armor/batch_001_032.json"
+      "file": "prompts/armor/tex_c6278f24b0.json"
     }
   ],
-  "batches": [
-    {
-      "start": 1,
-      "end": 32,
-      "count": 32,
-      "file": "prompts/armor/batch_001_032.json"
-    }
-  ]
+  "batches": [],
+  "family": "armor"
 }

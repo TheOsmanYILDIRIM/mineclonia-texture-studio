@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "family": "mobs",
+  "id": "tex_6a41d593d0",
+  "path": "ENTITIES/mobs_mc/mobs_mc_cat_ocelot.png",
+  "name": "mobs_mc_cat_ocelot.png",
+  "stages": {
+    "reference": "# Ocelot Cat — Creature Reference\n\nCreate a high-quality visual material reference for the entity/variant described below. This reference will be used in a second pass to transfer appearance onto an already structurally correct UV atlas; do not create a UV map, texture atlas, Minecraft render, voxel model, diagram, or game screenshot.\n\nSUBJECT:\nAn ocelot-like feline coat: warm tawny-gold base, pale underside and distinct dark rosettes/spots with natural irregularity. Fine short fur and wild-cat material realism; do not simplify the markings into domestic tabby stripes.\n\nART DIRECTION:\nGrounded dark-fantasy realism: ancient, weathered, somber, tactile and physically believable. Use restrained saturation, soft neutral diffuse lighting, controlled micro-detail and natural material transitions. Preserve the recognizable source identity and variant; do not redesign anatomy, add accessories, exaggerate horror, cute-ify the subject, or turn it into a different species.\n\nREFERENCE FUNCTION:\nMake pigmentation, markings, surface materials, age/wear and color relationships easy to read across the important visible body/material regions. Prefer a clear neutral three-quarter presentation or similarly informative view over dramatic action. Avoid heavy shadows, colored cinematic lighting, strong depth of field, glossy toy surfaces, cartoon/anime styling, pixel art, text, UI and decorative scene clutter.\n\nUse a simple neutral unobtrusive background. The image should be useful primarily as a clean appearance/material reference for later UV transfer."
+  }
+}

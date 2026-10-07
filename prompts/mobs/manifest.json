@@ -1,12 +1,12 @@
 {
-  "schema_version": 1,
-  "kind": "mob_entity_prompt_manifest",
+  "schema_version": 2,
+  "kind": "canonical_prompt_manifest",
   "workflow": "two_pass_hq_uv_then_reference_transfer",
-  "total": 241,
+  "total": 30,
   "mob_uv_total": 241,
   "auxiliary_total": 0,
   "done": 30,
-  "pending": 211,
+  "pending": 0,
   "last_completed_id": "tex_be7e0afdef",
   "last_completed_name": "mobs_mc_horse_chestnut.png",
   "next_id": "tex_e3963053d8",
@@ -28,7 +28,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_4c96b854a2.txt"
+      "file": "prompts/mobs/tex_4c96b854a2.json"
     },
     {
       "order": 2,
@@ -38,7 +38,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_5118e747ee.txt"
+      "file": "prompts/mobs/tex_5118e747ee.json"
     },
     {
       "order": 3,
@@ -48,7 +48,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_2ad993a962.txt"
+      "file": "prompts/mobs/tex_2ad993a962.json"
     },
     {
       "order": 4,
@@ -58,7 +58,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_3e9208c33b.txt"
+      "file": "prompts/mobs/tex_3e9208c33b.json"
     },
     {
       "order": 5,
@@ -68,7 +68,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_739f764dab.txt"
+      "file": "prompts/mobs/tex_739f764dab.json"
     },
     {
       "order": 6,
@@ -78,7 +78,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_050308d4cf.txt"
+      "file": "prompts/mobs/tex_050308d4cf.json"
     },
     {
       "order": 7,
@@ -88,7 +88,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_847bab2e9c.txt"
+      "file": "prompts/mobs/tex_847bab2e9c.json"
     },
     {
       "order": 8,
@@ -98,7 +98,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_703fd96869.txt"
+      "file": "prompts/mobs/tex_703fd96869.json"
     },
     {
       "order": 9,
@@ -108,7 +108,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_11b402716e.txt"
+      "file": "prompts/mobs/tex_11b402716e.json"
     },
     {
       "order": 10,
@@ -118,7 +118,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_15f0c75051.txt"
+      "file": "prompts/mobs/tex_15f0c75051.json"
     },
     {
       "order": 11,
@@ -128,7 +128,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_42562c4b34.txt"
+      "file": "prompts/mobs/tex_42562c4b34.json"
     },
     {
       "order": 12,
@@ -138,7 +138,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_cbafc01c98.txt"
+      "file": "prompts/mobs/tex_cbafc01c98.json"
     },
     {
       "order": 13,
@@ -148,7 +148,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_bc77d74ff3.txt"
+      "file": "prompts/mobs/tex_bc77d74ff3.json"
     },
     {
       "order": 14,
@@ -158,7 +158,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_6a41d593d0.txt"
+      "file": "prompts/mobs/tex_6a41d593d0.json"
     },
     {
       "order": 15,
@@ -168,7 +168,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_62e7985d98.txt"
+      "file": "prompts/mobs/tex_62e7985d98.json"
     },
     {
       "order": 16,
@@ -178,7 +178,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_2b84c5cfc0.txt"
+      "file": "prompts/mobs/tex_2b84c5cfc0.json"
     },
     {
       "order": 17,
@@ -188,7 +188,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_643abbcad6.txt"
+      "file": "prompts/mobs/tex_643abbcad6.json"
     },
     {
       "order": 18,
@@ -198,7 +198,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_e65a3afb50.txt"
+      "file": "prompts/mobs/tex_e65a3afb50.json"
     },
     {
       "order": 19,
@@ -208,7 +208,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_df599dc93f.txt"
+      "file": "prompts/mobs/tex_df599dc93f.json"
     },
     {
       "order": 20,
@@ -218,7 +218,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_07c710c7a6.txt"
+      "file": "prompts/mobs/tex_07c710c7a6.json"
     },
     {
       "order": 21,
@@ -228,7 +228,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_1569b9031b.txt"
+      "file": "prompts/mobs/tex_1569b9031b.json"
     },
     {
       "order": 22,
@@ -238,7 +238,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_93dcbde84e.txt"
+      "file": "prompts/mobs/tex_93dcbde84e.json"
     },
     {
       "order": 23,
@@ -248,7 +248,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_898ffa3d20.txt"
+      "file": "prompts/mobs/tex_898ffa3d20.json"
     },
     {
       "order": 24,
@@ -258,7 +258,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_e0e1d99044.txt"
+      "file": "prompts/mobs/tex_e0e1d99044.json"
     },
     {
       "order": 25,
@@ -268,7 +268,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_52a67cca9e.txt"
+      "file": "prompts/mobs/tex_52a67cca9e.json"
     },
     {
       "order": 26,
@@ -278,7 +278,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_87ac7bc43e.txt"
+      "file": "prompts/mobs/tex_87ac7bc43e.json"
     },
     {
       "order": 27,
@@ -288,7 +288,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_6f4c0e47af.txt"
+      "file": "prompts/mobs/tex_6f4c0e47af.json"
     },
     {
       "order": 28,
@@ -298,7 +298,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_16f4879c00.txt"
+      "file": "prompts/mobs/tex_16f4879c00.json"
     },
     {
       "order": 29,
@@ -308,7 +308,7 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_157ac6ba23.txt"
+      "file": "prompts/mobs/tex_157ac6ba23.json"
     },
     {
       "order": 30,
@@ -318,2117 +318,9 @@
       "priority": "P1",
       "workflow_role": "mob_uv",
       "status": "done",
-      "file": "prompts/mobs/tex_be7e0afdef.txt"
-    },
-    {
-      "order": 31,
-      "id": "tex_e3963053d8",
-      "name": "mobs_mc_horse_creamy.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_creamy.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 32,
-      "id": "tex_35923ab5f0",
-      "name": "mobs_mc_horse_darkbrown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_darkbrown.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 33,
-      "id": "tex_0dca066f9c",
-      "name": "mobs_mc_horse_gray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_gray.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 34,
-      "id": "tex_6821297350",
-      "name": "mobs_mc_horse_markings_blackdots.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_markings_blackdots.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 35,
-      "id": "tex_2dfd14d1c8",
-      "name": "mobs_mc_horse_markings_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_markings_white.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 36,
-      "id": "tex_f2d79163fc",
-      "name": "mobs_mc_horse_markings_whitedots.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_markings_whitedots.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 37,
-      "id": "tex_faa6b7718e",
-      "name": "mobs_mc_horse_markings_whitefield.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_markings_whitefield.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 38,
-      "id": "tex_11a7011fc5",
-      "name": "mobs_mc_horse_skeleton.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_skeleton.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 39,
-      "id": "tex_0d29d98456",
-      "name": "mobs_mc_horse_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_white.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 40,
-      "id": "tex_0a0ef367b5",
-      "name": "mobs_mc_horse_zombie.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_horse_zombie.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 41,
-      "id": "tex_4808c1c798",
-      "name": "mobs_mc_pig.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_pig.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 42,
-      "id": "tex_78231fc7f6",
-      "name": "mobs_mc_pig_saddle.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_pig_saddle.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 43,
-      "id": "tex_edc05cb4da",
-      "name": "mobs_mc_rabbit_black.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_black.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 44,
-      "id": "tex_d6211ff694",
-      "name": "mobs_mc_rabbit_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_brown.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 45,
-      "id": "tex_13ac1c45f8",
-      "name": "mobs_mc_rabbit_caerbannog.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_caerbannog.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 46,
-      "id": "tex_bb8390805b",
-      "name": "mobs_mc_rabbit_gold.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_gold.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 47,
-      "id": "tex_8ef2cfc72b",
-      "name": "mobs_mc_rabbit_salt.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_salt.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 48,
-      "id": "tex_740c247735",
-      "name": "mobs_mc_rabbit_toast.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_toast.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 49,
-      "id": "tex_9127a68657",
-      "name": "mobs_mc_rabbit_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_white.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 50,
-      "id": "tex_5c7f7d3be3",
-      "name": "mobs_mc_rabbit_white_splotched.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_rabbit_white_splotched.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 51,
-      "id": "tex_6dd195716e",
-      "name": "mobs_mc_sheep.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_sheep.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 52,
-      "id": "tex_f587934399",
-      "name": "mobs_mc_sheep_fur.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_sheep_fur.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 53,
-      "id": "tex_3c776b0d97",
-      "name": "mobs_mc_sheep_sheared.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_sheep_sheared.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 54,
-      "id": "tex_b832f36857",
-      "name": "mobs_mc_skeleton.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_skeleton.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 55,
-      "id": "tex_8ec877b951",
-      "name": "mobs_mc_spider.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_spider.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 56,
-      "id": "tex_ad300b7cb7",
-      "name": "mobs_mc_spider_eyes.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_spider_eyes.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 57,
-      "id": "tex_f7786c2ff1",
-      "name": "mobs_mc_squid.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_squid.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 58,
-      "id": "tex_d4a88142b2",
-      "name": "mobs_mc_villager.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 59,
-      "id": "tex_8a054f70a9",
-      "name": "mobs_mc_villager_base.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_base.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 60,
-      "id": "tex_a988492abb",
-      "name": "mobs_mc_villager_desert.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_desert.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 61,
-      "id": "tex_294e4757c2",
-      "name": "mobs_mc_villager_jungle.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_jungle.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 62,
-      "id": "tex_5c1e177257",
-      "name": "mobs_mc_villager_plains.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_plains.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 63,
-      "id": "tex_8a364398a8",
-      "name": "mobs_mc_villager_profession_armorer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_armorer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 64,
-      "id": "tex_0e26da5775",
-      "name": "mobs_mc_villager_profession_butcher.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_butcher.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 65,
-      "id": "tex_f258ce549b",
-      "name": "mobs_mc_villager_profession_cartographer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_cartographer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 66,
-      "id": "tex_322fd0e2f0",
-      "name": "mobs_mc_villager_profession_cleric.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_cleric.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 67,
-      "id": "tex_f92e188470",
-      "name": "mobs_mc_villager_profession_farmer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_farmer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 68,
-      "id": "tex_c122987d06",
-      "name": "mobs_mc_villager_profession_fisherman.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_fisherman.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 69,
-      "id": "tex_2715ba2f8e",
-      "name": "mobs_mc_villager_profession_fletcher.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_fletcher.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 70,
-      "id": "tex_7a7b13600f",
-      "name": "mobs_mc_villager_profession_leatherworker.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_leatherworker.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 71,
-      "id": "tex_94a1bc6953",
-      "name": "mobs_mc_villager_profession_librarian.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_librarian.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 72,
-      "id": "tex_7f14e26ce7",
-      "name": "mobs_mc_villager_profession_mason.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_mason.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 73,
-      "id": "tex_f12d3d8211",
-      "name": "mobs_mc_villager_profession_nitwit.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_nitwit.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 74,
-      "id": "tex_fb6f0d604f",
-      "name": "mobs_mc_villager_profession_shepherd.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_shepherd.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 75,
-      "id": "tex_8e9a15ecaa",
-      "name": "mobs_mc_villager_profession_toolsmith.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_toolsmith.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 76,
-      "id": "tex_d58ec390ab",
-      "name": "mobs_mc_villager_profession_weaponsmith.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_profession_weaponsmith.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 77,
-      "id": "tex_2511d87559",
-      "name": "mobs_mc_villager_savanna.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_savanna.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 78,
-      "id": "tex_7591722551",
-      "name": "mobs_mc_villager_snow.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_snow.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 79,
-      "id": "tex_37b8c883c2",
-      "name": "mobs_mc_villager_swamp.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_swamp.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 80,
-      "id": "tex_9018f9da41",
-      "name": "mobs_mc_villager_taiga.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_taiga.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 81,
-      "id": "tex_580b3fe65d",
-      "name": "mobs_mc_villager_wandering_trader.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_villager_wandering_trader.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 82,
-      "id": "tex_b0d3e456b6",
-      "name": "mobs_mc_vindicator.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_vindicator.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 83,
-      "id": "tex_99960c20f6",
-      "name": "mobs_mc_wither_skeleton.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wither_skeleton.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 84,
-      "id": "tex_19c86efd4f",
-      "name": "mobs_mc_wolf.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 85,
-      "id": "tex_f213e97af2",
-      "name": "mobs_mc_wolf_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 86,
-      "id": "tex_5e1878b7df",
-      "name": "mobs_mc_wolf_ashen.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_ashen.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 87,
-      "id": "tex_744828be12",
-      "name": "mobs_mc_wolf_ashen_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_ashen_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 88,
-      "id": "tex_3a8f4ea94d",
-      "name": "mobs_mc_wolf_ashen_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_ashen_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 89,
-      "id": "tex_2ab5cded20",
-      "name": "mobs_mc_wolf_black.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_black.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 90,
-      "id": "tex_87cd42ae1a",
-      "name": "mobs_mc_wolf_black_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_black_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 91,
-      "id": "tex_8269cf8439",
-      "name": "mobs_mc_wolf_black_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_black_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 92,
-      "id": "tex_9918117ddb",
-      "name": "mobs_mc_wolf_chestnut.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_chestnut.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 93,
-      "id": "tex_d092b65d11",
-      "name": "mobs_mc_wolf_chestnut_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_chestnut_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 94,
-      "id": "tex_102d186291",
-      "name": "mobs_mc_wolf_chestnut_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_chestnut_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 95,
-      "id": "tex_97f40017d4",
-      "name": "mobs_mc_wolf_collar.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_collar.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 96,
-      "id": "tex_d52df846d8",
-      "name": "mobs_mc_wolf_rusty.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_rusty.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 97,
-      "id": "tex_1bd5d22cd1",
-      "name": "mobs_mc_wolf_rusty_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_rusty_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 98,
-      "id": "tex_2eb3fbbf24",
-      "name": "mobs_mc_wolf_rusty_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_rusty_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 99,
-      "id": "tex_0d7716c9e6",
-      "name": "mobs_mc_wolf_snowy.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_snowy.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 100,
-      "id": "tex_cdbdc2d935",
-      "name": "mobs_mc_wolf_snowy_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_snowy_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 101,
-      "id": "tex_f151b47a95",
-      "name": "mobs_mc_wolf_snowy_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_snowy_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 102,
-      "id": "tex_3c41e9b620",
-      "name": "mobs_mc_wolf_spotted.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_spotted.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 103,
-      "id": "tex_720008d384",
-      "name": "mobs_mc_wolf_spotted_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_spotted_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 104,
-      "id": "tex_47886d6d49",
-      "name": "mobs_mc_wolf_spotted_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_spotted_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 105,
-      "id": "tex_800d49feb0",
-      "name": "mobs_mc_wolf_striped.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_striped.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 106,
-      "id": "tex_0512de044f",
-      "name": "mobs_mc_wolf_striped_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_striped_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 107,
-      "id": "tex_7d7e239dc8",
-      "name": "mobs_mc_wolf_striped_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_striped_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 108,
-      "id": "tex_3aa1c86211",
-      "name": "mobs_mc_wolf_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 109,
-      "id": "tex_096036e846",
-      "name": "mobs_mc_wolf_woods.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_woods.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 110,
-      "id": "tex_442be33dd0",
-      "name": "mobs_mc_wolf_woods_angry.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_woods_angry.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 111,
-      "id": "tex_1879b40999",
-      "name": "mobs_mc_wolf_woods_tame.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wolf_woods_tame.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 112,
-      "id": "tex_1cbbbcd49f",
-      "name": "mobs_mc_zombie.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 113,
-      "id": "tex_4e2d3b1765",
-      "name": "mobs_mc_zombie_villager.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 114,
-      "id": "tex_baf790286c",
-      "name": "mobs_mc_zombie_villager_base.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_base.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 115,
-      "id": "tex_5946123cf9",
-      "name": "mobs_mc_zombie_villager_desert.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_desert.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 116,
-      "id": "tex_1b8089b263",
-      "name": "mobs_mc_zombie_villager_jungle.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_jungle.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 117,
-      "id": "tex_a8db054e67",
-      "name": "mobs_mc_zombie_villager_plains.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_plains.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 118,
-      "id": "tex_e2208a5f5f",
-      "name": "mobs_mc_zombie_villager_profession_armorer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_armorer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 119,
-      "id": "tex_6adc571835",
-      "name": "mobs_mc_zombie_villager_profession_butcher.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_butcher.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 120,
-      "id": "tex_839f34eca6",
-      "name": "mobs_mc_zombie_villager_profession_cartographer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_cartographer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 121,
-      "id": "tex_34d4256edc",
-      "name": "mobs_mc_zombie_villager_profession_cleric.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_cleric.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 122,
-      "id": "tex_23eeac460b",
-      "name": "mobs_mc_zombie_villager_profession_farmer.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_farmer.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 123,
-      "id": "tex_1eff99439b",
-      "name": "mobs_mc_zombie_villager_profession_fisherman.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_fisherman.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 124,
-      "id": "tex_1053974e4e",
-      "name": "mobs_mc_zombie_villager_profession_fletcher.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_fletcher.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 125,
-      "id": "tex_75d8f5cf04",
-      "name": "mobs_mc_zombie_villager_profession_leatherworker.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_leatherworker.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 126,
-      "id": "tex_3f1275e34a",
-      "name": "mobs_mc_zombie_villager_profession_librarian.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_librarian.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 127,
-      "id": "tex_3ee3f1777c",
-      "name": "mobs_mc_zombie_villager_profession_mason.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_mason.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 128,
-      "id": "tex_adaf21be59",
-      "name": "mobs_mc_zombie_villager_profession_nitwit.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_nitwit.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 129,
-      "id": "tex_869daee2f1",
-      "name": "mobs_mc_zombie_villager_profession_shepherd.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_shepherd.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 130,
-      "id": "tex_d66d99eb13",
-      "name": "mobs_mc_zombie_villager_profession_toolsmith.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_toolsmith.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 131,
-      "id": "tex_e00bc2c08e",
-      "name": "mobs_mc_zombie_villager_profession_weaponsmith.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_profession_weaponsmith.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 132,
-      "id": "tex_81ec5f12da",
-      "name": "mobs_mc_zombie_villager_savanna.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_savanna.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 133,
-      "id": "tex_df6df9f5db",
-      "name": "mobs_mc_zombie_villager_snow.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_snow.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 134,
-      "id": "tex_a2d68833a1",
-      "name": "mobs_mc_zombie_villager_swamp.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_swamp.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 135,
-      "id": "tex_49258b556f",
-      "name": "mobs_mc_zombie_villager_taiga.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_zombie_villager_taiga.png",
-      "priority": "P1",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 136,
-      "id": "tex_b60aafe636",
-      "name": "extra_mobs_dolphin.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_dolphin.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 137,
-      "id": "tex_0447ef7f70",
-      "name": "extra_mobs_hoglin.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_hoglin.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 138,
-      "id": "tex_4550d0422d",
-      "name": "extra_mobs_strider.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_strider.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 139,
-      "id": "tex_677fb05a3e",
-      "name": "extra_mobs_strider_cold.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_strider_cold.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 140,
-      "id": "tex_9fd9f20c12",
-      "name": "extra_mobs_tropical_fish_a.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_a.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 141,
-      "id": "tex_840136722f",
-      "name": "extra_mobs_tropical_fish_b.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_b.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 142,
-      "id": "tex_2b66fcdbb5",
-      "name": "extra_mobs_tropical_fish_pattern_a_1.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_1.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 143,
-      "id": "tex_3559104a2f",
-      "name": "extra_mobs_tropical_fish_pattern_a_2.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_2.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 144,
-      "id": "tex_9efa285bf5",
-      "name": "extra_mobs_tropical_fish_pattern_a_3.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_3.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 145,
-      "id": "tex_6b1377d73b",
-      "name": "extra_mobs_tropical_fish_pattern_a_4.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_4.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 146,
-      "id": "tex_14ffb4428d",
-      "name": "extra_mobs_tropical_fish_pattern_a_5.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_5.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 147,
-      "id": "tex_0027e51c9d",
-      "name": "extra_mobs_tropical_fish_pattern_a_6.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_a_6.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 148,
-      "id": "tex_70b9d9a645",
-      "name": "extra_mobs_tropical_fish_pattern_b_1.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_1.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 149,
-      "id": "tex_d6438b1df2",
-      "name": "extra_mobs_tropical_fish_pattern_b_2.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_2.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 150,
-      "id": "tex_73b1b93ee9",
-      "name": "extra_mobs_tropical_fish_pattern_b_3.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_3.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 151,
-      "id": "tex_21be596a77",
-      "name": "extra_mobs_tropical_fish_pattern_b_4.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_4.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 152,
-      "id": "tex_18f0b935b8",
-      "name": "extra_mobs_tropical_fish_pattern_b_5.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_5.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 153,
-      "id": "tex_7e9e0e8b54",
-      "name": "extra_mobs_tropical_fish_pattern_b_6.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_tropical_fish_pattern_b_6.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 154,
-      "id": "tex_39cd6270b5",
-      "name": "extra_mobs_zoglin.png",
-      "texture_path": "ENTITIES/mobs_mc/extra_mobs_zoglin.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 155,
-      "id": "tex_30611c32ce",
-      "name": "mobs_mc_axolotl_black.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_black.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 156,
-      "id": "tex_d759ef8676",
-      "name": "mobs_mc_axolotl_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_brown.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 157,
-      "id": "tex_b652e3a2f7",
-      "name": "mobs_mc_axolotl_green.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_green.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 158,
-      "id": "tex_5c862540b8",
-      "name": "mobs_mc_axolotl_pink.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_pink.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 159,
-      "id": "tex_3eb8814f79",
-      "name": "mobs_mc_axolotl_purple.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_purple.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 160,
-      "id": "tex_5c06703e61",
-      "name": "mobs_mc_axolotl_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_white.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 161,
-      "id": "tex_9877b84e95",
-      "name": "mobs_mc_axolotl_yellow.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_axolotl_yellow.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 162,
-      "id": "tex_53f53e624e",
-      "name": "mobs_mc_blaze.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_blaze.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 163,
-      "id": "tex_3471cdaf04",
-      "name": "mobs_mc_donkey.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_donkey.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 164,
-      "id": "tex_fe5f82f8c9",
-      "name": "mobs_mc_dragon.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_dragon.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 165,
-      "id": "tex_595d384bbc",
-      "name": "mobs_mc_drowned.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_drowned.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 166,
-      "id": "tex_0291a9d07a",
-      "name": "mobs_mc_drowned_overlay.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_drowned_overlay.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 167,
-      "id": "tex_a1277455cb",
-      "name": "mobs_mc_endergolem.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_endergolem.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 168,
-      "id": "tex_3c5cc18dce",
-      "name": "mobs_mc_endermite.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_endermite.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 169,
-      "id": "tex_55b566e923",
-      "name": "mobs_mc_evoker.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_evoker.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 170,
-      "id": "tex_a14b786253",
-      "name": "mobs_mc_ghast.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_ghast.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 171,
-      "id": "tex_b9ada4687c",
-      "name": "mobs_mc_ghast_firing.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_ghast_firing.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 172,
-      "id": "tex_ace88b3c19",
-      "name": "mobs_mc_guardian.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_guardian.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 173,
-      "id": "tex_1963341a75",
-      "name": "mobs_mc_guardian_elder.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_guardian_elder.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 174,
-      "id": "tex_a7eadd9d74",
-      "name": "mobs_mc_husk.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_husk.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 175,
-      "id": "tex_1baff832ef",
-      "name": "mobs_mc_illusionist.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_illusionist.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 176,
-      "id": "tex_441b0d7fa3",
-      "name": "mobs_mc_iron_golem.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_iron_golem.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 177,
-      "id": "tex_44e2d4d267",
-      "name": "mobs_mc_iron_golem_crack_high.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_iron_golem_crack_high.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 178,
-      "id": "tex_4185f97a64",
-      "name": "mobs_mc_iron_golem_crack_low.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_iron_golem_crack_low.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 179,
-      "id": "tex_0829b2b51f",
-      "name": "mobs_mc_iron_golem_crack_medium.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_iron_golem_crack_medium.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 180,
-      "id": "tex_62a5b17d4c",
-      "name": "mobs_mc_llama.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 181,
-      "id": "tex_84cb2a64fc",
-      "name": "mobs_mc_llama_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_brown.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 182,
-      "id": "tex_dc30f918d0",
-      "name": "mobs_mc_llama_creamy.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_creamy.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 183,
-      "id": "tex_d4a82ffa99",
-      "name": "mobs_mc_llama_decor_black.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_black.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 184,
-      "id": "tex_3f328a12e5",
-      "name": "mobs_mc_llama_decor_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 185,
-      "id": "tex_f0c29fa4be",
-      "name": "mobs_mc_llama_decor_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_brown.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 186,
-      "id": "tex_08ecd78e85",
-      "name": "mobs_mc_llama_decor_cyan.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_cyan.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 187,
-      "id": "tex_d71451aa46",
-      "name": "mobs_mc_llama_decor_gray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_gray.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 188,
-      "id": "tex_a4ec346310",
-      "name": "mobs_mc_llama_decor_green.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_green.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 189,
-      "id": "tex_69a7731fe1",
-      "name": "mobs_mc_llama_decor_light_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_light_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 190,
-      "id": "tex_2ad60a9425",
-      "name": "mobs_mc_llama_decor_light_gray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_light_gray.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 191,
-      "id": "tex_0ed1b470ec",
-      "name": "mobs_mc_llama_decor_lime.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_lime.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 192,
-      "id": "tex_e71d7f252e",
-      "name": "mobs_mc_llama_decor_magenta.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_magenta.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 193,
-      "id": "tex_6aa0bb2542",
-      "name": "mobs_mc_llama_decor_orange.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_orange.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 194,
-      "id": "tex_767e511f52",
-      "name": "mobs_mc_llama_decor_pink.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_pink.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 195,
-      "id": "tex_92e4d882da",
-      "name": "mobs_mc_llama_decor_purple.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_purple.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 196,
-      "id": "tex_288526e00e",
-      "name": "mobs_mc_llama_decor_red.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_red.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 197,
-      "id": "tex_7fd9ed0ef3",
-      "name": "mobs_mc_llama_decor_wandering_trader.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_wandering_trader.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 198,
-      "id": "tex_6afc491663",
-      "name": "mobs_mc_llama_decor_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_white.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 199,
-      "id": "tex_53f5efae27",
-      "name": "mobs_mc_llama_decor_yellow.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_decor_yellow.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 200,
-      "id": "tex_fef694a410",
-      "name": "mobs_mc_llama_gray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_gray.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 201,
-      "id": "tex_e8de9705d5",
-      "name": "mobs_mc_llama_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_llama_white.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 202,
-      "id": "tex_6d603f805c",
-      "name": "mobs_mc_magmacube.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_magmacube.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 203,
-      "id": "tex_b63317715e",
-      "name": "mobs_mc_mooshroom.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_mooshroom.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 204,
-      "id": "tex_49246e9c2e",
-      "name": "mobs_mc_mooshroom_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_mooshroom_brown.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 205,
-      "id": "tex_9ae128f484",
-      "name": "mobs_mc_mule.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_mule.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 206,
-      "id": "tex_a6a3b99c7e",
-      "name": "mobs_mc_parrot_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_parrot_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 207,
-      "id": "tex_015531c722",
-      "name": "mobs_mc_parrot_green.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_parrot_green.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 208,
-      "id": "tex_44bc1c670a",
-      "name": "mobs_mc_parrot_grey.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_parrot_grey.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 209,
-      "id": "tex_1204176282",
-      "name": "mobs_mc_parrot_red_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_parrot_red_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 210,
-      "id": "tex_0507bf208c",
-      "name": "mobs_mc_parrot_yellow_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_parrot_yellow_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 211,
-      "id": "tex_389a4e1523",
-      "name": "mobs_mc_pillager.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_pillager.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 212,
-      "id": "tex_40e32aaf3a",
-      "name": "mobs_mc_polarbear.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_polarbear.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 213,
-      "id": "tex_aa75b2a33b",
-      "name": "mobs_mc_pufferfish.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_pufferfish.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 214,
-      "id": "tex_91fa281972",
-      "name": "mobs_mc_ravager.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_ravager.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 215,
-      "id": "tex_62cf1e2131",
-      "name": "mobs_mc_shulker_black.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_black.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 216,
-      "id": "tex_fcec166370",
-      "name": "mobs_mc_shulker_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 217,
-      "id": "tex_5a398cb5f0",
-      "name": "mobs_mc_shulker_brown.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_brown.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 218,
-      "id": "tex_8192a9e2ab",
-      "name": "mobs_mc_shulker_cyan.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_cyan.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 219,
-      "id": "tex_0ce14a1861",
-      "name": "mobs_mc_shulker_gray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_gray.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 220,
-      "id": "tex_5c139a499a",
-      "name": "mobs_mc_shulker_green.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_green.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 221,
-      "id": "tex_29937c838e",
-      "name": "mobs_mc_shulker_light_blue.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_light_blue.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 222,
-      "id": "tex_cad235e8f7",
-      "name": "mobs_mc_shulker_lime.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_lime.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 223,
-      "id": "tex_e6bf3152ab",
-      "name": "mobs_mc_shulker_magenta.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_magenta.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 224,
-      "id": "tex_1a334876f4",
-      "name": "mobs_mc_shulker_orange.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_orange.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 225,
-      "id": "tex_9401f61188",
-      "name": "mobs_mc_shulker_pink.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_pink.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 226,
-      "id": "tex_58d5a4080d",
-      "name": "mobs_mc_shulker_purple.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_purple.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 227,
-      "id": "tex_7027cff7ba",
-      "name": "mobs_mc_shulker_red.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_red.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 228,
-      "id": "tex_193c756223",
-      "name": "mobs_mc_shulker_silver.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_silver.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 229,
-      "id": "tex_eab1bfc040",
-      "name": "mobs_mc_shulker_white.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_white.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 230,
-      "id": "tex_2b480e4108",
-      "name": "mobs_mc_shulker_yellow.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_shulker_yellow.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 231,
-      "id": "tex_db49cdaaf5",
-      "name": "mobs_mc_silverfish.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_silverfish.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 232,
-      "id": "tex_919ee7b81c",
-      "name": "mobs_mc_slime.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_slime.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 233,
-      "id": "tex_158f0c66b3",
-      "name": "mobs_mc_snowman.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_snowman.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 234,
-      "id": "tex_01a36821e2",
-      "name": "mobs_mc_stray.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_stray.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 235,
-      "id": "tex_109b1ee2b1",
-      "name": "mobs_mc_stray_overlay.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_stray_overlay.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 236,
-      "id": "tex_7a59087f24",
-      "name": "mobs_mc_vex.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_vex.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 237,
-      "id": "tex_28b72e772b",
-      "name": "mobs_mc_vex_charging.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_vex_charging.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 238,
-      "id": "tex_4d7f9ad536",
-      "name": "mobs_mc_witch.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_witch.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 239,
-      "id": "tex_4ea8771346",
-      "name": "mobs_mc_wither.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wither.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 240,
-      "id": "tex_7e62089965",
-      "name": "mobs_mc_wither_armor.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wither_armor.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
-    },
-    {
-      "order": 241,
-      "id": "tex_0637bafd67",
-      "name": "mobs_mc_wither_invulnerable.png",
-      "texture_path": "ENTITIES/mobs_mc/mobs_mc_wither_invulnerable.png",
-      "priority": "P2",
-      "workflow_role": "mob_uv",
-      "status": "pending",
-      "file": null
+      "file": "prompts/mobs/tex_be7e0afdef.json"
     }
-  ]
+  ],
+  "family": "mobs",
+  "batches": []
 }

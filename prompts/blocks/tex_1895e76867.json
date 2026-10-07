@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "family": "blocks",
+  "id": "tex_1895e76867",
+  "path": "ITEMS/mcl_core/mcl_core_stripped_birch_top.png",
+  "name": "mcl_core_stripped_birch_top.png",
+  "stages": {
+    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThis world is old, harsh, and shaped by climate, time, decay, growth, use, pressure and survival. Its material language is rich in depth, restrained in color, irregular, aged and authored rather than sterile, procedural, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on the cut end-grain face of a stripped birch trunk with species-specific growth rings and radial grain.\n\nTreat this exact surface, face or component as its own material problem. Interpret freely how it would naturally exist in this world rather than copying a low-resolution game texture or following a mechanical detail checklist. Let structure, age, tonal variation, wear, imperfections, layering and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+  }
+}

@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_f7a8b19fa7",
-  "label": "mcl_core_log_big_oak",
-  "texture_path": "ITEMS/mcl_core/mcl_core_log_big_oak.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for the bark-covered side of an ancient dark oak trunk in a grounded dark-fantasy forest. This oak has grown slowly in deep shade for centuries. Its bark should be exceptionally thick and deeply plated, with broad irregular ridges, compressed furrows, old scars and near-black dirt embedded in recesses. Exposed high surfaces are dry and gray-brown while protected depths retain cooler, darker tones. Avoid charcoal-black fantasy bark, glowing cracks, faces, runes, excessive moss or the narrow vertical pattern of conifers. Its menace comes from age, scale and density. Make the bark feel massive enough to belong to a tree older than the surrounding settlement. Establish tactile depth and slow growth without reproducing the source layout."
+  "path": "ITEMS/mcl_core/mcl_core_log_big_oak.png",
+  "name": "mcl_core_log_big_oak.png",
+  "stages": {
+    "reference": "Create a close material reference for the bark-covered side of an ancient dark oak trunk in a grounded dark-fantasy forest. This oak has grown slowly in deep shade for centuries. Its bark should be exceptionally thick and deeply plated, with broad irregular ridges, compressed furrows, old scars and near-black dirt embedded in recesses. Exposed high surfaces are dry and gray-brown while protected depths retain cooler, darker tones. Avoid charcoal-black fantasy bark, glowing cracks, faces, runes, excessive moss or the narrow vertical pattern of conifers. Its menace comes from age, scale and density. Make the bark feel massive enough to belong to a tree older than the surrounding settlement. Establish tactile depth and slow growth without reproducing the source layout."
+  }
 }

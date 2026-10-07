@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_38106e970f",
-  "label": "default_obsidian",
-  "texture_path": "ITEMS/mcl_core/default_obsidian.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for naturally formed obsidian in a grounded dark-fantasy volcanic world. The material is volcanic glass: nearly black but not empty, with conchoidal fracture character, subtle smoky translucency at thin-looking facets, faint flow banding and restrained cool or brown undertones trapped inside the glassy mass. Reflections should be sharp only on select fractured planes, leaving most of the surface dark and dense. Avoid polished black marble, purple magical glow, metallic shine, random stone pores or lava cracks. Make the darkness reveal glass, fracture and frozen volcanic flow."
+  "path": "ITEMS/mcl_core/default_obsidian.png",
+  "name": "default_obsidian.png",
+  "stages": {
+    "reference": "Create a close material reference for naturally formed obsidian in a grounded dark-fantasy volcanic world. The material is volcanic glass: nearly black but not empty, with conchoidal fracture character, subtle smoky translucency at thin-looking facets, faint flow banding and restrained cool or brown undertones trapped inside the glassy mass. Reflections should be sharp only on select fractured planes, leaving most of the surface dark and dense. Avoid polished black marble, purple magical glow, metallic shine, random stone pores or lava cracks. Make the darkness reveal glass, fracture and frozen volcanic flow."
+  }
 }

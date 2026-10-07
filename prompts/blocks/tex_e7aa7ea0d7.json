@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "family": "blocks",
+  "id": "tex_e7aa7ea0d7",
+  "path": "ITEMS/mcl_ocean/mcl_ocean_horn_coral_block.png",
+  "name": "mcl_ocean_horn_coral_block.png",
+  "stages": {
+    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThe world is old and shaped by climate, pressure, water, decay, craft, use and survival. Materials should have authored depth, restrained color, irregularity and age without becoming theatrical, sterile, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on a living horn-coral block with muted golden-yellow calcareous growth, horn-like organic structure and believable underwater surface texture.\n\nTreat this exact material, face, state or construction as its own visual problem. Do not copy a low-resolution game texture and do not reduce the task to a generic family template. Interpret how this exact surface would physically exist in the shared world. Let structure, age, tonal variation, wear, imperfections, layering, moisture/dryness where appropriate, and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+  }
+}

@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "family": "blocks",
   "id": "tex_366c9eb9e3",
-  "label": "mcl_core_grass_block_top",
-  "texture_path": "ITEMS/mcl_core/mcl_core_grass_block_top.png",
-  "kind": "block_reference",
-  "status": "done",
-  "reference_prompt": "Create a close material reference for the top surface of natural grass-covered soil in a grounded dark-fantasy temperate world. The ground should feel like a resilient, repeatedly weathered turf rather than a manicured lawn. Short mixed blades overlap with tiny dry stems, sparse broadleaf traces and glimpses of dark organic matter below. Growth density varies naturally as moisture, footsteps, wind and season affect the surface. Use restrained green, olive and muted yellow-green with subtle brown organic undertones. Avoid golf-course uniformity, long meadow grass, flowers, obvious footprints, neon saturation or a moss carpet. Make the turf readable as a cohesive living ground material at a distance while retaining believable fine structure up close. Do not impose paths or scene composition."
+  "path": "ITEMS/mcl_core/mcl_core_grass_block_top.png",
+  "name": "mcl_core_grass_block_top.png",
+  "stages": {
+    "reference": "Create a close material reference for the top surface of natural grass-covered soil in a grounded dark-fantasy temperate world. The ground should feel like a resilient, repeatedly weathered turf rather than a manicured lawn. Short mixed blades overlap with tiny dry stems, sparse broadleaf traces and glimpses of dark organic matter below. Growth density varies naturally as moisture, footsteps, wind and season affect the surface. Use restrained green, olive and muted yellow-green with subtle brown organic undertones. Avoid golf-course uniformity, long meadow grass, flowers, obvious footprints, neon saturation or a moss carpet. Make the turf readable as a cohesive living ground material at a distance while retaining believable fine structure up close. Do not impose paths or scene composition."
+  }
 }
