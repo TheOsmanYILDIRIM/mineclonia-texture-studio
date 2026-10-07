@@ -23,3 +23,5 @@ jobs:
           node-version: '22'
       - name: Check runtime-winning texture paths
         run: node scripts/check-runtime-overrides.mjs
+      - name: Check architecture standardization
+        run: node scripts/check-standardization.mjs
