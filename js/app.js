@@ -617,7 +617,7 @@ function renderActivePrompt(){
  $('normalPromptBtns').style.display=isUv?'none':'';
  $('mobPromptBtns').classList.toggle('show',isUv);
  if(isUv){$('promptFamily').textContent=isArmor?'Armor · 3 aşamalı UV üretimi':'Mobs · 3 aşamalı UV üretimi';$('mobRefPrompt').textContent=isArmor?'2 · Armor Ref':'2 · Creature Ref';}
- if(isItem){$('promptFamily').textContent='Item · 2 aşamalı üretim';$('copyPrompt').textContent='1 · Creative';$('savePrompt').textContent='2 · A+B Correction';$('promptText').style.display='none';$('singlePromptJson').style.display='none';$('savePrompt').disabled=false;$('savePrompt').title='Image A = original · Image B = creative result';return;}
+ if(isItem){$('promptFamily').textContent='Item · 2 aşamalı üretim';$('copyPrompt').textContent='1 · Creative';$('savePrompt').textContent='2 · A+B Correction';$('promptText').style.display='';$('singlePromptJson').style.display='none';$('savePrompt').disabled=false;$('savePrompt').title='Image A = original · Image B = creative result';return;}
  $('copyPrompt').textContent=isP0?'Ref prompt':'Kopyala';
  $('savePrompt').textContent=isP0?'Üretim prompt':'Promptu kaydet';
  $('promptText').style.display=isP0?'none':'';
