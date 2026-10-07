@@ -16,7 +16,7 @@ Next: device-validate one fresh normal Chrome open. Confirm storage reaches “H
 - Old V2/radial exports are intentionally incompatible with V3. After this change the user must create a fresh **Export PNG** and use the AI result from that V3 sheet.
 - Round-trip invariant remains mandatory: unmodified V3 export → import → restore must reproduce the original layout/content apart from intended resolution scaling.
 - Restore is preview-only until `✓ Onayla / Aktif Yap`; `Geri Toplanmış PNG` exports without persisting. 3D preview continues to use the real entity B3D.
-- V3 implementation commits: `b67458a` (core refactor), `f694ec8` (publish/cache bump).
+- V3 implementation commits: `b67458a` (core refactor), `91655fb` (preserve detected slot mask through crop), `62332de` (publish/cache bump).
 
 
 ## Pages build/cache system — preserve
