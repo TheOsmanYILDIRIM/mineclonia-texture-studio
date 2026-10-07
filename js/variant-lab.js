@@ -112,7 +112,7 @@ function bindVariantLabUi(){
    if(t.id==='addVariantPngs'){e.preventDefault();$('variantFiles')?.click();return}
    if(t.id==='activateSelectedVariant'){await activateSelectedVariant();return}
    if(t.id==='variantMixToggle'){variantMixMode=!variantMixMode;renderVariantLab();return}
-   if(t.id==='variantUvManual'){if(window.MTSUvMapper?.open)await window.MTSUvMapper.open();else toast('Manuel UV modülü yüklenemedi');return}
+   if(t.id==='variantUvManual'){if(window.MTSVertexUvStudio?.open)await window.MTSVertexUvStudio.open();else toast('Vertex UV Studio yüklenemedi');return}
    if(t.id==='variant3dToggle'){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}return}
    if(t.dataset.vtile){variantTileN=Number(t.dataset.vtile);renderVariantStage();return}
    if(t.dataset.variantIndex!=null){const idx=Number(t.dataset.variantIndex);if(variantMixMode){const rec=variantList()[idx];if(rec&&!rec.system){rec.enabled=rec.enabled===false;renderVariantLab()}}else{variantSelectedIndex=idx;renderVariantLab()}}
