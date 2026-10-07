@@ -304,13 +304,6 @@ function runtimeRoleInfo(x){
 }
 function runtimeRoleOf(x){return runtimeRoleInfo(x).role}
 function hasAuthoredPrompt(x){return !!(x&&(promptRecord(x)||PROMPT_OVERRIDES.has(x.id)))}
-async function applyFilter(){const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPaths.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)));page=0;return render()}
-async function render(){
- const token=++renderToken,start=page*PAGE_SIZE,arr=filtered.slice(start,start+PAGE_SIZE);$('grid').innerHTML='';$('stat').textContent=`${filtered.length}/${CATALOG.length} • ${changedPaths.size} değişti • ${storageLabel()}`;$('pageInfo').textContent=`${Math.min(page+1,Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)))} / ${Math.max(1,Math.ceil(filtered.length/PAGE_SIZE))}`;
- if(!arr.length){$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Bu filtrede texture yok.</div>';return}
- const cards=[];for(const x of arr){const b=document.createElement('button');b.className='card';b.innerHTML=`<img><span class="badge" style="color:${priorityColor(x.priority)}">${x.priority}</span>${changedPaths.has(x.path)?'<span class="changed"></span>':''}`;b.title=x.path;b.onclick=()=>openDetail(x);$('grid').appendChild(b);cards.push([x,b.querySelector('img')])}
- for(let i=0;i<cards.length;i+=6){if(token!==renderToken)return;await Promise.all(cards.slice(i,i+6).map(async([x,img])=>{try{img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}}));await new Promise(requestAnimationFrame)}
-}
 async function countChanged(){return (await allEdits()).length}
 
 function b64bytes(s){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}
@@ -336,25 +329,6 @@ async function initStorage(){
 }
 function storageLabel(){return storageMode==='indexeddb'?'kalıcı':storageMode==='local'?'yerel fallback':'oturum'}
 async function localPut(path,blob){try{const data=await blobToDataURL(blob);localStorage.setItem('mts:'+path,JSON.stringify({data,updatedAt:Date.now()}));return true}catch(e){console.warn('localStorage unavailable/full',e);storageMode='memory';memoryEdits.set(path,{path,blob,updatedAt:Date.now()});return false}}
-async function putEdit(path,blob){
- if(storageMode==='indexeddb'&&dbp){try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).put({path,blob,updatedAt:Date.now()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});revoke(path);return}catch(e){console.warn(e);storageMode='local'}}
- if(storageMode==='local'){await localPut(path,blob)}else memoryEdits.set(path,{path,blob,updatedAt:Date.now()});revoke(path)
-}
-async function getEdit(path){
- if(storageMode==='indexeddb'&&dbp){try{return await new Promise((res,rej)=>{const r=dbp.transaction(STORE).objectStore(STORE).get(path);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})}catch(e){storageMode='local'}}
- if(storageMode==='local'){try{const s=localStorage.getItem('mts:'+path);if(!s)return null;const o=JSON.parse(s);return {path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt}}catch(e){storageMode='memory'}}
- return memoryEdits.get(path)||null
-}
-async function delEdit(path){
- if(storageMode==='indexeddb'&&dbp){try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){storageMode='local'}}
- if(storageMode==='local'){try{localStorage.removeItem('mts:'+path)}catch(e){}} memoryEdits.delete(path);revoke(path)
-}
-async function allEdits(){
- if(storageMode==='indexeddb'&&dbp){try{return await new Promise((res,rej)=>{const r=dbp.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}catch(e){storageMode='local'}}
- const out=[];
- if(storageMode==='local'){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('mts:')){const o=JSON.parse(localStorage.getItem(k));out.push({path:k.slice(4),blob:dataURLToBlob(o.data),updatedAt:o.updatedAt})}}}catch(e){storageMode='memory'}}
- for(const v of memoryEdits.values())if(!out.some(x=>x.path===v.path))out.push(v);return out
-}
 
 
 
@@ -757,16 +731,6 @@ async function decodeBlobToCanvas(blob){
  }finally{URL.revokeObjectURL(url)}
 }
 async function canvasPngBlob(c){return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(Error('PNG oluşturulamadı')),'image/png'))}
-async function normalizeTextureBlob(blob,meta){
- const c=await decodeBlobToCanvas(blob), sw=c.width, sh=c.height;
- const baseW=(meta&&meta.w)||sw, baseH=(meta&&meta.h)||sh;
- const dw=TARGET_RESOLUTION, dh=Math.max(1,Math.round(TARGET_RESOLUTION*(baseH/baseW)));
- if(sw<=dw && sh<=dh)return blob; // never upscale low-resolution originals
- const src=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,sw,sh);
- const resized=lanczosResizeImageData(src,sw,sh,dw,dh);
- const out=document.createElement('canvas');out.width=dw;out.height=dh;out.getContext('2d').putImageData(resized,0,0);
- return await canvasPngBlob(out)
-}
 async function lockEntityAlphaToSource(blob,meta){
  if(!meta||assetTypeOf(meta)!=='Entity')return blob;
  const [edited,sourceBlob]=await Promise.all([decodeBlobToCanvas(blob),originalBlob(meta.path)]);
@@ -817,7 +781,6 @@ async function prepareStoredEditBlob(blob,meta){
  return await removeConnectedBlackBackground(blob)
 }
 async function imageBlobTransform(blob, offset=false){return await new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.imageSmoothingEnabled=false;if(!offset){g.drawImage(im,0,0)}else{const w=c.width,h=c.height,dx=Math.floor(w/2),dy=Math.floor(h/2);g.drawImage(im, dx,dy);g.drawImage(im,dx-w,dy);g.drawImage(im,dx,dy-h);g.drawImage(im,dx-w,dy-h)}c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(Error('PNG oluşturulamadı'))},'image/png')};im.onerror=()=>rej(Error('PNG okunamadı'));im.src=u})}
-async function importPng(file,seam=false){if(!active||!file)return;toast('PNG hazırlanıyor · siyah arka plan varsa temizleniyor…');let b=await prepareImportedTextureBlob(file,active);if(seam)b=await imageBlobTransform(b,true);await putEdit(active.path,b);toast((seam?'Seam dönüşü':'Yeni texture')+' · kendi yüksek çözünürlüklü silüeti korundu');await openDetail(active);await applyFilter();setTimeout(()=>warmScaledForExisting(BACKGROUND_RESOLUTION).catch(console.warn),200)}
 async function blobsEqual(a,b){
  if(!a||!b||a.size!==b.size)return false;
  const [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]);
@@ -877,48 +840,10 @@ async function meaningfulEdits(){
  }
  return out
 }
-async function exportPack(){
- const btn=$('exportPack'),oldLabel=btn.textContent;
- btn.disabled=true;btn.textContent='ZIP • kayıtlar hazırlanıyor…';setSaveState('ZIP hazırlanıyor…','warn');
- try{
-   await editWriteQueue.catch(()=>{});
-   const edits=(await allEdits()).filter(e=>CATALOG.some(x=>x.path===e.path));
-   if(!edits.length){toast('Değiştirilmiş texture yok');return}
-   const z=new JSZip();const root=z.folder('Mineclonia_Dark_Realism');
-   root.file('texture_pack.conf','name = mineclonia_dark_realism\ntitle = Mineclonia Dark Realism\ndescription = Only user-modified Mineclonia textures. Original relative texture paths are preserved.\n');
-   for(let i=0;i<edits.length;i++){
-     const e=edits[i];root.file(e.path,e.blob,{compression:'STORE'});
-     if(i===0||i===edits.length-1||i%20===0){btn.textContent=`ZIP • dosyalar ${i+1}/${edits.length}`;await new Promise(requestAnimationFrame)}
-   }
-   const manifest={format:'mineclonia-dark-realism-delta',version:3,createdAt:new Date().toISOString(),count:edits.length,targetResolution:TARGET_RESOLUTION,paths:edits.map(e=>e.path)};
-   root.file('changed_textures.json',JSON.stringify(manifest,null,2),{compression:'STORE'});
-   const out=await z.generateAsync({type:'blob',compression:'STORE',streamFiles:true},m=>{
-     const p=Math.max(0,Math.min(100,Math.round(m.percent||0)));btn.textContent=`ZIP • %${p}`;setSaveState(`ZIP oluşturuluyor • %${p}`,'warn');
-   });
-   btn.textContent='ZIP • indiriliyor…';dl(out,'Mineclonia_Dark_Realism_delta.zip');
-   toast(`${edits.length} texture ZIP olarak hazırlandı`);
- }catch(err){
-   console.error('texturepack export',err);toast('ZIP oluşturulamadı: '+(err?.message||err));setSaveState('ZIP hatası','bad');
- }finally{
-   btn.disabled=false;btn.textContent=oldLabel;
-   setTimeout(()=>setSaveState(storageMode==='indexeddb'?'Hazır • kalıcı kayıt':storageMode==='local'?'Hazır • yerel fallback':'Hazır • sadece oturum',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad'),400);
- }
-}
 function catalogMatchForZipPath(zipPath){
  const clean=zipPath.replace(/^\/+/, '');
  const direct=CATALOG.find(x=>clean===x.path||clean.endsWith('/'+x.path));if(direct)return direct;
  const base=clean.split('/').pop();const matches=CATALOG.filter(x=>x.name===base);return matches.length===1?matches[0]:null
-}
-async function importZip(file){
- const z=await JSZip.loadAsync(file);let changed=0,same=0,ambiguous=0;
- for(const [path,f] of Object.entries(z.files)){
-   if(f.dir||!path.toLowerCase().endsWith('.png'))continue;
-   const meta=catalogMatchForZipPath(path);if(!meta){ambiguous++;continue}
-   let blob=await f.async('blob');blob=await prepareStoredEditBlob(blob,meta);
-   try{const orig=await originalBlob(meta.path);if(await blobsEqual(blob,orig)){await delEdit(meta.path);same++;continue}}catch(err){console.warn(err)}
-   await putEdit(meta.path,blob);changed++
- }
- toast(`${changed} değişiklik içe aktarıldı${same?`, ${same} orijinal atlandı`:''}${ambiguous?`, ${ambiguous} eşleşmedi`:''}`);applyFilter()
 }
 async function exportProjectBackup(){
  const edits=await allEdits();
@@ -929,14 +854,6 @@ async function exportProjectBackup(){
  root.file('manifest.json',JSON.stringify(manifest,null,2));
  const out=await z.generateAsync({type:'blob',compression:'STORE',streamFiles:true});
  dl(out,'Mineclonia_Texture_Studio_Backup.zip');toast(`${manifest.edits.length} düzenleme + ${PROMPT_OVERRIDES.size} prompt yedeklendi`)
-}
-async function importProjectBackup(file){
- const z=await JSZip.loadAsync(file);const mf=z.file('Mineclonia_Texture_Studio_Backup/manifest.json')||z.file('manifest.json');
- if(!mf)throw new Error('Geçerli proje yedeği değil');const m=JSON.parse(await mf.async('string'));
- if(m.format!=='mineclonia-texture-studio-backup')throw new Error('Yedek formatı tanınmadı');if([64,128,256,512].includes(m.targetResolution)){TARGET_RESOLUTION=m.targetResolution;if($('resolution'))$('resolution').value=String(TARGET_RESOLUTION)}
- let ok=0,missing=0;for(const e of (m.edits||[])){const x=CATALOG.find(v=>v.id===e.id)||CATALOG.find(v=>v.path===e.path);const f=z.file('Mineclonia_Texture_Studio_Backup/'+e.file)||z.file(e.file);if(!x||!f){missing++;continue}await putEdit(x.path,await f.async('blob'));ok++;}
- let pc=0;if(m.promptOverrides&&typeof m.promptOverrides==='object'){for(const [id,prompt] of Object.entries(m.promptOverrides)){if(CATALOG.some(x=>x.id===id)&&typeof prompt==='string'){PROMPT_OVERRIDES.set(id,prompt);pc++;}}savePromptOverrides();}
- await applyFilter();toast(`${ok} düzenleme, ${pc} prompt geri yüklendi${missing?`, ${missing} eşleşmedi`:''}`)
 }
 
 
@@ -1721,26 +1638,6 @@ async function warmScaledForExisting(res=BACKGROUND_RESOLUTION){
     queueScaled(e.path,e.blob,meta,res);
   }
 }
-async function putEdit(path,blob){
- if(storageMode==='indexeddb'&&dbp){try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).put({path,blob,updatedAt:Date.now()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});revoke(path);return}catch(e){console.warn(e);storageMode='local'}}
- if(storageMode==='local'){await localPut(path,blob)}else memoryEdits.set(path,{path,blob,updatedAt:Date.now()});revoke(path)
-}
-async function delEdit(path){
- if(storageMode==='indexeddb'&&dbp){try{await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){storageMode='local'}}
- if(storageMode==='local'){try{localStorage.removeItem('mts:'+path)}catch(e){storageMode='memory'}}else memoryEdits.delete(path);
- await delScaledPath(path); revoke(path)
-}
-async function importPng(file,seam=false){
-  if(!active||!file)return;
-  toast('Texture kaydediliyor…');
-  let b=file;
-  if(seam)b=await imageBlobTransform(b,true);
-  await putEdit(active.path,b);
-  queueScaled(active.path,b,active,BACKGROUND_RESOLUTION);
-  if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(active.path,b,active,TARGET_RESOLUTION);
-  toast((seam?'Seam dönüşü':'Yeni texture')+' kaydedildi · 256px kopya arka planda hazırlanıyor');
-  await openDetail(active); await applyFilter();
-}
 async function importZip(file){
  const z=await JSZip.loadAsync(file);let changed=0,same=0,ambiguous=0,processed=0;
  const pngs=Object.entries(z.files).filter(([path,f])=>!f.dir&&path.toLowerCase().endsWith('.png'));
@@ -1883,10 +1780,6 @@ async function robustPersist(path,blob,verification='changed'){
   memoryEdits.set(path,{path,blob,updatedAt:Date.now(),verification});
   setSaveState('Sadece oturumda • yedek al','bad');
 }
-async function putEdit(path,blob){
-  editWriteQueue=editWriteQueue.then(()=>robustPersist(path,blob));
-  return await editWriteQueue;
-}
 async function getEdit(path){
   if(hotEdits.has(path)) return hotEdits.get(path);
   if(storageMode==='indexeddb'&&dbp){
@@ -1896,19 +1789,6 @@ async function getEdit(path){
     try{const s=localStorage.getItem('mts:'+path); if(s){const o=JSON.parse(s);const v={path,blob:dataURLToBlob(o.data),updatedAt:o.updatedAt,verification:o.verification||'unknown'};hotEdits.set(path,v);return v}}catch(e){console.warn(e)}
   }
   return memoryEdits.get(path)||null;
-}
-async function delEdit(path){
-  editWriteQueue=editWriteQueue.then(async()=>{
-    setSaveState('Siliniyor…','warn');
-    hotEdits.delete(path); memoryEdits.delete(path);
-    if(storageMode==='indexeddb'&&dbp){
-      await new Promise((res,rej)=>{const tx=dbp.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(path);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);tx.onerror=()=>rej(tx.error)});
-    }
-    try{localStorage.removeItem('mts:'+path)}catch(_){}
-    await delScaledPath(path); revoke(path);
-    setSaveState(storageMode==='indexeddb'?'Kaydedildi • kalıcı':storageMode==='local'?'Kaydedildi • yerel fallback':'Sadece oturumda • yedek al',storageMode==='indexeddb'?'ok':storageMode==='local'?'warn':'bad');
-  });
-  return await editWriteQueue;
 }
 async function allEdits(){
   const outByPath=new Map();
@@ -1923,19 +1803,6 @@ async function allEdits(){
   for(const [k,v] of memoryEdits) if(!outByPath.has(k)) outByPath.set(k,v);
   for(const [k,v] of hotEdits) outByPath.set(k,v);
   return [...outByPath.values()];
-}
-async function importPng(file,seam=false){
-  if(!active||!file)return;
-  const target={...active}; // lock destination before any await
-  setSaveState('Dosya hazırlanıyor…','warn');
-  let b=file;
-  if(seam)b=await imageBlobTransform(b,true);
-  await putEdit(target.path,b);
-  queueScaled(target.path,b,target,BACKGROUND_RESOLUTION);
-  if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
-  toast((seam?'Seam dönüşü':'Yeni texture')+' kaydedildi');
-  if(active&&active.path===target.path) await openDetail(target);
-  await applyFilter();
 }
 window.addEventListener('pagehide',()=>{
   if(scaleQueue.length||scaleRunning) console.warn('Arka plan ölçek kuyruğu kapanırken tamamlanmamış olabilir');
