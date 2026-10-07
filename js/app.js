@@ -1834,7 +1834,10 @@ async function render(){
    b.title=x.path; b.onclick=()=>openDetail(x); $('grid').appendChild(b);
    const img=b.querySelector('img'); cardRefsFast.set(x.path,{card:b,img}); cards.push([x,img]);
  }
- const loadOne=async([x,img])=>{if(token!==renderToken)return;try{img.src=await previewUrl(x.path,hotEdits.has(x.path),THUMB_MAX_EDGE)}catch(e){console.warn(x.path,e)}};
+ const loadOne=async([x,img])=>{if(token!==renderToken)return;try{
+   if(hotEdits.has(x.path))img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE);
+   else{img.src=upstreamTextureUrl(x);img.decoding='async';}
+ }catch(e){console.warn(x.path,e)}};
  // Above-the-fold cards start together instead of waiting for six-item batches.
  await Promise.all(cards.slice(0,Math.min(12,cards.length)).map(loadOne));
  if(token!==renderToken)return;
