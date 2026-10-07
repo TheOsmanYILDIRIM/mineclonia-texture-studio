@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-const root=new URL('..',import.meta.url);
+const rootDir=fileURLToPath(new URL('..',import.meta.url));
 const app=fs.readFileSync(new URL('../js/app.js',import.meta.url),'utf8');
 const index=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 
@@ -28,7 +29,7 @@ for(const forbidden of ['loadCanonicalPromptFamily','ITEM_TWO_PASS_PROMPTS','BLO
 }
 
 for(const family of ['blocks','mobs','armor','items']){
-  const dir=path.join(new URL('..',root).pathname,'prompts',family);
+  const dir=path.join(rootDir,'prompts',family);
   if(!fs.existsSync(dir))continue;
   const files=fs.readdirSync(dir);
   expect(!files.some(f=>f.endsWith('.txt')),`${family}: production .txt prompt files are forbidden`);
