@@ -75,6 +75,9 @@ Key non-negotiables:
 - Entity dimensions alone must never trigger animation-strip treatment.
 - Animated textures preserve frame topology while edited resolution may increase.
 - Runtime role and gameplay function outrank decorative realism.
+- Authored prompt storage is canonical and singular: `prompts/<family>/tex_<id>.json`, schema v2 with `family/id/path/name/stages`. Manifests are indexes only. Do not add production prompt `.txt` files or batch prompt payloads.
+- Missing authored prompt coverage is represented by no usable prompt, not by a generated "PROMPT YOK" body or generic alpha-lock fallback.
+- True inventory items use the two-pass Creative → A+B Correction workflow from `PROMPT_AUTHORING_GUIDE.md`; their first pass is not source-silhouette/alpha locked.
 
 ## Existing decisions that must not silently regress
 
