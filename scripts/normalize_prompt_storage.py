@@ -78,23 +78,30 @@ for family in FAMILIES:
         if p.is_file() and rel not in keep and (p.suffix.lower()==".txt" or p.name.startswith("batch_")):
             p.unlink()
 
+    done_by_id={entry["id"]:(entry,obj,out) for entry,obj,out in canonical}
     new_entries=[]
-    for order,(entry,obj,out) in enumerate(canonical,1):
+    for order,entry in enumerate(manifest.get("entries",[]),1):
         e=dict(entry)
         e["order"]=order
-        e["id"]=obj["id"]
-        e["name"]=obj["name"]
-        e["texture_path"]=obj["path"]
-        e["status"]="done"
-        e["file"]=out.as_posix()
+        if e.get("id") in done_by_id:
+            _,obj,out=done_by_id[e["id"]]
+            e["id"]=obj["id"]
+            e["name"]=obj["name"]
+            e["texture_path"]=obj["path"]
+            e["status"]="done"
+            e["file"]=out.as_posix()
+        else:
+            e["status"]="pending"
+            e.pop("file",None)
         new_entries.append(e)
 
+    done_count=sum(1 for e in new_entries if e.get("status")=="done")
     manifest["schema_version"]=2
     manifest["kind"]="canonical_prompt_manifest"
     manifest["family"]=family
     manifest["total"]=len(new_entries)
-    manifest["done"]=len(new_entries)
-    manifest["pending"]=0
+    manifest["done"]=done_count
+    manifest["pending"]=len(new_entries)-done_count
     manifest["entries"]=new_entries
     manifest["batches"]=[]
     manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
