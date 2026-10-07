@@ -213,6 +213,7 @@ async function wizardNext(){
  if(S.wizardStep===1){if(!S.sourceComp)return toast('Önce üretilen adaya dokun');S.pick='target';setWizardStep(2);render();return}
  if(S.wizardStep===2){if(!S.targetComp)return toast('Önce orijinal hedef adaya dokun');if(!S.mesh)makeMesh(true);setWizardStep(3);render();return}
  if(S.wizardStep===3){S.meshBasePoints=null;for(const row of S.mesh.points)for(const p of row){p.ox=p.x;p.oy=p.y}S.mode='vertex';setAlignVisibility(false);setWizardStep(4);render();status('Komple hizalama tamam · şimdi vertexlerle şekli düzelt');return}
+ if(S.wizardStep===4&&S.islandSheetMode){if(!S.mesh)return toast('Düzenlenecek ada yok');applyPart();if(openNextMappedIsland())return;setWizardStep(7);render();status('Tüm kayıtlı adalar tamam · kaydet ve UV’ye geri topla');return}
  if(S.wizardStep===4){setWizardStep(5);render();return}
  if(S.wizardStep===5){setWizardStep(6);render();return}
  if(S.wizardStep===6){if(!S.mesh)return toast('Düzenlenecek ada yok');applyPart();setWizardStep(7);render();return}
@@ -220,6 +221,18 @@ async function wizardNext(){
 }
 function updateUi(){const pick=$('vuvPickState');if(pick)pick.textContent=S.addIslandMode?(S.addIslandMode==='source'?'Manuel source ada çiziliyor':'Manuel target ada çiziliyor'):S.pick==='source'?'1/2 · Üretilen adaya dokun':S.pick==='target'?'2/2 · Orijinal hedef adaya dokun':S.mesh?`${islandLabel(S.sourceComp,'Ü')} → ${islandLabel(S.targetComp,'O')} · mesh düzenleniyor`:'Ada çifti seç';document.querySelectorAll('[data-vuv-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.vuvMode===S.mode));document.querySelectorAll('[data-vuv-step]').forEach(b=>b.classList.toggle('primary',Math.abs(Number(b.dataset.vuvStep)-S.step)<1e-6));const gs=$('vuvGridSelect');if(gs)gs.value=String(S.grid);const n=$('vuvNode');if(n)n.textContent=S.selectedNode?`R${S.selectedNode.r+1} C${S.selectedNode.c+1}`:'Node yok';const pairs=$('vuvPairs');if(pairs)pairs.innerHTML=S.pairs.length?S.pairs.map((p,i)=>`<span class="vuvPair">#${i+1} ${p.source} → ${p.target}</span>`).join(''):'<span class="stat">Henüz eşleşme yok</span>';const count=$('vuvPairCount');if(count)count.textContent=`${S.pairs.length} eşleşme`}
 
+function openNextMappedIsland(){
+ if(!S.islandSheetMode)return false;
+ const src=(S.sourceAnalysis?.components||[]).find(c=>!S.usedSource.has(c.id));
+ if(!src)return false;
+ const tar=(S.targetAnalysis?.components||[]).find(c=>c.slotId===src.slotId&&!S.usedTarget.has(c.id));
+ if(!tar)return false;
+ S.sourceComp=src;S.targetComp=tar;S.pick=null;makeMesh(true);S.meshBasePoints=null;
+ for(const row of S.mesh.points)for(const p of row){p.ox=p.x;p.oy=p.y}
+ S.mode='vertex';setAlignVisibility(false);setWizardStep(4);focusMesh();render();
+ status(`Ada ${src.slotId+1}/${S.sourceAnalysis.components.length} · otomatik eşleşti · normalize/düzelt`);
+ return true;
+}
 async function openIslandSheet(ctx){
  const root=$('vertexUvStudio');if(!root)return toast('Vertex UV ekranı bulunamadı');
  root.classList.add('open');S.open=true;status('Ayrılmış adalar yükleniyor…');
@@ -227,12 +240,11 @@ async function openIslandSheet(ctx){
    const [targetSheet,sourceSheet]=await Promise.all([decodeBlob(ctx.templateBlob),decodeBlob(ctx.importedBlob)]);
    Object.assign(S,{meta:ctx.meta,rec:{name:'AI_IMPORT.png'},orig:targetSheet,sourceAtlas:cloneCanvas(sourceSheet),work:cloneCanvas(sourceSheet),sourceComp:null,targetComp:null,mesh:null,meshBasePoints:null,sourceCrop:null,meshBase:null,targetMaskWork:null,preview:null,selectedNode:null,mode:'vertex',pick:'source',grid:3,step:.25,ghost:.42,zoom:1,panX:0,panY:0,pointers:new Map(),pinch:0,drag:null,meshHistory:[],meshRedo:[],workHistory:[],workRedo:[],pairs:[],usedSource:new Set(),usedTarget:new Set(),manualSourceSeq:0,manualTargetSeq:0,addIslandMode:null,rectStart:null,rectPreview:null,wizardStep:1,partTransform:{x:0,y:0,scale:1},islandSheetMode:true,islandMap:ctx.map});
    $('vuvTitle').textContent=(ctx.meta?.name||'Entity')+' · Ayrılmış Adalar';
-   analyze();
+   analyze();applyIslandSlotComponents();
    // AI may move/change the exported slots. Keep every detected object
    // independent, project the original reference to AI/work resolution, then
    // pair a selected AI object with the nearest unused original object.
-   setWizardStep(1);applyView();render();status('Bağımsız objeler · orijinal AI çözünürlüğüne ölçeklenerek en yakın konum eşleniyor');
-   toast('Bir AI objesi seç · en yakın orijinal obje otomatik eşleşecek');
+   applyView();if(!openNextMappedIsland()){setWizardStep(1);render();status('Kayıtlı slotlardan otomatik ada bulunamadı');toast('Ada bulunamadı · elle seç')}else toast('Kayıtlı slotlar eşleşti · ilk ada normalize/düzeltmeye hazır');
  }catch(e){console.error(e);status('Açılış hatası: '+e.message);toast('Ada obje editörü açılamadı')}
 }
 async function open(){const lab=window.MTSVariantLab,meta=lab?.selectedMeta?.(),list=lab?.list?.()||[],idx=Number(lab?.selectedIndex?.()??0),rec=list[idx];if(!meta||!rec?.blob)return toast('Varyant seçilmedi');const root=$('vertexUvStudio');if(!root)return toast('Vertex UV ekranı bulunamadı');root.classList.add('open');S.open=true;status('Yükleniyor…');try{const ob=await window.MTSVariantBridge.originalBlob(meta.path),[orig,work]=await Promise.all([decodeBlob(ob),decodeBlob(rec.blob)]),sourceAtlas=cloneCanvas(work);Object.assign(S,{meta,rec,orig,sourceAtlas,work,sourceComp:null,targetComp:null,mesh:null,meshBasePoints:null,sourceCrop:null,meshBase:null,targetMaskWork:null,preview:null,selectedNode:null,mode:'vertex',pick:'source',grid:3,step:.25,ghost:.42,zoom:1,panX:0,panY:0,pointers:new Map(),pinch:0,drag:null,meshHistory:[],meshRedo:[],workHistory:[],workRedo:[],pairs:[],usedSource:new Set(),usedTarget:new Set(),manualSourceSeq:0,manualTargetSeq:0,addIslandMode:null,rectStart:null,rectPreview:null,wizardStep:1,partTransform:{x:0,y:0,scale:1}});$('vuvTitle').textContent=meta.name;analyze();setWizardStep(1);applyView();render();toast('Üretilen adaya dokun')}catch(e){console.error(e);status('Açılış hatası: '+e.message);toast('Vertex UV açılamadı: '+e.message)}}
