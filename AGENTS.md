@@ -84,7 +84,7 @@ Key non-negotiables:
 - Runtime-role classification exists because directory names are not semantically sufficient.
 - P0–P6 is only the priority axis. Browsing/classification is separate and follows Mineclonia creative-inventory categories plus deeper technical/runtime classes; do not overload P0/P1 as asset categories.
 - Variant Lab is a temporary comparison gallery. Non-winning variants stay session-only; only `Aktif yap` writes through the normal persistent edit store.
-- Island Studio restore is slot-mapped, not globally inferred: each manual island group exports to a dedicated padded V3 slot (`group-slots-v3`), and restore must use slot identity → local foreground fit → authoritative original mask → original UV position. Do not reintroduce global connected-component/silhouette/corner matching as the primary restore path.
+- Manual UV Studio is the primary entity-atlas repair path. It must remain resolution-aware: original-grid target selections are converted to generated/work coordinates before apply. Prefer direct detected-object selection, manual target selection, nearest-filled source material, and authoritative original-mask locking. Advanced auto-warp is optional. Island Studio is only an optional helper/experiment unless the user explicitly asks to return to automatic restoration.
 - Static technical asset tags are additive catalog metadata only. Prompt status and browser `Değiştirildi` state remain separate runtime concerns and must stay compatible with existing IndexedDB/localStorage records.
 - Mineclonia Lua/source is authoritative for node faces, overlays, composition and palette/tint semantics. Minecraft naming assumptions are not a source of truth.
 
