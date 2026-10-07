@@ -177,21 +177,170 @@ function islandTargetMask(p,isl,density){
  ng.putImageData(ni,0,0);m.getContext('2d').imageSmoothingEnabled=false;m.getContext('2d').drawImage(native,0,0,w,h);return m
 }
 
-function islandContourFit(source,targetMask){
- // Deterministic UV reconstruction: target alpha/topology is authoritative.
- // Sample generated material by normalized position, but never infer the final UV edge
- // from AI alpha. This removes 1–2 px contour drift and detached anti-alias artifacts.
- const sw=source.width,sh=source.height,tw=targetMask.width,th=targetMask.height;
- const sg=source.getContext('2d',{willReadFrequently:true}),si=sg.getImageData(0,0,sw,sh),sd=si.data;
- const mg=targetMask.getContext('2d',{willReadFrequently:true}),mi=mg.getImageData(0,0,tw,th),md=mi.data;
- const out=document.createElement('canvas');out.width=tw;out.height=th;const og=out.getContext('2d'),oi=og.createImageData(tw,th),od=oi.data;
- const sample=(x,y)=>{x=Math.max(0,Math.min(sw-1,x));y=Math.max(0,Math.min(sh-1,y));const x0=Math.floor(x),y0=Math.floor(y),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=x-x0,fy=y-y0,r=[0,0,0,0];for(let k=0;k<4;k++){const a=sd[(y0*sw+x0)*4+k]*(1-fx)+sd[(y0*sw+x1)*4+k]*fx,b=sd[(y1*sw+x0)*4+k]*(1-fx)+sd[(y1*sw+x1)*4+k]*fx;r[k]=Math.round(a*(1-fy)+b*fy)}return r};
- for(let y=0;y<th;y++)for(let x=0;x<tw;x++){
-   const k=(y*tw+x)*4;if(md[k+3]<16){od[k]=od[k+1]=od[k+2]=od[k+3]=0;continue}
-   const sx=(x+.5)*sw/tw-.5,sy=(y+.5)*sh/th-.5,p=sample(sx,sy);
-   od[k]=p[0];od[k+1]=p[1];od[k+2]=p[2];od[k+3]=255;
+
+function islandMaskInfo(canvas){
+ const w=canvas.width,h=canvas.height,mask=islandForegroundMask(canvas);
+ return {w,h,mask}
+}
+function islandDominantComponent(mask,w,h){
+ const comps=islandComponents(mask,w,h,{x:0,y:0,w,h});
+ if(!comps.length)return null;
+ comps.sort((a,b)=>b.count-a.count);
+ return comps[0]
+}
+function islandBoundaryEdges(mask,w,h,comp){
+ const out=[],inside=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&mask[y*w+x];
+ for(let y=comp.y;y<comp.y+comp.h;y++)for(let x=comp.x;x<comp.x+comp.w;x++){
+   if(!inside(x,y))continue;
+   if(!inside(x,y-1))out.push([[x,y],[x+1,y]]);
+   if(!inside(x+1,y))out.push([[x+1,y],[x+1,y+1]]);
+   if(!inside(x,y+1))out.push([[x+1,y+1],[x,y+1]]);
+   if(!inside(x-1,y))out.push([[x,y+1],[x,y]]);
  }
- og.putImageData(oi,0,0);return out
+ return out
+}
+function islandTracePolygon(mask,w,h){
+ const comp=islandDominantComponent(mask,w,h);if(!comp)return null;
+ const edges=islandBoundaryEdges(mask,w,h,comp);if(!edges.length)return null;
+ const key=p=>p[0]+','+p[1],next=new Map();
+ for(const [a,b] of edges){const k=key(a);if(!next.has(k))next.set(k,[]);next.get(k).push(b)}
+ let start=edges[0][0];
+ for(const [a] of edges)if(a[1]<start[1]||(a[1]===start[1]&&a[0]<start[0]))start=a;
+ const pts=[{x:start[0],y:start[1]}];let cur=start,guard=0;
+ while(guard++<200000){
+   const arr=next.get(key(cur));if(!arr?.length)break;
+   const n=arr.pop();cur=n;
+   if(cur[0]===start[0]&&cur[1]===start[1])break;
+   pts.push({x:cur[0],y:cur[1]})
+ }
+ if(pts.length<4)return null;
+ return islandSimplifyPolygon(pts)
+}
+function islandSimplifyPolygon(poly){
+ const same=(a,b)=>a.x===b.x&&a.y===b.y;
+ let pts=poly.filter((p,i)=>i===0||!same(p,poly[i-1]));
+ const col=(a,b,c)=>Math.abs((b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x))<1e-6;
+ let changed=true;
+ while(changed&&pts.length>=4){
+   changed=false;const out=[];
+   for(let i=0;i<pts.length;i++){
+     const a=pts[(i-1+pts.length)%pts.length],b=pts[i],c=pts[(i+1)%pts.length];
+     if(col(a,b,c)){changed=true;continue}
+     out.push(b)
+   }
+   pts=out
+ }
+ // Remove only true micro-jogs: two consecutive edges both <= 2 px.
+ changed=true;
+ while(changed&&pts.length>=6){
+   changed=false;const out=[];
+   for(let i=0;i<pts.length;i++){
+     const a=pts[(i-1+pts.length)%pts.length],b=pts[i],c=pts[(i+1)%pts.length];
+     const l1=Math.hypot(b.x-a.x,b.y-a.y),l2=Math.hypot(c.x-b.x,c.y-b.y);
+     if(l1<=2&&l2<=2){changed=true;continue}
+     out.push(b)
+   }
+   pts=out
+ }
+ return pts
+}
+function islandTurn(poly,i){
+ const a=poly[(i-1+poly.length)%poly.length],b=poly[i],c=poly[(i+1)%poly.length];
+ const z=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);
+ return z>=0?1:-1
+}
+function islandResampleCorners(poly,n){
+ if(poly.length===n)return poly.slice();
+ // Arc-length resampling fallback when AI introduced/dropped tiny corners.
+ const seg=[],cum=[0];let total=0;
+ for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],l=Math.hypot(b.x-a.x,b.y-a.y);seg.push(l);total+=l;cum.push(total)}
+ const out=[];
+ for(let k=0;k<n;k++){
+   const d=total*k/n;let i=0;while(i<seg.length-1&&cum[i+1]<d)i++;
+   const a=poly[i],b=poly[(i+1)%poly.length],u=seg[i]?((d-cum[i])/seg[i]):0;
+   out.push({x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u})
+ }
+ return out
+}
+function islandMatchCornerCycles(target,source){
+ if(!target?.length||!source?.length)return null;
+ const n=Math.max(4,Math.min(128,target.length));
+ const t=islandResampleCorners(target,n),s0=islandResampleCorners(source,n);
+ let best=null,bestScore=Infinity;
+ for(const rev of [false,true]){
+   const s=rev?s0.slice().reverse():s0;
+   for(let shift=0;shift<n;shift++){
+     let score=0;
+     for(let i=0;i<n;i++){
+       const a=t[i],b=s[(i+shift)%n];
+       const ta=islandTurn(t,i),sa=islandTurn(s,(i+shift)%n);
+       if(ta!==sa)score+=8;
+       const ap=t[(i+1)%n],bp=s[(i+shift+1)%n];
+       const al=Math.hypot(ap.x-a.x,ap.y-a.y),bl=Math.hypot(bp.x-b.x,bp.y-b.y);
+       score+=Math.abs(Math.log((al+1e-3)/(bl+1e-3)));
+     }
+     if(score<bestScore){bestScore=score;best={t,s,shift,score}}
+   }
+ }
+ if(!best)return null;
+ return best.t.map((t,i)=>({target:t,source:best.s[(i+best.shift)%n]}))
+}
+function islandDenseControls(matched){
+ const out=[];
+ for(let i=0;i<matched.length;i++){
+   const a=matched[i],b=matched[(i+1)%matched.length];
+   const span=Math.max(Math.hypot(b.target.x-a.target.x,b.target.y-a.target.y),Math.hypot(b.source.x-a.source.x,b.source.y-a.source.y));
+   const n=Math.max(2,Math.min(48,Math.ceil(span/3)+1));
+   for(let k=0;k<n;k++){
+     const u=k/(n-1);
+     out.push({
+       tx:a.target.x+(b.target.x-a.target.x)*u,
+       ty:a.target.y+(b.target.y-a.target.y)*u,
+       sx:a.source.x+(b.source.x-a.source.x)*u,
+       sy:a.source.y+(b.source.y-a.source.y)*u
+     })
+   }
+ }
+ return out
+}
+function islandContourFit(source,targetMask){
+ const fallback=()=>{
+   const sw=source.width,sh=source.height,tw=targetMask.width,th=targetMask.height;
+   const sg=source.getContext('2d',{willReadFrequently:true}),si=sg.getImageData(0,0,sw,sh),sd=si.data;
+   const mg=targetMask.getContext('2d',{willReadFrequently:true}),mi=mg.getImageData(0,0,tw,th),md=mi.data;
+   const out=document.createElement('canvas');out.width=tw;out.height=th;const og=out.getContext('2d'),oi=og.createImageData(tw,th),od=oi.data;
+   const sample=(x,y)=>{x=Math.max(0,Math.min(sw-1,x));y=Math.max(0,Math.min(sh-1,y));const x0=Math.floor(x),y0=Math.floor(y),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=x-x0,fy=y-y0,r=[0,0,0,0];for(let k=0;k<4;k++){const a=sd[(y0*sw+x0)*4+k]*(1-fx)+sd[(y0*sw+x1)*4+k]*fx,b=sd[(y1*sw+x0)*4+k]*(1-fx)+sd[(y1*sw+x1)*4+k]*fx;r[k]=Math.round(a*(1-fy)+b*fy)}return r};
+   for(let y=0;y<th;y++)for(let x=0;x<tw;x++){const k=(y*tw+x)*4;if(md[k+3]<16){od[k]=od[k+1]=od[k+2]=od[k+3]=0;continue}const p=sample((x+.5)*sw/tw-.5,(y+.5)*sh/th-.5);od[k]=p[0];od[k+1]=p[1];od[k+2]=p[2];od[k+3]=255}
+   og.putImageData(oi,0,0);return out
+ };
+ try{
+   const sm=islandMaskInfo(source),tm=islandMaskInfo(targetMask);
+   const sp=islandTracePolygon(sm.mask,sm.w,sm.h),tp=islandTracePolygon(tm.mask,tm.w,tm.h);
+   if(!sp?.length||!tp?.length)return fallback();
+   const matched=islandMatchCornerCycles(tp,sp);if(!matched?.length)return fallback();
+   const controls=islandDenseControls(matched);if(controls.length<8)return fallback();
+
+   const sw=source.width,sh=source.height,tw=targetMask.width,th=targetMask.height;
+   const sg=source.getContext('2d',{willReadFrequently:true}),si=sg.getImageData(0,0,sw,sh),sd=si.data;
+   const mg=targetMask.getContext('2d',{willReadFrequently:true}),mi=mg.getImageData(0,0,tw,th),md=mi.data;
+   const out=document.createElement('canvas');out.width=tw;out.height=th;const og=out.getContext('2d'),oi=og.createImageData(tw,th),od=oi.data;
+   const sample=(x,y)=>{x=Math.max(0,Math.min(sw-1,x));y=Math.max(0,Math.min(sh-1,y));const x0=Math.floor(x),y0=Math.floor(y),x1=Math.min(sw-1,x0+1),y1=Math.min(sh-1,y0+1),fx=x-x0,fy=y-y0,r=[0,0,0,0];for(let k=0;k<4;k++){const a=sd[(y0*sw+x0)*4+k]*(1-fx)+sd[(y0*sw+x1)*4+k]*fx,b=sd[(y1*sw+x0)*4+k]*(1-fx)+sd[(y1*sw+x1)*4+k]*fx;r[k]=Math.round(a*(1-fy)+b*fy)}return r};
+
+   const radius=Math.max(8,Math.min(tw,th)*.32),r2=radius*radius;
+   for(let y=0;y<th;y++)for(let x=0;x<tw;x++){
+     const k=(y*tw+x)*4;if(md[k+3]<16){od[k]=od[k+1]=od[k+2]=od[k+3]=0;continue}
+     let dx=0,dy=0,ws=0,nearest=Infinity,hard=null;
+     for(const q of controls){
+       const ax=(x+.5)-q.tx,ay=(y+.5)-q.ty,d2=ax*ax+ay*ay;
+       if(d2<nearest){nearest=d2;hard=q}
+       if(d2>r2)continue;
+       const wt=1/Math.pow(d2+.05,1.25);dx+=(q.sx-q.tx)*wt;dy+=(q.sy-q.ty)*wt;ws+=wt
+     }
+     if(nearest<.08&&hard){dx=hard.sx-hard.tx;dy=hard.sy-hard.ty}else if(ws){dx/=ws;dy/=ws}else{dx=dy=0}
+     const p=sample(x+.5+dx-.5,y+.5+dy-.5);od[k]=p[0];od[k+1]=p[1];od[k+2]=p[2];od[k+3]=255
+   }
+   og.putImageData(oi,0,0);return out
+ }catch(e){console.warn('corner matched UV fit fallback',e);return fallback()}
 }
 
 async function islandStudioRestore(){
@@ -206,7 +355,7 @@ async function islandStudioRestore(){
    g.drawImage(fitted,Math.round(p.src.x*density),Math.round(p.src.y*density));found++
  }
  if(!found){islandStudio.restored=null;islandStudioStatus('Hiçbir AI adası tespit edilemedi. Ayrılmış AI görünümünü kontrol et.');return}
- islandStudio.restored=out;islandStudioStatus('Maskeye kilitli UV geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
+ islandStudio.restored=out;islandStudioStatus('Köşe/kenar eşlemeli UV geri toplama · '+found+'/'+m.parts.length+' ada · '+outW+'×'+outH+(missed.length?' · bulunamadı: '+missed.join(', '):''));islandStudioSetTab('restored')
 }
 
 let islandPreview3dPromise=null;
