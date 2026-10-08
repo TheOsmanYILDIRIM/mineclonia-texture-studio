@@ -68,8 +68,8 @@ async function ensurePreview3dLoaded(){
 }
 function updateVariant3dButton(){
  const x=variantSelectedMeta(),b=$('variant3dToggle');if(!b)return;
- const entity=assetTypeOf(x)==='Entity',hasModel=!!String(runtimeRoleInfo?.(x)?.model||'').match(/\.b3d/i);
- const eligible=entity&&hasModel;b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];const ub=$('variantUvManual'),rec=variantList()[variantSelectedIndex];if(ub){ub.style.display=entity?'':'none';ub.disabled=!entity||variantMixMode||!rec;}
+ const type=assetTypeOf(x),entity=type==='Entity',block=type==='Block'||type==='Functional Block',hasModel=!!String(runtimeRoleInfo?.(x)?.model||'').match(/\.b3d/i);
+ const eligible=block||(entity&&hasModel);b.style.display=eligible?'':'none';b.disabled=!eligible||variantMixMode||!variantList()[variantSelectedIndex];const ub=$('variantUvManual'),rec=variantList()[variantSelectedIndex];if(ub){ub.style.display=entity?'':'none';ub.disabled=!entity||variantMixMode||!rec;}
 }
 function renderVariantLab(){
  const x=variantSelectedMeta();if(!x)return;
