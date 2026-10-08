@@ -22,6 +22,13 @@ Current code on `main` always outranks stale prose. If a handoff note conflicts 
 
 Do not duplicate large prompt catalogs, source files, or long handoff history into Beyin.
 
+## Offline UV alignment reference
+
+- Keep `tools/uv-pipeline/creeper_outer_rigid_truevoid.py` unchanged as the recovered historical baseline.
+- Reusable work lives in `tools/uv-pipeline/uv_geometry.py` and `uv_align_guarded_v2.py`; test with `test_uv_align_guarded_v2.py`. See local README for commands and supported inputs.
+- Original UV topology and alpha are authoritative; do not implement texture-specific coordinate patches. Reject low-confidence correspondence and unsafe sampling maps rather than silently producing misregistered mob atlases.
+- Do not wire experimental Python aligners into browser storage, runtime UX or GitHub workflows without a separate verified integration task. Existing browser data must never be wiped.
+
 ## Core project invariants
 
 Texture Studio edits Mineclonia textures while preserving gameplay structure and identity.
