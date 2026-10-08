@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "projection": "orthographic",
+    "geometry": "cube",
+    "alpha_mode": "auto",
+    "background": "checker-dark"
+  },
+  "profiles": [
+    {
+      "id": "grass_block",
+      "match": {
+        "names": [
+          "mcl_core_grass_block_top.png",
+          "mcl_core_grass_block_side_overlay.png"
+        ]
+      },
+      "geometry": "cube",
+      "projection": "orthographic",
+      "background": "dirt",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_core_grass_block_top.png",
+            "tint": "#8EB971"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "default_dirt.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "default_dirt.png"
+          },
+          {
+            "texture": "mcl_core_grass_block_side_overlay.png",
+            "tint": "#8EB971"
+          }
+        ],
+        "south": [
+          {
+            "texture": "default_dirt.png"
+          },
+          {
+            "texture": "mcl_core_grass_block_side_overlay.png",
+            "tint": "#8EB971"
+          }
+        ],
+        "east": [
+          {
+            "texture": "default_dirt.png"
+          },
+          {
+            "texture": "mcl_core_grass_block_side_overlay.png",
+            "tint": "#8EB971"
+          }
+        ],
+        "west": [
+          {
+            "texture": "default_dirt.png"
+          },
+          {
+            "texture": "mcl_core_grass_block_side_overlay.png",
+            "tint": "#8EB971"
+          }
+        ]
+      }
+    },
+    {
+      "id": "acacia_log",
+      "match": {
+        "names": [
+          "default_acacia_tree.png",
+          "default_acacia_tree_top.png"
+        ]
+      },
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "default_acacia_tree_top.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "default_acacia_tree_top.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "default_acacia_tree.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "default_acacia_tree.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "default_acacia_tree.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "default_acacia_tree.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "generic_log_pair",
+      "match": {
+        "suffix_pairs": [
+          [
+            "_tree.png",
+            "_tree_top.png"
+          ],
+          [
+            "_log.png",
+            "_log_top.png"
+          ],
+          [
+            "_log_side.png",
+            "_log_top.png"
+          ]
+        ]
+      },
+      "geometry": "cube",
+      "projection": "orthographic",
+      "resolver": "paired_log"
+    },
+    {
+      "id": "single_texture_cube",
+      "match": {
+        "asset_types": [
+          "Block",
+          "Functional Block"
+        ]
+      },
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "$self"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "$self"
+          }
+        ],
+        "north": [
+          {
+            "texture": "$self"
+          }
+        ],
+        "south": [
+          {
+            "texture": "$self"
+          }
+        ],
+        "east": [
+          {
+            "texture": "$self"
+          }
+        ],
+        "west": [
+          {
+            "texture": "$self"
+          }
+        ]
+      }
+    }
+  ]
+}
