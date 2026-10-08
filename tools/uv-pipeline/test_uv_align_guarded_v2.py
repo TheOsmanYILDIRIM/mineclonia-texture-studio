@@ -100,6 +100,30 @@ class GuardedUVTests(unittest.TestCase):
         self.assertTrue(np.array_equal(out[55:68, 52:68], original[55:68, 52:68]))
         self.assertEqual(report['status'], 'validated')
 
+    def test_known_translation_of_non_creeper_uv_shape_is_reversed(self):
+        # Deterministic T-shaped atlas; not a Creeper example or coordinate patch.
+        h, w = 128, 256
+        yy, xx = np.mgrid[:h, :w]
+        original = np.zeros((h, w, 4), np.uint8)
+        mask = (((xx >= 30) & (xx < 100) & (yy >= 18) & (yy < 105)) |
+                ((xx >= 100) & (xx < 175) & (yy >= 43) & (yy < 88)))
+        mask[(xx >= 55) & (xx < 76) & (yy >= 57) & (yy < 75)] = False
+        for channel, values in enumerate(((xx * 7 + yy * 5 + 60) % 190 + 60,
+                                          (xx * 3 + yy * 11 + 40) % 190 + 60,
+                                          (xx * 13 + yy * 2 + 25) % 190 + 60)):
+            original[:, :, channel][mask] = values.astype(np.uint8)[mask]
+        original[:, :, 3][mask] = 255
+        ai = cv2.warpAffine(original, np.float32([[1, 0, 2], [0, 1, 1]]),
+                            (w, h), flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT)
+        out, report = engine.run(original, ai)
+        original_material = original[:, :, :3].astype(float)
+        shifted_mae = float(np.abs(ai[:, :, :3].astype(float) - original_material)[mask].mean())
+        corrected_mae = float(np.abs(out[:, :, :3].astype(float) - original_material)[mask].mean())
+        self.assertLess(corrected_mae, shifted_mae * 0.05)
+        self.assertTrue(np.array_equal(out[:, :, 3], original[:, :, 3]))
+        self.assertTrue(np.array_equal(out[~mask], original[~mask]))
+        self.assertEqual(report['status'], 'validated')
+
     def test_unsafe_map_refuses_to_publish(self):
         with self.assertRaises(engine.AlignmentError):
             engine.condition_axis(np.array([0, 95, 99], np.float32),
