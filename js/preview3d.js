@@ -440,9 +440,9 @@
  async function render(){
   if(!active)return;
   document.getElementById('preview3dMeta').textContent=active.name;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),entity=canEntity(active),object=canObject(active),surface=canSurface(active);
-  obj.textContent=entity?'Entity':'Obje';
-  obj.style.display=(entity||object)?'':'none';
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),entity=canEntity(active),blockObject=canObject(active),surface=canSurface(active),object=surface;
+  obj.textContent=entity?'Entity':blockObject?'Obje':'Küp';
+  obj.style.display=entity?'':'none';
   w.disabled=entity||!canWorld(active);w.style.display=entity||!canWorld(active)?'none':'';
   if(surfaceBtn){surfaceBtn.hidden=entity||!surface;surfaceBtn.classList.toggle('active',mode==='surface');surfaceBtn.setAttribute('aria-label',mode==='surface'?'Blok/obje görünümüne geç':'İnce yüzey görünümüne geç')}
   obj.classList.toggle('primary',mode==='object');w.classList.toggle('primary',mode==='world');
@@ -450,9 +450,8 @@
   if(entity){mode='object';await renderEntity(active);resetView();return}
   cleanupEntityGL();
   if(mode==='surface'&&surface){await renderSurface(active);resetView();return}
-  if(!object&&surface){mode='surface';await renderSurface(active);resetView();return}
-  if(mode==='world'&&!canWorld(active))mode='object';
-  if(mode==='world')await renderWorld(active);else await renderObject(active);
+  if(mode==='world'&&!canWorld(active))mode=blockObject?'object':'surface';
+  if(mode==='world')await renderWorld(active);else if(mode==='object')await renderObject(active);else await renderSurface(active);
   const ai=await alphaInfo(active);stage.classList.toggle('alphaAware',ai.hasAlpha||ai.hasSemi);
   resetView();
  }
@@ -467,7 +466,7 @@
  document.getElementById('preview3dReset').addEventListener('click',resetView);
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
  document.getElementById('preview3dWorld').addEventListener('click',async()=>{if(!canWorld(active))return;mode='world';await render()});
- document.getElementById('preview3dSurfaceToggle')?.addEventListener('click',async()=>{if(!active||!canSurface(active))return;mode=mode==='surface'?(canObject(active)?'object':'surface'):'surface';await render()});
+ document.getElementById('preview3dSurfaceToggle')?.addEventListener('click',async()=>{if(!active||!canSurface(active))return;mode=mode==='surface'?'object':'surface';await render()});
 
  stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
  stage.addEventListener('pointermove',e=>{
