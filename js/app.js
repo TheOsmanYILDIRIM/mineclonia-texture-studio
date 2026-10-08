@@ -212,13 +212,14 @@ function textureTechnicalCategoriesOf(x){
 function minecloniaInventoryCategoryLabels(x){const labels=Object.fromEntries(MINECLONIA_INVENTORY_TABS);return minecloniaInventoryCategoriesOf(x).map(id=>labels[id]||id)}
 async function buildFilters(){
  const sel=$('category');
- sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:item_authored">Item · '+(window.MTSPromptStore?.authoredCount('items')||0)+'</option><option value="special:armor_uv">Armor UV · 32</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
+ sel.innerHTML='<option value="">Tüm sınıflar</option><optgroup label="Özel üretim"><option value="special:item_authored">Item · '+(window.MTSPromptStore?.authoredCount('items')||0)+'</option><option value="special:armor_uv">Armor UV · 32</option><option value="special:variants">Variants · 6</option></optgroup><optgroup label="Mineclonia Creative">'+MINECLONIA_INVENTORY_TABS.map(([id,label])=>`<option value="inv:${id}">${label}</option>`).join('')+'</optgroup><optgroup label="Texture / Teknik">'+TEXTURE_TECH_CATEGORIES.map(([id,label])=>`<option value="tech:${id}">${label}</option>`).join('')+'</optgroup>';
  const vals=['ALL','P0','P1','P2','P3','P4','P5','P6'];
  const counts=Object.fromEntries(vals.map(v=>[v,v==='ALL'?CATALOG.length:CATALOG.filter(x=>x.priority===v).length]));
  $('filters').innerHTML=vals.map(v=>`<button class="chip ${v==='P0'?'active':''}" data-p="${v}">${v==='ALL'?'Tümü':v} · ${counts[v]}</button>`).join('');
  $('filters').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const p=b.dataset.p;$('stat').textContent=(p==='ALL'?'Liste':p)+' hazırlanıyor…';applyFilter()}
 }
-function categoryMatches(x,cat){if(!cat)return true;if(cat==='special:item_authored')return isAuthoredItemTexture(x);if(cat==='special:armor_uv')return isArmorUvTexture(x);const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
+function isLockedParentVariant(x){return !!x&&!!materialReferenceDependency(x)?.kind?.startsWith('locked-parent-')}
+function categoryMatches(x,cat){if(!cat)return true;if(cat==='special:item_authored')return isAuthoredItemTexture(x);if(cat==='special:armor_uv')return isArmorUvTexture(x);if(cat==='special:variants')return isLockedParentVariant(x);const [kind,id]=cat.split(':');return kind==='tech'?textureTechnicalCategoriesOf(x).includes(id):minecloniaInventoryCategoriesOf(x).includes(id)}
 function activePriority(){return document.querySelector('.chip.active')?.dataset.p||'P0'}
 function assetTypeOf(x){
  const p=x.path||'', n=(x.name||'').toLowerCase(), parts=p.split('/'), top=parts[0]||'', mod=parts[1]||'';
