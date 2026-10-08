@@ -132,6 +132,8 @@ jobs:
                 await page.locator('#open3dPreview').evaluate(el => el.click());
                 await page.waitForSelector('#preview3d.open', { timeout: 10000 });
                 await page.waitForTimeout(800);
+                const profileId = await page.locator('#preview3d').getAttribute('data-preview-profile').catch(()=>null);
+                stateErrors.push('preview3d-profile:' + t.name + ':' + profileId);
                 await capture(page, `preview3d-block-${t.name}-fold`);
                 const surfaceToggle = page.locator('#preview3dSurfaceToggle');
                 if (await surfaceToggle.isVisible().catch(() => false)) {
