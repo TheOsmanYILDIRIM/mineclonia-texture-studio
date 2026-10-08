@@ -524,6 +524,34 @@ body{min-height:100dvh}
   .compactAnimSection:has(.animBox.show){display:none}
   .compactModeRow::after{content:none}
 }
+
+@media(max-width:699px){
+  .compactPrimaryDock{
+    grid-template-columns:48px minmax(0,1fr)!important;
+    gap:7px!important;
+  }
+  .compactDockClose{
+    width:48px;
+    height:48px;
+    min-width:48px;
+    border:1px solid #303743;
+    border-radius:13px;
+    background:#171c23;
+    color:#f2f5f8;
+    font-size:19px;
+    font-weight:800;
+    display:grid;
+    place-items:center;
+    padding:0;
+  }
+  .compactPrimaryDock #compactMain{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:7px;
+    min-width:0;
+  }
+  .compactPrimaryDock #uploadEdited{width:100%}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
