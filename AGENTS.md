@@ -98,6 +98,8 @@ Key non-negotiables:
 - Missing authored prompt coverage is represented by no usable prompt, not by a generated "PROMPT YOK" body or generic alpha-lock fallback.
 - True inventory items use the two-pass Creative → A+B Correction workflow from `PROMPT_AUTHORING_GUIDE.md`; their first pass is not source-silhouette/alpha locked.
 
+- Locked Parent Composite (`js/locked-parent-composite.js`) is an opt-in ore editor: retain the finished parent Stone/Deepslate pixels exactly outside the user-painted mineral mask. Never rewrite source parent edits, auto-select uncertain minerals, or save before explicit confirmation.
+
 ## Existing decisions that must not silently regress
 
 - 3D preview is intentionally supported: blocks use Lua-derived node-face composition with semantic/name fallback; supported entity skins use Mineclonia's real `.b3d` mesh + UV data in a lazy WebGL renderer. Do not replace real runtime/mesh mapping with guessed cube wrapping.
