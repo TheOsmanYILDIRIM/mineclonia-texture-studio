@@ -107,7 +107,7 @@ async function addVariantFiles(files){
 }
 async function activateSelectedVariant(){
  const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;
- const committed=await api().prepareStoredEditBlob?.(rec.blob,x)||rec.blob;await putEdit(x.path,committed);api().markChanged?.(x.path);await refreshVariantSources();variantSelectedIndex=1;await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
+ const committed=await api().prepareStoredEditBlob?.(rec.blob,x)||rec.blob;await putEdit(x.path,committed);api().markChanged?.(x.path);await refreshVariantSources();variantSelectedIndex=Math.max(0,variantSources.findIndex(v=>v.kind==='active'));await applyFilter();renderVariantLab();toast('Seçili varyant ana texture olarak kaydedildi');
 }
 
 
