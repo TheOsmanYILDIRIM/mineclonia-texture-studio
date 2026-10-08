@@ -4,7 +4,7 @@
  const scene=document.getElementById('preview3dScene');
  if(!root||!stage||!scene)return;
 
- let mode='object',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0;
+ let mode='object',projection='orthographic',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0,previewProfileConfig=null,previewBgUrl=null;
  const S=150;
  const byName=name=>CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name).toLowerCase())||null;
  const canObject=x=>!!x&&['Block','Functional Block'].includes(assetTypeOf(x));
@@ -14,6 +14,89 @@
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
  const canSurface=x=>!!x&&assetTypeOf(x)!=='Entity';
  let entityGL=null,variantSession=null;
+
+ async function loadPreviewProfiles(){
+  if(previewProfileConfig)return previewProfileConfig;
+  try{
+    const r=await fetch('js/data/preview3d-profiles.json',{cache:'no-cache'});
+    previewProfileConfig=r.ok?await r.json():{defaults:{projection:'orthographic'},profiles:[]};
+  }catch{previewProfileConfig={defaults:{projection:'orthographic'},profiles:[]}}
+  return previewProfileConfig;
+ }
+ function profileMatches(profile,meta){
+  const m=profile?.match||{},n=String(meta?.name||'').toLowerCase(),type=assetTypeOf(meta);
+  if(Array.isArray(m.names)&&m.names.some(x=>String(x).toLowerCase()===n))return true;
+  if(Array.isArray(m.asset_types)&&m.asset_types.includes(type))return true;
+  if(Array.isArray(m.suffix_pairs)){
+    for(const pair of m.suffix_pairs||[])for(const suffix of pair||[])if(n.endsWith(String(suffix).toLowerCase()))return true;
+  }
+  return false;
+ }
+ function findCatalogTexture(name){return CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name||'').toLowerCase())||null}
+ function pairedLogFaces(meta,profile){
+  const n=String(meta?.name||''),low=n.toLowerCase();
+  for(const pair of profile?.match?.suffix_pairs||[]){
+    const [sideSuffix,topSuffix]=pair;
+    const s=String(sideSuffix||'').toLowerCase(),t=String(topSuffix||'').toLowerCase();
+    let stem=null;
+    if(low.endsWith(s))stem=n.slice(0,n.length-s.length);
+    else if(low.endsWith(t))stem=n.slice(0,n.length-t.length);
+    if(stem==null)continue;
+    const side=findCatalogTexture(stem+sideSuffix)||meta,top=findCatalogTexture(stem+topSuffix)||meta;
+    const layer=x=>[{texture:x?.name||'$self'}];
+    return {top:layer(top),bottom:layer(top),north:layer(side),south:layer(side),east:layer(side),west:layer(side)};
+  }
+  return null;
+ }
+ async function resolvePreviewProfile(meta){
+  const cfg=await loadPreviewProfiles();
+  const profile=(cfg.profiles||[]).find(p=>profileMatches(p,meta))||null;
+  if(!profile)return {id:'fallback',projection:cfg.defaults?.projection||'orthographic',faces:null,background:cfg.defaults?.background||'checker-dark'};
+  const out={...cfg.defaults,...profile};
+  if(profile.resolver==='paired_log')out.faces=pairedLogFaces(meta,profile);
+  projection=out.projection||'orthographic';
+  return out;
+ }
+ async function layerCanvas(layer,meta,overrideBlob,size){
+  const texture=layer?.texture||'$self';
+  let blob=null;
+  if(texture==='$self'||String(texture).toLowerCase()===String(meta?.name||'').toLowerCase())blob=overrideBlob||await displayBlob(meta.path);
+  else{
+    const ref=findCatalogTexture(texture);if(ref)blob=await displayBlob(ref.path);
+  }
+  const cv=document.createElement('canvas');cv.width=cv.height=size;
+  if(!blob)return cv;
+  const bmp=await createImageBitmap(blob),g=cv.getContext('2d',{willReadFrequently:true});g.imageSmoothingEnabled=false;g.drawImage(bmp,0,0,size,size);bmp.close?.();
+  if(layer?.tint){
+    const rgb=(String(layer.tint).match(/[0-9a-f]{2}/gi)||['ff','ff','ff']).map(x=>parseInt(x,16));
+    const im=g.getImageData(0,0,size,size),d=im.data;
+    for(let i=0;i<d.length;i+=4){if(!d[i+3])continue;d[i]=Math.round(d[i]*rgb[0]/255);d[i+1]=Math.round(d[i+1]*rgb[1]/255);d[i+2]=Math.round(d[i+2]/255*rgb[2])}
+    g.putImageData(im,0,0);
+  }
+  return cv;
+ }
+ async function composeFace(layers,meta,overrideBlob,size=256){
+  const cv=document.createElement('canvas');cv.width=cv.height=size;const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+  for(const layer of layers||[{texture:'$self'}]){const src=await layerCanvas(layer,meta,overrideBlob,size);g.drawImage(src,0,0)}
+  return cv;
+ }
+ async function buildFaceAtlas(profile,meta,overrideBlob){
+  const names=['north','south','east','west','top','bottom'],cell=256,atlas=document.createElement('canvas');atlas.width=cell*3;atlas.height=cell*2;
+  const g=atlas.getContext('2d');g.imageSmoothingEnabled=false;
+  for(let i=0;i<names.length;i++){
+    const face=await composeFace(profile?.faces?.[names[i]]||[{texture:'$self'}],meta,overrideBlob,cell);
+    g.drawImage(face,(i%3)*cell,Math.floor(i/3)*cell);
+  }
+  return atlas;
+ }
+ async function applyPreviewBackground(profile){
+  if(previewBgUrl){try{URL.revokeObjectURL(previewBgUrl)}catch{}previewBgUrl=null}
+  stage.style.backgroundImage='';stage.style.backgroundSize='';stage.style.backgroundPosition='';
+  if(profile?.background==='dirt'){
+    const dirt=findCatalogTexture('default_dirt.png');
+    if(dirt){previewBgUrl=URL.createObjectURL(await displayBlob(dirt.path));stage.style.backgroundImage=`linear-gradient(rgba(8,10,12,.38),rgba(8,10,12,.38)),url("${previewBgUrl}")`;stage.style.backgroundSize='auto,96px 96px';stage.style.backgroundPosition='0 0,center';}
+  }
+ }
 
  const FACE_SUFFIX_RULES=[
   ['front',/_(?:front_(?:active|on|off)|front_(?:horizontal|vertical)|front)\.png$/],
@@ -366,7 +449,7 @@
  function entityRotation(){const ax=rx*Math.PI/180,ay=ry*Math.PI/180,cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Math.sin(ay);return new Float32Array([cy,sx*sy,-cx*sy,0,0,cx,sx,0,sy,-sx*cy,cx*cy,0,0,0,0,1])}
  function drawEntityGL(){
   const e=entityGL;if(!e)return;const {gl,canvas}=e,dpr=Math.min(1.5,devicePixelRatio||1),w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
-  if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
+  if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());if(e.uPerspective)gl.uniform1f(e.uPerspective,projection==='perspective'?.72:0);const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
  }
  async function swapEntityTexture(blob){
   const e=entityGL;if(!e||!blob)return;
@@ -442,6 +525,8 @@
  }
  async function renderCubeGL(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';
+  const profile=await resolvePreviewProfile(meta);await applyPreviewBackground(profile);
+  const atlas=await buildFaceAtlas(profile,meta,textureBlob);
   const canvas=document.createElement('canvas');
   canvas.className='preview3dBlockCanvas';
   canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:2';
@@ -450,14 +535,13 @@
   if(!gl)throw Error('WebGL desteklenmiyor');
 
   const vs=glShader(gl,gl.VERTEX_SHADER,
-    'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;varying float shade;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.42,1.0);u=t;shade=.82+.18*max(0.0,q.z+0.5);}'
+    'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;uniform float persp;varying vec2 u;varying float shade;void main(){vec4 q=r*vec4(p,1.0);float w=1.0+persp*max(-0.48,min(0.48,q.z));gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.42,w);u=t;shade=.82+.18*max(0.0,q.z+0.5);}'
   );
   const fs=glShader(gl,gl.FRAGMENT_SHADER,
     'precision mediump float;uniform sampler2D tex;varying vec2 u;varying float shade;void main(){vec4 c=texture2D(tex,u);if(c.a<0.015)discard;gl_FragColor=vec4(c.rgb*shade,c.a);}'
   );
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
-  if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');
-  gl.useProgram(program);
+  if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
 
   const P=[
    -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1,
@@ -467,29 +551,23 @@
    -1, 1, 1,  1, 1, 1,  1, 1,-1, -1, 1,-1,
    -1,-1,-1,  1,-1,-1,  1,-1, 1, -1,-1, 1
   ].map(v=>v*.5);
-  const UV=[];for(let i=0;i<6;i++)UV.push(0,1,1,1,1,0,0,0);
+  const UV=[];
+  for(let f=0;f<6;f++){
+    const col=f%3,row=Math.floor(f/3),u0=col/3,u1=(col+1)/3,v0=row/2,v1=(row+1)/2;
+    UV.push(u0,v1,u1,v1,u1,v0,u0,v0);
+  }
   const I=[];for(let f=0;f<6;f++){const o=f*4;I.push(o,o+1,o+2,o,o+2,o+3)}
-
   const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(P),gl.STATIC_DRAW);
   const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
   const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(UV),gl.STATIC_DRAW);
   const ta=gl.getAttribLocation(program,'t');gl.enableVertexAttribArray(ta);gl.vertexAttribPointer(ta,2,gl.FLOAT,false,0,0);
   const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(I),gl.STATIC_DRAW);
-
-  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);
-  const bmp=await createImageBitmap(textureBlob||await displayBlob(meta.path));gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,0);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,atlas);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
-
-  entityGL={
-    canvas,gl,program,pb,tb,ib,tex,count:I.length,indexType:gl.UNSIGNED_SHORT,
-    uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s'),
-    isBlockCube:true
-  };
+  entityGL={canvas,gl,program,pb,tb,ib,tex,count:I.length,indexType:gl.UNSIGNED_SHORT,uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s'),uPerspective:gl.getUniformLocation(program,'persp'),isBlockCube:true,profile};
   drawEntityGL();
  }
-
  async function makeTextureCube(meta,size=S){
   const st=await faceStyle(meta);
   const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
@@ -535,7 +613,7 @@
   mode=canObject(active)||canEntity(active)?'object':'surface';
   root.classList.add('open');await render();
  }
- function close(){root.classList.remove('open');cleanupEntityGL();for(const n of scene.querySelectorAll('.preview3dSurface')){if(n._textureUrl)try{URL.revokeObjectURL(n._textureUrl)}catch{}}scene.innerHTML='';stage.classList.remove('alphaAware');variantSession=null;renderVariantStrip();pointers.clear();lastPinch=0}
+ function close(){root.classList.remove('open');cleanupEntityGL();for(const n of scene.querySelectorAll('.preview3dSurface')){if(n._textureUrl)try{URL.revokeObjectURL(n._textureUrl)}catch{}}scene.innerHTML='';stage.classList.remove('alphaAware');stage.style.backgroundImage='';stage.style.backgroundSize='';stage.style.backgroundPosition='';if(previewBgUrl){try{URL.revokeObjectURL(previewBgUrl)}catch{}previewBgUrl=null}variantSession=null;renderVariantStrip();pointers.clear();lastPinch=0}
  document.getElementById('preview3dClose').addEventListener('click',close);
  document.getElementById('preview3dReset').addEventListener('click',resetView);
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
