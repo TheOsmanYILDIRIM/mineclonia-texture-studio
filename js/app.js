@@ -903,6 +903,21 @@ async function downloadMaterialReferences(x){
  }
  toast(d.refs.length>1?d.refs.length+' referans indirildi':'Referans texture indirildi');
 }
+function oreHostOnlyPrompt(x){
+ const d=materialReferenceDependency(x);
+ if(!d?.refs?.length||!/(?:^host-material$|^runtime-composite$)/.test(d.kind)||!/ore\.png$/i.test(x?.name||''))return null;
+ const host=d.refs[0].name;
+ const mineral=String(x.name).replace(/^.*?_((?:coal|iron|gold|copper|diamond|lapis|emerald|redstone|quartz))_ore\.png$/i,'$1').replace(/_/g,' ');
+ return `Create the ${mineral} ore texture using the completed ${host} texture supplied as Image B.
+
+Keep Image B exactly unchanged wherever the ore does not physically occupy or affect the stone. Preserve its original pixel values, lighting and color without adjustment.
+
+Add only natural ${mineral} mineral deposits, inclusions and the immediate contact details they require. Do not repaint, relight, recolor, regrade or regenerate the stone.
+
+Use Image A only to identify the ore type and approximate deposit scale, not to copy its arrangement.
+
+Keep the result seamless across opposite edges. Output the completed texture only.`;
+}
 function materialDependencyPromptBlock(x){
  const d=materialReferenceDependency(x);if(!d||!d.refs.length)return '';
  const names=d.refs.map(v=>v.name).join(', ');
@@ -928,6 +943,7 @@ function p0ProductionMeta(x){
  return {subject,face,tileable};
 }
 function p0ProductionPromptFor(x){
+ const orePrompt=oreHostOnlyPrompt(x);if(orePrompt)return orePrompt;
  const m=p0ProductionMeta(x);
  const foliage=/^(?:default_(?:acacia_leaves|jungleleaves|leaves)|mcl_core_leaves_(?:big_oak|birch|spruce))\.png$/i.test(x?.name||'');
  const porosity=foliage?'FOLIAGE TRANSPARENCY: Match only the approximate overall proportion of opaque foliage and fully transparent gaps in Image A. Freely redesign where gaps appear, their shapes and sizes, and all leaf clusters. Never copy the original alpha mask or fill the entire square. Keep true alpha=0 openings; match density, not arrangement. Opposite edges must tile without closing these gaps.':'';
