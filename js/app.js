@@ -792,6 +792,7 @@ async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION)
  return await normalizeTextureBlob(blob,meta,targetRes);
 }
 async function prepareStoredEditBlob(blob,meta){
+ if(!document.getElementById('autoBlackBgClean')?.checked)return blob;
  if(!await sourceUsesAlphaCutouts(meta))return blob;
  return await removeConnectedBlackBackground(blob);
 }
