@@ -23,3 +23,29 @@
 .preview3dVariants{display:none;gap:7px;overflow-x:auto;padding:8px 10px calc(8px + var(--safe));background:rgba(13,15,18,.97);border-top:1px solid var(--line);scrollbar-width:none}
 .preview3dVariants.show{display:flex}.preview3dVariant{position:relative;flex:0 0 58px;width:58px;height:58px;border:2px solid transparent;border-radius:10px;padding:0;background:#0b0d10;overflow:hidden}
 .preview3dVariant img{width:100%;height:100%;display:block;object-fit:cover}.preview3dVariant.active{border-color:var(--accent)}.preview3dVariant span{position:absolute;left:2px;right:2px;bottom:2px;padding:1px 3px;border-radius:4px;background:rgba(0,0,0,.72);font-size:7px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+
+/* 2026-10-08 visual QA refinement */
+.variantTop{padding:8px 10px;background:rgba(13,15,18,.985)}
+.variantTopRow{max-width:900px;margin:0 auto;gap:6px}
+.variantTopRow .select{padding:8px 10px;border-radius:10px}
+.variantAdd{padding:8px 10px}
+.variantThumbStrip{max-width:900px;margin:0 auto;padding:7px 10px 5px}
+.variantThumb{flex-basis:52px;width:52px;height:52px;border-radius:9px}
+.variantBody{padding:7px 10px 16px}
+.variantControls{gap:5px;margin:2px 0 7px}
+.variantControls .btn{padding:7px 9px;border-radius:9px}
+.variantStage{width:min(90vw,680px);border-radius:10px}
+.variantFooter{gap:6px;margin-top:7px}
+.variantFooter .btn{padding:9px 10px}
+.variantStatus{margin-top:5px}
+@media(max-width:640px){
+  .variantTopRow{align-items:stretch}
+  .variantTopRow .select{font-size:12px}
+  .variantAdd{font-size:11px;white-space:nowrap}
+  .variantThumbStrip{padding-left:8px;padding-right:8px}
+  .variantStage{width:calc(100vw - 16px)}
+  .variantBody{padding-left:8px;padding-right:8px}
+  .variantFooter{display:grid;grid-template-columns:1fr 1fr}
+  .variantFooter .btn{min-width:0;font-size:11px}
+}
