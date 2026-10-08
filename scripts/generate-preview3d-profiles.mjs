@@ -27,7 +27,7 @@ function profileFor(node,def){
     faces[logical[i]]=layers.length?layers:[{texture:tex[0]}];
   }
   const names=[...new Set([...tex,...ov].flatMap(x=>String(x||'').match(/[A-Za-z0-9_./-]+\.png/g)||[]))];
-  return {id:'node:'+node,match:{names},node,geometry:'cube',projection:'orthographic',faces};
+  return {id:'node:'+node,match:{names},node,texture_base:def.texture_base||null,geometry:'cube',projection:'orthographic',faces};
 }
 const profiles=[];
 for(const [node,def] of Object.entries(src.nodes||{})){const p=profileFor(node,def);if(p)profiles.push(p)}
