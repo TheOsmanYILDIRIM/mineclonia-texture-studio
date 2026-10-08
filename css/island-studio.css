@@ -7,3 +7,34 @@
 .islandModeChooser{position:absolute;z-index:20;inset:0;background:#0d0f12;padding:72px 14px 20px;display:grid;align-content:start;gap:12px}.islandModeChooser.hidden{display:none}.islandModeCard{border:1px solid #303641;border-radius:16px;background:#171a20;padding:16px;display:grid;gap:10px}.islandModeCard b{font-size:18px}.islandModeCard span{font-size:13px;line-height:1.45;color:#aeb7c4}.islandModeCard .btn{min-height:50px;font-size:15px}
 
 .islandDataPanel{position:absolute;z-index:22;inset:58px 10px 10px;background:#101318;border:1px solid #303641;border-radius:14px;padding:10px;overflow:hidden}.islandDataPanel[hidden]{display:none}.islandDataTop{display:flex;gap:8px;align-items:center;margin-bottom:8px}.islandDataTop b{margin-right:auto}.islandDataPanel textarea{width:100%;height:calc(100% - 48px);resize:none;border:1px solid #303641;border-radius:10px;background:#090b0e;color:#dbe3ec;padding:10px;font:12px/1.45 ui-monospace,monospace;box-sizing:border-box}
+
+
+/* 2026-10-08 visual QA refinement */
+.islandStudioTop{padding:8px 10px;background:rgba(13,15,18,.99)}
+.islandStudioTop .select{padding:8px 10px}
+.islandStudioTabs,.islandStudioTools{gap:5px;padding:6px 10px}
+.islandStudioTabs .btn,.islandStudioTools .btn{padding:7px 9px;font-size:11px}
+.islandStudioStatus{padding:0 10px 6px;font-size:11px}
+.islandStudioStage{margin:0 10px;border-radius:10px;min-height:240px;border-color:#292f37}
+.islandWizardHead{margin:8px 10px;padding:9px 10px;border-radius:10px;background:#12161b}
+.islandWizardHead span{font-size:10px;padding:3px 6px}
+.islandWizardHead b{font-size:13px}
+.islandWizardHead div{font-size:11px}
+.islandWizardNav{gap:6px;margin:8px 10px}
+.islandWizardNav .btn{min-height:42px}
+.islandModeChooser{padding:64px 12px 16px;gap:8px}
+.islandModeCard{border-radius:12px;padding:13px;gap:7px;background:#14181d}
+.islandModeCard b{font-size:16px}
+.islandModeCard span{font-size:12px;line-height:1.4}
+.islandModeCard .btn{min-height:44px;font-size:13px}
+.islandJoystickDock{padding:6px 10px 8px}
+@media(max-width:640px){
+  .islandStudioTop{position:sticky;gap:5px}
+  .islandStudioTop .select{font-size:11px}
+  .islandStudioTabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .islandStudioTools{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .islandStudioTabs .btn,.islandStudioTools .btn{flex:0 0 auto}
+  .islandStudioStage{min-height:42vh;margin:0 7px}
+  .islandWizardNav{position:sticky;bottom:0;z-index:8;background:rgba(13,15,18,.98);padding:5px 0}
+  .islandModeChooser{padding-top:56px}
+}
