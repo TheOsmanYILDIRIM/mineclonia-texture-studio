@@ -20,10 +20,70 @@
 
 @media(min-width:700px){.grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;padding:12px}.controls{grid-template-columns:minmax(240px,1fr) 190px 160px 120px auto}.controls .search{grid-column:auto}.drawer{max-width:720px;margin:0 auto}.bottom{left:50%;transform:translateX(-50%);max-width:720px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}}
 .recentTextures{position:sticky;top:0;z-index:24;display:none;align-items:center;gap:6px;height:48px;background:rgba(13,15,18,.96);border-bottom:1px solid var(--line);padding:4px 8px;backdrop-filter:blur(10px);box-sizing:border-box}.recentTextures.show{display:flex}.recentTexturesHead{flex:0 0 auto;font-size:9px;color:var(--muted);writing-mode:horizontal-tb}.recentTextureStrip{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}.recentTexture{flex:0 0 42px;width:42px;height:38px;border:1px solid var(--line);background:#111419;border-radius:7px;padding:2px;color:var(--txt);overflow:hidden}.recentTexture img{display:block;width:36px;height:27px;object-fit:contain;border-radius:4px;background:#090b0e;image-rendering:auto}.recentTexture span{display:none}
+
+/* 2026-10-08 visual QA refinement */
+.title{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand build" "status status";align-items:center;gap:5px 10px}
+.title h1{grid-area:brand;font-size:15px;letter-spacing:-.01em}
+.title>.stat{font-size:10px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stat{grid-area:status;justify-self:start;padding-right:46%}
+#saveState{grid-area:status;justify-self:end;max-width:46%;text-align:right}
+.buildCtl{grid-area:build;display:flex;align-items:center;gap:5px}
+.buildBadge,.buildCheck{border:1px solid var(--line);background:#14181d;color:var(--muted);border-radius:9px;padding:6px 8px;font-size:10px;line-height:1;white-space:nowrap}
+.buildCheck{color:#d8dee7}
+.top{padding:8px 10px}
+.controls{margin-top:7px;gap:6px}
+.search,.select{border-radius:10px;padding:8px 10px}
+.filterRow{padding-top:6px;gap:5px}
+.filters{gap:5px}
+.chip,.changedChip{padding:6px 9px;font-size:11px}
+.grid{gap:6px;padding:8px}
+.card{border-radius:7px;background:#101318;border-color:#252b33}
+.badge{font-size:7px;padding:2px 4px}
+.pager{z-index:10;padding:8px 12px calc(76px + var(--safe))}
+.bottom{z-index:40;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px;padding:6px 8px calc(6px + var(--safe));background:rgba(18,21,26,.985);backdrop-filter:blur(14px)}
+.bottom .btn{min-width:0;padding:8px 5px;border-radius:9px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drawer{max-height:96vh;padding:10px 12px calc(14px + var(--safe))}
+.preview{width:min(82vw,420px);margin:10px auto;border-radius:12px}
+.actions{gap:6px}
+.actions .btn{padding:9px 10px;font-size:12px}
+.promptBox,.animBox,.hint{border-radius:11px}
+.recentTextures{height:44px}
+@media(max-width:699px){
+  .app{padding-bottom:calc(70px + var(--safe))}
+  .top{position:sticky}
+  .title{grid-template-columns:minmax(0,1fr) auto;gap:4px 6px}
+  .title h1{font-size:14px}
+  .buildBadge,.buildCheck{padding:5px 6px;font-size:9px}
+  .controls{grid-template-columns:minmax(0,1fr) 92px}
+  .controls .search{grid-column:1/-1}
+  .controls #category{grid-column:1}
+  .controls #resolution{grid-column:2}
+  .search,.select{padding:7px 9px;font-size:12px}
+  .filterRow{overflow:hidden}
+  .filters{padding-bottom:1px}
+  .chip,.changedChip{padding:5px 8px;font-size:10px}
+  .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:6px}
+  .bottom .btn{font-size:10px;padding:8px 3px}
+  .pager{padding-bottom:calc(66px + var(--safe))}
+  .preview{width:min(78vw,360px)}
+  .meta h2{font-size:15px}
+  .path{font-size:10px}
+}
+@media(min-width:700px) and (max-width:1099px){
+  .grid{grid-template-columns:repeat(8,minmax(0,1fr))}
+  .bottom{max-width:680px}
+}
+@media(min-width:1100px){
+  .grid{grid-template-columns:repeat(10,minmax(0,1fr));max-width:1320px;margin:0 auto;gap:7px;padding:10px 12px}
+  .top{padding-left:max(14px,calc((100vw - 1320px)/2));padding-right:max(14px,calc((100vw - 1320px)/2))}
+  .drawer{max-width:760px}
+  .preview{width:min(48vh,420px)}
+  .bottom{max-width:700px}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
-<header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncellemeyi kontrol et</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
+<header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
-<main><div class="grid" id="grid"></div><div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div></main><div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP içe aktar</button><button class="btn" id="promptJson">Prompt JSON</button><button class="btn" id="openVariantLab">Varyant Lab</button><button class="btn primary" id="exportPack">Texturepack ZIP</button></div>
+<main><div class="grid" id="grid"></div><div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div></main><div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP İçe</button><button class="btn" id="promptJson">Promptlar</button><button class="btn" id="openVariantLab">Varyant</button><button class="btn primary" id="exportPack">Dışa ZIP</button></div>
 </div>
 <div class="sheet" id="sheet"><div class="drawer"><div class="handle"></div><div class="meta"><div><h2 id="detailName"></h2><div class="path" id="detailPath"></div><div class="path" id="detailRole"></div></div><button class="btn" id="close" type="button" aria-label="Detay görünümünü kapat">✕</button></div><div class="preview" id="preview"><img id="origImg"><img id="editImg" class="editedClip"></div><div class="compareCtl"><span class="stat">Orijinal</span><input id="compare" type="range" min="0" max="100" value="50"><span class="stat">Yeni</span></div><div class="tileTools"><span class="stat">Tile</span><button class="btn mini active" data-tile="1">1×1</button><button class="btn mini" data-tile="3">3×3</button><button class="btn mini" data-tile="6">6×6</button><button class="btn mini" data-tile="9">9×9</button><button class="btn mini" id="tileSource">Yeni</button></div><div class="tilePreview" id="tilePreview"></div><div class="actions"><button class="btn" id="downloadOriginal">Orijinali indir</button><button class="btn" id="downloadEdited">Yeniyi indir</button><button class="btn primary" id="uploadEdited">Düzenlenmiş PNG yükle</button><label title="Siyah arka planı otomatik temizle (yalnız uygun şeffaf item sprite’larında)" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;white-space:nowrap;cursor:pointer"><input id="autoBlackBgClean" type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)" aria-label="Otomatik siyah arka plan temizleme">✂</label><button class="btn warn" id="seamExport">50% Offset PNG</button><button class="btn warn wide" id="seamImport">Offset düzenlemeyi geri yükle</button><button class="btn" id="detailVariantLab">Varyant Lab</button><button class="btn" id="detailIslandStudio">Ada (opsiyonel)</button><button class="btn" id="open3dPreview">3D Önizleme</button><button class="btn danger" id="revert">Değişikliği sil / orijinale dön</button></div><div class="animBox" id="animBox"><div class="animHead"><div><div class="promptTitle">Animasyon araçları</div><div class="animMeta" id="animMeta"></div></div><button class="btn" id="animToggle">Durdur</button></div><div class="animCanvasWrap"><canvas id="animCanvas" width="256" height="256"></canvas></div><div class="animBtns"><button class="btn" id="exportAtlas">Strip → Kare atlas</button><button class="btn primary" id="importAtlas">Atlası geri yükle</button></div><div class="hint" id="animHint"></div></div><div class="promptBox"><div class="promptHead"><div><div class="promptTitle">AI üretim</div><div class="promptFamily" id="promptFamily"></div><div class="textureId" id="textureId"></div></div></div><div class="promptBtns" id="normalPromptBtns"><button class="btn" id="copyPrompt">Ref prompt</button><button class="btn primary" id="savePrompt">Üretim prompt</button><button class="btn" id="singlePromptJson" style="display:none">Bu prompt JSON</button></div><div class="mobPromptBtns" id="mobPromptBtns"><button class="btn" id="mobHqPrompt">1 · HQ UV</button><button class="btn" id="mobRefPrompt">2 · Armor Ref</button><button class="btn primary" id="mobFinalPrompt">3 · Final UV</button></div><textarea id="promptText" spellcheck="false" style="display:none"></textarea></div><div class="hint" id="hint"></div></div></div>
 <input id="fileEdited" type="file" accept="image/png" hidden><input id="fileSeam" type="file" accept="image/png" hidden><input id="fileAnimAtlas" type="file" accept="image/png" hidden><input id="fileZip" type="file" accept=".zip,application/zip" hidden><input id="filePromptJson" type="file" accept="application/json,.json" hidden><input id="fileProjectBackup" type="file" accept=".zip,application/zip" hidden>
