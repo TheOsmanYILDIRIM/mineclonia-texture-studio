@@ -31,6 +31,9 @@ function tiles(v){if(!v)return null;const out=[];for(const m of v.matchAll(/(?:n
 const nodes={};
 for(const file of inputs.flatMap(p=>walk(p))){
  const src=fs.readFileSync(file,'utf8'),re=/(?:core|minetest)\.register_node\s*\(\s*["']([^"']+)["']\s*,\s*\{/g;let m;
- while((m=re.exec(src))){const brace=src.indexOf('{',m.index),body=balanced(src,brace);if(!body)continue;const t=tiles(field(body,'tiles'));if(!t)continue;nodes[m[1]]={textures:t};const o=tiles(field(body,'overlay_tiles'));if(o)nodes[m[1]].overlays=o;for(const k of ['palette','color','paramtype2']){const v=field(body,k);if(typeof v==='string')nodes[m[1]][k]=v}re.lastIndex=brace+body.length}
+ while((m=re.exec(src))){const brace=src.indexOf('{',m.index),body=balanced(src,brace);if(!body)continue;const t=tiles(field(body,'tiles'));if(!t)continue;
+  const norm=file.replace(/\\\\/g,'/'),mm=norm.match(/\/mods\/([^/]+)\/([^/]+)\//)||norm.match(/(?:^|\/)mods\/([^/]+)\/([^/]+)\//);
+  nodes[m[1]]={textures:t};if(mm)nodes[m[1]].texture_base=mm[1]+'/'+mm[2];
+  const o=tiles(field(body,'overlay_tiles'));if(o)nodes[m[1]].overlays=o;for(const k of ['palette','color','paramtype2']){const v=field(body,k);if(typeof v==='string')nodes[m[1]][k]=v}re.lastIndex=brace+body.length}
 }
 process.stdout.write(JSON.stringify({schema:1,source:'Luanti Lua static extraction',face_order:['top','bottom','right','left','back','front'],nodes},null,2));
