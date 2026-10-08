@@ -24,9 +24,14 @@
     ]);
     const manual=manualRes.ok?await manualRes.json():{defaults:{projection:'orthographic'},profiles:[]};
     const generated=generatedRes.ok?await generatedRes.json():{profiles:[]};
+    const manualProfiles=[...(manual.profiles||[])];
+    const genericManual=manualProfiles.filter(p=>p?.id==='single_texture_cube'||p?.match?.asset_types);
+    const specificManual=manualProfiles.filter(p=>!genericManual.includes(p));
     previewProfileConfig={
       defaults:manual.defaults||{projection:'orthographic'},
-      profiles:[...(manual.profiles||[]),...(generated.profiles||[])]
+      // Specific hand-authored overrides first, then generated Mineclonia node profiles,
+      // and generic asset-type fallbacks last.
+      profiles:[...specificManual,...(generated.profiles||[]),...genericManual]
     };
   }catch{previewProfileConfig={defaults:{projection:'orthographic'},profiles:[]}}
   return previewProfileConfig;
@@ -533,7 +538,7 @@
  }
  async function renderCubeGL(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';
-  const profile=await resolvePreviewProfile(meta);await applyPreviewBackground(profile);
+  const profile=await resolvePreviewProfile(meta);await applyPreviewBackground(profile);root.dataset.previewProfile=profile?.id||'fallback';
   const atlas=await buildFaceAtlas(profile,meta,textureBlob);
   const canvas=document.createElement('canvas');
   canvas.className='preview3dBlockCanvas';
