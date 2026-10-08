@@ -1,182 +1,59 @@
 # AGENTS.md — Mineclonia Texture Studio
 
-This repository is the canonical source of truth for the Mineclonia Texture Studio project.
+This repository is the **canonical source of truth**. Branch: `main`; production: GitHub Pages. If memory/handoff disagrees with current code or Git history, verify `main` first and repair the documentation. Avenox/Beyin is only a short continuation index, not a duplicate project database.
 
-## Read order for a new working session
+## Work / close protocol
 
-1. `AGENTS.md` — working contract and source-of-truth rules.
-2. `README.md` — project/deployment entry point.
-3. `SESSION_HANDOFF.md` — concise current state, verification, open work, and next concrete step.
-4. `PROMPT_AUTHORING_GUIDE.md` — persistent texture-prompt methodology.
+At the start: read `AGENTS.md`, `README.md`, `SESSION_HANDOFF.md`, and `PROMPT_AUTHORING_GUIDE.md`; inspect current HEAD, relevant source, and latest relevant Actions/deploy results. Continue from the handoff's **Next concrete work**, unless the user gives a new priority.
 
-Current code on `main` always outranks stale prose. If a handoff note conflicts with the repository state, verify the code/history and repair the handoff instead of forcing the code to match old notes.
+At the end: commit actual code changes first, verify relevant tests/deploys, and update `SESSION_HANDOFF.md` to contain **current state, evidence, unresolved work, next step**, not a chronological diary. Keep stable rules here and detailed domain findings in their own README. Never store private reasoning or secrets in the repository.
 
-## Source of truth and memory
+Do not manually dispatch Actions for documentation, UV experiments, or a closeout. A doc-only commit must not be described as a deployed feature. Check whether CI/deploy ran before claiming a result.
 
-- GitHub repository: `TheOsmanYILDIRIM/mineclonia-texture-studio`.
-- Canonical branch: `main`.
-- Production: GitHub Pages from `main` through GitHub Actions.
-- The repository is authoritative for code, prompts, classifications, project decisions, and current work state.
-- Avenox/Beyin is a continuity index, not a second project database. It should store only concise pointers/outcomes needed to rediscover this repository and its current continuation point.
-- If Beyin and the repository disagree, verify current GitHub state first; GitHub wins for project state and Beyin should then be refreshed.
+## Core texture / model invariants
 
-Do not duplicate large prompt catalogs, source files, or long handoff history into Beyin.
+- Preserve gameplay identity, correct original UV/mask/alpha/void geometry, animation frame topology/order, tileability at literal canvas borders, entity face identity, overlay/tint behavior and game-distance readability.
+- Visual target: **grounded dark-fantasy material realism** — weathered, somber, muted, tactile, diffusely lit, restrained saturation, believable scale; not simply upscaled pixel art.
+- Mineclonia **Lua/runtime** is authoritative for the meaning of a file: node faces, particles, HUD sprites, items, palette tint, overlays, animation and combined textures. Filename, aspect ratio, folder and Minecraft naming intuition alone are insufficient. For particle/effect textures also establish the trigger/runtime use.
+- Entity `.b3d` UV data, source PNG and relevant overlays (e.g. Enderman eyes) define the real 3D presentation; do not invent cuboid UV mappings or assume that every visible RGB feature is a separate UV island.
 
-## Offline UV alignment reference
+## Prompt / catalog system
 
-- Keep `tools/uv-pipeline/creeper_outer_rigid_truevoid.py` unchanged as the recovered historical baseline.
-- Reusable work lives in `tools/uv-pipeline/uv_geometry.py` and `uv_align_guarded_v2.py`; test with `test_uv_align_guarded_v2.py`. See local README for commands and supported inputs.
-- Original UV topology and alpha are authoritative; do not implement texture-specific coordinate patches. Reject low-confidence correspondence and unsafe sampling maps rather than silently producing misregistered mob atlases.
-- **Prevention-first entity workflow (2026-10-08):** prioritize source-constrained *generation*, not fixing named examples after distortion. See `tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md`. Original B3D UV faces, separate overlays, alpha/void topology, and semantic face landmarks must be checked before accepting new AI atlases.
-- Do not copy original occupancy/mask onto the raw AI output **before** independently detecting its islands; that produced misleading `validated` outcomes on cat/Enderman/pig. Mask restoration at final composition is not proof of correct face correspondence.
-- A valid mesh render depends on correct B3D UV-V orientation, real alpha, and layered textures such as Enderman eyes. Prototype Python renderers are not authoritative until compared to known authentic models. Keep successful horse-atlas behavior as a *user report* pending verification, not a passing benchmark.
-- Do not wire experimental Python aligners into browser storage, runtime UX or GitHub workflows without a separate verified integration task. Existing browser data must never be wiped.
+- `PROMPT_AUTHORING_GUIDE.md` defines full methodology. For P0 materials, make a reference/world image first and then use the image-A **source structure/function** + image-B **style reference** production method. Reference prompts describe material identity without a feature-by-feature visual checklist. Material family continuity and runtime role outrank decorative creativity.
+- Only literal outer canvas boundaries of tileable materials are seam-critical. Tree/log top means cut-trunk end grain, not leaves. Prior P0 “creative alternative” flow is retired.
+- P0–P6 indicates **priority**, not texture family. Catalog classification follows creative-inventory groups plus deeper runtime/technical categories. Only true material Block records enter P0 automatically; functional/UI/sprite/system records do not.
+- Authored prompts have exactly one canonical home: `prompts/<family>/tex_<id>.json`, schema v2 `{schema_version:2,family,id,path,name,stages}`. Manifests are indexes. `js/prompt-registry.js` is the sole runtime prompt loader/resolver; do not restore per-family loaders, production `.txt` batches, synthetic “PROMPT YOK” fallback or generic alpha-lock body.
+- Real inventory items use the item-only two-stage **Creative → A+B Correction** flow; first-pass Creative is not source-silhouette locked. Entity atlas dimensions alone never imply animation strips. High-resolution animations must reconstruct at edited frame/cell resolution.
+- Canonical prompt-import workflow: `.github/workflows/import-prompts.yml`, trigger `imports/mts-prompt-import.json` — never reintroduce per-family import workflows.
 
-## 3D block preview profiles
+## Browser architecture and data safety
 
-- Block preview behavior is data-driven through `js/data/preview3d-profiles.json`; do not add block-family face rules directly to the renderer when a profile can express them.
-- Default block projection is orthographic; perspective is an optional viewer toggle.
-- Profiles may assign different textures per face and stack layers on a face (for example dirt base + grass overlay). The scene background is separate from face layers.
-- Multi-face families such as logs/stems and grass-like blocks should be extended by adding/updating profile data. Ordinary blocks fall back to the single-texture cube profile.
-- Variant previews replace the selected texture layer while sibling/base textures continue to resolve from the current catalog/edit state.
+- Keep code modular: `index.html` mainly structure; `js/app.js` orchestrates shared runtime; distinct editors/screens and styles belong in `js/` and `css/` ES modules, isolated so a broken optional feature cannot prevent core catalog startup. Prefer explicit public bridges over touching other modules' private state; avoid duplicate/shadowed core function implementations.
+- **Never wipe or silently migrate user edits.** Existing identities stay readable: IndexedDB `MinecloniaTextureStudio` v1/`edits`, local prefix `mts:`; scaled cache `MinecloniaTextureStudioScaled`/`scaled`; prompt overrides `mts:promptOverrides:v1`; recent textures `mts_recent_textures_v1`; resolution preference `mineclonia_texture_target_resolution_v1`; Island Studio prefix `mts_uv_islands_v1:`. Any DB version/storage name change requires an explicit lossless tested migration.
+- Variant Lab is a session-only comparison gallery except `Aktif yap`, which commits through the normal edit store. Static asset tags and prompt authoring status must not change `Değiştirildi` semantics.
+- `js/locked-parent-composite.js` (opt-in ore workflow) must copy AI mineral pixels only inside the user-approved mask; preserve finalized Stone/Deepslate source-parent pixels exactly elsewhere. Never auto-pick uncertain minerals or save before confirmation.
 
-## Core project invariants
+## Renderers and UV editing
 
-Texture Studio edits Mineclonia textures while preserving gameplay structure and identity.
+- Entity 3D preview: real Mineclonia B3D mesh/UV in lazy WebGL, not guessed cube wrapping. Block preview: Mineclonia Lua-derived node-face composition with semantic fallback and data-driven `js/data/preview3d-profiles.json` (generic orthographic default; perspective optional). Face layers can combine dirt+grass overlays while the scene background remains independent. Sibling/base textures should be resolved from catalog or source. Add face behaviors by profile data, not one-off JS rules.
+- `js/uv-repair-router.js` routes all UV repair entrypoints. Primary: `js/vertex-uv-studio.js` and its CSS. Preserve island IDs, one-to-one pairing, optional manual split/add, independent whole-part drag/offset/scale before local vertex warp, centered fine scale and real contour-node placement (3×3 through 15×15). Do not extend bbox background pixels as fake material.
+- Keep `js/ordered-contour-warp.js` (island deformation) separate from `js/island-repack.js` (atlas reconstruction). Repack deterministically consumes persisted V3 `slot.rects`/`slot.src`, not a new guessing/redetection pass. Old Island Studio/rectangle mapper are optional experimental paths.
+- Main compare viewer must preserve mobile pinch-zoom/pan and not change actual texture pixels.
 
-Protect, as applicable:
+## Offline entity UV research — prevention first
 
-- UV/mask layout
-- transparency
-- animation topology/frame order
-- tileability
-- silhouette and occupied/empty regions
-- runtime compositing/tint behavior
-- gameplay readability
+- Preserve recovered `tools/uv-pipeline/creeper_outer_rigid_truevoid.py` **unchanged**. `uv_geometry.py`, `uv_align_guarded_v2.py` and tests are **offline fallback prototypes**, not proof of universal semantic registration. Detailed historical findings: `tools/uv-pipeline/README.md`, `PREVENTION_FIRST_HANDOFF.md`.
+- Current separate cat research: `tools/uv-pipeline/CONNECTED_NET_EXPERIMENTS.md`. Connected-net temporary layout can be invertible while generated eye placement, seams and alpha still fail. **Do not claim successful AI geometry merely because final target mask is forced or pack→unpack is exact.**
+- Never pre-mask raw AI using original occupancy before independent source/target correspondence; that caused false-positive “validated” results. Distinguish true transparent pixels, opaque black/cyan matte, guard-line contamination, and renderer UV orientation/overlays. Do not infer that GPT Image consumes invisible RGB.
+- Favor *preventing* AI UV damage during generation over Creeper-specific coordinate repairs. Test generated geometry, semantic landmarks, real B3D views and masked-edge contamination independently. Treat successful-horse-atlas claim as user observation until original+AI are measured.
+- Experimental Python aligners, source fixtures or model changes do **not** automatically enter browser runtime/IndexedDB, production builds or workflows.
 
-The shared visual target is grounded dark-fantasy material realism: weathered, somber, muted, tactile, physically believable, restrained in saturation and lighting, and never merely enlarged HD pixel art.
+## Pages build and cache discipline
 
-## Runtime semantics rule
+- Production is **GitHub Pages**, not legacy Netlify config. Verify real Pages/Runtime Guards outcome before claiming deployment.
+- Deployed workflow stamps `js/build-status.js` and fingerprints local JS/CSS by commit SHA; publishes a `latest.html` stamped entrypoint. Build badge shows the **loaded deployed artifact SHA**, not necessarily repository HEAD.
+- `Güncellemeyi kontrol et` checks deployed `js/build-status.js?probe=<timestamp>` with `cache: no-store`; if newer, navigate to `latest.html?build=<sha>&_=<timestamp>`. Do not regress to repeated normal `index.html` reloads or confuse a GitHub commit with deployed build. Cache Storage/service workers may be cleared defensively, **never** application IndexedDB/localStorage edits.
 
-Do not infer a texture's real role from filename, folder, dimensions, or appearance alone when runtime use is ambiguous.
+## Separate Voxel Model Studio
 
-Trace the exact filename through Mineclonia source and determine its actual runtime role. Runtime code wins over naming intuition.
-
-This is especially important for:
-
-- entity skins vs overlays
-- tintable layers
-- particle/effect sprites
-- item masks
-- HUD assets
-- animations
-- node faces
-- reusable/composited textures
-
-For particle/effect textures, determine the trigger/context and relevant runtime behavior before authoring or revising the prompt.
-
-## Prompt rules
-
-`PROMPT_AUTHORING_GUIDE.md` is the canonical prompt-authoring method.
-
-Key non-negotiables:
-
-- P0 material work is reference-first: **Ref prompt** creates a style/world reference; **Üretim prompt** is the shared Image A (source structure/function) + Image B (dominant style) production prompt.
-- Reference prompts describe the world/art direction and material identity, but avoid checklists of visual details; the reference image should carry the style.
-- Only the literal outer canvas boundary is seam-critical for ordinary tile materials; internal cracks, stone edges, bark lines, leaf contours, etc. are not seam constraints.
-- Tree/log top textures are end-grain/cut-trunk surfaces, not foliage. Oriented faces must be semantically distinguished.
-- The former P0 “creative alternative” workflow is retired; do not reintroduce it unless explicitly requested.
-- P0/P1/P2… are priority only. Browsing/classification is a separate axis based on Mineclonia creative-inventory groups plus deeper technical/runtime classes.
-- Promote only true material **Block** records into material-P0; do not automatically promote Functional Block/UI/sprite/system records.
-- Production prompts outside the P0 material flow remain asset-specific or deliberately controlled variants.
-- Locked UV/entity atlases must preserve their exact islands/masks.
-- Entity dimensions alone must never trigger animation-strip treatment.
-- Animated textures preserve frame topology while edited resolution may increase.
-- Runtime role and gameplay function outrank decorative realism.
-- Authored prompt storage is canonical and singular: `prompts/<family>/tex_<id>.json`, schema v2 with `family/id/path/name/stages`. Manifests are indexes only. Do not add production prompt `.txt` files or batch prompt payloads.
-- `js/prompt-registry.js` is the only runtime loader/resolver for authored prompts. All families use the same registry API (`get`, `stage`, `has`, `family`, `belongsTo`); do not add family-specific manifest fetchers, registries, or file parsers back into `js/app.js`.
-- Missing authored prompt coverage is represented by no usable prompt, not by a generated "PROMPT YOK" body or generic alpha-lock fallback.
-- True inventory items use the two-pass Creative → A+B Correction workflow from `PROMPT_AUTHORING_GUIDE.md`; their first pass is not source-silhouette/alpha locked.
-
-- Locked Parent Composite (`js/locked-parent-composite.js`) is an opt-in ore editor: retain the finished parent Stone/Deepslate pixels exactly outside the user-painted mineral mask. Never rewrite source parent edits, auto-select uncertain minerals, or save before explicit confirmation.
-
-## Existing decisions that must not silently regress
-
-- 3D preview is intentionally supported: blocks use Lua-derived node-face composition with semantic/name fallback; supported entity skins use Mineclonia's real `.b3d` mesh + UV data in a lazy WebGL renderer. Do not replace real runtime/mesh mapping with guessed cube wrapping.
-- High-resolution edited animation atlases must reconstruct at the edited cell resolution, not be forced back to the original low resolution.
-- Main Original/New comparison preview supports mobile pinch zoom/pan without modifying texture data.
-- Runtime-role classification exists because directory names are not semantically sufficient.
-- P0–P6 is only the priority axis. Browsing/classification is separate and follows Mineclonia creative-inventory categories plus deeper technical/runtime classes; do not overload P0/P1 as asset categories.
-- Variant Lab is a temporary comparison gallery. Non-winning variants stay session-only; only `Aktif yap` writes through the normal persistent edit store.
-- Vertex UV Studio (`js/vertex-uv-studio.js` + `css/vertex-uv-studio.css`) is the primary entity-atlas repair path. Variant Lab → `UV Eşle` must open it. Islands are the editor's segmentation/pairing model: stable source/target island IDs, optional manual rectangular island creation for merged components, one-to-one pair editing, per-pair mesh deformation, and merge into the final atlas. Preserve real foreground/alpha inside each source island; never fill bbox background by pulling edge pixels. After target selection, auto-fit immediately; outer mesh nodes must snap to real source/target island contours, interior nodes should conform to those boundaries, and scale adjustments must be centered. Mesh node density must support 3×3 through 15×15. Old Island Studio and the legacy rectangle mapper are optional/experimental.
-- Static technical asset tags are additive catalog metadata only. Prompt status and browser `Değiştirildi` state remain separate runtime concerns and must stay compatible with existing IndexedDB/localStorage records.
-- Mineclonia Lua/source is authoritative for node faces, overlays, composition and palette/tint semantics. Minecraft naming assumptions are not a source of truth.
-- Browser data compatibility is a hard invariant. Do not rename or version-bump persistent storage without an explicit, tested migration that preserves existing user data. Current identities that must remain readable: IndexedDB `MinecloniaTextureStudio` v1 store `edits`; local edit prefix `mts:`; scaled cache DB `MinecloniaTextureStudioScaled` store `scaled`; prompt override key `mts:promptOverrides:v1`; recent texture key `mts_recent_textures_v1`; resolution key `mineclonia_texture_target_resolution_v1`; Island Studio prefix `mts_uv_islands_v1:`.
-- Core runtime functions must have one implementation only. Do not reintroduce shadowed duplicate definitions for edit storage, import/export, filter/render, or normalization paths.
-- UV repair launchers must route through `js/uv-repair-router.js`. Vertex UV Studio is primary; Island Studio / legacy mapper are explicit optional paths behind the router.
-- Island-sheet deformation and atlas repack are separate responsibilities. Ordered contour fitting lives in `js/ordered-contour-warp.js`; reverse packing lives in `js/island-repack.js`. Repack must use persisted V3 `slot.rects` / `slot.src` metadata deterministically and must not re-detect, resize-fit, or guess island identity from the corrected sheet.
-- Canonical prompt imports use the single family-agnostic workflow `.github/workflows/import-prompts.yml` and trigger `imports/mts-prompt-import.json`. Do not add family-specific prompt import workflows.
-
-
-## Front-end module boundary
-
-- Do not grow `index.html` / `js/app.js` into feature monoliths. A substantial independent screen, editor, lab, or workflow must live in its own JS module and its own CSS file.
-- `js/app.js` is the application core/orchestrator: catalog, shared persistence/runtime helpers, and small public bridges. Feature-specific state, gestures, rendering, import/export, and UI event wiring belong to the feature module.
-- Feature modules must be failure-isolated: a missing/broken optional editor must not prevent the main catalog, detail sheet, or unrelated tools from booting.
-- Prefer a small explicit `window.MTS*Bridge` / public API over reaching into another module's private state.
-- Keep `index.html` primarily structural. Do not add large feature CSS or feature logic inline; use files under `css/` and `js/`.
-- Current examples: Island Studio → `js/island-studio.js` + `css/island-studio.css`; Variant Lab should follow the same boundary.
-
-## Session / handoff protocol
-
-Before meaningful changes:
-
-1. Read `SESSION_HANDOFF.md`.
-2. Inspect current `main` HEAD/recent commits.
-3. Verify relevant implementation before assuming an old note is still true.
-
-After meaningful changes:
-
-1. Commit the actual project change first.
-2. Update `SESSION_HANDOFF.md` so it contains:
-   - what changed,
-   - why,
-   - evidence/commit references,
-   - what remains open,
-   - the next concrete step,
-   - important non-regression constraints.
-3. Keep the handoff concise enough to resume work; do not turn it into a raw chronological log.
-4. Record only a compact source-backed outcome/pointer in Avenox/Beyin. The repository remains canonical.
-
-Do not store private chain-of-thought or raw tool logs in the repository.
-
-
-## Development build / cache update invariant
-
-- Chrome may keep the GitHub Pages `index.html` document cached in the normal profile even when a newer deployment is live; Incognito showing the new build while the normal profile shows the old build is the known symptom.
-- Do not rely on a plain `location.reload()`, repeated cache-bust query changes on the same `index.html`, or comparison against repository `main` alone.
-- The Pages workflow stamps the deployed commit SHA and UTC time into `js/build-status.js` and fingerprints local JS/CSS `?v=` URLs with `${GITHUB_SHA}`.
-- The Pages artifact also publishes `latest.html`, copied from the stamped/fingerprinted `index.html`.
-- The visible Build badge reports the SHA embedded in the actually loaded deployed artifact.
-- “Güncellemeyi kontrol et” probes the deployed Pages `js/build-status.js?probe=<timestamp>` with `cache: no-store`; it compares against the build actually available on Pages, not merely the newest repository commit.
-- When a newer deployed build exists, refresh through `latest.html?build=<full-sha>&_=<timestamp>`. This different document URL is intentional and is the canonical cache-bypass path.
-- Before that navigation, clearing Cache Storage / unregistering a service worker is allowed as defensive cleanup, but user IndexedDB/localStorage texture/edit data must never be cleared by the update mechanism.
-- Preserve this system when changing deployment or cache behavior. Do not regress to repeatedly reopening cached `index.html`.
-
-## Deployment discipline
-
-Production is GitHub Pages. Netlify configuration may remain as legacy/supporting project material, but Netlify is not the production source of truth unless the user explicitly changes that decision.
-
-When changing deployment-sensitive files, verify the GitHub Pages workflow/result before claiming production is updated.
-
-## Default continuation point
-
-Unless newer repository state says otherwise, use the `Next concrete work` section in `SESSION_HANDOFF.md` as the continuation queue.
-
-
-## Voxel Model Studio
-
-- `model-studio/` is intentionally isolated from the Texture Studio runtime. It is a tiny cuboid/voxel-style model editor for rapidly deriving new Mineclonia-shaped creatures from simple box proportions.
-- Keep this editor deliberately simple and mobile-first: select part, resize X/Y/Z, move, rotate, duplicate, delete, add box, save/load project.
-- Do not couple its project JSON or UI state to Texture Studio IndexedDB/localStorage.
-- The current cuboid template is an editable approximation, not yet a lossless B3D rig/animation editor. Do not claim B3D export or animation preservation until implemented and verified.
+`model-studio/` is an isolated mobile-first cuboid prototype (select, transform, duplicate, delete, save/load); no Texture Studio persistence coupling. It is **not** a lossless B3D rig or animation editor; do not claim otherwise.
