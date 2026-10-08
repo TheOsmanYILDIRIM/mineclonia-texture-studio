@@ -592,11 +592,12 @@
  async function render(){
   if(!active)return;
   document.getElementById('preview3dMeta').textContent=active.name;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),entity=canEntity(active),blockObject=canObject(active),surface=canSurface(active),object=surface;
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),projectionBtn=document.getElementById('preview3dProjection'),entity=canEntity(active),blockObject=canObject(active),surface=canSurface(active),object=surface;
   obj.textContent=entity?'Entity':blockObject?'Obje':'Küp';
   obj.style.display=(entity||blockObject)?'':'none';
   w.disabled=entity||!canWorld(active);w.style.display=entity||!canWorld(active)?'none':'';
   if(surfaceBtn){surfaceBtn.hidden=entity||!surface;surfaceBtn.classList.toggle('active',mode==='surface');surfaceBtn.setAttribute('aria-label',mode==='surface'?'Blok/obje görünümüne geç':'İnce yüzey görünümüne geç')}
+  if(projectionBtn){projectionBtn.hidden=entity||!blockObject||mode!=='object';projectionBtn.classList.toggle('perspective',projection==='perspective');projectionBtn.querySelector('span')&&(projectionBtn.querySelector('span').textContent=projection==='perspective'?'Persp':'Ortho');projectionBtn.setAttribute('aria-label','Projection: '+projection)}
   obj.classList.toggle('primary',mode==='object');w.classList.toggle('primary',mode==='world');
   stage.classList.remove('alphaAware');
   if(entity){mode='object';await renderEntity(active);resetView();return}
@@ -619,6 +620,7 @@
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
  document.getElementById('preview3dWorld').addEventListener('click',async()=>{if(!canWorld(active))return;mode='world';await render()});
  document.getElementById('preview3dSurfaceToggle')?.addEventListener('click',async()=>{if(!active||!canSurface(active))return;mode=mode==='surface'?'object':'surface';await render()});
+ document.getElementById('preview3dProjection')?.addEventListener('click',()=>{if(!entityGL?.isBlockCube)return;projection=projection==='orthographic'?'perspective':'orthographic';const b=document.getElementById('preview3dProjection');b?.classList.toggle('perspective',projection==='perspective');const s=b?.querySelector('span');if(s)s.textContent=projection==='perspective'?'Persp':'Ortho';b?.setAttribute('aria-label','Projection: '+projection);drawEntityGL()});
 
  stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
  stage.addEventListener('pointermove',e=>{
@@ -635,13 +637,14 @@
   variantSession=Array.isArray(variants)&&variants.length?{meta,variants,index:Math.max(0,Math.min(index,variants.length-1))}:null;
   const selectedBlob=variantSession?variantSession.variants[variantSession.index].blob:blob;
   mode='object';root.classList.add('open');document.getElementById('preview3dMeta').textContent=meta.name+' · '+label;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),s=document.getElementById('preview3dSurfaceToggle');
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),s=document.getElementById('preview3dSurfaceToggle'),pb=document.getElementById('preview3dProjection');
   if(canEntity(meta)){
-    obj.textContent='Entity';w.style.display='none';if(s)s.hidden=true;
+    obj.textContent='Entity';w.style.display='none';if(s)s.hidden=true;if(pb)pb.hidden=true;
     await renderEntity(meta,selectedBlob);
   }else{
-    obj.textContent='Obje';obj.style.display='';w.style.display='none';if(s){s.hidden=false;s.classList.remove('active')}
+    obj.textContent='Obje';obj.style.display='';w.style.display='none';if(s){s.hidden=false;s.classList.remove('active')}if(pb)pb.hidden=false;
     await renderCubeGL(meta,selectedBlob);
+    if(pb){pb.classList.toggle('perspective',projection==='perspective');const ps=pb.querySelector('span');if(ps)ps.textContent=projection==='perspective'?'Persp':'Ortho'}
   }
   resetView();renderVariantStrip();
  }
