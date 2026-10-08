@@ -76,15 +76,16 @@ python -m unittest discover -s tools/uv-pipeline -p 'test_uv_align_guarded_v2.py
 ### Contract: preserve geometry, not patch examples
 
 1. Determine original and AI foreground components using true alpha when available, otherwise an opaque-black background threshold. Reject missing or drastically mismatched islands.
-2. Keep the original canvas, component locations, holes, background pixels and alpha **exactly**. Only occupied RGB pixels receive AI material sampling.
-3. Build ordered contour constraints and analyze the inverse sampling rate *before rendering*. Detect intervals mapping wide destination strips to nearly one source pixel, including atlas component boundaries.
-4. Automatically condition only problematic axis-coordinate intervals. Keep safe coordinates unchanged. Protect the component world position; never reposition the original atlas islands to make their holes look aligned.
-5. Reject impossible/nonmonotonic transforms or large displacement rather than silently publishing an incorrect atlas; write optional JSON diagnostics for every component and X/Y axis.
-6. Preserve the archived baseline for rollback. No image-specific exception tables belong in the production algorithm; fixture-specific coordinates belong only in tests.
+2. When UV foreground masks already match exactly, skip all geometric resampling and transfer AI RGB directly (zero interpolation drift).
+3. Keep the original canvas, component locations, holes, background pixels and alpha **exactly**. Only occupied RGB pixels receive AI material sampling.
+4. Build ordered contour constraints and analyze the inverse sampling rate *before rendering*. Detect intervals mapping wide destination strips to nearly one source pixel, including atlas component boundaries.
+5. Automatically condition only problematic axis-coordinate intervals. Keep safe coordinates unchanged. Protect the component world position; never reposition the original atlas islands to make their holes look aligned.
+6. Reject impossible/nonmonotonic transforms or large displacement rather than silently publishing an incorrect atlas; write optional JSON diagnostics for every component and X/Y axis.
+7. Preserve the archived baseline for rollback. No image-specific exception tables belong in the production algorithm; fixture-specific coordinates belong only in tests.
 
 ### Verified on the supplied Creeper pair
 
-Local verification on `119110.png` and `119116.png` (both 1536×768): 2 components paired; 3 degenerate Y intervals repaired in the large atlas island; 2 X + 2 Y degenerate edge intervals repaired in the detached square. The face crop covering the eyes and mouth (x=200..409, y=210..351) matches the archived baseline pixel-for-pixel. Original background/void pixels were unchanged. Ten local regression tests passed, including the real PNG case.
+Local verification on `119110.png` and `119116.png` (both 1536×768): 2 components paired; 3 degenerate Y intervals repaired in the large atlas island; 2 X + 2 Y degenerate edge intervals repaired in the detached square. The face crop covering the eyes and mouth (x=200..409, y=210..351) matches the archived baseline pixel-for-pixel. Original background/void pixels were unchanged. Twelve local regression tests passed, including the real PNG case.
 
 **Limits:** This prototype currently requires equal canvas dimensions and a sufficiently similar arrangement of non-tiny UV islands. It is primarily suited to axis-aligned texture atlases with opaque-black or alpha backgrounds. It does not guarantee semantic face/eye alignment for arbitrary differently arranged UV layouts, independently rotated islands or aggressive AI rearrangements: those should be rejected or handled by an explicit per-island registration workflow. A `validated` report means numeric/topological checks passed, not that a human has approved every aesthetic detail.
 
