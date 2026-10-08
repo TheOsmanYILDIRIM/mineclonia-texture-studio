@@ -428,6 +428,66 @@
  }
  function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
  function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
+
+ function cubeRotationMatrix(){
+  const ax=rx*Math.PI/180,ay=ry*Math.PI/180,cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Math.sin(ay);
+  return new Float32Array([
+    cy, sx*sy, -cx*sy, 0,
+    0,  cx,     sx,    0,
+    sy,-sx*cy,  cx*cy, 0,
+    0,  0,      0,     1
+  ]);
+ }
+ async function renderCubeGL(meta){
+  cleanupEntityGL();scene.innerHTML='';scene.style.display='none';
+  const canvas=document.createElement('canvas');
+  canvas.className='preview3dBlockCanvas';
+  canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:2';
+  stage.insertBefore(canvas,stage.firstChild);
+  const gl=canvas.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false})||canvas.getContext('experimental-webgl');
+  if(!gl)throw Error('WebGL desteklenmiyor');
+
+  const vs=glShader(gl,gl.VERTEX_SHADER,
+    'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;varying float shade;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.42,1.0);u=t;shade=.82+.18*max(0.0,q.z+0.5);}'
+  );
+  const fs=glShader(gl,gl.FRAGMENT_SHADER,
+    'precision mediump float;uniform sampler2D tex;varying vec2 u;varying float shade;void main(){vec4 c=texture2D(tex,u);if(c.a<0.015)discard;gl_FragColor=vec4(c.rgb*shade,c.a);}'
+  );
+  const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
+  if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');
+  gl.useProgram(program);
+
+  const P=[
+   -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1,
+    1,-1,-1, -1,-1,-1, -1, 1,-1,  1, 1,-1,
+    1,-1, 1,  1,-1,-1,  1, 1,-1,  1, 1, 1,
+   -1,-1,-1, -1,-1, 1, -1, 1, 1, -1, 1,-1,
+   -1, 1, 1,  1, 1, 1,  1, 1,-1, -1, 1,-1,
+   -1,-1,-1,  1,-1,-1,  1,-1, 1, -1,-1, 1
+  ].map(v=>v*.5);
+  const UV=[];for(let i=0;i<6;i++)UV.push(0,1,1,1,1,0,0,0);
+  const I=[];for(let f=0;f<6;f++){const o=f*4;I.push(o,o+1,o+2,o,o+2,o+3)}
+
+  const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(P),gl.STATIC_DRAW);
+  const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
+  const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(UV),gl.STATIC_DRAW);
+  const ta=gl.getAttribLocation(program,'t');gl.enableVertexAttribArray(ta);gl.vertexAttribPointer(ta,2,gl.FLOAT,false,0,0);
+  const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(I),gl.STATIC_DRAW);
+
+  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);
+  const bmp=await createImageBitmap(await displayBlob(meta.path));gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
+
+  entityGL={
+    canvas,gl,program,pb,tb,ib,tex,count:I.length,indexType:gl.UNSIGNED_SHORT,
+    uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s'),
+    isBlockCube:true
+  };
+  drawEntityGL();
+ }
+
  async function makeTextureCube(meta,size=S){
   const st=await faceStyle(meta);
   const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
@@ -440,11 +500,8 @@
   return c;
  }
  async function renderObject(meta){
-  scene.innerHTML='';
-  // "Obje" is intentionally a literal six-faced cube for block textures.
-  // Specialized node geometry remains available in world/other previews.
-  const c=canObject(meta)?await makeTextureCube(meta,S):await makeCube(meta,S);
-  scene.appendChild(c);
+  if(canObject(meta)){await renderCubeGL(meta);return}
+  cleanupEntityGL();scene.style.display='';scene.innerHTML='';const c=await makeCube(meta,S);scene.appendChild(c);
  }
  async function renderWorld(meta){
   scene.innerHTML='';
