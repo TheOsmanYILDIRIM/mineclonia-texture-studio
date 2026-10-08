@@ -674,7 +674,7 @@ const RECENT_TEXTURES_KEY='mts_recent_textures_v1';
 function recentTexturePaths(){try{const x=JSON.parse(localStorage.getItem(RECENT_TEXTURES_KEY)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}}
 function rememberRecentTexture(x){if(!x?.path)return;const list=[x.path,...recentTexturePaths().filter(p=>p!==x.path)].slice(0,10);try{localStorage.setItem(RECENT_TEXTURES_KEY,JSON.stringify(list))}catch(_){}renderRecentTextures()}
 async function renderRecentTextures(){const root=$('recentTextures'),strip=$('recentTextureStrip');if(!root||!strip)return;const items=recentTexturePaths().map(p=>CATALOG.find(x=>x.path===p)).filter(Boolean).slice(0,8);root.classList.add('show');strip.innerHTML='';if(!items.length){const empty=document.createElement('div');empty.className='recentTextureEmpty';empty.textContent='Henüz açılan texture yok';strip.appendChild(empty);return}for(const x of items){const b=document.createElement('button');b.className='recentTexture';b.title=x.path;b.innerHTML='<img><span></span>';b.querySelector('span').textContent=x.name||x.path.split('/').pop();b.onclick=()=>openDetail(x);strip.appendChild(b);try{b.querySelector('img').src=await previewUrl(x.path,true,96)}catch(_){}}}
-async function openDetail(x){active=x;await PROMPT_STORE_READY;rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;await PROMPT_STORE_READY;rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -885,6 +885,23 @@ function materialReferenceDependency(x){
  const d=MATERIAL_REFERENCE_DEPENDENCIES.find(v=>v.test(n));if(!d)return null;
  const refs=d.refs.map(name=>CATALOG.find(v=>String(v.name||'').toLowerCase()===name)).filter(Boolean);
  return {...d,refs};
+}
+function updateMaterialReferenceDownload(x){
+ const b=document.getElementById('downloadMaterialRef');if(!b)return;
+ const d=materialReferenceDependency(x),count=d?.refs?.length||0;
+ b.hidden=!count;
+ if(!count){b.textContent='Referansı indir';b.title='';return}
+ b.textContent=count>1?'Referansları indir':'Referansı indir';
+ b.title=d.refs.map(v=>v.name).join(', ');
+}
+async function downloadMaterialReferences(x){
+ const d=materialReferenceDependency(x);if(!d?.refs?.length)return toast('Bu texture için bağlı referans yok');
+ for(const ref of d.refs){
+   const blob=await displayBlob(ref.path);
+   dl(blob,ref.name||ref.path.split('/').pop());
+   await new Promise(r=>setTimeout(r,120));
+ }
+ toast(d.refs.length>1?d.refs.length+' referans indirildi':'Referans texture indirildi');
 }
 function materialDependencyPromptBlock(x){
  const d=materialReferenceDependency(x);if(!d||!d.refs.length)return '';
@@ -2061,7 +2078,7 @@ function setupCompactMobileDetail(){
     <div class="compactActionTray" id="compactActionTray">
       <div class="compactSection" data-section="downloads">
         <div class="compactSectionBody compactDownloadBody">
-          <div class="compactTwo" id="compactDownloads"></div>
+          <div class="compactTwo compactDownloadsGrid" id="compactDownloads"></div>
           <div class="compactInlineGroup" id="compactSeamGroup">
             <div class="compactInlineTitle"><span>Seam</span><small>Offset düzenleme</small></div>
             <div id="compactSeam"></div>
@@ -2160,6 +2177,14 @@ function setupCompactMobileDetail(){
 
   move('downloadOriginal','#compactDownloads');
   move('downloadEdited','#compactDownloads');
+  const refDownload=document.createElement('button');
+  refDownload.className='btn compactRefDownload';
+  refDownload.id='downloadMaterialRef';
+  refDownload.type='button';
+  refDownload.hidden=true;
+  refDownload.textContent='Referansı indir';
+  refDownload.addEventListener('click',()=>active&&downloadMaterialReferences(active));
+  compact.querySelector('#compactDownloads')?.appendChild(refDownload);
   move('seamExport','#compactSeam');
   move('seamImport','#compactSeam');
   const toolRail=compact.querySelector('#compactToolRail');
