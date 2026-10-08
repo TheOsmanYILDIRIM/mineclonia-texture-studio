@@ -740,6 +740,15 @@ body{min-height:100dvh}
   }
   .compactRefDownload[hidden]{display:none!important}
 }
+
+.preview3dProjection{
+  height:36px;display:flex;align-items:center;gap:5px;padding:0 9px;border:1px solid #303743;border-radius:10px;
+  background:#171c23;color:#aeb7c3;font-size:9px;font-weight:800;letter-spacing:.02em
+}
+.preview3dProjection svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.preview3dProjection.perspective{background:#24271d;color:#e6efb5;border-color:#6e7441}
+.preview3dProjection[hidden]{display:none!important}
+@media(max-width:699px){.preview3dProjection{width:38px;padding:0;justify-content:center}.preview3dProjection span{display:none}}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -828,6 +837,10 @@ body{min-height:100dvh}
     <button class="btn primary" id="preview3dObject">Obje</button>
     <button class="btn" id="preview3dWorld">Dünya</button>
     <button class="btn" id="preview3dReset">Sıfırla</button>
+    <button class="preview3dProjection" id="preview3dProjection" type="button" aria-label="Projection: orthographic" title="Orthographic / Perspective">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7 12 4l7 3v10l-7 3-7-3V7Z"/><path d="M5 7h14M12 4v16"/></svg>
+      <span>Ortho</span>
+    </button>
     <div class="spacer"></div>
     <div class="preview3dMeta" id="preview3dMeta"></div>
     <button class="preview3dSurfaceToggle" id="preview3dSurfaceToggle" type="button" aria-label="İnce yüzey görünümüne geç" title="İnce yüzey görünümü">
