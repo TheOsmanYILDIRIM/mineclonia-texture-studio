@@ -121,13 +121,18 @@ jobs:
             }
 
             try {
-              await page.locator('#openVariantLab').click();
+              try {
+                await page.locator('#openVariantLab').click({ timeout: 3000 });
+              } catch (err) {
+                stateErrors.push('variant-lab-pointer: ' + String(err));
+                await page.locator('#openVariantLab').evaluate(el => el.click());
+              }
               await page.waitForSelector('#variantLab.open', { timeout: 10000 });
               await page.waitForTimeout(900);
               await capture(page, `variant-lab-${t.name}-fold`);
-              await page.locator('#closeVariantLab').click();
+              await page.locator('#closeVariantLab').evaluate(el => el.click());
             } catch (err) {
-              stateErrors.push('variant-lab: ' + String(err));
+              stateErrors.push('variant-lab-state: ' + String(err));
             }
 
             const layout = await page.evaluate(() => {
