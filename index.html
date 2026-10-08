@@ -552,6 +552,58 @@ body{min-height:100dvh}
   }
   .compactPrimaryDock #uploadEdited{width:100%}
 }
+
+@media(max-width:699px){
+  #sheet .mobileTopCloseHidden{display:none!important}
+  #sheet .mobilePreviewCaption{
+    order:0;
+    display:block!important;
+    min-height:0!important;
+    padding:2px 2px 7px!important;
+    border:0!important;
+    text-align:left;
+  }
+  #sheet .mobilePreviewCaption>div{min-width:0}
+  #sheet .mobilePreviewCaption h2{
+    font-size:14px!important;
+    line-height:1.25;
+    margin:0 0 3px!important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  #sheet .mobilePreviewCaption .path{
+    font-size:10px!important;
+    line-height:1.25;
+    color:#8f99a7;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .compactDockClose{
+    background:#5a2026!important;
+    border-color:#8b343d!important;
+    color:#fff!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .compactDockClose::after{
+    content:"Geri";
+    font-size:10px;
+    font-weight:800;
+    margin-left:4px;
+  }
+  .compactDockClose{
+    width:64px!important;
+    min-width:64px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px;
+  }
+  .compactPrimaryDock{
+    grid-template-columns:64px minmax(0,1fr)!important;
+  }
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
