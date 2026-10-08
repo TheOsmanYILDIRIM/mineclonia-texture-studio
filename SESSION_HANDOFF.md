@@ -23,6 +23,13 @@ Branch: `main` · Production: GitHub Pages.
 - `scripts/check-standardization.mjs` plus Runtime Guards now fail CI if duplicate core functions, legacy prompt storage, multiple prompt loaders, UV-router regressions, or persistent browser-storage identity changes return.
 - No browser-stored edit, prompt override, resolution preference, recent-texture entry, scaled cache, or Island Studio mapping was intentionally deleted or renamed by this refactor.
 
+## Current focus — Island warp / repack split
+- Warp and restore are now separate paths. `js/ordered-contour-warp.js` provides ordered perimeter fitting for Vertex UV Studio auto-fit; commit chain: `44b25cf`, `4ac5f68`, wired in `4f30c09`.
+- `js/island-repack.js` now reconstructs the normal atlas directly from V3 `slot.rects` / `slot.src` metadata and corrected slot frames. `islandStudioRestore()` no longer redetects/fits islands from image content; commits `2bae9c9`, `987d950`.
+- `index.html` loads both modules before the feature editors (`59606c8`).
+- Non-regression: component detection may scope/edit an island, but restore identity/placement must come from persisted slot metadata. Never reintroduce bbox guessing, foreground-search repack, or forced canonical low-resolution output.
+- Next verification: device-test the V3 export → AI import → Vertex UV correction → save/restore round trip on Pig, then inspect restored resolution and rect placement before changing warp heuristics further.
+
 ## Current focus — Vertex UV Studio
 - Variant Lab → `UV Eşle` opens the dedicated `js/vertex-uv-studio.js` + `css/vertex-uv-studio.css` editor. This is the primary entity-atlas repair workflow.
 - Islands are the editor's segmentation/pairing model, not the retired automatic Island Studio restore experiment. Source/target island IDs remain stable during a session; used pairs are tracked as `Ü# → O#` and merged one-by-one into the final atlas.
