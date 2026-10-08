@@ -46,6 +46,22 @@ jobs:
 
           const browser = await chromium.launch({ headless: true });
 
+          async function waitForLiveBuild() {
+            const expected = process.env.GITHUB_SHA;
+            let last = '';
+            for (let attempt = 1; attempt <= 18; attempt++) {
+              try {
+                const res = await fetch(base + 'js/build-status.js?probe=' + Date.now(), { cache: 'no-store' });
+                last = await res.text();
+                if (expected && last.includes(expected)) return;
+              } catch {}
+              await new Promise(r => setTimeout(r, 10000));
+            }
+            throw new Error('Pages did not publish expected build ' + expected + ' · last=' + last.slice(0, 160));
+          }
+
+          await waitForLiveBuild();
+
           async function openReady(page, url, readySelector) {
             let loaded = false;
             let lastError = null;
@@ -128,9 +144,52 @@ jobs:
                 await page.locator('#openVariantLab').evaluate(el => el.click());
               }
               await page.waitForSelector('#variantLab.open', { timeout: 10000 });
-              await page.waitForTimeout(900);
+              await page.waitForTimeout(700);
               await capture(page, `variant-lab-${t.name}-fold`);
-              await page.locator('#closeVariantLab').evaluate(el => el.click());
+
+              const entityId = await page.evaluate(() => {
+                const api = window.MTSVariantBridge;
+                const all = api?.catalog?.() || [];
+                const entity = all.find(x => api.assetTypeOf?.(x) === 'Entity' && /\\.b3d/i.test(String(api.runtimeRoleInfo?.(x)?.model || '')))
+                  || all.find(x => api.assetTypeOf?.(x) === 'Entity');
+                return entity?.id || null;
+              });
+
+              if (entityId) {
+                try {
+                  await page.evaluate(async id => {
+                    const api = window.MTSVariantBridge;
+                    const meta = (api?.catalog?.() || []).find(x => x.id === id);
+                    if (!meta) throw new Error('Entity metadata missing');
+                    await window.MTSVariantLab.open(meta);
+                    await window.MTSUvRepair.openPrimary();
+                  }, entityId);
+                  await page.waitForSelector('.vertexUvStudio.open', { timeout: 10000 });
+                  await page.waitForTimeout(700);
+                  await capture(page, `vertex-uv-${t.name}-fold`);
+                  await page.evaluate(() => document.querySelector('.vertexUvStudio')?.classList.remove('open'));
+                } catch (err) {
+                  stateErrors.push('vertex-uv-state: ' + String(err));
+                }
+
+                try {
+                  await page.evaluate(async id => {
+                    const api = window.MTSVariantBridge;
+                    const meta = (api?.catalog?.() || []).find(x => x.id === id);
+                    if (!meta) throw new Error('Entity metadata missing');
+                    document.querySelector('#variantLab')?.classList.remove('open');
+                    await window.MTSUvRepair.openIsland(meta.path);
+                  }, entityId);
+                  await page.waitForSelector('.islandStudio.open', { timeout: 10000 });
+                  await page.waitForTimeout(700);
+                  await capture(page, `island-studio-${t.name}-fold`);
+                  await page.evaluate(() => document.querySelector('.islandStudio')?.classList.remove('open'));
+                } catch (err) {
+                  stateErrors.push('island-studio-state: ' + String(err));
+                }
+              }
+
+              await page.evaluate(() => document.querySelector('#variantLab')?.classList.remove('open'));
             } catch (err) {
               stateErrors.push('variant-lab-state: ' + String(err));
             }
