@@ -2253,14 +2253,10 @@ async function init(){
   setupCompactMobileDetail();
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
-  setSaveState('Kayıt açılıyor…','warn');
+  setSaveState('Kayıt hazırlanıyor…','warn');
+  // Do not block first paint on IndexedDB or prompt manifests.
   storageBootPromise=initStorage();
-  await PROMPT_STORE_READY;
   await buildFilters();
-  await Promise.race([storageBootPromise,new Promise(r=>setTimeout(r,900))]);
-  if(storageMode==='indexeddb')setSaveState('Hazır • kalıcı kayıt','ok');
-  else if(storageMode==='local')setSaveState('Hazır • yerel fallback','warn');
-  else setSaveState('Kayıt hazırlanıyor…','warn');
   await new Promise(requestAnimationFrame);
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
 
@@ -2288,7 +2284,12 @@ async function init(){
 
   await renderRecentTextures();
   await applyFilter();
+  // Heavy persistence verification and prompt metadata hydrate after the usable UI is visible.
   bootstrapStorageInBackground();
+  PROMPT_STORE_READY.then(()=>{
+    const opt=document.querySelector('#category option[value="special:item_authored"]');
+    if(opt)opt.textContent='Item · '+(window.MTSPromptStore?.authoredCount('items')||0);
+  }).catch(err=>console.warn('prompt registry background load',err));
 }
 CATALOG_READY.then(()=>{
  const promoted=applyCanonicalPriorityPromotions();
