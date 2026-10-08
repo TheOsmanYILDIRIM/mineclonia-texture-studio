@@ -2100,29 +2100,48 @@ function setupCompactMobileDetail(){
   }
   if(topClose)topClose.classList.add('mobileTopCloseHidden');
 
-  // Large one-hand gestures. Preview and interactive controls are excluded.
-  const gestureBlocked=el=>!!el.closest('#preview,button,input,select,textarea,label,.compactThumbDock,.compactActionTray');
-  let gestureStart=null;
+  // Large one-hand gestures across almost the whole detail surface.
+  // Only controls that genuinely need drag/selection are excluded.
+  const gestureBlocked=el=>!!el.closest('#preview,input[type="range"],select,textarea,input[type="file"],[contenteditable="true"]');
+  let gestureStart=null,gestureClaimed=false,gestureSuppressClickUntil=0;
+  drawer.addEventListener('click',e=>{
+    if(performance.now()<gestureSuppressClickUntil){
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation?.();
+    }
+  },true);
   drawer.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1||gestureBlocked(e.target)){gestureStart=null;return}
+    if(e.touches.length!==1||gestureBlocked(e.target)){gestureStart=null;gestureClaimed=false;return}
     const t=e.touches[0];
     gestureStart={x:t.clientX,y:t.clientY,time:performance.now()};
+    gestureClaimed=false;
   },{passive:true});
+  drawer.addEventListener('touchmove',e=>{
+    if(!gestureStart||e.touches.length!==1)return;
+    const t=e.touches[0],dx=t.clientX-gestureStart.x,dy=t.clientY-gestureStart.y,ax=Math.abs(dx),ay=Math.abs(dy);
+    if(!gestureClaimed&&((dy>34&&ay>ax*1.15)||(ax>34&&ax>ay*1.15)))gestureClaimed=true;
+    if(gestureClaimed)e.preventDefault();
+  },{passive:false});
   drawer.addEventListener('touchend',e=>{
-    if(!gestureStart||e.changedTouches.length!==1){gestureStart=null;return}
+    if(!gestureStart||e.changedTouches.length!==1){gestureStart=null;gestureClaimed=false;return}
     const t=e.changedTouches[0],dx=t.clientX-gestureStart.x,dy=t.clientY-gestureStart.y;
     const ax=Math.abs(dx),ay=Math.abs(dy),elapsed=performance.now()-gestureStart.time;
-    gestureStart=null;
-    if(elapsed>1200)return;
-    if(dy>130&&ay>ax*1.25){closeDetailSheet();return}
-    if(ax>105&&ax>ay*1.35){
+    const claimed=gestureClaimed;
+    gestureStart=null;gestureClaimed=false;
+    if(elapsed>1400)return;
+    if(dy>105&&ay>ax*1.15){
+      gestureSuppressClickUntil=performance.now()+450;
+      closeDetailSheet();return
+    }
+    if(ax>90&&ax>ay*1.2){
+      gestureSuppressClickUntil=performance.now()+450;
       const list=(filtered&&filtered.length?filtered:CATALOG)||[];
       const idx=list.findIndex(x=>x?.path===active?.path);
       if(idx<0)return;
       const nextIdx=dx<0?idx+1:idx-1;
       if(nextIdx<0||nextIdx>=list.length){toast(dx<0?'Son texture':'İlk texture');return}
-      openDetail(list[nextIdx]);
+      openDetail(list[nextIdx]);return
     }
+    if(claimed)gestureSuppressClickUntil=performance.now()+150;
   },{passive:true});
   const upload=$('uploadEdited');
   const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
