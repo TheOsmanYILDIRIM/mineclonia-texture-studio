@@ -16,17 +16,37 @@ function staticAssetTags(x){
  if(x.w!==x.h)t.add('non-square');if(x.w>16||x.h>16)t.add('atlas-or-hires');
  return [...t].sort();
 }
-const NODE_TAGS_READY=fetch('js/data/node-faces.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{
- NODE_TAG_INDEX=new Map();
- for(const [node,def] of Object.entries(j?.nodes||{})){
-  for(const expr of [...(def.textures||[]),...(def.overlays||[])]){
-   const composite=String(expr||'').includes('^');
-   for(const m of String(expr||'').matchAll(/[A-Za-z0-9_./-]+\.png/g)){
-    const key=m[0].toLowerCase(),tags=NODE_TAG_INDEX.get(key)||[];
-    tags.push('lua:node','node:'+node);if(composite)tags.push('composite');if((def.overlays||[]).length)tags.push('node-overlay');if(def.palette)tags.push('runtime-tint');
-    NODE_TAG_INDEX.set(key,tags);
+let NODE_TAGS_READY=null;
+function loadNodeTagsInBackground(){
+ if(NODE_TAGS_READY)return NODE_TAGS_READY;
+ NODE_TAGS_READY=fetch('js/data/node-faces.json',{cache:'force-cache'}).then(r=>r.ok?r.json():null).then(j=>{
+  NODE_TAG_INDEX=new Map();
+  for(const [node,def] of Object.entries(j?.nodes||{})){
+   for(const expr of [...(def.textures||[]),...(def.overlays||[])]){
+    const composite=String(expr||'').includes('^');
+    for(const m of String(expr||'').matchAll(/[A-Za-z0-9_./-]+\.png/g)){
+     const key=m[0].toLowerCase(),tags=NODE_TAG_INDEX.get(key)||[];
+     tags.push('lua:node','node:'+node);if(composite)tags.push('composite');if((def.overlays||[]).length)tags.push('node-overlay');if(def.palette)tags.push('runtime-tint');
+     NODE_TAG_INDEX.set(key,tags);
+    }
    }
   }
- }
-}).catch(()=>{NODE_TAG_INDEX=new Map()});
-const CATALOG_READY=Promise.all([NODE_TAGS_READY,...CATALOG_TECH_FILES.map(async id=>{const r=await fetch('js/data/catalog/'+id+'.json',{cache:'no-store'});if(!r.ok)throw new Error('catalog '+id+' '+r.status);return await r.json()})]).then(parts=>{const rows=parts.slice(1).flat();rows.sort((a,b)=>a[6]-b[6]);CATALOG=rows.map(r=>{const category=CATALOG_META.c[r[0]],mod=CATALOG_META.m[r[1]],priority=CATALOG_META.p[r[2]],name=r[8];return {path:category+'/'+mod+'/'+name,name,category,mod,priority,w:r[3],h:r[4],animated:!!r[5],rank:r[6],id:'tex_'+r[7],tags:staticAssetTags({category,mod,priority,w:r[3],h:r[4],animated:!!r[5],name})}});return CATALOG});
+  for(const x of CATALOG){
+   const extra=NODE_TAG_INDEX.get(String(x.name||'').toLowerCase())||[];
+   if(extra.length)x.tags=[...new Set([...(x.tags||[]),...extra])].sort();
+  }
+  return NODE_TAG_INDEX;
+ }).catch(()=>{NODE_TAG_INDEX=new Map();return NODE_TAG_INDEX});
+ return NODE_TAGS_READY;
+}
+const CATALOG_READY=Promise.all(CATALOG_TECH_FILES.map(async id=>{
+ const r=await fetch('js/data/catalog/'+id+'.json',{cache:'force-cache'});
+ if(!r.ok)throw new Error('catalog '+id+' '+r.status);
+ return await r.json();
+})).then(parts=>{
+ const rows=parts.flat();rows.sort((a,b)=>a[6]-b[6]);
+ CATALOG=rows.map(r=>{const category=CATALOG_META.c[r[0]],mod=CATALOG_META.m[r[1]],priority=CATALOG_META.p[r[2]],name=r[8];return {path:category+'/'+mod+'/'+name,name,category,mod,priority,w:r[3],h:r[4],animated:!!r[5],rank:r[6],id:'tex_'+r[7],tags:staticAssetTags({category,mod,priority,w:r[3],h:r[4],animated:!!r[5],name})}});
+ const defer=()=>loadNodeTagsInBackground();
+ if(typeof requestIdleCallback==='function')requestIdleCallback(defer,{timeout:2500});else setTimeout(defer,1200);
+ return CATALOG;
+});
