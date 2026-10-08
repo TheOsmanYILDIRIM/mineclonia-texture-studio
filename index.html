@@ -656,6 +656,10 @@ body{min-height:100dvh}
   .preview3dSurfaceToggle{width:34px;height:34px;border-radius:9px;padding:7px}
   .preview3dHint{bottom:9px;font-size:9px;max-width:86vw;white-space:normal;text-align:center}
 }
+
+.preview3dSurfaceToggle .cubeIcon{display:none}
+.preview3dSurfaceToggle.active .surfaceIcon{display:none}
+.preview3dSurfaceToggle.active .cubeIcon{display:block}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -747,7 +751,8 @@ body{min-height:100dvh}
     <div class="spacer"></div>
     <div class="preview3dMeta" id="preview3dMeta"></div>
     <button class="preview3dSurfaceToggle" id="preview3dSurfaceToggle" type="button" aria-label="İnce yüzey görünümüne geç" title="İnce yüzey görünümü">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="m4 7.5 8 3.5 8-3.5M12 11v9"/></svg>
+      <svg class="surfaceIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5 18.5 4v12.5L5 20V7.5Z"/><path d="m8 9 7.5-2v8L8 17"/></svg>
+      <svg class="cubeIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="m4 7.5 8 3.5 8-3.5M12 11v9"/></svg>
     </button>
     <button class="btn" id="preview3dClose">✕</button>
   </div>
