@@ -223,6 +223,53 @@ body{min-height:100dvh}
     border-right:1px solid var(--line)!important;
   }
 }
+
+/* viewport width hard lock */
+.app{
+  width:100vw!important;
+  max-width:100vw!important;
+  min-width:0!important;
+}
+.top,.recentTextures,.catalogViewport,.pager,.bottom{
+  box-sizing:border-box;
+  width:100%!important;
+  max-width:100vw!important;
+  min-width:0!important;
+  left:0!important;
+  right:0!important;
+  transform:none!important;
+}
+.top>*,
+.title,.controls,.filterRow,.filters,
+.recentTextureStrip,
+.catalogViewport .grid,
+.pager>*,
+.bottom>*{
+  min-width:0!important;
+  max-width:100%;
+}
+.bottom{
+  justify-self:stretch!important;
+  overflow:hidden;
+}
+.bottom .btn{
+  width:100%!important;
+  min-width:0!important;
+}
+.pager{
+  justify-self:stretch!important;
+  overflow:hidden;
+}
+@media(max-width:699px){
+  .top{overflow:hidden}
+  .title,.controls,.filterRow{width:100%}
+  .filterRow{max-width:100%;overflow:hidden}
+  .filters{overflow-x:auto}
+  .catalogViewport{width:100vw!important}
+  .catalogViewport .grid{width:100%!important}
+  .pager{display:flex!important;justify-content:center!important}
+  .bottom{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
