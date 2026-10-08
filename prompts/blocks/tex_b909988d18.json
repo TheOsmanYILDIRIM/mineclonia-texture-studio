@@ -5,6 +5,6 @@
   "path": "ITEMS/mcl_core/mcl_core_gold_ore.png",
   "name": "mcl_core_gold_ore.png",
   "stages": {
-    "reference": "MINERAL REFERENCE — GOLD\n\nRare native gold flecks and short fractured seams, muted warm yellow metal with small naturally reflective facets; no decorative nuggets or bright glitter.\n\nCreate only the mineral formations and their immediate contact details as an isolated design reference. The completed default_stone.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, illuminate or redesign the host stone. Avoid a full stone-tile rendering; concentrate exclusively on the ore deposits."
+    "reference": "MINERAL REFERENCE — GOLD\n\nRare native gold flecks and short fractured seams, subdued warm yellow metallic facets, never glitter or jewelry.\n\nCreate only the mineral formations and their immediate contact details as a standalone design reference. The completed default_stone.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, relight or redesign the host stone. Do not render a full stone tile; concentrate exclusively on the ore deposits."
   }
 }
