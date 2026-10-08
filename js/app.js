@@ -1915,15 +1915,29 @@ async function render(){
    b.title=x.path; b.onclick=()=>openDetail(x); $('grid').appendChild(b);
    const img=b.querySelector('img'); cardRefsFast.set(x.path,{card:b,img}); cards.push([x,img]);
  }
- const loadOne=async([x,img])=>{if(token!==renderToken)return;try{
+ const loadOne=async([x,img])=>{if(token!==renderToken||img.dataset.loaded==='1')return;img.dataset.loaded='1';try{
    if(hotEdits.has(x.path))img.src=await previewUrl(x.path,true,THUMB_MAX_EDGE);
    else{img.src=upstreamTextureUrl(x);img.decoding='async';}
- }catch(e){console.warn(x.path,e)}};
- // Above-the-fold cards start together instead of waiting for six-item batches.
- await Promise.all(cards.slice(0,Math.min(12,cards.length)).map(loadOne));
+ }catch(e){img.dataset.loaded='';console.warn(x.path,e)}};
+ // Load only the visible/near-visible cards. Avoid saturating startup with all 36 upstream PNGs.
+ const eager=Math.min(8,cards.length);
+ for(let i=0;i<eager;i++)loadOne(cards[i]);
  if(token!==renderToken)return;
- let cursor=12;const workers=Array.from({length:Math.min(12,Math.max(0,cards.length-cursor))},async()=>{while(token===renderToken){const i=cursor++;if(i>=cards.length)return;await loadOne(cards[i])}});
- Promise.allSettled(workers);
+ const rest=cards.slice(eager);
+ if('IntersectionObserver' in window&&rest.length){
+   const root=$('grid')?.closest('.catalogViewport')||null;
+   const io=new IntersectionObserver(entries=>{
+     for(const entry of entries){
+       if(!entry.isIntersecting)continue;
+       const pair=entry.target.__mtsCardPair;if(pair)loadOne(pair);
+       io.unobserve(entry.target);
+     }
+   },{root,rootMargin:'320px 0px',threshold:.01});
+   for(const pair of rest){pair[1].__mtsCardPair=pair;io.observe(pair[1])}
+ }else{
+   const pump=()=>{if(token!==renderToken)return;const batch=rest.splice(0,4);batch.forEach(loadOne);if(rest.length)setTimeout(pump,80)};
+   setTimeout(pump,120);
+ }
 }
 async function importPng(file,seam=false){
   if(!active||!file)return;
