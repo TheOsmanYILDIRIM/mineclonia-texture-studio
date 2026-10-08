@@ -29,8 +29,9 @@
     const specificManual=manualProfiles.filter(p=>!genericManual.includes(p));
     previewProfileConfig={
       defaults:manual.defaults||{projection:'orthographic'},
-      // Specific hand-authored overrides first, then generated Mineclonia node profiles,
-      // and generic asset-type fallbacks last.
+      specificManual:specificManual.map(p=>({...p,_source:'manual'})),
+      generated:(generated.profiles||[]).map(p=>({...p,_source:'generated'})),
+      genericManual:genericManual.map(p=>({...p,_source:'fallback'})),
       profiles:[...specificManual,...(generated.profiles||[]),...genericManual]
     };
   }catch{previewProfileConfig={defaults:{projection:'orthographic'},profiles:[]}}
@@ -61,9 +62,39 @@
   }
   return null;
  }
+ function exprLayers(expr){
+  return (String(expr||'').match(/[A-Za-z0-9_./-]+\.png/g)||[]).map(texture=>({texture}));
+ }
+ async function directNodeProfile(meta){
+  await loadLuaFaceManifest();
+  const name=String(meta?.name||'').toLowerCase(),rows=LUA_FACE_INDEX?.get(name)||[];
+  if(!rows.length)return null;
+  const rank=([node,def])=>{
+    const tail=String(node||'').split(':').pop().replace(/_/g,'');
+    const stem=name.replace(/\.png$/,'').replace(/^(?:mcl_|default_)/,'').replace(/_/g,'');
+    let s=0;
+    if(tail&&stem&&(tail.includes(stem)||stem.includes(tail)))s+=20;
+    if((def.textures||[]).some(x=>String(x).toLowerCase()===name))s+=50;
+    if((def.overlays||[]).some(x=>String(x).toLowerCase()===name))s+=30;
+    return s;
+  };
+  const [node,def]=[...rows].sort((a,b)=>rank(b)-rank(a))[0];
+  const tex=expandLuaFaces(def.textures||[]),ovs=expandLuaFaces(def.overlays||[],{sparse:true});
+  if(!tex)return null;
+  const logical=['top','bottom','east','west','north','south'],faces={};
+  for(let i=0;i<6;i++){
+    const layers=[...exprLayers(tex[i]),...exprLayers(ovs?.[i]||'')];
+    if(def.palette&&def.color&&layers.length)layers[layers.length-1]={...layers[layers.length-1],tint:def.color};
+    faces[logical[i]]=layers.length?layers:[{texture:name}];
+  }
+  return {id:'node:'+node,node,texture_base:def.texture_base||null,geometry:'cube',projection:'orthographic',faces,_source:'node-faces'};
+ }
  async function resolvePreviewProfile(meta){
   const cfg=await loadPreviewProfiles();
-  const profile=(cfg.profiles||[]).find(p=>profileMatches(p,meta))||null;
+  let profile=(cfg.specificManual||[]).find(p=>profileMatches(p,meta))||null;
+  if(!profile)profile=await directNodeProfile(meta);
+  if(!profile)profile=(cfg.generated||[]).find(p=>profileMatches(p,meta))||null;
+  if(!profile)profile=(cfg.genericManual||[]).find(p=>profileMatches(p,meta))||null;
   if(!profile)return {id:'fallback',projection:cfg.defaults?.projection||'orthographic',faces:null,background:cfg.defaults?.background||'checker-dark'};
   const out={...cfg.defaults,...profile};
   if(profile.resolver==='paired_log')out.faces=pairedLogFaces(meta,profile);
