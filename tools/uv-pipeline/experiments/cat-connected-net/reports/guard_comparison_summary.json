@@ -1,0 +1,148 @@
+{
+  "plain_raw": {
+    "status": "needs_visual_3d_review",
+    "target_size": [
+      1536,
+      768
+    ],
+    "received_generated_size": [
+      1536,
+      1536
+    ],
+    "generator_canvas_was_resized": false,
+    "packed_source_mask_iou": 0.983031,
+    "missing_source_pixels_at_original_uv_coordinates": 0,
+    "regions": [
+      {
+        "id": "head",
+        "target_pixel_count": 86400,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "body",
+        "target_pixel_count": 211968,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "tail",
+        "target_pixel_count": 50688,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "legs",
+        "target_pixel_count": 101376,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "strip",
+        "target_pixel_count": 15552,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      }
+    ],
+    "original_target_alpha_pixel_exact": true
+  },
+  "guard_raw": {
+    "status": "needs_visual_3d_review",
+    "target_size": [
+      1536,
+      768
+    ],
+    "received_generated_size": [
+      1536,
+      1536
+    ],
+    "generator_canvas_was_resized": false,
+    "packed_source_mask_iou": 0.964209,
+    "missing_source_pixels_at_original_uv_coordinates": 0,
+    "regions": [
+      {
+        "id": "head",
+        "target_pixel_count": 86400,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "body",
+        "target_pixel_count": 211968,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "tail",
+        "target_pixel_count": 50688,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "legs",
+        "target_pixel_count": 101376,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "strip",
+        "target_pixel_count": 15552,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      }
+    ],
+    "original_target_alpha_pixel_exact": true
+  },
+  "guard_cleaned": {
+    "status": "needs_visual_3d_review",
+    "target_size": [
+      1536,
+      768
+    ],
+    "received_generated_size": [
+      1536,
+      1536
+    ],
+    "generator_canvas_was_resized": false,
+    "packed_source_mask_iou": 1.0,
+    "missing_source_pixels_at_original_uv_coordinates": 0,
+    "regions": [
+      {
+        "id": "head",
+        "target_pixel_count": 86400,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "body",
+        "target_pixel_count": 211968,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "tail",
+        "target_pixel_count": 50688,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "legs",
+        "target_pixel_count": 101376,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      },
+      {
+        "id": "strip",
+        "target_pixel_count": 15552,
+        "source_missing_in_target": 0,
+        "missing_fraction": 0.0
+      }
+    ],
+    "original_target_alpha_pixel_exact": true
+  },
+  "guard_magenta_inside_before": 0,
+  "guard_magenta_inside_after": 0,
+  "guard_total_magenta_before": 0,
+  "guard_total_magenta_after": 0,
+  "cleaned_inpaint_pixels_inside_fg": 0
+}
