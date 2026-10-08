@@ -5,6 +5,6 @@
   "path": "ITEMS/mcl_deepslate/mcl_deepslate_coal_ore.png",
   "name": "mcl_deepslate_coal_ore.png",
   "stages": {
-    "reference": "MINERAL REFERENCE — COAL\n\nSparse irregular seams of dull charcoal-black carbonaceous mineral, compressed and partly buried, with fine granular fracture edges; avoid uniformly scattered black spots.\n\nCreate only the mineral formations and their immediate contact details as an isolated design reference. The completed mcl_deepslate_deepslate.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, illuminate or redesign the host stone. Avoid a full stone-tile rendering; concentrate exclusively on the ore deposits."
+    "reference": "MINERAL REFERENCE — COAL\n\nSparse compressed carbonaceous seams, dull charcoal grains and fractured mineral edges; no scattered decorative spots.\n\nCreate only the mineral formations and their immediate contact details as a standalone design reference. The completed mcl_deepslate_deepslate.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, relight or redesign the host stone. Do not render a full stone tile; concentrate exclusively on the ore deposits."
   }
 }
