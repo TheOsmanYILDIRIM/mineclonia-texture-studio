@@ -49,3 +49,5 @@
   .variantFooter{display:grid;grid-template-columns:1fr 1fr}
   .variantFooter .btn{min-width:0;font-size:11px}
 }
+
+.variantTop{padding-top:calc(8px + env(safe-area-inset-top,0px))!important}
