@@ -1,1 +1,1355 @@
-{"schema":1,"source":"Mineclonia Lua node definitions","face_order":["top","bottom","right","left","back","front"],"nodes":{"mcl_core:dirt_with_grass":{"textures":["mcl_core_grass_block_top.png","default_dirt.png","default_dirt.png^mcl_dirt_grass_shadow.png"],"overlays":["","","mcl_core_grass_block_side_overlay.png"],"palette":"mcl_core_palette_grass.png","color":"#8EB971","paramtype2":"color"},"mcl_core:grass_path":{"textures":["mcl_core_grass_path_top.png","default_dirt.png","mcl_core_grass_path_side.png"]},"mcl_core:mycelium":{"textures":["mcl_core_mycelium_top.png","default_dirt.png","mcl_core_mycelium_side.png"]},"mcl_core:podzol":{"textures":["mcl_core_dirt_podzol_top.png","default_dirt.png","mcl_core_dirt_podzol_side.png"]},"mcl_crimson:warped_nylium":{"textures":["warped_nylium.png","mcl_nether_netherrack.png","mcl_nether_netherrack.png^warped_nylium_side.png","mcl_nether_netherrack.png^warped_nylium_side.png","mcl_nether_netherrack.png^warped_nylium_side.png","mcl_nether_netherrack.png^warped_nylium_side.png"]},"mcl_crimson:crimson_nylium":{"textures":["crimson_nylium.png","mcl_nether_netherrack.png","mcl_nether_netherrack.png^crimson_nylium_side.png","mcl_nether_netherrack.png^crimson_nylium_side.png","mcl_nether_netherrack.png^crimson_nylium_side.png","mcl_nether_netherrack.png^crimson_nylium_side.png"]},"mcl_crimson:crimson_tree":{"textures":["crimson_hyphae.png","crimson_hyphae.png","crimson_hyphae_side.png"]},"mcl_crimson:warped_tree":{"textures":["warped_hyphae.png","warped_hyphae.png","warped_hyphae_side.png"]},"mcl_crimson:stripped_crimson":{"textures":["stripped_crimson_stem_top.png","stripped_crimson_stem_top.png","stripped_crimson_stem_side.png"]},"mcl_crimson:stripped_warped":{"textures":["stripped_warped_stem_top.png","stripped_warped_stem_top.png","stripped_warped_stem_side.png"]}}}
+{
+  "schema": 1,
+  "source": "Luanti Lua static extraction",
+  "face_order": [
+    "top",
+    "bottom",
+    "right",
+    "left",
+    "back",
+    "front"
+  ],
+  "nodes": {
+    "mcl_noteblock:noteblock": {
+      "textures": [
+        "mesecons_noteblock.png"
+      ]
+    },
+    "mcl_redstone_torch:redstoneblock": {
+      "textures": [
+        "redstone_redstone_block.png"
+      ]
+    },
+    "mcl_amethyst:amethyst_block": {
+      "textures": [
+        "mcl_amethyst_amethyst_block.png"
+      ]
+    },
+    "mcl_amethyst:budding_amethyst_block": {
+      "textures": [
+        "mcl_amethyst_budding_amethyst.png"
+      ]
+    },
+    "mcl_amethyst:calcite": {
+      "textures": [
+        "mcl_amethyst_calcite_block.png"
+      ]
+    },
+    "mcl_amethyst:tinted_glass": {
+      "textures": [
+        "mcl_amethyst_tinted_glass.png"
+      ]
+    },
+    "mcl_amethyst:amethyst_cluster": {
+      "textures": [
+        "mcl_amethyst_amethyst_cluster.png"
+      ],
+      "paramtype2": "wallmounted"
+    },
+    "mcl_armor_stand:armor_stand": {
+      "textures": [
+        "default_wood.png",
+        "mcl_stairs_stone_slab_top.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_bamboo:bamboo_mosaic": {
+      "textures": [
+        "mcl_bamboo_bamboo_plank_mosaic.png"
+      ]
+    },
+    "mcl_banners:standing_banner": {
+      "textures": [
+        "mcl_banners_fallback_wood.png"
+      ]
+    },
+    "mcl_banners:hanging_banner": {
+      "textures": [
+        "mcl_banners_fallback_wood.png"
+      ],
+      "paramtype2": "wallmounted"
+    },
+    "mcl_barrels:barrel_closed": {
+      "textures": [
+        "mcl_barrels_barrel_top.png^[transformR270",
+        "mcl_barrels_barrel_bottom.png",
+        "mcl_barrels_barrel_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_barrels:barrel_open": {
+      "textures": [
+        "mcl_barrels_barrel_top_open.png",
+        "mcl_barrels_barrel_bottom.png",
+        "mcl_barrels_barrel_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_beacons:beacon": {
+      "textures": [
+        "beacon_UV.png"
+      ]
+    },
+    "mcl_beacons:beacon_beam": {
+      "textures": [
+        "blank.png^[noalpha^[colorize:#b8bab9"
+      ],
+      "palette": "mcl_dyes_palette.png",
+      "paramtype2": "color"
+    },
+    "mcl_beehives:beehive": {
+      "textures": [
+        "mcl_beehives_beehive_end.png",
+        "mcl_beehives_beehive_end.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_front.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_beehives:beehive_5": {
+      "textures": [
+        "mcl_beehives_beehive_end.png",
+        "mcl_beehives_beehive_end.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_side.png",
+        "mcl_beehives_beehive_front_honey.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_beehives:bee_nest": {
+      "textures": [
+        "mcl_beehives_bee_nest_top.png",
+        "mcl_beehives_bee_nest_bottom.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_front.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_beehives:bee_nest_5": {
+      "textures": [
+        "mcl_beehives_bee_nest_top.png",
+        "mcl_beehives_bee_nest_bottom.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_side.png",
+        "mcl_beehives_bee_nest_front_honey.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_blackstone:blackstone": {
+      "textures": [
+        "mcl_blackstone_top.png",
+        "mcl_blackstone_top.png",
+        "mcl_blackstone_side.png"
+      ]
+    },
+    "mcl_blackstone:blackstone_gilded": {
+      "textures": [
+        "mcl_blackstone_gilded.png"
+      ]
+    },
+    "mcl_blackstone:nether_gold": {
+      "textures": [
+        "mcl_nether_gold_ore.png"
+      ]
+    },
+    "mcl_blackstone:basalt_polished": {
+      "textures": [
+        "mcl_blackstone_basalt_top_polished.png",
+        "mcl_blackstone_basalt_top_polished.png",
+        "mcl_blackstone_basalt_side_polished.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_blackstone:basalt": {
+      "textures": [
+        "mcl_blackstone_basalt_top.png",
+        "mcl_blackstone_basalt_top.png",
+        "mcl_blackstone_basalt_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_blackstone:basalt_smooth": {
+      "textures": [
+        "mcl_blackstone_basalt_smooth.png"
+      ]
+    },
+    "mcl_blackstone:blackstone_polished": {
+      "textures": [
+        "mcl_blackstone_polished.png"
+      ]
+    },
+    "mcl_blackstone:blackstone_chiseled_polished": {
+      "textures": [
+        "mcl_blackstone_chiseled_polished.png"
+      ]
+    },
+    "mcl_blackstone:blackstone_brick_polished": {
+      "textures": [
+        "mcl_blackstone_polished_bricks.png"
+      ]
+    },
+    "mcl_blackstone:blackstone_brick_polished_cracked": {
+      "textures": [
+        "mcl_blackstone_polished_bricks_cracked.png"
+      ]
+    },
+    "mcl_blackstone:quartz_brick": {
+      "textures": [
+        "mcl_backstone_quartz_bricks.png"
+      ]
+    },
+    "mcl_blackstone:soul_soil": {
+      "textures": [
+        "mcl_blackstone_soul_soil.png"
+      ]
+    },
+    "mcl_blackstone:soul_fire": {
+      "textures": [
+        "soul_fire_basic_flame_animated.png"
+      ]
+    },
+    "mcl_books:bookshelf": {
+      "textures": [
+        "mcl_books_bookshelf_top.png",
+        "mcl_books_bookshelf_top.png",
+        "default_bookshelf.png"
+      ]
+    },
+    "mcl_cartography_table:cartography_table": {
+      "textures": [
+        "cartography_table_top.png",
+        "cartography_table_side3.png",
+        "cartography_table_side3.png",
+        "cartography_table_side2.png",
+        "cartography_table_side3.png",
+        "cartography_table_side1.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_cauldrons:cauldron": {
+      "textures": [
+        "mcl_cauldrons_cauldron_inner.png^mcl_cauldrons_cauldron_top.png",
+        "mcl_cauldrons_cauldron_inner.png^mcl_cauldrons_cauldron_bottom.png",
+        "mcl_cauldrons_cauldron_side.png"
+      ]
+    },
+    "mcl_colorblocks:hardened_clay": {
+      "textures": [
+        "hardened_clay.png"
+      ]
+    },
+    "mcl_compass:lodestone": {
+      "textures": [
+        "lodestone_top.png",
+        "lodestone_bottom.png",
+        "lodestone_side1.png",
+        "lodestone_side2.png",
+        "lodestone_side3.png",
+        "lodestone_side4.png"
+      ]
+    },
+    "mcl_composters:composter": {
+      "textures": [
+        "mcl_composter_bottom.png^mcl_composter_top.png",
+        "mcl_composter_bottom.png",
+        "mcl_composter_side.png"
+      ]
+    },
+    "mcl_composters:composter_ready": {
+      "textures": [
+        "mcl_composter_ready.png^mcl_composter_top.png",
+        "mcl_composter_bottom.png",
+        "mcl_composter_side.png"
+      ]
+    },
+    "mcl_conduits:conduit": {
+      "textures": [
+        "mcl_conduit_conduit_node.png"
+      ]
+    },
+    "mcl_copper:stone_with_copper": {
+      "textures": [
+        "default_stone.png^mcl_copper_ore.png"
+      ]
+    },
+    "mcl_copper:block_raw": {
+      "textures": [
+        "mcl_copper_block_raw.png"
+      ]
+    },
+    "mcl_core:stone": {
+      "textures": [
+        "default_stone.png"
+      ]
+    },
+    "mcl_core:stone_with_coal": {
+      "textures": [
+        "mcl_core_coal_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_iron": {
+      "textures": [
+        "mcl_core_iron_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_gold": {
+      "textures": [
+        "mcl_core_gold_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_redstone": {
+      "textures": [
+        "mcl_core_redstone_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_redstone_lit": {
+      "textures": [
+        "mcl_core_redstone_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_lapis": {
+      "textures": [
+        "mcl_core_lapis_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_emerald": {
+      "textures": [
+        "mcl_core_emerald_ore.png"
+      ]
+    },
+    "mcl_core:stone_with_diamond": {
+      "textures": [
+        "mcl_core_diamond_ore.png"
+      ]
+    },
+    "mcl_core:stonebrick": {
+      "textures": [
+        "default_stone_brick.png"
+      ]
+    },
+    "mcl_core:stonebrickcarved": {
+      "textures": [
+        "mcl_core_stonebrick_carved.png"
+      ]
+    },
+    "mcl_core:stonebrickcracked": {
+      "textures": [
+        "mcl_core_stonebrick_cracked.png"
+      ]
+    },
+    "mcl_core:stonebrickmossy": {
+      "textures": [
+        "mcl_core_stonebrick_mossy.png"
+      ]
+    },
+    "mcl_core:stone_smooth": {
+      "textures": [
+        "mcl_stairs_stone_slab_top.png"
+      ]
+    },
+    "mcl_core:granite": {
+      "textures": [
+        "mcl_core_granite.png"
+      ]
+    },
+    "mcl_core:granite_smooth": {
+      "textures": [
+        "mcl_core_granite_smooth.png"
+      ]
+    },
+    "mcl_core:andesite": {
+      "textures": [
+        "mcl_core_andesite.png"
+      ]
+    },
+    "mcl_core:andesite_smooth": {
+      "textures": [
+        "mcl_core_andesite_smooth.png"
+      ]
+    },
+    "mcl_core:diorite": {
+      "textures": [
+        "mcl_core_diorite.png"
+      ]
+    },
+    "mcl_core:diorite_smooth": {
+      "textures": [
+        "mcl_core_diorite_smooth.png"
+      ]
+    },
+    "mcl_core:dirt_with_grass": {
+      "textures": [
+        "mcl_core_grass_block_top.png",
+        "default_dirt.png",
+        "default_dirt.png^mcl_dirt_grass_shadow.png"
+      ],
+      "overlays": [
+        "mcl_core_grass_block_side_overlay.png"
+      ],
+      "palette": "mcl_core_palette_grass.png",
+      "color": "white",
+      "paramtype2": "color"
+    },
+    "mcl_core:grass_path": {
+      "textures": [
+        "mcl_core_grass_path_top.png",
+        "default_dirt.png",
+        "mcl_core_grass_path_side.png"
+      ]
+    },
+    "mcl_core:mycelium": {
+      "textures": [
+        "mcl_core_mycelium_top.png",
+        "default_dirt.png",
+        "mcl_core_mycelium_side.png"
+      ]
+    },
+    "mcl_core:podzol": {
+      "textures": [
+        "mcl_core_dirt_podzol_top.png",
+        "default_dirt.png",
+        "mcl_core_dirt_podzol_side.png"
+      ]
+    },
+    "mcl_core:dirt": {
+      "textures": [
+        "default_dirt.png"
+      ]
+    },
+    "mcl_core:coarse_dirt": {
+      "textures": [
+        "mcl_core_coarse_dirt.png"
+      ]
+    },
+    "mcl_core:gravel": {
+      "textures": [
+        "default_gravel.png"
+      ]
+    },
+    "mcl_core:sand": {
+      "textures": [
+        "default_sand.png"
+      ]
+    },
+    "mcl_core:sandstone": {
+      "textures": [
+        "mcl_core_sandstone_top.png",
+        "mcl_core_sandstone_bottom.png",
+        "mcl_core_sandstone_normal.png"
+      ]
+    },
+    "mcl_core:sandstonesmooth": {
+      "textures": [
+        "mcl_core_sandstone_top.png",
+        "mcl_core_sandstone_bottom.png",
+        "mcl_core_sandstone_smooth.png"
+      ]
+    },
+    "mcl_core:sandstonecarved": {
+      "textures": [
+        "mcl_core_sandstone_top.png",
+        "mcl_core_sandstone_bottom.png",
+        "mcl_core_sandstone_carved.png"
+      ]
+    },
+    "mcl_core:sandstonesmooth2": {
+      "textures": [
+        "mcl_core_sandstone_top.png"
+      ]
+    },
+    "mcl_core:redsand": {
+      "textures": [
+        "mcl_core_red_sand.png"
+      ]
+    },
+    "mcl_core:redsandstone": {
+      "textures": [
+        "mcl_core_red_sandstone_top.png",
+        "mcl_core_red_sandstone_bottom.png",
+        "mcl_core_red_sandstone_normal.png"
+      ]
+    },
+    "mcl_core:redsandstonesmooth": {
+      "textures": [
+        "mcl_core_red_sandstone_top.png",
+        "mcl_core_red_sandstone_bottom.png",
+        "mcl_core_red_sandstone_smooth.png"
+      ]
+    },
+    "mcl_core:redsandstonecarved": {
+      "textures": [
+        "mcl_core_red_sandstone_top.png",
+        "mcl_core_red_sandstone_bottom.png",
+        "mcl_core_red_sandstone_carved.png"
+      ]
+    },
+    "mcl_core:redsandstonesmooth2": {
+      "textures": [
+        "mcl_core_red_sandstone_top.png"
+      ]
+    },
+    "mcl_core:clay": {
+      "textures": [
+        "default_clay.png"
+      ]
+    },
+    "mcl_core:brick_block": {
+      "textures": [
+        "default_brick.png"
+      ]
+    },
+    "mcl_core:bedrock": {
+      "textures": [
+        "mcl_core_bedrock.png"
+      ]
+    },
+    "mcl_core:cobble": {
+      "textures": [
+        "default_cobble.png"
+      ]
+    },
+    "mcl_core:mossycobble": {
+      "textures": [
+        "default_mossycobble.png"
+      ]
+    },
+    "mcl_core:coalblock": {
+      "textures": [
+        "default_coal_block.png"
+      ]
+    },
+    "mcl_core:ironblock": {
+      "textures": [
+        "default_steel_block.png"
+      ]
+    },
+    "mcl_core:goldblock": {
+      "textures": [
+        "default_gold_block.png"
+      ]
+    },
+    "mcl_core:diamondblock": {
+      "textures": [
+        "default_diamond_block.png"
+      ]
+    },
+    "mcl_core:lapisblock": {
+      "textures": [
+        "mcl_core_lapis_block.png"
+      ]
+    },
+    "mcl_core:emeraldblock": {
+      "textures": [
+        "mcl_core_emerald_block.png"
+      ]
+    },
+    "mcl_core:obsidian": {
+      "textures": [
+        "default_obsidian.png"
+      ]
+    },
+    "mcl_core:crying_obsidian": {
+      "textures": [
+        "default_obsidian.png^mcl_core_crying_obsidian.png"
+      ]
+    },
+    "mcl_core:ice": {
+      "textures": [
+        "default_ice.png"
+      ]
+    },
+    "mcl_core:packed_ice": {
+      "textures": [
+        "mcl_core_ice_packed.png"
+      ]
+    },
+    "mcl_core:blue_ice": {
+      "textures": [
+        "mcl_core_ice_blue.png"
+      ]
+    },
+    "mcl_core:snowblock": {
+      "textures": [
+        "default_snow.png"
+      ]
+    },
+    "mcl_core:cactus": {
+      "textures": [
+        "mcl_core_cactus_top.png",
+        "mcl_core_cactus_bottom.png",
+        "mcl_core_cactus_side.png"
+      ]
+    },
+    "mcl_core:cactus_flower": {
+      "textures": [
+        "cactus_flower.png"
+      ]
+    },
+    "mcl_core:reeds": {
+      "textures": [
+        "mcl_core_papyrus.png"
+      ],
+      "palette": "mcl_core_palette_grass.png",
+      "paramtype2": "color"
+    },
+    "mcl_core:vine": {
+      "textures": [
+        "mcl_core_vine.png"
+      ],
+      "paramtype2": "wallmounted"
+    },
+    "mcl_core:glass": {
+      "textures": [
+        "default_glass.png",
+        "default_glass_detail.png"
+      ],
+      "paramtype2": "glasslikeliquidlevel"
+    },
+    "mcl_core:water_flowing": {
+      "textures": [
+        "default_water_flowing_animated.png^[verticalframe:64:0"
+      ],
+      "paramtype2": "flowingliquid"
+    },
+    "mcl_core:water_source": {
+      "textures": [
+        "default_water_source_animated.png"
+      ]
+    },
+    "mcl_core:lava_flowing": {
+      "textures": [
+        "default_lava_flowing_animated.png^[verticalframe:64:0"
+      ],
+      "paramtype2": "flowingliquid"
+    },
+    "mcl_core:lava_source": {
+      "textures": [
+        "default_lava_source_animated.png"
+      ]
+    },
+    "mcl_core:bone_block": {
+      "textures": [
+        "mcl_core_bone_block_top.png",
+        "mcl_core_bone_block_top.png",
+        "mcl_core_bone_block_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_core:slimeblock": {
+      "textures": [
+        "mcl_core_slime.png"
+      ]
+    },
+    "mcl_core:cobweb": {
+      "textures": [
+        "mcl_core_web.png"
+      ],
+      "paramtype2": "degrotate"
+    },
+    "mcl_core:deadbush": {
+      "textures": [
+        "default_dry_shrub.png"
+      ]
+    },
+    "mcl_core:realm_barrier": {
+      "textures": [
+        "blank.png"
+      ]
+    },
+    "mcl_crafting_table:crafting_table": {
+      "textures": [
+        "crafting_workbench_top.png",
+        "default_wood.png",
+        "crafting_workbench_side.png",
+        "crafting_workbench_side.png",
+        "crafting_workbench_front.png",
+        "crafting_workbench_front.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_crimson:warped_fungus": {
+      "textures": [
+        "farming_warped_fungus.png"
+      ]
+    },
+    "mcl_crimson:nether_sprouts": {
+      "textures": [
+        "nether_sprouts.png"
+      ]
+    },
+    "mcl_crimson:warped_roots": {
+      "textures": [
+        "warped_roots.png"
+      ]
+    },
+    "mcl_crimson:warped_wart_block": {
+      "textures": [
+        "warped_wart_block.png"
+      ]
+    },
+    "mcl_crimson:shroomlight": {
+      "textures": [
+        "shroomlight.png"
+      ]
+    },
+    "mcl_crimson:warped_nylium": {
+      "textures": [
+        "warped_nylium.png",
+        "mcl_nether_netherrack.png",
+        "mcl_nether_netherrack.png^warped_nylium_side.png",
+        "mcl_nether_netherrack.png^warped_nylium_side.png",
+        "mcl_nether_netherrack.png^warped_nylium_side.png",
+        "mcl_nether_netherrack.png^warped_nylium_side.png"
+      ]
+    },
+    "mcl_crimson:crimson_fungus": {
+      "textures": [
+        "farming_crimson_fungus.png"
+      ]
+    },
+    "mcl_crimson:crimson_roots": {
+      "textures": [
+        "crimson_roots.png"
+      ]
+    },
+    "mcl_crimson:crimson_nylium": {
+      "textures": [
+        "crimson_nylium.png",
+        "mcl_nether_netherrack.png",
+        "mcl_nether_netherrack.png^crimson_nylium_side.png",
+        "mcl_nether_netherrack.png^crimson_nylium_side.png",
+        "mcl_nether_netherrack.png^crimson_nylium_side.png",
+        "mcl_nether_netherrack.png^crimson_nylium_side.png"
+      ]
+    },
+    "mcl_deepslate:deepslate": {
+      "textures": [
+        "mcl_deepslate_top.png",
+        "mcl_deepslate_top.png",
+        "mcl_deepslate.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_deepslate:deepslate_reinforced": {
+      "textures": [
+        "mcl_deepslate_reinforced_top.png",
+        "mcl_deepslate_reinforced_bottom.png",
+        "mcl_deepslate_reinforced.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_deepslate:tuff_chiseled": {
+      "textures": [
+        "mcl_deepslate_tuff_chiseled_top.png",
+        "mcl_deepslate_tuff_chiseled_top.png",
+        "mcl_deepslate_tuff_chiseled.png"
+      ]
+    },
+    "mcl_deepslate:tuff_chiseled_bricks": {
+      "textures": [
+        "mcl_deepslate_tuff_chiseled_bricks_top.png",
+        "mcl_deepslate_tuff_chiseled_bricks_top.png",
+        "mcl_deepslate_tuff_chiseled_bricks.png"
+      ]
+    },
+    "mcl_dripstone:dripstone_block": {
+      "textures": [
+        "dripstone_block.png"
+      ]
+    },
+    "mcl_enchanting:table": {
+      "textures": [
+        "mcl_enchanting_table_top.png",
+        "mcl_enchanting_table_bottom.png",
+        "mcl_enchanting_table_side.png",
+        "mcl_enchanting_table_side.png",
+        "mcl_enchanting_table_side.png",
+        "mcl_enchanting_table_side.png"
+      ]
+    },
+    "mcl_end:end_stone": {
+      "textures": [
+        "mcl_end_end_stone.png"
+      ]
+    },
+    "mcl_end:end_bricks": {
+      "textures": [
+        "mcl_end_end_bricks.png"
+      ]
+    },
+    "mcl_end:purpur_block": {
+      "textures": [
+        "mcl_end_purpur_block.png"
+      ]
+    },
+    "mcl_end:purpur_pillar": {
+      "textures": [
+        "mcl_end_purpur_pillar_top.png",
+        "mcl_end_purpur_pillar_top.png^[transformFY",
+        "mcl_end_purpur_pillar.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_end:end_rod": {
+      "textures": [
+        "mcl_end_end_rod_top.png",
+        "mcl_end_end_rod_bottom.png",
+        "mcl_end_end_rod_side.png",
+        "mcl_end_end_rod_side.png",
+        "mcl_end_end_rod_side.png",
+        "mcl_end_end_rod_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_end:dragon_egg": {
+      "textures": [
+        "mcl_end_dragon_egg.png",
+        "mcl_end_dragon_egg.png",
+        "mcl_end_dragon_egg.png",
+        "mcl_end_dragon_egg.png",
+        "mcl_end_dragon_egg.png",
+        "mcl_end_dragon_egg.png"
+      ]
+    },
+    "mcl_end:chorus_plant": {
+      "textures": [
+        "mcl_end_chorus_plant.png",
+        "mcl_end_chorus_plant.png",
+        "mcl_end_chorus_plant.png",
+        "mcl_end_chorus_plant.png",
+        "mcl_end_chorus_plant.png",
+        "mcl_end_chorus_plant.png"
+      ]
+    },
+    "mcl_farming:beetroot_0": {
+      "textures": [
+        "mcl_farming_beetroot_0.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:beetroot_1": {
+      "textures": [
+        "mcl_farming_beetroot_1.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:beetroot_2": {
+      "textures": [
+        "mcl_farming_beetroot_2.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:beetroot": {
+      "textures": [
+        "mcl_farming_beetroot_3.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:carrot": {
+      "textures": [
+        "farming_carrot_4.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:potato": {
+      "textures": [
+        "mcl_farming_potatoes_stage_3.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_farming:soil": {
+      "textures": [
+        "mcl_farming_farmland_dry.png",
+        "default_dirt.png"
+      ]
+    },
+    "mcl_farming:soil_wet": {
+      "textures": [
+        "mcl_farming_farmland_wet.png",
+        "default_dirt.png"
+      ]
+    },
+    "mcl_farming:hay_block": {
+      "textures": [
+        "mcl_farming_hayblock_top.png",
+        "mcl_farming_hayblock_top.png",
+        "mcl_farming_hayblock_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_fire:fire": {
+      "textures": [
+        "fire_basic_flame_animated.png"
+      ]
+    },
+    "mcl_fire:eternal_fire": {
+      "textures": [
+        "fire_basic_flame_animated.png"
+      ]
+    },
+    "mcl_fletching_table:fletching_table": {
+      "textures": [
+        "fletching_table_top.png",
+        "fletching_table_bottom.png",
+        "fletching_table_front.png",
+        "fletching_table_front.png",
+        "fletching_table_side.png",
+        "fletching_table_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_flowers:waterlily": {
+      "textures": [
+        "flowers_waterlily.png",
+        "flowers_waterlily.png^[transformFY"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_grindstone:grindstone": {
+      "textures": [
+        "grindstone_top.png",
+        "grindstone_top.png",
+        "grindstone_side.png",
+        "grindstone_side.png",
+        "grindstone_front.png",
+        "grindstone_front.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_honey:honeycomb_block": {
+      "textures": [
+        "mcl_honey_honeycomb_block.png"
+      ]
+    },
+    "mcl_honey:honey_block": {
+      "textures": [
+        "mcl_honey_block_side.png"
+      ]
+    },
+    "mcl_loom:loom": {
+      "textures": [
+        "loom_top.png",
+        "loom_bottom.png",
+        "loom_side.png",
+        "loom_side.png",
+        "loom_side.png",
+        "loom_front.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_lush_caves:dripleaf_small_stem": {
+      "textures": [
+        "mcl_lush_caves_dripleaf_small.png"
+      ],
+      "paramtype2": "4dir"
+    },
+    "mcl_lush_caves:dripleaf_small": {
+      "textures": [
+        "mcl_lush_caves_dripleaf_small.png"
+      ],
+      "paramtype2": "4dir"
+    },
+    "mcl_lush_caves:dripleaf_big_stem": {
+      "textures": [
+        "mcl_lush_caves_dripleaf_big.png"
+      ],
+      "paramtype2": "4dir"
+    },
+    "mcl_lush_caves:moss": {
+      "textures": [
+        "mcl_lush_caves_moss_block.png"
+      ]
+    },
+    "mcl_lush_caves:moss_carpet": {
+      "textures": [
+        "mcl_lush_caves_moss_carpet.png"
+      ]
+    },
+    "mcl_lush_caves:hanging_roots": {
+      "textures": [
+        "mcl_lush_caves_hanging_roots.png"
+      ]
+    },
+    "mcl_lush_caves:cave_vines": {
+      "textures": [
+        "mcl_lush_caves_cave_vines.png"
+      ]
+    },
+    "mcl_lush_caves:cave_vines_lit": {
+      "textures": [
+        "mcl_lush_caves_cave_vines_lit.png"
+      ]
+    },
+    "mcl_lush_caves:rooted_dirt": {
+      "textures": [
+        "mcl_lush_caves_rooted_dirt.png"
+      ]
+    },
+    "mcl_lush_caves:spore_blossom": {
+      "textures": [
+        "mcl_lush_caves_spore_blossom_base.png",
+        "mcl_lush_caves_spore_blossom.png"
+      ]
+    },
+    "mcl_mangrove:mangrove_roots": {
+      "textures": [
+        "mcl_mangrove_roots_top.png",
+        "mcl_mangrove_roots_side.png",
+        "mcl_mangrove_roots_side.png"
+      ]
+    },
+    "mcl_mangrove:propagule": {
+      "textures": [
+        "mcl_mangrove_propagule_item.png"
+      ]
+    },
+    "mcl_mangrove:mangrove_mud_roots": {
+      "textures": [
+        "mcl_mud.png^mcl_mangrove_roots_top.png",
+        "mcl_mud.png^mcl_mangrove_roots_side.png",
+        "mcl_mud.png^mcl_mangrove_roots_side.png"
+      ]
+    },
+    "mcl_mobspawners:spawner": {
+      "textures": [
+        "mob_spawner.png"
+      ]
+    },
+    "mcl_mud:mud": {
+      "textures": [
+        "mcl_mud.png"
+      ]
+    },
+    "mcl_mud:packed_mud": {
+      "textures": [
+        "mcl_mud_packed_mud.png"
+      ]
+    },
+    "mcl_mud:mud_bricks": {
+      "textures": [
+        "mcl_mud_bricks.png"
+      ]
+    },
+    "mcl_mushrooms:mushroom_brown": {
+      "textures": [
+        "farming_mushroom_brown.png"
+      ]
+    },
+    "mcl_mushrooms:mushroom_red": {
+      "textures": [
+        "farming_mushroom_red.png"
+      ]
+    },
+    "mcl_nether:glowstone": {
+      "textures": [
+        "mcl_nether_glowstone.png"
+      ]
+    },
+    "mcl_nether:quartz_ore": {
+      "textures": [
+        "mcl_nether_quartz_ore.png"
+      ]
+    },
+    "mcl_nether:ancient_debris": {
+      "textures": [
+        "mcl_nether_ancient_debris_top.png",
+        "mcl_nether_ancient_debris_side.png"
+      ]
+    },
+    "mcl_nether:netheriteblock": {
+      "textures": [
+        "mcl_nether_netheriteblock.png"
+      ]
+    },
+    "mcl_nether:netherrack": {
+      "textures": [
+        "mcl_nether_netherrack.png"
+      ]
+    },
+    "mcl_nether:magma": {
+      "textures": [
+        "mcl_nether_magma.png"
+      ]
+    },
+    "mcl_nether:soul_sand": {
+      "textures": [
+        "mcl_nether_soul_sand.png"
+      ]
+    },
+    "mcl_nether:nether_wart_block": {
+      "textures": [
+        "mcl_nether_nether_wart_block.png"
+      ]
+    },
+    "mcl_nether:quartz_block": {
+      "textures": [
+        "mcl_nether_quartz_block_top.png",
+        "mcl_nether_quartz_block_bottom.png",
+        "mcl_nether_quartz_block_side.png"
+      ]
+    },
+    "mcl_nether:quartz_chiseled": {
+      "textures": [
+        "mcl_nether_quartz_chiseled_top.png",
+        "mcl_nether_quartz_chiseled_top.png",
+        "mcl_nether_quartz_chiseled_side.png"
+      ]
+    },
+    "mcl_nether:quartz_pillar": {
+      "textures": [
+        "mcl_nether_quartz_pillar_top.png",
+        "mcl_nether_quartz_pillar_top.png^[transformFY",
+        "mcl_nether_quartz_pillar_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_nether:quartz_smooth": {
+      "textures": [
+        "mcl_nether_quartz_block_bottom.png"
+      ]
+    },
+    "mcl_nether:nether_wart_0": {
+      "textures": [
+        "mcl_nether_nether_wart_stage_0.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_nether:nether_wart_1": {
+      "textures": [
+        "mcl_nether_nether_wart_stage_1.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_nether:nether_wart_2": {
+      "textures": [
+        "mcl_nether_nether_wart_stage_1.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_nether:nether_wart": {
+      "textures": [
+        "mcl_nether_nether_wart_stage_2.png"
+      ],
+      "paramtype2": "meshoptions"
+    },
+    "mcl_ocean:dried_kelp_block": {
+      "textures": [
+        "mcl_ocean_dried_kelp_top.png",
+        "mcl_ocean_dried_kelp_bottom.png",
+        "mcl_ocean_dried_kelp_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_ocean:sea_lantern": {
+      "textures": [
+        "mcl_ocean_sea_lantern.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_ocean:prismarine": {
+      "textures": [
+        "mcl_ocean_prismarine_anim.png"
+      ]
+    },
+    "mcl_ocean:prismarine_brick": {
+      "textures": [
+        "mcl_ocean_prismarine_bricks.png"
+      ]
+    },
+    "mcl_ocean:prismarine_dark": {
+      "textures": [
+        "mcl_ocean_prismarine_dark.png"
+      ]
+    },
+    "mcl_pale_oak:pale_moss": {
+      "textures": [
+        "mcl_pale_oak_moss.png"
+      ]
+    },
+    "mcl_pale_oak:pale_moss_carpet": {
+      "textures": [
+        "mcl_pale_oak_moss.png"
+      ]
+    },
+    "mcl_pale_oak:block_of_resin": {
+      "textures": [
+        "mcl_pale_oak_resin_block.png"
+      ]
+    },
+    "mcl_pale_oak:resin_brick_block": {
+      "textures": [
+        "mcl_pale_oak_resin_brick_block.png"
+      ]
+    },
+    "mcl_pale_oak:chiseled_resin_brick": {
+      "textures": [
+        "mcl_pale_oak_chiseled_resin_bricks.png"
+      ]
+    },
+    "mcl_portals:portal_end": {
+      "textures": [
+        "mcl_portals_end_portal.png",
+        "mcl_portals_end_portal.png",
+        "blank.png"
+      ]
+    },
+    "mcl_portals:end_portal_frame": {
+      "textures": [
+        "mcl_portals_endframe_top.png",
+        "mcl_portals_endframe_bottom.png",
+        "mcl_portals_endframe_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_portals:end_portal_frame_eye": {
+      "textures": [
+        "mcl_portals_endframe_top.png^[lowpart:75:mcl_portals_endframe_eye.png",
+        "mcl_portals_endframe_bottom.png",
+        "mcl_portals_endframe_eye.png^mcl_portals_endframe_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_portals:portal": {
+      "textures": [
+        "blank.png",
+        "blank.png",
+        "blank.png",
+        "blank.png",
+        "mcl_portals_portal.png",
+        "mcl_portals_portal.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_pottery_sherds:pot": {
+      "textures": [
+        "mcl_pottery_sherds_pot_top.png",
+        "mcl_pottery_sherds_pot_bottom.png",
+        "mcl_pottery_sherds_pot_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_powder_snow:powder_snow": {
+      "textures": [
+        "powder_snow.png"
+      ]
+    },
+    "mcl_sculk:sculk": {
+      "textures": [
+        "mcl_sculk_sculk.png"
+      ]
+    },
+    "mcl_sculk:vein": {
+      "textures": [
+        "mcl_sculk_vein.png"
+      ],
+      "paramtype2": "wallmounted"
+    },
+    "mcl_sculk:catalyst": {
+      "textures": [
+        "mcl_sculk_catalyst_top.png",
+        "mcl_sculk_catalyst_bottom.png",
+        "mcl_sculk_catalyst_side.png"
+      ]
+    },
+    "mcl_sculk:sensor": {
+      "textures": [
+        "mcl_sculk_sensor_top.png",
+        "mcl_sculk_sensor_bottom.png",
+        "mcl_sculk_sensor_side.png"
+      ]
+    },
+    "mcl_sculk:shrieker": {
+      "textures": [
+        "mcl_sculk_shrieker_top.png",
+        "mcl_sculk_shrieker_bottom.png",
+        "mcl_sculk_shrieker_side.png"
+      ]
+    },
+    "mcl_smithing_table:table": {
+      "textures": [
+        "mcl_smithing_table_top.png",
+        "mcl_smithing_table_bottom.png",
+        "mcl_smithing_table_side.png",
+        "mcl_smithing_table_side.png",
+        "mcl_smithing_table_side.png",
+        "mcl_smithing_table_front.png"
+      ]
+    },
+    "mcl_sponges:sponge": {
+      "textures": [
+        "mcl_sponges_sponge.png"
+      ]
+    },
+    "mcl_sponges:sponge_wet": {
+      "textures": [
+        "mcl_sponges_sponge_wet.png"
+      ]
+    },
+    "mcl_sponges:sponge_wet_river_water": {
+      "textures": [
+        "mcl_sponges_sponge_wet_river_water.png"
+      ]
+    },
+    "mcl_stonecutter:stonecutter": {
+      "textures": [
+        "mcl_stonecutter_top.png",
+        "mcl_stonecutter_bottom.png",
+        "mcl_stonecutter_side.png",
+        "mcl_stonecutter_side.png",
+        "mcl_stonecutter_saw.png",
+        "mcl_stonecutter_saw.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_tnt:tnt": {
+      "textures": [
+        "default_tnt_top.png",
+        "default_tnt_bottom.png",
+        "default_tnt_side.png",
+        "default_tnt_side.png",
+        "default_tnt_side.png",
+        "default_tnt_side.png"
+      ]
+    },
+    "mcl_tools:heavy_core": {
+      "textures": [
+        "mcl_tools_heavy_core_top.png",
+        "mcl_tools_heavy_core_bottom.png",
+        "mcl_tools_heavy_core_side.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_levelgen:jigsaw_block": {
+      "textures": [
+        "mcl_levelgen_jigsaw_block_top.png",
+        "mcl_levelgen_jigsaw_block_bottom.png",
+        "mcl_levelgen_jigsaw_block_side_north.png",
+        "mcl_levelgen_jigsaw_block_side_north.png",
+        "mcl_levelgen_jigsaw_block_side_north.png",
+        "mcl_levelgen_jigsaw_block_side_south.png"
+      ],
+      "paramtype2": "facedir"
+    },
+    "mcl_villages:no_paths": {
+      "textures": [
+        "mcl_core_barrier.png"
+      ]
+    },
+    "mcl_villages:path_endpoint": {
+      "textures": [
+        "wool_white.png"
+      ]
+    },
+    "mcl_villages:demo_poi": {
+      "textures": [
+        "blank.png"
+      ]
+    }
+  }
+}
