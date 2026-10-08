@@ -128,10 +128,23 @@ jobs:
               await page.waitForSelector('#sheet.open', { timeout: 10000 });
               await page.waitForTimeout(700);
               await capture(page, `detail-${t.name}-fold`);
-              await page.locator('#close').click();
-              await page.waitForSelector('#sheet.open', { state: 'detached', timeout: 5000 }).catch(async () => {
-                await page.waitForFunction(() => !document.querySelector('#sheet')?.classList.contains('open'), null, { timeout: 5000 });
-              });
+              try {
+                await page.locator('#open3dPreview').evaluate(el => el.click());
+                await page.waitForSelector('#preview3d.open', { timeout: 10000 });
+                await page.waitForTimeout(800);
+                await capture(page, `preview3d-block-${t.name}-fold`);
+                const surfaceToggle = page.locator('#preview3dSurfaceToggle');
+                if (await surfaceToggle.isVisible().catch(() => false)) {
+                  await surfaceToggle.evaluate(el => el.click());
+                  await page.waitForTimeout(600);
+                  await capture(page, `preview3d-surface-${t.name}-fold`);
+                }
+                await page.locator('#preview3dClose').evaluate(el => el.click());
+              } catch (err) {
+                stateErrors.push('preview3d: ' + String(err));
+              }
+
+              await page.evaluate(() => document.querySelector('#sheet')?.classList.remove('open'));
             } catch (err) {
               stateErrors.push('detail: ' + String(err));
             }
