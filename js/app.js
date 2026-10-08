@@ -2048,30 +2048,35 @@ function setupCompactMobileDetail(){
   const compact=document.createElement('div');
   compact.className='compactDetail';
   compact.innerHTML=`
-    <div class="compactMain" id="compactMain"></div>
-    <div class="compactSection" data-section="downloads">
-      <button class="compactSectionHead" type="button"><span>İndir</span><span>Orijinal / Yeni</span><i>⌄</i></button>
-      <div class="compactSectionBody compactTwo" id="compactDownloads"></div>
+    <div class="compactActionTray" id="compactActionTray">
+      <div class="compactSection" data-section="downloads">
+        <div class="compactSectionBody compactTwo" id="compactDownloads"></div>
+      </div>
+      <div class="compactSection" data-section="seam">
+        <div class="compactSectionBody" id="compactSeam"></div>
+      </div>
+      <div class="compactSection" data-section="tools">
+        <div class="compactSectionBody compactTools" id="compactTools"></div>
+      </div>
+      <div class="compactSection" data-section="ai">
+        <div class="compactSectionBody" id="compactAi"></div>
+      </div>
+      <div class="compactSection compactAnimSection" data-section="anim">
+        <div class="compactSectionBody" id="compactAnim"></div>
+      </div>
+      <div class="compactSection" data-section="advanced">
+        <div class="compactSectionBody" id="compactAdvanced"></div>
+      </div>
     </div>
-    <div class="compactSection" data-section="seam">
-      <button class="compactSectionHead" type="button"><span>Seam</span><span>Offset araçları</span><i>⌄</i></button>
-      <div class="compactSectionBody" id="compactSeam"></div>
-    </div>
-    <div class="compactSection" data-section="tools">
-      <button class="compactSectionHead" type="button"><span>Araçlar</span><span>Varyant · UV · 3D</span><i>⌄</i></button>
-      <div class="compactSectionBody compactTools" id="compactTools"></div>
-    </div>
-    <div class="compactSection" data-section="ai">
-      <button class="compactSectionHead" type="button"><span>AI</span><span>Prompt üretimi</span><i>⌄</i></button>
-      <div class="compactSectionBody" id="compactAi"></div>
-    </div>
-    <div class="compactSection compactAnimSection" data-section="anim">
-      <button class="compactSectionHead" type="button"><span>Animasyon</span><span>Atlas araçları</span><i>⌄</i></button>
-      <div class="compactSectionBody" id="compactAnim"></div>
-    </div>
-    <div class="compactSection" data-section="advanced">
-      <button class="compactSectionHead" type="button"><span>Gelişmiş</span><span>Sıfırla / açıklama</span><i>⌄</i></button>
-      <div class="compactSectionBody" id="compactAdvanced"></div>
+    <div class="compactThumbDock" id="compactThumbDock">
+      <div class="compactPrimaryDock" id="compactMain"></div>
+      <div class="compactModeRow">
+        <button class="compactMode" type="button" data-open-section="downloads">İndir</button>
+        <button class="compactMode" type="button" data-open-section="seam">Seam</button>
+        <button class="compactMode" type="button" data-open-section="tools">Araçlar</button>
+        <button class="compactMode" type="button" data-open-section="ai">AI</button>
+        <button class="compactMode compactMore" type="button" data-open-section="advanced" aria-label="Gelişmiş">•••</button>
+      </div>
     </div>`;
   actions.before(compact);
 
@@ -2098,13 +2103,18 @@ function setupCompactMobileDetail(){
   actions.style.display='none';
   drawer.dataset.compactDetailReady='1';
 
-  compact.querySelectorAll('.compactSectionHead').forEach(head=>{
-    head.addEventListener('click',()=>{
-      const section=head.closest('.compactSection');
-      const open=!section.classList.contains('open');
-      compact.querySelectorAll('.compactSection.open').forEach(x=>{if(x!==section)x.classList.remove('open')});
-      section.classList.toggle('open',open);
-    });
+  const setCompactSection=name=>{
+    const selected=compact.querySelector('.compactSection[data-section="'+name+'"]');
+    const active=selected?.classList.contains('open');
+    compact.querySelectorAll('.compactSection.open').forEach(x=>x.classList.remove('open'));
+    compact.querySelectorAll('.compactMode.active').forEach(x=>x.classList.remove('active'));
+    if(!active&&selected){
+      selected.classList.add('open');
+      compact.querySelector('.compactMode[data-open-section="'+name+'"]')?.classList.add('active');
+    }
+  };
+  compact.querySelectorAll('.compactMode').forEach(btn=>{
+    btn.addEventListener('click',()=>setCompactSection(btn.dataset.openSection));
   });
 }
 
