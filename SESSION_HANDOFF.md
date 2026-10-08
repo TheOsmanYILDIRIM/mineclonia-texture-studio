@@ -1,5 +1,14 @@
 # ACTIVE HANDOFF — 2026-10-08
 
+## 3D block preview
+- `js/data/preview3d-profiles.json` now defines block geometry/projection/face-layer relationships; renderer is generic WebGL.
+- Default is orthographic with an optional Ortho/Perspective toggle.
+- Supported multi-face/layer families include grass block/path, mycelium, podzol, crimson/warped nylium, common overworld logs + stripped variants, and crimson/warped stem/hypha families.
+- Grass side composition is face-local: dirt base + shadow/grass overlay. It does **not** change the whole 3D scene background.
+- Add future related blocks by extending the profile JSON rather than adding renderer-specific conditionals. Single-texture blocks use the generic cube fallback.
+- Main commits: `d7322ca`, `d2c2ce4`, `5192eb2`, `cb3518f`, `cc1f142`.
+
+
 Branch: `main` · Production: GitHub Pages. **Do not dispatch Actions for this UV tool.**
 
 ## Current focus — Guarded reusable UV alignment (offline Python)
