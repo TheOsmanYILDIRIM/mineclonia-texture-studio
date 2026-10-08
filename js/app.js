@@ -867,6 +867,12 @@ async function exportProjectBackup(){
 
 /* P0 REFERENCE-FIRST PROMPT SYSTEM — 2026-10-05 */
 const MATERIAL_REFERENCE_DEPENDENCIES=[
+ {test:n=>n==='default_mossycobble.png',refs:['default_cobble.png'],kind:'locked-parent-organic-growth',note:'LOCKED PARENT: use the completed cobblestone texture as the exact underlying stone surface. Add moss only where it grows in joints, damp crevices and selected sheltered stones. Uncovered stones remain pixel-for-pixel unchanged. Moss may cover or locally weather its contact zones. Do not redesign the cobblestone pattern.'},
+ {test:n=>n==='mcl_core_stonebrick_mossy.png',refs:['default_stone_brick.png'],kind:'locked-parent-organic-growth',note:'LOCKED PARENT: keep the completed stone-brick layout and untouched faces identical. Add moss within mortar joints, damp cracks and selected sheltered surfaces; do not regenerate the masonry.'},
+ {test:n=>n==='mcl_core_stonebrick_cracked.png',refs:['default_stone_brick.png'],kind:'locked-parent-fracture',note:'LOCKED PARENT: retain intact stone-brick surfaces and joint geometry; create convincing fractures, chipped edges and local displacement only where damage occurs. Unaffected parent stone stays unchanged.'},
+ {test:n=>n==='mcl_deepslate_bricks_cracked.png',refs:['mcl_deepslate_bricks.png'],kind:'locked-parent-fracture',note:'LOCKED PARENT: preserve the completed deepslate brick pattern outside newly fractured regions. Local cracks and chips may strongly disrupt only affected areas.'},
+ {test:n=>n==='mcl_deepslate_tiles_cracked.png',refs:['mcl_deepslate_tiles.png'],kind:'locked-parent-fracture',note:'LOCKED PARENT: preserve the completed deepslate tile pattern outside local fractures; keep undamaged tile surfaces and seams unchanged.'},
+ {test:n=>n==='mcl_core_crying_obsidian.png',refs:['mcl_core_obsidian.png'],kind:'locked-parent-seepage',note:'LOCKED PARENT: retain the completed obsidian texture wherever untouched. Introduce luminous violet seepage, fissures and wet streaks only in localized affected zones; do not rebuild the entire obsidian material.'},
  {test:n=>n==='mcl_core_grass_block_side_overlay.png',refs:['mcl_core_grass_block_top.png'],kind:'runtime-composite',note:'Mineclonia overlays this tintable grass edge over default_dirt; top grass is the material-continuity reference.'},
  {test:n=>/^mcl_core_(coal|iron|gold|diamond|lapis|emerald|redstone)_ore\.png$/.test(n),refs:['default_stone.png'],kind:'host-material',note:'Mineclonia registers these as stone-with-ore nodes; use the finished Mineclonia stone as the authoritative host-rock appearance.'},
  {test:n=>n==='mcl_copper_ore.png',refs:['default_stone.png'],kind:'runtime-composite',note:'Mineclonia explicitly renders Copper Ore as default_stone.png ^ mcl_copper_ore.png.'},
@@ -887,6 +893,7 @@ This asset has a verified Mineclonia material dependency.
 Reference texture(s): ${names}.
 Use the finished/generated version of the referenced Mineclonia texture as the authoritative material-family reference when creating this asset's visual reference.
 Preserve this target asset's own gameplay role and geometry; inherit only the physically shared host/base material identity, scale, microstructure, weathering, roughness and value behavior.
+${d.kind.startsWith("locked-parent-")?"LOCKED PARENT RULE: Treat the completed parent texture as the actual unchanged base image, not merely a stylistic suggestion. Preserve every unaffected parent pixel, pattern, edge, material value and lighting. The derived material may alter only local regions physically affected by its added moss, cracks or seepage. Build the derived texture from the parent image itself.":"Host-material continuity applies according to the dependency type."}
 Do not treat the reference as a generic Minecraft assumption. This relationship is specific to Mineclonia.
 Dependency type: ${d.kind}.
 ${d.note}`;
