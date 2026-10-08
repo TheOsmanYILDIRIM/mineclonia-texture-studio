@@ -2137,8 +2137,8 @@ function setupCompactMobileDetail(){
       const list=(filtered&&filtered.length?filtered:CATALOG)||[];
       const idx=list.findIndex(x=>x?.path===active?.path);
       if(idx<0)return;
-      const nextIdx=dx<0?idx+1:idx-1;
-      if(nextIdx<0||nextIdx>=list.length){toast(dx<0?'Son texture':'İlk texture');return}
+      const nextIdx=dx<0?idx-1:idx+1;
+      if(nextIdx<0||nextIdx>=list.length){toast(dx<0?'İlk texture':'Son texture');return}
       openDetail(list[nextIdx]);return
     }
     if(claimed)gestureSuppressClickUntil=performance.now()+150;
