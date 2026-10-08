@@ -12,6 +12,7 @@
  const entityPreviewRole=x=>String(runtimeRoleInfo?.(x)?.role||'');
  const canEntity=x=>{if(!x||assetTypeOf(x)!=='Entity'||!entityModelFile(x))return false;const r=entityPreviewRole(x);return /^Entity /.test(r)&&!/(Overlay|Layer|Marking|Equipment|Effect|Particle|Template|Mask)/.test(r)};
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
+ const canSurface=x=>!!x&&assetTypeOf(x)!=='Entity';
  let entityGL=null,variantSession=null;
 
  const FACE_SUFFIX_RULES=[
@@ -401,6 +402,30 @@
   entityGL={canvas,gl,program,pb,tb,ib,tex,count:indices.length,indexType,uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s')};drawEntityGL();
  }
 
+ async function alphaInfo(meta){
+  try{
+    const blob=await displayBlob(meta.path),cv=await decodeBlobToCanvas(blob),g=cv.getContext('2d',{willReadFrequently:true}),d=g.getImageData(0,0,cv.width,cv.height).data;
+    let transparent=0,semi=0,total=d.length/4;
+    for(let i=3;i<d.length;i+=4){const a=d[i];if(a<250)transparent++;if(a>8&&a<247)semi++}
+    return {hasAlpha:transparent>Math.max(2,total*.002),hasSemi:semi>Math.max(2,total*.001)};
+  }catch{return {hasAlpha:false,hasSemi:false}}
+ }
+ async function makeSurface(meta){
+  const wrap=document.createElement('div');wrap.className='preview3dSurface';
+  const blob=await displayBlob(meta.path),url=URL.createObjectURL(blob);
+  const backdrop=document.createElement('div');backdrop.className='preview3dSurfaceBackdrop';
+  const front=document.createElement('div');front.className='preview3dSurfaceFace front';front.style.backgroundImage=`url("${url}")`;
+  const back=document.createElement('div');back.className='preview3dSurfaceFace back';back.style.backgroundImage=`url("${url}")`;
+  const edge=document.createElement('div');edge.className='preview3dSurfaceEdge';
+  wrap.append(backdrop,front,back,edge);
+  wrap._textureUrl=url;
+  return wrap;
+ }
+ async function renderSurface(meta){
+  cleanupEntityGL();scene.style.display='';scene.innerHTML='';
+  const surface=await makeSurface(meta);scene.appendChild(surface);
+  const ai=await alphaInfo(meta);stage.classList.toggle('alphaAware',ai.hasAlpha||ai.hasSemi);
+ }
  function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
  function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
  async function renderObject(meta){
@@ -415,23 +440,34 @@
  async function render(){
   if(!active)return;
   document.getElementById('preview3dMeta').textContent=active.name;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),entity=canEntity(active);
-  obj.textContent=entity?'Entity':'Obje';w.disabled=entity||!canWorld(active);w.style.display=entity?'none':'';
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),entity=canEntity(active),object=canObject(active),surface=canSurface(active);
+  obj.textContent=entity?'Entity':'Obje';
+  obj.style.display=(entity||object)?'':'none';
+  w.disabled=entity||!canWorld(active);w.style.display=entity||!canWorld(active)?'none':'';
+  if(surfaceBtn){surfaceBtn.hidden=entity||!surface;surfaceBtn.classList.toggle('active',mode==='surface');surfaceBtn.setAttribute('aria-label',mode==='surface'?'Blok/obje görünümüne geç':'İnce yüzey görünümüne geç')}
   obj.classList.toggle('primary',mode==='object');w.classList.toggle('primary',mode==='world');
+  stage.classList.remove('alphaAware');
   if(entity){mode='object';await renderEntity(active);resetView();return}
-  cleanupEntityGL();if(mode==='world'&&!canWorld(active))mode='object';
-  if(mode==='world')await renderWorld(active);else await renderObject(active);resetView();
+  cleanupEntityGL();
+  if(mode==='surface'&&surface){await renderSurface(active);resetView();return}
+  if(!object&&surface){mode='surface';await renderSurface(active);resetView();return}
+  if(mode==='world'&&!canWorld(active))mode='object';
+  if(mode==='world')await renderWorld(active);else await renderObject(active);
+  const ai=await alphaInfo(active);stage.classList.toggle('alphaAware',ai.hasAlpha||ai.hasSemi);
+  resetView();
  }
  async function open(){
   if(!active)return;
-  if(!canObject(active)&&!canEntity(active)){toast(assetTypeOf(active)==='Entity'?'Bu entity için henüz gerçek Mineclonia .b3d mesh eşleşmesi yok':'3D önizleme şu an blok ve eşleşmiş entity modelleri için');return}
-  mode='object';root.classList.add('open');await render();
+  if(!canObject(active)&&!canEntity(active)&&!canSurface(active)){toast('Bu texture için 3D önizleme yok');return}
+  mode=canObject(active)||canEntity(active)?'object':'surface';
+  root.classList.add('open');await render();
  }
- function close(){root.classList.remove('open');cleanupEntityGL();scene.innerHTML='';variantSession=null;renderVariantStrip();pointers.clear();lastPinch=0}
+ function close(){root.classList.remove('open');cleanupEntityGL();for(const n of scene.querySelectorAll('.preview3dSurface')){if(n._textureUrl)try{URL.revokeObjectURL(n._textureUrl)}catch{}}scene.innerHTML='';stage.classList.remove('alphaAware');variantSession=null;renderVariantStrip();pointers.clear();lastPinch=0}
  document.getElementById('preview3dClose').addEventListener('click',close);
  document.getElementById('preview3dReset').addEventListener('click',resetView);
  document.getElementById('preview3dObject').addEventListener('click',async()=>{mode='object';await render()});
  document.getElementById('preview3dWorld').addEventListener('click',async()=>{if(!canWorld(active))return;mode='world';await render()});
+ document.getElementById('preview3dSurfaceToggle')?.addEventListener('click',async()=>{if(!active||!canSurface(active))return;mode=mode==='surface'?(canObject(active)?'object':'surface'):'surface';await render()});
 
  stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
  stage.addEventListener('pointermove',e=>{
@@ -447,7 +483,7 @@
   if(!canEntity(meta))throw Error('Bu UV map için gerçek Mineclonia .b3d mesh eşleşmesi yok');
   variantSession=Array.isArray(variants)&&variants.length?{meta,variants,index:Math.max(0,Math.min(index,variants.length-1))}:null;
   mode='object';root.classList.add('open');document.getElementById('preview3dMeta').textContent=meta.name+' · '+label;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld');obj.textContent='Entity';w.style.display='none';
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),s=document.getElementById('preview3dSurfaceToggle');obj.textContent='Entity';w.style.display='none';if(s)s.hidden=true;
   await renderEntity(meta,variantSession?variantSession.variants[variantSession.index].blob:blob);resetView();renderVariantStrip();
  }
  function canVariant3D(meta){return canEntity(meta)}
