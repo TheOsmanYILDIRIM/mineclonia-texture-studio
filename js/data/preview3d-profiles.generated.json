@@ -11,6 +11,7 @@
         ]
       },
       "node": "mcl_noteblock:noteblock",
+      "texture_base": "ITEMS/REDSTONE",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -54,6 +55,7 @@
         ]
       },
       "node": "mcl_redstone_torch:redstoneblock",
+      "texture_base": "ITEMS/REDSTONE",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -97,6 +99,7 @@
         ]
       },
       "node": "mcl_amethyst:amethyst_block",
+      "texture_base": "ITEMS/mcl_amethyst",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -140,6 +143,7 @@
         ]
       },
       "node": "mcl_amethyst:budding_amethyst_block",
+      "texture_base": "ITEMS/mcl_amethyst",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -183,6 +187,7 @@
         ]
       },
       "node": "mcl_amethyst:calcite",
+      "texture_base": "ITEMS/mcl_amethyst",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -226,6 +231,7 @@
         ]
       },
       "node": "mcl_amethyst:tinted_glass",
+      "texture_base": "ITEMS/mcl_amethyst",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -269,6 +275,7 @@
         ]
       },
       "node": "mcl_amethyst:amethyst_cluster",
+      "texture_base": "ITEMS/mcl_amethyst",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -313,6 +320,7 @@
         ]
       },
       "node": "mcl_armor_stand:armor_stand",
+      "texture_base": "ITEMS/mcl_armor_stand",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -356,6 +364,7 @@
         ]
       },
       "node": "mcl_bamboo:bamboo_mosaic",
+      "texture_base": "ITEMS/mcl_bamboo",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -399,6 +408,7 @@
         ]
       },
       "node": "mcl_banners:standing_banner",
+      "texture_base": "ITEMS/mcl_banners",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -442,6 +452,7 @@
         ]
       },
       "node": "mcl_banners:hanging_banner",
+      "texture_base": "ITEMS/mcl_banners",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -487,6 +498,7 @@
         ]
       },
       "node": "mcl_barrels:barrel_closed",
+      "texture_base": "ITEMS/mcl_barrels",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -535,6 +547,7 @@
         ]
       },
       "node": "mcl_barrels:barrel_open",
+      "texture_base": "ITEMS/mcl_barrels",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -578,6 +591,7 @@
         ]
       },
       "node": "mcl_beacons:beacon",
+      "texture_base": "ITEMS/mcl_beacons",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -621,6 +635,7 @@
         ]
       },
       "node": "mcl_beacons:beacon_beam",
+      "texture_base": "ITEMS/mcl_beacons",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -702,6 +717,7 @@
         ]
       },
       "node": "mcl_beehives:beehive",
+      "texture_base": "ITEMS/mcl_beehives",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -747,6 +763,7 @@
         ]
       },
       "node": "mcl_beehives:beehive_5",
+      "texture_base": "ITEMS/mcl_beehives",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -793,6 +810,7 @@
         ]
       },
       "node": "mcl_beehives:bee_nest",
+      "texture_base": "ITEMS/mcl_beehives",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -839,6 +857,7 @@
         ]
       },
       "node": "mcl_beehives:bee_nest_5",
+      "texture_base": "ITEMS/mcl_beehives",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -883,6 +902,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -926,6 +946,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone_gilded",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -969,6 +990,7 @@
         ]
       },
       "node": "mcl_blackstone:nether_gold",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1013,6 +1035,7 @@
         ]
       },
       "node": "mcl_blackstone:basalt_polished",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1057,6 +1080,7 @@
         ]
       },
       "node": "mcl_blackstone:basalt",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1100,6 +1124,7 @@
         ]
       },
       "node": "mcl_blackstone:basalt_smooth",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1143,6 +1168,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone_polished",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1186,6 +1212,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone_chiseled_polished",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1229,6 +1256,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone_brick_polished",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1272,6 +1300,7 @@
         ]
       },
       "node": "mcl_blackstone:blackstone_brick_polished_cracked",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1315,6 +1344,7 @@
         ]
       },
       "node": "mcl_blackstone:quartz_brick",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1358,6 +1388,7 @@
         ]
       },
       "node": "mcl_blackstone:soul_soil",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1401,6 +1432,7 @@
         ]
       },
       "node": "mcl_blackstone:soul_fire",
+      "texture_base": "ITEMS/mcl_blackstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1445,6 +1477,7 @@
         ]
       },
       "node": "mcl_books:bookshelf",
+      "texture_base": "ITEMS/mcl_books",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1491,6 +1524,7 @@
         ]
       },
       "node": "mcl_cartography_table:cartography_table",
+      "texture_base": "ITEMS/mcl_cartography_table",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1537,6 +1571,7 @@
         ]
       },
       "node": "mcl_cauldrons:cauldron",
+      "texture_base": "ITEMS/mcl_cauldrons",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1586,6 +1621,7 @@
         ]
       },
       "node": "mcl_colorblocks:hardened_clay",
+      "texture_base": "ITEMS/mcl_colorblocks",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1634,6 +1670,7 @@
         ]
       },
       "node": "mcl_compass:lodestone",
+      "texture_base": "ITEMS/mcl_compass",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1679,6 +1716,7 @@
         ]
       },
       "node": "mcl_composters:composter",
+      "texture_base": "ITEMS/mcl_composters",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1728,6 +1766,7 @@
         ]
       },
       "node": "mcl_composters:composter_ready",
+      "texture_base": "ITEMS/mcl_composters",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1774,6 +1813,7 @@
         ]
       },
       "node": "mcl_conduits:conduit",
+      "texture_base": "ITEMS/mcl_conduits",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1818,6 +1858,7 @@
         ]
       },
       "node": "mcl_copper:stone_with_copper",
+      "texture_base": "ITEMS/mcl_copper",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1879,6 +1920,7 @@
         ]
       },
       "node": "mcl_copper:block_raw",
+      "texture_base": "ITEMS/mcl_copper",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1922,6 +1964,7 @@
         ]
       },
       "node": "mcl_core:stone",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -1965,6 +2008,7 @@
         ]
       },
       "node": "mcl_core:stone_with_coal",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2008,6 +2052,7 @@
         ]
       },
       "node": "mcl_core:stone_with_iron",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2051,6 +2096,7 @@
         ]
       },
       "node": "mcl_core:stone_with_gold",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2094,6 +2140,7 @@
         ]
       },
       "node": "mcl_core:stone_with_redstone",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2137,6 +2184,7 @@
         ]
       },
       "node": "mcl_core:stone_with_redstone_lit",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2180,6 +2228,7 @@
         ]
       },
       "node": "mcl_core:stone_with_lapis",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2223,6 +2272,7 @@
         ]
       },
       "node": "mcl_core:stone_with_emerald",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2266,6 +2316,7 @@
         ]
       },
       "node": "mcl_core:stone_with_diamond",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2309,6 +2360,7 @@
         ]
       },
       "node": "mcl_core:stonebrick",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2352,6 +2404,7 @@
         ]
       },
       "node": "mcl_core:stonebrickcarved",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2395,6 +2448,7 @@
         ]
       },
       "node": "mcl_core:stonebrickcracked",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2438,6 +2492,7 @@
         ]
       },
       "node": "mcl_core:stonebrickmossy",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2481,6 +2536,7 @@
         ]
       },
       "node": "mcl_core:stone_smooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2524,6 +2580,7 @@
         ]
       },
       "node": "mcl_core:granite",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2567,6 +2624,7 @@
         ]
       },
       "node": "mcl_core:granite_smooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2610,6 +2668,7 @@
         ]
       },
       "node": "mcl_core:andesite",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2653,6 +2712,7 @@
         ]
       },
       "node": "mcl_core:andesite_smooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2696,6 +2756,7 @@
         ]
       },
       "node": "mcl_core:diorite",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2739,6 +2800,7 @@
         ]
       },
       "node": "mcl_core:diorite_smooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2785,6 +2847,7 @@
         ]
       },
       "node": "mcl_core:dirt_with_grass",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2866,6 +2929,7 @@
         ]
       },
       "node": "mcl_core:grass_path",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2911,6 +2975,7 @@
         ]
       },
       "node": "mcl_core:mycelium",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2956,6 +3021,7 @@
         ]
       },
       "node": "mcl_core:podzol",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -2999,6 +3065,7 @@
         ]
       },
       "node": "mcl_core:dirt",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3042,6 +3109,7 @@
         ]
       },
       "node": "mcl_core:coarse_dirt",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3085,6 +3153,7 @@
         ]
       },
       "node": "mcl_core:gravel",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3128,6 +3197,7 @@
         ]
       },
       "node": "mcl_core:sand",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3173,6 +3243,7 @@
         ]
       },
       "node": "mcl_core:sandstone",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3218,6 +3289,7 @@
         ]
       },
       "node": "mcl_core:sandstonesmooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3263,6 +3335,7 @@
         ]
       },
       "node": "mcl_core:sandstonecarved",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3306,6 +3379,7 @@
         ]
       },
       "node": "mcl_core:sandstonesmooth2",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3349,6 +3423,7 @@
         ]
       },
       "node": "mcl_core:redsand",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3394,6 +3469,7 @@
         ]
       },
       "node": "mcl_core:redsandstone",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3439,6 +3515,7 @@
         ]
       },
       "node": "mcl_core:redsandstonesmooth",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3484,6 +3561,7 @@
         ]
       },
       "node": "mcl_core:redsandstonecarved",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3527,6 +3605,7 @@
         ]
       },
       "node": "mcl_core:redsandstonesmooth2",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3570,6 +3649,7 @@
         ]
       },
       "node": "mcl_core:clay",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3613,6 +3693,7 @@
         ]
       },
       "node": "mcl_core:brick_block",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3656,6 +3737,7 @@
         ]
       },
       "node": "mcl_core:bedrock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3699,6 +3781,7 @@
         ]
       },
       "node": "mcl_core:cobble",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3742,6 +3825,7 @@
         ]
       },
       "node": "mcl_core:mossycobble",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3785,6 +3869,7 @@
         ]
       },
       "node": "mcl_core:coalblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3828,6 +3913,7 @@
         ]
       },
       "node": "mcl_core:ironblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3871,6 +3957,7 @@
         ]
       },
       "node": "mcl_core:goldblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3914,6 +4001,7 @@
         ]
       },
       "node": "mcl_core:diamondblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -3957,6 +4045,7 @@
         ]
       },
       "node": "mcl_core:lapisblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4000,6 +4089,7 @@
         ]
       },
       "node": "mcl_core:emeraldblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4043,6 +4133,7 @@
         ]
       },
       "node": "mcl_core:obsidian",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4087,6 +4178,7 @@
         ]
       },
       "node": "mcl_core:crying_obsidian",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4148,6 +4240,7 @@
         ]
       },
       "node": "mcl_core:ice",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4191,6 +4284,7 @@
         ]
       },
       "node": "mcl_core:packed_ice",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4234,6 +4328,7 @@
         ]
       },
       "node": "mcl_core:blue_ice",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4277,6 +4372,7 @@
         ]
       },
       "node": "mcl_core:snowblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4322,6 +4418,7 @@
         ]
       },
       "node": "mcl_core:cactus",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4365,6 +4462,7 @@
         ]
       },
       "node": "mcl_core:cactus_flower",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4408,6 +4506,7 @@
         ]
       },
       "node": "mcl_core:reeds",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4451,6 +4550,7 @@
         ]
       },
       "node": "mcl_core:vine",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4495,6 +4595,7 @@
         ]
       },
       "node": "mcl_core:glass",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4538,6 +4639,7 @@
         ]
       },
       "node": "mcl_core:water_flowing",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4599,6 +4701,7 @@
         ]
       },
       "node": "mcl_core:water_source",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4642,6 +4745,7 @@
         ]
       },
       "node": "mcl_core:lava_flowing",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4703,6 +4807,7 @@
         ]
       },
       "node": "mcl_core:lava_source",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4747,6 +4852,7 @@
         ]
       },
       "node": "mcl_core:bone_block",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4790,6 +4896,7 @@
         ]
       },
       "node": "mcl_core:slimeblock",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4833,6 +4940,7 @@
         ]
       },
       "node": "mcl_core:cobweb",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4876,6 +4984,7 @@
         ]
       },
       "node": "mcl_core:deadbush",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4919,6 +5028,7 @@
         ]
       },
       "node": "mcl_core:realm_barrier",
+      "texture_base": "ITEMS/mcl_core",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -4965,6 +5075,7 @@
         ]
       },
       "node": "mcl_crafting_table:crafting_table",
+      "texture_base": "ITEMS/mcl_crafting_table",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5008,6 +5119,7 @@
         ]
       },
       "node": "mcl_crimson:warped_fungus",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5051,6 +5163,7 @@
         ]
       },
       "node": "mcl_crimson:nether_sprouts",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5094,6 +5207,7 @@
         ]
       },
       "node": "mcl_crimson:warped_roots",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5137,6 +5251,7 @@
         ]
       },
       "node": "mcl_crimson:warped_wart_block",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5180,6 +5295,7 @@
         ]
       },
       "node": "mcl_crimson:shroomlight",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5225,6 +5341,7 @@
         ]
       },
       "node": "mcl_crimson:warped_nylium",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5280,6 +5397,7 @@
         ]
       },
       "node": "mcl_crimson:crimson_fungus",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5323,6 +5441,7 @@
         ]
       },
       "node": "mcl_crimson:crimson_roots",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5368,6 +5487,7 @@
         ]
       },
       "node": "mcl_crimson:crimson_nylium",
+      "texture_base": "ITEMS/mcl_crimson",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5424,6 +5544,7 @@
         ]
       },
       "node": "mcl_deepslate:deepslate",
+      "texture_base": "ITEMS/mcl_deepslate",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5469,6 +5590,7 @@
         ]
       },
       "node": "mcl_deepslate:deepslate_reinforced",
+      "texture_base": "ITEMS/mcl_deepslate",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5513,6 +5635,7 @@
         ]
       },
       "node": "mcl_deepslate:tuff_chiseled",
+      "texture_base": "ITEMS/mcl_deepslate",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5557,6 +5680,7 @@
         ]
       },
       "node": "mcl_deepslate:tuff_chiseled_bricks",
+      "texture_base": "ITEMS/mcl_deepslate",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5600,6 +5724,7 @@
         ]
       },
       "node": "mcl_dripstone:dripstone_block",
+      "texture_base": "ITEMS/mcl_dripstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5645,6 +5770,7 @@
         ]
       },
       "node": "mcl_enchanting:table",
+      "texture_base": "ITEMS/mcl_enchanting",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5688,6 +5814,7 @@
         ]
       },
       "node": "mcl_end:end_stone",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5731,6 +5858,7 @@
         ]
       },
       "node": "mcl_end:end_bricks",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5774,6 +5902,7 @@
         ]
       },
       "node": "mcl_end:purpur_block",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5818,6 +5947,7 @@
         ]
       },
       "node": "mcl_end:purpur_pillar",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5866,6 +5996,7 @@
         ]
       },
       "node": "mcl_end:end_rod",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5909,6 +6040,7 @@
         ]
       },
       "node": "mcl_end:dragon_egg",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5952,6 +6084,7 @@
         ]
       },
       "node": "mcl_end:chorus_plant",
+      "texture_base": "ITEMS/mcl_end",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -5995,6 +6128,7 @@
         ]
       },
       "node": "mcl_farming:beetroot_0",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6038,6 +6172,7 @@
         ]
       },
       "node": "mcl_farming:beetroot_1",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6081,6 +6216,7 @@
         ]
       },
       "node": "mcl_farming:beetroot_2",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6124,6 +6260,7 @@
         ]
       },
       "node": "mcl_farming:beetroot",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6167,6 +6304,7 @@
         ]
       },
       "node": "mcl_farming:carrot",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6210,6 +6348,7 @@
         ]
       },
       "node": "mcl_farming:potato",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6254,6 +6393,7 @@
         ]
       },
       "node": "mcl_farming:soil",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6298,6 +6438,7 @@
         ]
       },
       "node": "mcl_farming:soil_wet",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6342,6 +6483,7 @@
         ]
       },
       "node": "mcl_farming:hay_block",
+      "texture_base": "ITEMS/mcl_farming",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6385,6 +6527,7 @@
         ]
       },
       "node": "mcl_fire:fire",
+      "texture_base": "ITEMS/mcl_fire",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6428,6 +6571,7 @@
         ]
       },
       "node": "mcl_fire:eternal_fire",
+      "texture_base": "ITEMS/mcl_fire",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6474,6 +6618,7 @@
         ]
       },
       "node": "mcl_fletching_table:fletching_table",
+      "texture_base": "ITEMS/mcl_fletching_table",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6517,6 +6662,7 @@
         ]
       },
       "node": "mcl_flowers:waterlily",
+      "texture_base": "ITEMS/mcl_flowers",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6577,6 +6723,7 @@
         ]
       },
       "node": "mcl_grindstone:grindstone",
+      "texture_base": "ITEMS/mcl_grindstone",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6620,6 +6767,7 @@
         ]
       },
       "node": "mcl_honey:honeycomb_block",
+      "texture_base": "ITEMS/mcl_honey",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6663,6 +6811,7 @@
         ]
       },
       "node": "mcl_honey:honey_block",
+      "texture_base": "ITEMS/mcl_honey",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6709,6 +6858,7 @@
         ]
       },
       "node": "mcl_loom:loom",
+      "texture_base": "ITEMS/mcl_loom",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6752,6 +6902,7 @@
         ]
       },
       "node": "mcl_lush_caves:dripleaf_small_stem",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6795,6 +6946,7 @@
         ]
       },
       "node": "mcl_lush_caves:dripleaf_small",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6838,6 +6990,7 @@
         ]
       },
       "node": "mcl_lush_caves:dripleaf_big_stem",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6881,6 +7034,7 @@
         ]
       },
       "node": "mcl_lush_caves:moss",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6924,6 +7078,7 @@
         ]
       },
       "node": "mcl_lush_caves:moss_carpet",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -6967,6 +7122,7 @@
         ]
       },
       "node": "mcl_lush_caves:hanging_roots",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7010,6 +7166,7 @@
         ]
       },
       "node": "mcl_lush_caves:cave_vines",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7053,6 +7210,7 @@
         ]
       },
       "node": "mcl_lush_caves:cave_vines_lit",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7096,6 +7254,7 @@
         ]
       },
       "node": "mcl_lush_caves:rooted_dirt",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7140,6 +7299,7 @@
         ]
       },
       "node": "mcl_lush_caves:spore_blossom",
+      "texture_base": "ITEMS/mcl_lush_caves",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7184,6 +7344,7 @@
         ]
       },
       "node": "mcl_mangrove:mangrove_roots",
+      "texture_base": "ITEMS/mcl_mangrove",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7227,6 +7388,7 @@
         ]
       },
       "node": "mcl_mangrove:propagule",
+      "texture_base": "ITEMS/mcl_mangrove",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7272,6 +7434,7 @@
         ]
       },
       "node": "mcl_mangrove:mangrove_mud_roots",
+      "texture_base": "ITEMS/mcl_mangrove",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7333,6 +7496,7 @@
         ]
       },
       "node": "mcl_mobspawners:spawner",
+      "texture_base": "ITEMS/mcl_mobspawners",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7376,6 +7540,7 @@
         ]
       },
       "node": "mcl_mud:mud",
+      "texture_base": "ITEMS/mcl_mud",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7419,6 +7584,7 @@
         ]
       },
       "node": "mcl_mud:packed_mud",
+      "texture_base": "ITEMS/mcl_mud",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7462,6 +7628,7 @@
         ]
       },
       "node": "mcl_mud:mud_bricks",
+      "texture_base": "ITEMS/mcl_mud",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7505,6 +7672,7 @@
         ]
       },
       "node": "mcl_mushrooms:mushroom_brown",
+      "texture_base": "ITEMS/mcl_mushrooms",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7548,6 +7716,7 @@
         ]
       },
       "node": "mcl_mushrooms:mushroom_red",
+      "texture_base": "ITEMS/mcl_mushrooms",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7591,6 +7760,7 @@
         ]
       },
       "node": "mcl_nether:glowstone",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7634,6 +7804,7 @@
         ]
       },
       "node": "mcl_nether:quartz_ore",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7678,6 +7849,7 @@
         ]
       },
       "node": "mcl_nether:ancient_debris",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7721,6 +7893,7 @@
         ]
       },
       "node": "mcl_nether:netheriteblock",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7764,6 +7937,7 @@
         ]
       },
       "node": "mcl_nether:netherrack",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7807,6 +7981,7 @@
         ]
       },
       "node": "mcl_nether:magma",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7850,6 +8025,7 @@
         ]
       },
       "node": "mcl_nether:soul_sand",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7893,6 +8069,7 @@
         ]
       },
       "node": "mcl_nether:nether_wart_block",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7938,6 +8115,7 @@
         ]
       },
       "node": "mcl_nether:quartz_block",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -7982,6 +8160,7 @@
         ]
       },
       "node": "mcl_nether:quartz_chiseled",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8026,6 +8205,7 @@
         ]
       },
       "node": "mcl_nether:quartz_pillar",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8072,6 +8252,7 @@
         ]
       },
       "node": "mcl_nether:quartz_smooth",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8115,6 +8296,7 @@
         ]
       },
       "node": "mcl_nether:nether_wart_0",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8158,6 +8340,7 @@
         ]
       },
       "node": "mcl_nether:nether_wart_1",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8201,6 +8384,7 @@
         ]
       },
       "node": "mcl_nether:nether_wart_2",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8244,6 +8428,7 @@
         ]
       },
       "node": "mcl_nether:nether_wart",
+      "texture_base": "ITEMS/mcl_nether",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8289,6 +8474,7 @@
         ]
       },
       "node": "mcl_ocean:dried_kelp_block",
+      "texture_base": "ITEMS/mcl_ocean",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8332,6 +8518,7 @@
         ]
       },
       "node": "mcl_ocean:sea_lantern",
+      "texture_base": "ITEMS/mcl_ocean",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8375,6 +8562,7 @@
         ]
       },
       "node": "mcl_ocean:prismarine",
+      "texture_base": "ITEMS/mcl_ocean",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8418,6 +8606,7 @@
         ]
       },
       "node": "mcl_ocean:prismarine_brick",
+      "texture_base": "ITEMS/mcl_ocean",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8461,6 +8650,7 @@
         ]
       },
       "node": "mcl_ocean:prismarine_dark",
+      "texture_base": "ITEMS/mcl_ocean",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8504,6 +8694,7 @@
         ]
       },
       "node": "mcl_pale_oak:pale_moss",
+      "texture_base": "ITEMS/mcl_pale_oak",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8547,6 +8738,7 @@
         ]
       },
       "node": "mcl_pale_oak:pale_moss_carpet",
+      "texture_base": "ITEMS/mcl_pale_oak",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8590,6 +8782,7 @@
         ]
       },
       "node": "mcl_pale_oak:block_of_resin",
+      "texture_base": "ITEMS/mcl_pale_oak",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8633,6 +8826,7 @@
         ]
       },
       "node": "mcl_pale_oak:resin_brick_block",
+      "texture_base": "ITEMS/mcl_pale_oak",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8676,6 +8870,7 @@
         ]
       },
       "node": "mcl_pale_oak:chiseled_resin_brick",
+      "texture_base": "ITEMS/mcl_pale_oak",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8720,6 +8915,7 @@
         ]
       },
       "node": "mcl_portals:portal_end",
+      "texture_base": "ITEMS/mcl_portals",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8765,6 +8961,7 @@
         ]
       },
       "node": "mcl_portals:end_portal_frame",
+      "texture_base": "ITEMS/mcl_portals",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8811,6 +9008,7 @@
         ]
       },
       "node": "mcl_portals:end_portal_frame_eye",
+      "texture_base": "ITEMS/mcl_portals",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8870,6 +9068,7 @@
         ]
       },
       "node": "mcl_portals:portal",
+      "texture_base": "ITEMS/mcl_portals",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8915,6 +9114,7 @@
         ]
       },
       "node": "mcl_pottery_sherds:pot",
+      "texture_base": "ITEMS/mcl_pottery_sherds",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -8958,6 +9158,7 @@
         ]
       },
       "node": "mcl_powder_snow:powder_snow",
+      "texture_base": "ITEMS/mcl_powder_snow",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9001,6 +9202,7 @@
         ]
       },
       "node": "mcl_sculk:sculk",
+      "texture_base": "ITEMS/mcl_sculk",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9044,6 +9246,7 @@
         ]
       },
       "node": "mcl_sculk:vein",
+      "texture_base": "ITEMS/mcl_sculk",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9089,6 +9292,7 @@
         ]
       },
       "node": "mcl_sculk:catalyst",
+      "texture_base": "ITEMS/mcl_sculk",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9134,6 +9338,7 @@
         ]
       },
       "node": "mcl_sculk:sensor",
+      "texture_base": "ITEMS/mcl_sculk",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9179,6 +9384,7 @@
         ]
       },
       "node": "mcl_sculk:shrieker",
+      "texture_base": "ITEMS/mcl_sculk",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9225,6 +9431,7 @@
         ]
       },
       "node": "mcl_smithing_table:table",
+      "texture_base": "ITEMS/mcl_smithing_table",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9268,6 +9475,7 @@
         ]
       },
       "node": "mcl_sponges:sponge",
+      "texture_base": "ITEMS/mcl_sponges",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9311,6 +9519,7 @@
         ]
       },
       "node": "mcl_sponges:sponge_wet",
+      "texture_base": "ITEMS/mcl_sponges",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9354,6 +9563,7 @@
         ]
       },
       "node": "mcl_sponges:sponge_wet_river_water",
+      "texture_base": "ITEMS/mcl_sponges",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9400,6 +9610,7 @@
         ]
       },
       "node": "mcl_stonecutter:stonecutter",
+      "texture_base": "ITEMS/mcl_stonecutter",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9445,6 +9656,7 @@
         ]
       },
       "node": "mcl_tnt:tnt",
+      "texture_base": "ITEMS/mcl_tnt",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9490,6 +9702,7 @@
         ]
       },
       "node": "mcl_tools:heavy_core",
+      "texture_base": "ITEMS/mcl_tools",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9536,6 +9749,7 @@
         ]
       },
       "node": "mcl_levelgen:jigsaw_block",
+      "texture_base": "MAPGEN/mcl_levelgen",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9579,6 +9793,7 @@
         ]
       },
       "node": "mcl_villages:no_paths",
+      "texture_base": "MAPGEN/mcl_villages",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9622,6 +9837,7 @@
         ]
       },
       "node": "mcl_villages:path_endpoint",
+      "texture_base": "MAPGEN/mcl_villages",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {
@@ -9665,6 +9881,7 @@
         ]
       },
       "node": "mcl_villages:demo_poi",
+      "texture_base": "MAPGEN/mcl_villages",
       "geometry": "cube",
       "projection": "orthographic",
       "faces": {

@@ -13,37 +13,44 @@
     "mcl_noteblock:noteblock": {
       "textures": [
         "mesecons_noteblock.png"
-      ]
+      ],
+      "texture_base": "ITEMS/REDSTONE"
     },
     "mcl_redstone_torch:redstoneblock": {
       "textures": [
         "redstone_redstone_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/REDSTONE"
     },
     "mcl_amethyst:amethyst_block": {
       "textures": [
         "mcl_amethyst_amethyst_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_amethyst"
     },
     "mcl_amethyst:budding_amethyst_block": {
       "textures": [
         "mcl_amethyst_budding_amethyst.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_amethyst"
     },
     "mcl_amethyst:calcite": {
       "textures": [
         "mcl_amethyst_calcite_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_amethyst"
     },
     "mcl_amethyst:tinted_glass": {
       "textures": [
         "mcl_amethyst_tinted_glass.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_amethyst"
     },
     "mcl_amethyst:amethyst_cluster": {
       "textures": [
         "mcl_amethyst_amethyst_cluster.png"
       ],
+      "texture_base": "ITEMS/mcl_amethyst",
       "paramtype2": "wallmounted"
     },
     "mcl_armor_stand:armor_stand": {
@@ -51,22 +58,26 @@
         "default_wood.png",
         "mcl_stairs_stone_slab_top.png"
       ],
+      "texture_base": "ITEMS/mcl_armor_stand",
       "paramtype2": "facedir"
     },
     "mcl_bamboo:bamboo_mosaic": {
       "textures": [
         "mcl_bamboo_bamboo_plank_mosaic.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_bamboo"
     },
     "mcl_banners:standing_banner": {
       "textures": [
         "mcl_banners_fallback_wood.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_banners"
     },
     "mcl_banners:hanging_banner": {
       "textures": [
         "mcl_banners_fallback_wood.png"
       ],
+      "texture_base": "ITEMS/mcl_banners",
       "paramtype2": "wallmounted"
     },
     "mcl_barrels:barrel_closed": {
@@ -75,6 +86,7 @@
         "mcl_barrels_barrel_bottom.png",
         "mcl_barrels_barrel_side.png"
       ],
+      "texture_base": "ITEMS/mcl_barrels",
       "paramtype2": "facedir"
     },
     "mcl_barrels:barrel_open": {
@@ -83,17 +95,20 @@
         "mcl_barrels_barrel_bottom.png",
         "mcl_barrels_barrel_side.png"
       ],
+      "texture_base": "ITEMS/mcl_barrels",
       "paramtype2": "facedir"
     },
     "mcl_beacons:beacon": {
       "textures": [
         "beacon_UV.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_beacons"
     },
     "mcl_beacons:beacon_beam": {
       "textures": [
         "blank.png^[noalpha^[colorize:#b8bab9"
       ],
+      "texture_base": "ITEMS/mcl_beacons",
       "palette": "mcl_dyes_palette.png",
       "paramtype2": "color"
     },
@@ -106,6 +121,7 @@
         "mcl_beehives_beehive_side.png",
         "mcl_beehives_beehive_front.png"
       ],
+      "texture_base": "ITEMS/mcl_beehives",
       "paramtype2": "facedir"
     },
     "mcl_beehives:beehive_5": {
@@ -117,6 +133,7 @@
         "mcl_beehives_beehive_side.png",
         "mcl_beehives_beehive_front_honey.png"
       ],
+      "texture_base": "ITEMS/mcl_beehives",
       "paramtype2": "facedir"
     },
     "mcl_beehives:bee_nest": {
@@ -128,6 +145,7 @@
         "mcl_beehives_bee_nest_side.png",
         "mcl_beehives_bee_nest_front.png"
       ],
+      "texture_base": "ITEMS/mcl_beehives",
       "paramtype2": "facedir"
     },
     "mcl_beehives:bee_nest_5": {
@@ -139,6 +157,7 @@
         "mcl_beehives_bee_nest_side.png",
         "mcl_beehives_bee_nest_front_honey.png"
       ],
+      "texture_base": "ITEMS/mcl_beehives",
       "paramtype2": "facedir"
     },
     "mcl_blackstone:blackstone": {
@@ -146,17 +165,20 @@
         "mcl_blackstone_top.png",
         "mcl_blackstone_top.png",
         "mcl_blackstone_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:blackstone_gilded": {
       "textures": [
         "mcl_blackstone_gilded.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:nether_gold": {
       "textures": [
         "mcl_nether_gold_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:basalt_polished": {
       "textures": [
@@ -164,6 +186,7 @@
         "mcl_blackstone_basalt_top_polished.png",
         "mcl_blackstone_basalt_side_polished.png"
       ],
+      "texture_base": "ITEMS/mcl_blackstone",
       "paramtype2": "facedir"
     },
     "mcl_blackstone:basalt": {
@@ -172,54 +195,64 @@
         "mcl_blackstone_basalt_top.png",
         "mcl_blackstone_basalt_side.png"
       ],
+      "texture_base": "ITEMS/mcl_blackstone",
       "paramtype2": "facedir"
     },
     "mcl_blackstone:basalt_smooth": {
       "textures": [
         "mcl_blackstone_basalt_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:blackstone_polished": {
       "textures": [
         "mcl_blackstone_polished.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:blackstone_chiseled_polished": {
       "textures": [
         "mcl_blackstone_chiseled_polished.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:blackstone_brick_polished": {
       "textures": [
         "mcl_blackstone_polished_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:blackstone_brick_polished_cracked": {
       "textures": [
         "mcl_blackstone_polished_bricks_cracked.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:quartz_brick": {
       "textures": [
         "mcl_backstone_quartz_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:soul_soil": {
       "textures": [
         "mcl_blackstone_soul_soil.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_blackstone:soul_fire": {
       "textures": [
         "soul_fire_basic_flame_animated.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_blackstone"
     },
     "mcl_books:bookshelf": {
       "textures": [
         "mcl_books_bookshelf_top.png",
         "mcl_books_bookshelf_top.png",
         "default_bookshelf.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_books"
     },
     "mcl_cartography_table:cartography_table": {
       "textures": [
@@ -230,6 +263,7 @@
         "cartography_table_side3.png",
         "cartography_table_side1.png"
       ],
+      "texture_base": "ITEMS/mcl_cartography_table",
       "paramtype2": "facedir"
     },
     "mcl_cauldrons:cauldron": {
@@ -237,12 +271,14 @@
         "mcl_cauldrons_cauldron_inner.png^mcl_cauldrons_cauldron_top.png",
         "mcl_cauldrons_cauldron_inner.png^mcl_cauldrons_cauldron_bottom.png",
         "mcl_cauldrons_cauldron_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_cauldrons"
     },
     "mcl_colorblocks:hardened_clay": {
       "textures": [
         "hardened_clay.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_colorblocks"
     },
     "mcl_compass:lodestone": {
       "textures": [
@@ -252,136 +288,162 @@
         "lodestone_side2.png",
         "lodestone_side3.png",
         "lodestone_side4.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_compass"
     },
     "mcl_composters:composter": {
       "textures": [
         "mcl_composter_bottom.png^mcl_composter_top.png",
         "mcl_composter_bottom.png",
         "mcl_composter_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_composters"
     },
     "mcl_composters:composter_ready": {
       "textures": [
         "mcl_composter_ready.png^mcl_composter_top.png",
         "mcl_composter_bottom.png",
         "mcl_composter_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_composters"
     },
     "mcl_conduits:conduit": {
       "textures": [
         "mcl_conduit_conduit_node.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_conduits"
     },
     "mcl_copper:stone_with_copper": {
       "textures": [
         "default_stone.png^mcl_copper_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_copper"
     },
     "mcl_copper:block_raw": {
       "textures": [
         "mcl_copper_block_raw.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_copper"
     },
     "mcl_core:stone": {
       "textures": [
         "default_stone.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_coal": {
       "textures": [
         "mcl_core_coal_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_iron": {
       "textures": [
         "mcl_core_iron_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_gold": {
       "textures": [
         "mcl_core_gold_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_redstone": {
       "textures": [
         "mcl_core_redstone_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_redstone_lit": {
       "textures": [
         "mcl_core_redstone_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_lapis": {
       "textures": [
         "mcl_core_lapis_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_emerald": {
       "textures": [
         "mcl_core_emerald_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_with_diamond": {
       "textures": [
         "mcl_core_diamond_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stonebrick": {
       "textures": [
         "default_stone_brick.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stonebrickcarved": {
       "textures": [
         "mcl_core_stonebrick_carved.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stonebrickcracked": {
       "textures": [
         "mcl_core_stonebrick_cracked.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stonebrickmossy": {
       "textures": [
         "mcl_core_stonebrick_mossy.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:stone_smooth": {
       "textures": [
         "mcl_stairs_stone_slab_top.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:granite": {
       "textures": [
         "mcl_core_granite.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:granite_smooth": {
       "textures": [
         "mcl_core_granite_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:andesite": {
       "textures": [
         "mcl_core_andesite.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:andesite_smooth": {
       "textures": [
         "mcl_core_andesite_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:diorite": {
       "textures": [
         "mcl_core_diorite.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:diorite_smooth": {
       "textures": [
         "mcl_core_diorite_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:dirt_with_grass": {
       "textures": [
@@ -389,6 +451,7 @@
         "default_dirt.png",
         "default_dirt.png^mcl_dirt_grass_shadow.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "overlays": [
         "mcl_core_grass_block_side_overlay.png"
       ],
@@ -401,200 +464,236 @@
         "mcl_core_grass_path_top.png",
         "default_dirt.png",
         "mcl_core_grass_path_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:mycelium": {
       "textures": [
         "mcl_core_mycelium_top.png",
         "default_dirt.png",
         "mcl_core_mycelium_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:podzol": {
       "textures": [
         "mcl_core_dirt_podzol_top.png",
         "default_dirt.png",
         "mcl_core_dirt_podzol_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:dirt": {
       "textures": [
         "default_dirt.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:coarse_dirt": {
       "textures": [
         "mcl_core_coarse_dirt.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:gravel": {
       "textures": [
         "default_gravel.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:sand": {
       "textures": [
         "default_sand.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:sandstone": {
       "textures": [
         "mcl_core_sandstone_top.png",
         "mcl_core_sandstone_bottom.png",
         "mcl_core_sandstone_normal.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:sandstonesmooth": {
       "textures": [
         "mcl_core_sandstone_top.png",
         "mcl_core_sandstone_bottom.png",
         "mcl_core_sandstone_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:sandstonecarved": {
       "textures": [
         "mcl_core_sandstone_top.png",
         "mcl_core_sandstone_bottom.png",
         "mcl_core_sandstone_carved.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:sandstonesmooth2": {
       "textures": [
         "mcl_core_sandstone_top.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:redsand": {
       "textures": [
         "mcl_core_red_sand.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:redsandstone": {
       "textures": [
         "mcl_core_red_sandstone_top.png",
         "mcl_core_red_sandstone_bottom.png",
         "mcl_core_red_sandstone_normal.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:redsandstonesmooth": {
       "textures": [
         "mcl_core_red_sandstone_top.png",
         "mcl_core_red_sandstone_bottom.png",
         "mcl_core_red_sandstone_smooth.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:redsandstonecarved": {
       "textures": [
         "mcl_core_red_sandstone_top.png",
         "mcl_core_red_sandstone_bottom.png",
         "mcl_core_red_sandstone_carved.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:redsandstonesmooth2": {
       "textures": [
         "mcl_core_red_sandstone_top.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:clay": {
       "textures": [
         "default_clay.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:brick_block": {
       "textures": [
         "default_brick.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:bedrock": {
       "textures": [
         "mcl_core_bedrock.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:cobble": {
       "textures": [
         "default_cobble.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:mossycobble": {
       "textures": [
         "default_mossycobble.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:coalblock": {
       "textures": [
         "default_coal_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:ironblock": {
       "textures": [
         "default_steel_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:goldblock": {
       "textures": [
         "default_gold_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:diamondblock": {
       "textures": [
         "default_diamond_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:lapisblock": {
       "textures": [
         "mcl_core_lapis_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:emeraldblock": {
       "textures": [
         "mcl_core_emerald_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:obsidian": {
       "textures": [
         "default_obsidian.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:crying_obsidian": {
       "textures": [
         "default_obsidian.png^mcl_core_crying_obsidian.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:ice": {
       "textures": [
         "default_ice.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:packed_ice": {
       "textures": [
         "mcl_core_ice_packed.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:blue_ice": {
       "textures": [
         "mcl_core_ice_blue.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:snowblock": {
       "textures": [
         "default_snow.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:cactus": {
       "textures": [
         "mcl_core_cactus_top.png",
         "mcl_core_cactus_bottom.png",
         "mcl_core_cactus_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:cactus_flower": {
       "textures": [
         "cactus_flower.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:reeds": {
       "textures": [
         "mcl_core_papyrus.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "palette": "mcl_core_palette_grass.png",
       "paramtype2": "color"
     },
@@ -602,6 +701,7 @@
       "textures": [
         "mcl_core_vine.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "wallmounted"
     },
     "mcl_core:glass": {
@@ -609,29 +709,34 @@
         "default_glass.png",
         "default_glass_detail.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "glasslikeliquidlevel"
     },
     "mcl_core:water_flowing": {
       "textures": [
         "default_water_flowing_animated.png^[verticalframe:64:0"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "flowingliquid"
     },
     "mcl_core:water_source": {
       "textures": [
         "default_water_source_animated.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:lava_flowing": {
       "textures": [
         "default_lava_flowing_animated.png^[verticalframe:64:0"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "flowingliquid"
     },
     "mcl_core:lava_source": {
       "textures": [
         "default_lava_source_animated.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:bone_block": {
       "textures": [
@@ -639,28 +744,33 @@
         "mcl_core_bone_block_top.png",
         "mcl_core_bone_block_side.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "facedir"
     },
     "mcl_core:slimeblock": {
       "textures": [
         "mcl_core_slime.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:cobweb": {
       "textures": [
         "mcl_core_web.png"
       ],
+      "texture_base": "ITEMS/mcl_core",
       "paramtype2": "degrotate"
     },
     "mcl_core:deadbush": {
       "textures": [
         "default_dry_shrub.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_core:realm_barrier": {
       "textures": [
         "blank.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_core"
     },
     "mcl_crafting_table:crafting_table": {
       "textures": [
@@ -671,32 +781,38 @@
         "crafting_workbench_front.png",
         "crafting_workbench_front.png"
       ],
+      "texture_base": "ITEMS/mcl_crafting_table",
       "paramtype2": "facedir"
     },
     "mcl_crimson:warped_fungus": {
       "textures": [
         "farming_warped_fungus.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:nether_sprouts": {
       "textures": [
         "nether_sprouts.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:warped_roots": {
       "textures": [
         "warped_roots.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:warped_wart_block": {
       "textures": [
         "warped_wart_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:shroomlight": {
       "textures": [
         "shroomlight.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:warped_nylium": {
       "textures": [
@@ -706,17 +822,20 @@
         "mcl_nether_netherrack.png^warped_nylium_side.png",
         "mcl_nether_netherrack.png^warped_nylium_side.png",
         "mcl_nether_netherrack.png^warped_nylium_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:crimson_fungus": {
       "textures": [
         "farming_crimson_fungus.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:crimson_roots": {
       "textures": [
         "crimson_roots.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_crimson:crimson_nylium": {
       "textures": [
@@ -726,7 +845,8 @@
         "mcl_nether_netherrack.png^crimson_nylium_side.png",
         "mcl_nether_netherrack.png^crimson_nylium_side.png",
         "mcl_nether_netherrack.png^crimson_nylium_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_crimson"
     },
     "mcl_deepslate:deepslate": {
       "textures": [
@@ -734,6 +854,7 @@
         "mcl_deepslate_top.png",
         "mcl_deepslate.png"
       ],
+      "texture_base": "ITEMS/mcl_deepslate",
       "paramtype2": "facedir"
     },
     "mcl_deepslate:deepslate_reinforced": {
@@ -742,6 +863,7 @@
         "mcl_deepslate_reinforced_bottom.png",
         "mcl_deepslate_reinforced.png"
       ],
+      "texture_base": "ITEMS/mcl_deepslate",
       "paramtype2": "facedir"
     },
     "mcl_deepslate:tuff_chiseled": {
@@ -749,19 +871,22 @@
         "mcl_deepslate_tuff_chiseled_top.png",
         "mcl_deepslate_tuff_chiseled_top.png",
         "mcl_deepslate_tuff_chiseled.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_deepslate"
     },
     "mcl_deepslate:tuff_chiseled_bricks": {
       "textures": [
         "mcl_deepslate_tuff_chiseled_bricks_top.png",
         "mcl_deepslate_tuff_chiseled_bricks_top.png",
         "mcl_deepslate_tuff_chiseled_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_deepslate"
     },
     "mcl_dripstone:dripstone_block": {
       "textures": [
         "dripstone_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_dripstone"
     },
     "mcl_enchanting:table": {
       "textures": [
@@ -771,22 +896,26 @@
         "mcl_enchanting_table_side.png",
         "mcl_enchanting_table_side.png",
         "mcl_enchanting_table_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_enchanting"
     },
     "mcl_end:end_stone": {
       "textures": [
         "mcl_end_end_stone.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_end"
     },
     "mcl_end:end_bricks": {
       "textures": [
         "mcl_end_end_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_end"
     },
     "mcl_end:purpur_block": {
       "textures": [
         "mcl_end_purpur_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_end"
     },
     "mcl_end:purpur_pillar": {
       "textures": [
@@ -794,6 +923,7 @@
         "mcl_end_purpur_pillar_top.png^[transformFY",
         "mcl_end_purpur_pillar.png"
       ],
+      "texture_base": "ITEMS/mcl_end",
       "paramtype2": "facedir"
     },
     "mcl_end:end_rod": {
@@ -805,6 +935,7 @@
         "mcl_end_end_rod_side.png",
         "mcl_end_end_rod_side.png"
       ],
+      "texture_base": "ITEMS/mcl_end",
       "paramtype2": "facedir"
     },
     "mcl_end:dragon_egg": {
@@ -815,7 +946,8 @@
         "mcl_end_dragon_egg.png",
         "mcl_end_dragon_egg.png",
         "mcl_end_dragon_egg.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_end"
     },
     "mcl_end:chorus_plant": {
       "textures": [
@@ -825,55 +957,64 @@
         "mcl_end_chorus_plant.png",
         "mcl_end_chorus_plant.png",
         "mcl_end_chorus_plant.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_end"
     },
     "mcl_farming:beetroot_0": {
       "textures": [
         "mcl_farming_beetroot_0.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:beetroot_1": {
       "textures": [
         "mcl_farming_beetroot_1.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:beetroot_2": {
       "textures": [
         "mcl_farming_beetroot_2.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:beetroot": {
       "textures": [
         "mcl_farming_beetroot_3.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:carrot": {
       "textures": [
         "farming_carrot_4.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:potato": {
       "textures": [
         "mcl_farming_potatoes_stage_3.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "meshoptions"
     },
     "mcl_farming:soil": {
       "textures": [
         "mcl_farming_farmland_dry.png",
         "default_dirt.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_farming"
     },
     "mcl_farming:soil_wet": {
       "textures": [
         "mcl_farming_farmland_wet.png",
         "default_dirt.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_farming"
     },
     "mcl_farming:hay_block": {
       "textures": [
@@ -881,17 +1022,20 @@
         "mcl_farming_hayblock_top.png",
         "mcl_farming_hayblock_side.png"
       ],
+      "texture_base": "ITEMS/mcl_farming",
       "paramtype2": "facedir"
     },
     "mcl_fire:fire": {
       "textures": [
         "fire_basic_flame_animated.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_fire"
     },
     "mcl_fire:eternal_fire": {
       "textures": [
         "fire_basic_flame_animated.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_fire"
     },
     "mcl_fletching_table:fletching_table": {
       "textures": [
@@ -902,6 +1046,7 @@
         "fletching_table_side.png",
         "fletching_table_side.png"
       ],
+      "texture_base": "ITEMS/mcl_fletching_table",
       "paramtype2": "facedir"
     },
     "mcl_flowers:waterlily": {
@@ -909,6 +1054,7 @@
         "flowers_waterlily.png",
         "flowers_waterlily.png^[transformFY"
       ],
+      "texture_base": "ITEMS/mcl_flowers",
       "paramtype2": "facedir"
     },
     "mcl_grindstone:grindstone": {
@@ -920,17 +1066,20 @@
         "grindstone_front.png",
         "grindstone_front.png"
       ],
+      "texture_base": "ITEMS/mcl_grindstone",
       "paramtype2": "facedir"
     },
     "mcl_honey:honeycomb_block": {
       "textures": [
         "mcl_honey_honeycomb_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_honey"
     },
     "mcl_honey:honey_block": {
       "textures": [
         "mcl_honey_block_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_honey"
     },
     "mcl_loom:loom": {
       "textures": [
@@ -941,165 +1090,195 @@
         "loom_side.png",
         "loom_front.png"
       ],
+      "texture_base": "ITEMS/mcl_loom",
       "paramtype2": "facedir"
     },
     "mcl_lush_caves:dripleaf_small_stem": {
       "textures": [
         "mcl_lush_caves_dripleaf_small.png"
       ],
+      "texture_base": "ITEMS/mcl_lush_caves",
       "paramtype2": "4dir"
     },
     "mcl_lush_caves:dripleaf_small": {
       "textures": [
         "mcl_lush_caves_dripleaf_small.png"
       ],
+      "texture_base": "ITEMS/mcl_lush_caves",
       "paramtype2": "4dir"
     },
     "mcl_lush_caves:dripleaf_big_stem": {
       "textures": [
         "mcl_lush_caves_dripleaf_big.png"
       ],
+      "texture_base": "ITEMS/mcl_lush_caves",
       "paramtype2": "4dir"
     },
     "mcl_lush_caves:moss": {
       "textures": [
         "mcl_lush_caves_moss_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:moss_carpet": {
       "textures": [
         "mcl_lush_caves_moss_carpet.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:hanging_roots": {
       "textures": [
         "mcl_lush_caves_hanging_roots.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:cave_vines": {
       "textures": [
         "mcl_lush_caves_cave_vines.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:cave_vines_lit": {
       "textures": [
         "mcl_lush_caves_cave_vines_lit.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:rooted_dirt": {
       "textures": [
         "mcl_lush_caves_rooted_dirt.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_lush_caves:spore_blossom": {
       "textures": [
         "mcl_lush_caves_spore_blossom_base.png",
         "mcl_lush_caves_spore_blossom.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_lush_caves"
     },
     "mcl_mangrove:mangrove_roots": {
       "textures": [
         "mcl_mangrove_roots_top.png",
         "mcl_mangrove_roots_side.png",
         "mcl_mangrove_roots_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mangrove"
     },
     "mcl_mangrove:propagule": {
       "textures": [
         "mcl_mangrove_propagule_item.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mangrove"
     },
     "mcl_mangrove:mangrove_mud_roots": {
       "textures": [
         "mcl_mud.png^mcl_mangrove_roots_top.png",
         "mcl_mud.png^mcl_mangrove_roots_side.png",
         "mcl_mud.png^mcl_mangrove_roots_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mangrove"
     },
     "mcl_mobspawners:spawner": {
       "textures": [
         "mob_spawner.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mobspawners"
     },
     "mcl_mud:mud": {
       "textures": [
         "mcl_mud.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mud"
     },
     "mcl_mud:packed_mud": {
       "textures": [
         "mcl_mud_packed_mud.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mud"
     },
     "mcl_mud:mud_bricks": {
       "textures": [
         "mcl_mud_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mud"
     },
     "mcl_mushrooms:mushroom_brown": {
       "textures": [
         "farming_mushroom_brown.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mushrooms"
     },
     "mcl_mushrooms:mushroom_red": {
       "textures": [
         "farming_mushroom_red.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_mushrooms"
     },
     "mcl_nether:glowstone": {
       "textures": [
         "mcl_nether_glowstone.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:quartz_ore": {
       "textures": [
         "mcl_nether_quartz_ore.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:ancient_debris": {
       "textures": [
         "mcl_nether_ancient_debris_top.png",
         "mcl_nether_ancient_debris_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:netheriteblock": {
       "textures": [
         "mcl_nether_netheriteblock.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:netherrack": {
       "textures": [
         "mcl_nether_netherrack.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:magma": {
       "textures": [
         "mcl_nether_magma.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:soul_sand": {
       "textures": [
         "mcl_nether_soul_sand.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:nether_wart_block": {
       "textures": [
         "mcl_nether_nether_wart_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:quartz_block": {
       "textures": [
         "mcl_nether_quartz_block_top.png",
         "mcl_nether_quartz_block_bottom.png",
         "mcl_nether_quartz_block_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:quartz_chiseled": {
       "textures": [
         "mcl_nether_quartz_chiseled_top.png",
         "mcl_nether_quartz_chiseled_top.png",
         "mcl_nether_quartz_chiseled_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:quartz_pillar": {
       "textures": [
@@ -1107,35 +1286,41 @@
         "mcl_nether_quartz_pillar_top.png^[transformFY",
         "mcl_nether_quartz_pillar_side.png"
       ],
+      "texture_base": "ITEMS/mcl_nether",
       "paramtype2": "facedir"
     },
     "mcl_nether:quartz_smooth": {
       "textures": [
         "mcl_nether_quartz_block_bottom.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_nether"
     },
     "mcl_nether:nether_wart_0": {
       "textures": [
         "mcl_nether_nether_wart_stage_0.png"
       ],
+      "texture_base": "ITEMS/mcl_nether",
       "paramtype2": "meshoptions"
     },
     "mcl_nether:nether_wart_1": {
       "textures": [
         "mcl_nether_nether_wart_stage_1.png"
       ],
+      "texture_base": "ITEMS/mcl_nether",
       "paramtype2": "meshoptions"
     },
     "mcl_nether:nether_wart_2": {
       "textures": [
         "mcl_nether_nether_wart_stage_1.png"
       ],
+      "texture_base": "ITEMS/mcl_nether",
       "paramtype2": "meshoptions"
     },
     "mcl_nether:nether_wart": {
       "textures": [
         "mcl_nether_nether_wart_stage_2.png"
       ],
+      "texture_base": "ITEMS/mcl_nether",
       "paramtype2": "meshoptions"
     },
     "mcl_ocean:dried_kelp_block": {
@@ -1144,60 +1329,71 @@
         "mcl_ocean_dried_kelp_bottom.png",
         "mcl_ocean_dried_kelp_side.png"
       ],
+      "texture_base": "ITEMS/mcl_ocean",
       "paramtype2": "facedir"
     },
     "mcl_ocean:sea_lantern": {
       "textures": [
         "mcl_ocean_sea_lantern.png"
       ],
+      "texture_base": "ITEMS/mcl_ocean",
       "paramtype2": "facedir"
     },
     "mcl_ocean:prismarine": {
       "textures": [
         "mcl_ocean_prismarine_anim.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_ocean"
     },
     "mcl_ocean:prismarine_brick": {
       "textures": [
         "mcl_ocean_prismarine_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_ocean"
     },
     "mcl_ocean:prismarine_dark": {
       "textures": [
         "mcl_ocean_prismarine_dark.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_ocean"
     },
     "mcl_pale_oak:pale_moss": {
       "textures": [
         "mcl_pale_oak_moss.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak"
     },
     "mcl_pale_oak:pale_moss_carpet": {
       "textures": [
         "mcl_pale_oak_moss.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak"
     },
     "mcl_pale_oak:block_of_resin": {
       "textures": [
         "mcl_pale_oak_resin_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak"
     },
     "mcl_pale_oak:resin_brick_block": {
       "textures": [
         "mcl_pale_oak_resin_brick_block.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak"
     },
     "mcl_pale_oak:chiseled_resin_brick": {
       "textures": [
         "mcl_pale_oak_chiseled_resin_bricks.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak"
     },
     "mcl_portals:portal_end": {
       "textures": [
         "mcl_portals_end_portal.png",
         "mcl_portals_end_portal.png",
         "blank.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_portals"
     },
     "mcl_portals:end_portal_frame": {
       "textures": [
@@ -1205,6 +1401,7 @@
         "mcl_portals_endframe_bottom.png",
         "mcl_portals_endframe_side.png"
       ],
+      "texture_base": "ITEMS/mcl_portals",
       "paramtype2": "facedir"
     },
     "mcl_portals:end_portal_frame_eye": {
@@ -1213,6 +1410,7 @@
         "mcl_portals_endframe_bottom.png",
         "mcl_portals_endframe_eye.png^mcl_portals_endframe_side.png"
       ],
+      "texture_base": "ITEMS/mcl_portals",
       "paramtype2": "facedir"
     },
     "mcl_portals:portal": {
@@ -1224,6 +1422,7 @@
         "mcl_portals_portal.png",
         "mcl_portals_portal.png"
       ],
+      "texture_base": "ITEMS/mcl_portals",
       "paramtype2": "facedir"
     },
     "mcl_pottery_sherds:pot": {
@@ -1232,22 +1431,26 @@
         "mcl_pottery_sherds_pot_bottom.png",
         "mcl_pottery_sherds_pot_side.png"
       ],
+      "texture_base": "ITEMS/mcl_pottery_sherds",
       "paramtype2": "facedir"
     },
     "mcl_powder_snow:powder_snow": {
       "textures": [
         "powder_snow.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_powder_snow"
     },
     "mcl_sculk:sculk": {
       "textures": [
         "mcl_sculk_sculk.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sculk"
     },
     "mcl_sculk:vein": {
       "textures": [
         "mcl_sculk_vein.png"
       ],
+      "texture_base": "ITEMS/mcl_sculk",
       "paramtype2": "wallmounted"
     },
     "mcl_sculk:catalyst": {
@@ -1255,21 +1458,24 @@
         "mcl_sculk_catalyst_top.png",
         "mcl_sculk_catalyst_bottom.png",
         "mcl_sculk_catalyst_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sculk"
     },
     "mcl_sculk:sensor": {
       "textures": [
         "mcl_sculk_sensor_top.png",
         "mcl_sculk_sensor_bottom.png",
         "mcl_sculk_sensor_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sculk"
     },
     "mcl_sculk:shrieker": {
       "textures": [
         "mcl_sculk_shrieker_top.png",
         "mcl_sculk_shrieker_bottom.png",
         "mcl_sculk_shrieker_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sculk"
     },
     "mcl_smithing_table:table": {
       "textures": [
@@ -1279,22 +1485,26 @@
         "mcl_smithing_table_side.png",
         "mcl_smithing_table_side.png",
         "mcl_smithing_table_front.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_smithing_table"
     },
     "mcl_sponges:sponge": {
       "textures": [
         "mcl_sponges_sponge.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sponges"
     },
     "mcl_sponges:sponge_wet": {
       "textures": [
         "mcl_sponges_sponge_wet.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sponges"
     },
     "mcl_sponges:sponge_wet_river_water": {
       "textures": [
         "mcl_sponges_sponge_wet_river_water.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_sponges"
     },
     "mcl_stonecutter:stonecutter": {
       "textures": [
@@ -1305,6 +1515,7 @@
         "mcl_stonecutter_saw.png",
         "mcl_stonecutter_saw.png"
       ],
+      "texture_base": "ITEMS/mcl_stonecutter",
       "paramtype2": "facedir"
     },
     "mcl_tnt:tnt": {
@@ -1315,7 +1526,8 @@
         "default_tnt_side.png",
         "default_tnt_side.png",
         "default_tnt_side.png"
-      ]
+      ],
+      "texture_base": "ITEMS/mcl_tnt"
     },
     "mcl_tools:heavy_core": {
       "textures": [
@@ -1323,6 +1535,7 @@
         "mcl_tools_heavy_core_bottom.png",
         "mcl_tools_heavy_core_side.png"
       ],
+      "texture_base": "ITEMS/mcl_tools",
       "paramtype2": "facedir"
     },
     "mcl_levelgen:jigsaw_block": {
@@ -1334,22 +1547,26 @@
         "mcl_levelgen_jigsaw_block_side_north.png",
         "mcl_levelgen_jigsaw_block_side_south.png"
       ],
+      "texture_base": "MAPGEN/mcl_levelgen",
       "paramtype2": "facedir"
     },
     "mcl_villages:no_paths": {
       "textures": [
         "mcl_core_barrier.png"
-      ]
+      ],
+      "texture_base": "MAPGEN/mcl_villages"
     },
     "mcl_villages:path_endpoint": {
       "textures": [
         "wool_white.png"
-      ]
+      ],
+      "texture_base": "MAPGEN/mcl_villages"
     },
     "mcl_villages:demo_poi": {
       "textures": [
         "blank.png"
-      ]
+      ],
+      "texture_base": "MAPGEN/mcl_villages"
     }
   }
 }
