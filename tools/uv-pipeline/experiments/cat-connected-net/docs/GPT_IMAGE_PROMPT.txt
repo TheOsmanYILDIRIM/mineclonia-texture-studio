@@ -1,0 +1,13 @@
+Edit the uploaded image directly. It is a connected, cube-net-inspired UV surface layout for an existing calico cat 3D model.
+
+TASK: Replace ONLY the low-resolution surface colors with natural, finely detailed, realistic calico cat fur.
+
+STRICT STRUCTURE: Treat all regions as parts of ONE fixed unfolded texture. Do not create an animal portrait, redesign the shape, move, expand, shrink, separate, or rearrange any region. Preserve all connected edges and the relative position of the face and body markings. The head, torso, legs, tail and narrow attached strip belong to the same original game model. They must not be reinterpreted as extra limbs or distinct objects.
+
+STITCHING: The shared edges are intentional; make fur shading and color continuous across existing touching borders without changing their geometry or painting outside them. Avoid border glows, outlines, shadows, halos and bleed into empty areas.
+
+COLOR/SEMANTICS: Keep the source calico pattern in the same regions; preserve recognizable eye/nose positions, and do not paint new facial features on body or limbs. Use soft diffuse lighting, realistic hair fibers, restrained contrast and no neon/glossy effects.
+
+BACKGROUND: Preserve the empty background. Do not fill holes, add padding, extra objects or labels. This is a technical texture replacement, not a new layout illustration.
+
+Return only the edited connected atlas, no annotations or grid.

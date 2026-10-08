@@ -1,0 +1,18 @@
+{
+  "status": "prototype_ready",
+  "source_native": [
+    64,
+    32
+  ],
+  "packed_native": [
+    64,
+    64
+  ],
+  "visible_connected_components_original": 2,
+  "visible_connected_components_packed": 1,
+  "covered_source_texels": 809,
+  "covered_packed_texels": 809,
+  "exact_native_roundtrip": true,
+  "exact_realistic_24x_roundtrip": true,
+  "real_3d_render_pixel_match_at_two_yaws": true
+}

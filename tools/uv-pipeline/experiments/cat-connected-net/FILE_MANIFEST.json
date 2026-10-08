@@ -1,0 +1,94 @@
+{
+  "source/cat_original_64x32.png": {
+    "size_bytes": 546,
+    "sha256": "5e25c8d09308cc143c52e0c82625f61629ad18f91f06f7812957cf1f83374086"
+  },
+  "source/cat_model.b3d": {
+    "size_bytes": 193540,
+    "sha256": "b59a1d5949c303bc2d70ce3185697b0cd500f474e3a4f79614c9eaca08610ae5"
+  },
+  "code/cube_net_repack.py": {
+    "size_bytes": 9192,
+    "sha256": "63066c9780752b32299ed0fb237bef191c6bce85ab85a00e96e8f3e06588cb2e"
+  },
+  "code/build_experiment.py": {
+    "size_bytes": 9616,
+    "sha256": "bb13fd5fa29d776da038040a936384b63c6ed2e1ade5a2d8ad7c8545ab42d04a"
+  },
+  "code/render_b3d_correct.py": {
+    "size_bytes": 10445,
+    "sha256": "b606065844d60774a64e575325cad91bed6e633c77fbf4783a8745fbbc29b9fb"
+  },
+  "code/component_bbox_lock_fix_v2.py": {
+    "size_bytes": 8480,
+    "sha256": "6e40079a6812cb71ebe23e879f60904acb2c2cd4a6a02534821396fcb431a940"
+  },
+  "config/mapping.json": {
+    "size_bytes": 1302,
+    "sha256": "57e38655a32381c4dd39a96cf7204ea2ca323779d5b3df250b3e413c11404d99"
+  },
+  "inputs/cat_connected_net_original.png": {
+    "size_bytes": 14447,
+    "sha256": "8b4a34aace2889b23821e34ab26b3d4516053cc71a6745dffe33a8a88e1d8815"
+  },
+  "inputs/cat_connected_net_alpha_safe.png": {
+    "size_bytes": 26902,
+    "sha256": "e45b8359146a8db9e3674cd251369bd827fbe756bafcae03fea6a4e62f2ee4f7"
+  },
+  "inputs/cat_connected_net_cyan.png": {
+    "size_bytes": 15709,
+    "sha256": "6b308a5223fe6bd0a5ac0ad00fb478f7478a194cbc5878917119d4c6c12ee045"
+  },
+  "inputs/cat_connected_net_cyan_guard_1px.png": {
+    "size_bytes": 16173,
+    "sha256": "aa2b79a94efbd7f859e65fd301870a9df2c384313fe6c994568caf8db175f862"
+  },
+  "outputs/AI_cyan_no_guard_119496.png": {
+    "size_bytes": 178732,
+    "sha256": "18534fadb1fd6f1bba0c698b5b57416f2b116f7bec2b5cf0425e893803875f82"
+  },
+  "outputs/AI_cyan_with_guard_119497.png": {
+    "size_bytes": 183129,
+    "sha256": "79c0bb94b8111caa77ca62408a7109a740efe3a9e7717138a893db23bf525119"
+  },
+  "outputs/cyan_no_guard_restored.png": {
+    "size_bytes": 778734,
+    "sha256": "67d5a8ab157ff72ac888c15eea810ef9e0a9d9d1b354b6f0ba6c671421314021"
+  },
+  "outputs/cyan_guard_restored.png": {
+    "size_bytes": 784047,
+    "sha256": "94e8f724db6b32cb970b518161d567ebd848a1cd720db1304838ca71bd9af2d2"
+  },
+  "outputs/cyan_guard_mask_locked.png": {
+    "size_bytes": 784047,
+    "sha256": "94e8f724db6b32cb970b518161d567ebd848a1cd720db1304838ca71bd9af2d2"
+  },
+  "reports/guard_comparison_summary.json": {
+    "size_bytes": 3554,
+    "sha256": "8f54a29ee1d93baf401ea41e9e56a82652a9a040b189f8c8bb09fb20258b63e7"
+  },
+  "reports/UV_comparison.png": {
+    "size_bytes": 525362,
+    "sha256": "20bb6919e7de2023a7c7c6739cf37cf099bc77d5c8c5071e3c7d334ba6b15b3f"
+  },
+  "reports/3D_comparison_front.png": {
+    "size_bytes": 450502,
+    "sha256": "80fdb89111d54f6ea2e63f1fdc1779df7602fda0dd861f73dfa3aa524501d306"
+  },
+  "reports/3D_comparison_rear.png": {
+    "size_bytes": 334197,
+    "sha256": "9e9f7acf76af9b9a88d031c748d661813666589771f5817869c1b5b2c0857256"
+  },
+  "reports/connected_net_validation.json": {
+    "size_bytes": 394,
+    "sha256": "b5edde33eb74624556876fd7f47f11d708ebd1657fe61f814038d8457fbe9eca"
+  },
+  "docs/README.md": {
+    "size_bytes": 2870,
+    "sha256": "202cfee6b8ca0f0a537551002665ea37d79451e7779b420b5aaa67d4cf32e385"
+  },
+  "docs/GPT_IMAGE_PROMPT.txt": {
+    "size_bytes": 1423,
+    "sha256": "25ac8fadafed1ae1cd3000e2fca48d1b0fdc5d2bb3688b670c938224ce1d2c8b"
+  }
+}

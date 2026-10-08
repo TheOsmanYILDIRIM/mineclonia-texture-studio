@@ -1,0 +1,87 @@
+{
+  "format": "mineclonia-cat-connected-net-v1",
+  "source_size": [
+    64,
+    32
+  ],
+  "layout_size": [
+    64,
+    64
+  ],
+  "scale": 24,
+  "source_sha256": "5e25c8d09308cc143c52e0c82625f61629ad18f91f06f7812957cf1f83374086",
+  "groups": [
+    {
+      "id": "head",
+      "title": "Head cuboid net",
+      "source": [
+        0,
+        0,
+        20,
+        10
+      ],
+      "dest": [
+        8,
+        19
+      ]
+    },
+    {
+      "id": "body",
+      "title": "Torso cuboid net",
+      "source": [
+        20,
+        0,
+        40,
+        22
+      ],
+      "dest": [
+        28,
+        15
+      ]
+    },
+    {
+      "id": "tail",
+      "title": "Tail cuboid net",
+      "source": [
+        40,
+        0,
+        48,
+        12
+      ],
+      "dest": [
+        48,
+        20
+      ]
+    },
+    {
+      "id": "legs",
+      "title": "Legs and paws",
+      "source": [
+        0,
+        10,
+        20,
+        28
+      ],
+      "dest": [
+        28,
+        37
+      ]
+    },
+    {
+      "id": "strip",
+      "title": "Original detached lower strip",
+      "source": [
+        26,
+        29,
+        35,
+        32
+      ],
+      "dest": [
+        32,
+        55
+      ]
+    }
+  ],
+  "verified_exact_inverse": true,
+  "mapping": "native integer-pixel block-copy translation, not warping"
+}
