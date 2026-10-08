@@ -2060,10 +2060,13 @@ function setupCompactMobileDetail(){
   compact.innerHTML=`
     <div class="compactActionTray" id="compactActionTray">
       <div class="compactSection" data-section="downloads">
-        <div class="compactSectionBody compactTwo" id="compactDownloads"></div>
-      </div>
-      <div class="compactSection" data-section="seam">
-        <div class="compactSectionBody" id="compactSeam"></div>
+        <div class="compactSectionBody compactDownloadBody">
+          <div class="compactTwo" id="compactDownloads"></div>
+          <div class="compactInlineGroup" id="compactSeamGroup">
+            <div class="compactInlineTitle"><span>Seam</span><small>Offset düzenleme</small></div>
+            <div id="compactSeam"></div>
+          </div>
+        </div>
       </div>
       <div class="compactSection" data-section="tools">
         <div class="compactSectionBody compactTools" id="compactTools"></div>
@@ -2085,7 +2088,6 @@ function setupCompactMobileDetail(){
       </div>
       <div class="compactModeRow">
         <button class="compactMode" type="button" data-open-section="downloads">İndir</button>
-        <button class="compactMode" type="button" data-open-section="seam">Seam</button>
         <button class="compactMode" type="button" data-open-section="tools">Araçlar</button>
         <button class="compactMode" type="button" data-open-section="ai">AI</button>
         <button class="compactMode compactMore" type="button" data-open-section="advanced" aria-label="Gelişmiş">•••</button>
