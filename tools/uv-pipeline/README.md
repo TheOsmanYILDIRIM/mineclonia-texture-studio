@@ -10,6 +10,12 @@ This pipeline solves a specific problem in Mineclonia Texture Studio: AI-generat
 
 This is a *geometry-constrained texture transfer*, not a new image generator, not a generic background remover, and not a license to redraw the atlas or change its UV layout. The recovered baseline is useful but **not yet artifact-free**; especially edge streaks remain to be fixed in a separate version.
 
+## Current research decision (2026-10-08): prevention first
+
+The Python aligner below is a **preserved fallback/prototype**, not the desired primary production method. The current goal is to prevent an AI image generator from shifting, merging or redrawing authentic B3D UV faces in the first place. A generated atlas should retain exactly the original topology, face identity, small islands, alpha/void behavior and overlays, with only material detail replaced.
+
+See **[`PREVENTION_FIRST_HANDOFF.md`](PREVENTION_FIRST_HANDOFF.md)** for the cat/Enderman/pig failures, user-reported successful horse case, false-positive tests caused by premasking AI with original UV, the 3D renderer correction, and the next controlled comparison experiments. Those independent-island V3 attempts are local/unmerged; the unsolved cases are **not** represented as validated outputs.
+
 ## Reference PNGs
 
 - `original.png`: original Creeper texture; reference for UV island boundaries, dimensions, placement, and enclosed voids. Supplied in chat as `119110.png` (1536×768).
