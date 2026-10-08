@@ -1,0 +1,53 @@
+name: Normalize ore reference prompts
+on:
+  push:
+    paths:
+      - 'imports/normalize-ore-references.json'
+permissions:
+  contents: write
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rewrite all ore reference stages
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('prompts/blocks/manifest.json').read_text())
+          descriptions={
+            'coal':'Sparse compressed carbonaceous seams, dull charcoal grains and fractured mineral edges; no scattered decorative spots.',
+            'iron':'Compact iron-bearing inclusions with earthy ochre, rusty brown and dark metallic granules, naturally embedded.',
+            'gold':'Rare native gold flecks and short fractured seams, subdued warm yellow metallic facets, never glitter or jewelry.',
+            'diamond':'Very sparse pressure-grown diamond pockets, pale icy cyan and nearly colorless crystalline facets with restrained internal depth, never cut gemstones.',
+            'lapis':'Concentrated lapis-lazuli pockets, deep mineral blue with subtle pale inclusions, never evenly distributed blue speckles.',
+            'emerald':'Rare fractured emerald crystals with muted deep green translucence and imperfect mineral faces, partly buried.',
+            'redstone':'Irregular redstone mineral veins with dark iron-red grains and restrained localized energy, never broad neon light.',
+            'copper':'Copper-bearing mineral seams with warm subdued copper, earthy oxidation and localized greenish mineral traces.'
+          }
+          changed=0
+          for e in m['entries']:
+            n=e.get('name','')
+            if not n.endswith('_ore.png') or e.get('status')!='done': continue
+            mineral=next((k for k in descriptions if n.endswith('_'+k+'_ore.png')),None)
+            if not mineral: continue
+            p=Path(e['file'])
+            o=json.loads(p.read_text())
+            host='mcl_deepslate_deepslate.png' if n.startswith('mcl_deepslate_') else 'default_stone.png'
+            o['stages']['reference']=f"MINERAL REFERENCE — {mineral.upper()}\n\n{descriptions[mineral]}\n\nCreate only the mineral formations and their immediate contact details as a standalone design reference. The completed {host} texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, relight or redesign the host stone. Do not render a full stone tile; concentrate exclusively on the ore deposits."
+            p.write_text(json.dumps(o,indent=2,ensure_ascii=False)+'\n')
+            changed+=1
+          assert changed==15, f'Expected 15 ore prompts, got {changed}'
+          print('Validated ore reference prompts:',changed)
+          PY
+          rm imports/normalize-ore-references.json
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prompts/blocks imports
+          git diff --cached --quiet || (git commit -m "prompts: normalize all 15 mineral-only references" && git push)
