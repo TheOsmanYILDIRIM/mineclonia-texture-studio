@@ -70,12 +70,20 @@
   projection=out.projection||'orthographic';
   return out;
  }
- async function layerCanvas(layer,meta,overrideBlob,size){
+ async function layerCanvas(layer,meta,overrideBlob,size,profile){
   const texture=layer?.texture||'$self';
   let blob=null;
   if(texture==='$self'||String(texture).toLowerCase()===String(meta?.name||'').toLowerCase())blob=overrideBlob||await displayBlob(meta.path);
   else{
-    const ref=findCatalogTexture(texture);if(ref)blob=await displayBlob(ref.path);
+    const ref=findCatalogTexture(texture);
+    if(ref)blob=await displayBlob(ref.path);
+    else if(profile?.texture_base){
+      try{
+        const url=`${MINECLONIA_RAW_BASE}/${profile.texture_base}/textures/${encodeURIComponent(texture)}`;
+        const res=await fetch(url,{cache:'force-cache'});
+        if(res.ok)blob=await res.blob();
+      }catch{}
+    }
   }
   const cv=document.createElement('canvas');cv.width=cv.height=size;
   if(!blob)return cv;
@@ -88,16 +96,16 @@
   }
   return cv;
  }
- async function composeFace(layers,meta,overrideBlob,size=256){
+ async function composeFace(layers,meta,overrideBlob,size=256,profile=null){
   const cv=document.createElement('canvas');cv.width=cv.height=size;const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
-  for(const layer of layers||[{texture:'$self'}]){const src=await layerCanvas(layer,meta,overrideBlob,size);g.drawImage(src,0,0)}
+  for(const layer of layers||[{texture:'$self'}]){const src=await layerCanvas(layer,meta,overrideBlob,size,profile);g.drawImage(src,0,0)}
   return cv;
  }
  async function buildFaceAtlas(profile,meta,overrideBlob){
   const names=['north','south','east','west','top','bottom'],cell=256,atlas=document.createElement('canvas');atlas.width=cell*3;atlas.height=cell*2;
   const g=atlas.getContext('2d');g.imageSmoothingEnabled=false;
   for(let i=0;i<names.length;i++){
-    const face=await composeFace(profile?.faces?.[names[i]]||[{texture:'$self'}],meta,overrideBlob,cell);
+    const face=await composeFace(profile?.faces?.[names[i]]||[{texture:'$self'}],meta,overrideBlob,cell,profile);
     g.drawImage(face,(i%3)*cell,Math.floor(i/3)*cell);
   }
   return atlas;
