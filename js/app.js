@@ -2088,11 +2088,11 @@ function setupCompactMobileDetail(){
       </div>
       <div class="compactModeRow">
         <button class="compactMode" type="button" data-open-section="downloads">İndir</button>
-        <button class="compactMode" type="button" data-open-section="tools">Araçlar</button>
         <button class="compactMode" type="button" data-open-section="ai">AI</button>
         <button class="compactMode compactMore" type="button" data-open-section="advanced" aria-label="Gelişmiş">•••</button>
       </div>
-    </div>`;
+    </div>
+    <div class="compactToolRail" id="compactToolRail" aria-label="Hızlı araçlar"></div>`;
   actions.before(compact);
 
   const move=(id,target)=>{const el=$(id),dest=compact.querySelector(target);if(el&&dest)dest.appendChild(el)};
@@ -2162,9 +2162,30 @@ function setupCompactMobileDetail(){
   move('downloadEdited','#compactDownloads');
   move('seamExport','#compactSeam');
   move('seamImport','#compactSeam');
-  move('detailVariantLab','#compactTools');
-  move('detailIslandStudio','#compactTools');
-  move('open3dPreview','#compactTools');
+  const toolRail=compact.querySelector('#compactToolRail');
+  const makeTool=(id,label,svg)=>{
+    const source=$(id);if(!source||!toolRail)return;
+    const b=document.createElement('button');b.type='button';b.className='compactToolOrb';b.setAttribute('aria-label',label);b.title=label;
+    b.innerHTML=svg;
+    b.addEventListener('click',()=>source.click());
+    toolRail.appendChild(b);
+  };
+  makeTool('detailVariantLab','Varyant Lab',`
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="5" width="10" height="10" rx="2"/>
+      <rect x="10" y="9" width="10" height="10" rx="2"/>
+      <path d="M7 12h4M12 16h5"/>
+    </svg>`);
+  makeTool('detailIslandStudio','Ada / UV araçları',`
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7.5 9 5l3 2 3-1 4 3v6l-4 4-5-1-5-4v-6.5Z"/>
+      <circle cx="9" cy="5" r="1.2"/><circle cx="12" cy="7" r="1.2"/><circle cx="15" cy="6" r="1.2"/>
+    </svg>`);
+  makeTool('open3dPreview','3D Önizleme',`
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m4 7 8-4 8 4-8 4-8-4Z"/>
+      <path d="m4 7v9l8 5 8-5V7M12 11v10"/>
+    </svg>`);
 
   compact.querySelector('#compactAi').appendChild(promptBox);
   if(animBox)compact.querySelector('#compactAnim').appendChild(animBox);
