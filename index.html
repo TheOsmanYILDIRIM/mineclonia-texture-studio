@@ -684,6 +684,50 @@ body{min-height:100dvh}
   .compactInlineTitle small{font-size:9px;color:#7f8996}
   #compactSeam{display:grid;grid-template-columns:1fr;gap:7px}
 }
+
+@media(max-width:699px){
+  .compactModeRow{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .compactToolRail{
+    position:absolute;
+    right:8px;
+    top:34%;
+    z-index:14;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    pointer-events:none;
+  }
+  .compactToolOrb{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    border:1px solid #39414c;
+    background:rgba(20,24,30,.94);
+    color:#d9e0e8;
+    display:grid;
+    place-items:center;
+    padding:11px;
+    box-shadow:0 8px 24px rgba(0,0,0,.28);
+    backdrop-filter:blur(10px);
+    pointer-events:auto;
+  }
+  .compactToolOrb:active{
+    transform:scale(.96);
+    background:#26331f;
+    color:#c9f69e;
+    border-color:#527b35;
+  }
+  .compactToolOrb svg{
+    width:24px;
+    height:24px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .compactSection[data-section="tools"]{display:none!important}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
