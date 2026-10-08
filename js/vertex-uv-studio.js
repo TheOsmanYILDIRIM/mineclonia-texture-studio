@@ -161,7 +161,46 @@ function focusMesh(){
  S.panY=stage.clientHeight/2-stack.offsetTop-cy*S.zoom;
  applyView();
 }
-function makeMesh(snap=false){if(!S.sourceComp||!S.targetComp)return;S.sourceCrop=cropSource();const src=S.sourceComp.bbox,t=targetWorkRect(),cols=S.grid,rows=S.grid,pts=[];for(let r=0;r<=rows;r++){const row=[];for(let c=0;c<=cols;c++){const u=c/cols,v=r/rows;row.push({x:src.x+u*src.w,y:src.y+v*src.h,u:u*S.sourceCrop.width,v:v*S.sourceCrop.height,ox:src.x+u*src.w,oy:src.y+v*src.h})}pts.push(row)}S.mesh={cols,rows,points:pts};S.meshBasePoints=JSON.parse(JSON.stringify(pts));const srcCx=src.x+src.w/2,srcCy=src.y+src.h/2,tarCx=t.x+t.w/2,tarCy=t.y+t.h/2;S.partTransform={x:snap?tarCx-srcCx:0,y:snap?tarCy-srcCy:0,scale:1};S.alignScale=1;if(snap)applyPartTransform();S.selectedNode=null;S.meshHistory=[];S.meshRedo=[];S.meshBase=cloneCanvas(S.work);clearComponent(S.meshBase,S.sourceComp,S.sourceAnalysis,false);clearComponent(S.meshBase,S.targetComp,S.targetAnalysis,true);S.targetMaskWork=buildTargetMaskWork();if(snap){S.mode='move';setAlignVisibility(true)}render();if(snap)focusMesh();status(snap?'Komple ada hizalama · sürükle / pinch ile scale · orijinal önde':'Ada çifti hazır')}
+function makeMesh(snap=false){
+ if(!S.sourceComp||!S.targetComp)return;
+ S.sourceCrop=cropSource();
+ const src=S.sourceComp.bbox,t=targetWorkRect(),cols=S.grid,rows=S.grid,pts=[];
+ for(let r=0;r<=rows;r++){
+   const row=[];
+   for(let c=0;c<=cols;c++){
+     const u=c/cols,v=r/rows;
+     row.push({x:src.x+u*src.w,y:src.y+v*src.h,u:u*S.sourceCrop.width,v:v*S.sourceCrop.height,ox:src.x+u*src.w,oy:src.y+v*src.h});
+   }
+   pts.push(row);
+ }
+ S.mesh={cols,rows,points:pts};
+ let contourFit=false;
+ if(snap&&window.MTSOrderedContourWarp?.fitMesh){
+   try{
+     contourFit=!!window.MTSOrderedContourWarp.fitMesh({
+       mesh:S.mesh,
+       sourceComp:S.sourceComp,
+       sourceAnalysis:S.sourceAnalysis,
+       targetComp:S.targetComp,
+       targetAnalysis:S.targetAnalysis,
+       sourceCrop:S.sourceCrop,
+       workWidth:S.work.width,
+       workHeight:S.work.height
+     });
+   }catch(e){console.warn('Ordered contour fit fallback',e)}
+ }
+ S.meshBasePoints=JSON.parse(JSON.stringify(S.mesh.points));
+ const srcCx=src.x+src.w/2,srcCy=src.y+src.h/2,tarCx=t.x+t.w/2,tarCy=t.y+t.h/2;
+ S.partTransform={x:snap&&!contourFit?tarCx-srcCx:0,y:snap&&!contourFit?tarCy-srcCy:0,scale:1};
+ S.alignScale=1;
+ if(snap&&!contourFit)applyPartTransform();
+ S.selectedNode=null;S.meshHistory=[];S.meshRedo=[];
+ S.meshBase=cloneCanvas(S.work);clearComponent(S.meshBase,S.sourceComp,S.sourceAnalysis,false);clearComponent(S.meshBase,S.targetComp,S.targetAnalysis,true);
+ S.targetMaskWork=buildTargetMaskWork();
+ if(snap){S.mode='move';setAlignVisibility(true)}
+ render();if(snap)focusMesh();
+ status(contourFit?'Ordered contour fit · dış hatlar sırayla eşleşti · gerekirse komple taşı/scale':(snap?'Komple ada hizalama · sürükle / pinch ile scale · orijinal önde':'Ada çifti hazır'));
+}
 function meshSnapshot(){return S.mesh?JSON.stringify(S.mesh.points):null}
 function pushMesh(){const x=meshSnapshot();if(!x)return;S.meshHistory.push(x);if(S.meshHistory.length>50)S.meshHistory.shift();S.meshRedo=[]}
 function captureWorkState(){return {canvas:cloneCanvas(S.work),pairs:S.pairs.map(x=>({...x})),usedSource:[...S.usedSource],usedTarget:[...S.usedTarget]}}
