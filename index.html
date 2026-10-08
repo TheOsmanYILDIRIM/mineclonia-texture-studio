@@ -367,6 +367,163 @@ body{min-height:100dvh}
   .tileTools>.stat{display:none!important}
   .tileTools .mini{width:100%!important;min-width:0!important;padding:8px 4px!important;font-size:12px!important}
 }
+
+/* one-hand mobile detail ergonomics */
+@media(max-width:699px){
+  #sheet{align-items:stretch}
+  #sheet .drawer{
+    height:100dvh;
+    max-height:100dvh;
+    border-radius:0;
+    padding:calc(8px + var(--safe-top)) 10px 0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #sheet .handle{display:none}
+  #sheet .meta{
+    flex:0 0 auto;
+    min-height:44px;
+    align-items:center;
+    padding-bottom:6px;
+    border-bottom:1px solid #252c35;
+  }
+  #sheet .meta>div{min-width:0}
+  #sheet .meta h2{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    margin:0 0 2px;
+  }
+  #sheet #detailPath,#sheet #detailRole{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  #sheet #close{
+    width:42px;
+    height:42px;
+    padding:0;
+    display:grid;
+    place-items:center;
+    border-radius:11px;
+  }
+  #sheet .preview{
+    flex:0 0 auto;
+    width:min(72vw,320px);
+    margin:10px auto 7px;
+  }
+  #sheet .compareCtl{
+    flex:0 0 auto;
+    margin:4px 2px 6px;
+  }
+  #sheet .tileTools{
+    flex:0 0 auto;
+    margin:0 0 6px!important;
+  }
+  #sheet .tilePreview{
+    flex:0 0 auto;
+    width:min(72vw,320px);
+    margin:6px auto;
+  }
+  .compactDetail{
+    flex:1 1 auto;
+    min-height:0;
+    margin:0;
+    display:grid!important;
+    grid-template-rows:minmax(0,1fr) auto;
+    overflow:hidden;
+  }
+  .compactActionTray{
+    min-height:0;
+    overflow-y:auto;
+    padding:4px 0 8px;
+    overscroll-behavior:contain;
+  }
+  .compactActionTray:empty{display:none}
+  .compactSection{
+    display:none;
+    margin:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    overflow:visible;
+  }
+  .compactSection.open{display:block}
+  .compactSectionBody{
+    display:grid!important;
+    padding:8px 0 10px;
+    border:0;
+    gap:8px;
+  }
+  .compactThumbDock{
+    flex:0 0 auto;
+    position:relative;
+    z-index:12;
+    padding:8px 0 calc(8px + var(--safe));
+    background:linear-gradient(to top,#11151b 72%,rgba(17,21,27,.96));
+    border-top:1px solid #2b323c;
+    box-shadow:0 -10px 30px rgba(0,0,0,.28);
+  }
+  .compactPrimaryDock{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:7px;
+    align-items:center;
+    margin-bottom:7px;
+  }
+  .compactPrimaryDock #uploadEdited{
+    min-height:48px;
+    border-radius:13px;
+    font-size:14px;
+    font-weight:800;
+  }
+  .compactPrimaryDock .compactClean{
+    height:48px;
+    min-width:48px;
+    border-radius:13px;
+  }
+  .compactModeRow{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:5px;
+  }
+  .compactMode{
+    min-width:0;
+    min-height:42px;
+    border:1px solid #303743;
+    border-radius:11px;
+    background:#171c23;
+    color:#aeb7c3;
+    font-size:11px;
+    font-weight:700;
+    padding:6px 3px;
+    white-space:nowrap;
+  }
+  .compactMode.active{
+    background:#26331f;
+    color:#c9f69e;
+    border-color:#527b35;
+  }
+  .compactMore{font-size:14px;letter-spacing:1px}
+  #compactDownloads,#compactTools{
+    grid-template-columns:1fr 1fr;
+  }
+  #compactTools #open3dPreview{grid-column:1/-1}
+  #compactSeam{grid-template-columns:1fr}
+  #compactAi .promptBox{
+    background:#101318!important;
+    border:1px solid #252c35!important;
+    border-radius:12px!important;
+    padding:10px!important;
+  }
+  #compactAdvanced #hint{
+    margin:0;
+    background:#101318;
+  }
+  .compactAnimSection:has(.animBox.show){display:none}
+  .compactModeRow::after{content:none}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
