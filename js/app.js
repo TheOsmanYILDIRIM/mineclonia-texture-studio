@@ -2087,6 +2087,41 @@ function setupCompactMobileDetail(){
   const main=compact.querySelector('#compactMain');
   const dockClose=compact.querySelector('#compactDockClose');
   if(dockClose)dockClose.addEventListener('click',closeDetailSheet);
+
+  // Mobile: move texture identity under the image like a caption.
+  const meta=drawer.querySelector('.meta');
+  const preview=$('preview');
+  const topClose=$('close');
+  if(meta&&preview){
+    preview.after(meta);
+    meta.classList.add('mobilePreviewCaption');
+  }
+  if(topClose)topClose.classList.add('mobileTopCloseHidden');
+
+  // Large one-hand gestures. Preview and interactive controls are excluded.
+  const gestureBlocked=el=>!!el.closest('#preview,button,input,select,textarea,label,.compactThumbDock,.compactActionTray');
+  let gestureStart=null;
+  drawer.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1||gestureBlocked(e.target)){gestureStart=null;return}
+    const t=e.touches[0];
+    gestureStart={x:t.clientX,y:t.clientY,time:performance.now()};
+  },{passive:true});
+  drawer.addEventListener('touchend',e=>{
+    if(!gestureStart||e.changedTouches.length!==1){gestureStart=null;return}
+    const t=e.changedTouches[0],dx=t.clientX-gestureStart.x,dy=t.clientY-gestureStart.y;
+    const ax=Math.abs(dx),ay=Math.abs(dy),elapsed=performance.now()-gestureStart.time;
+    gestureStart=null;
+    if(elapsed>1200)return;
+    if(dy>130&&ay>ax*1.25){closeDetailSheet();return}
+    if(ax>105&&ax>ay*1.35){
+      const list=(filtered&&filtered.length?filtered:CATALOG)||[];
+      const idx=list.findIndex(x=>x?.path===active?.path);
+      if(idx<0)return;
+      const nextIdx=dx<0?idx+1:idx-1;
+      if(nextIdx<0||nextIdx>=list.length){toast(dx<0?'Son texture':'İlk texture');return}
+      openDetail(list[nextIdx]);
+    }
+  },{passive:true});
   const upload=$('uploadEdited');
   const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
   if(upload)main.appendChild(upload);
