@@ -2038,7 +2038,78 @@ function open3dPreviewLazy(){
  return preview3dLoadPromise.then(()=>window.MTSPreview3D?.open(active)).catch(err=>{console.error(err);toast(err.message)})
 }
 
+
+function setupCompactMobileDetail(){
+  const drawer=document.querySelector('#sheet .drawer');
+  if(!drawer||drawer.dataset.compactDetailReady==='1'||!window.matchMedia('(max-width:699px)').matches)return;
+  const actions=drawer.querySelector('.actions'),promptBox=drawer.querySelector('.promptBox'),animBox=drawer.querySelector('.animBox'),hint=drawer.querySelector('#hint');
+  if(!actions||!promptBox)return;
+
+  const compact=document.createElement('div');
+  compact.className='compactDetail';
+  compact.innerHTML=`
+    <div class="compactMain" id="compactMain"></div>
+    <div class="compactSection" data-section="downloads">
+      <button class="compactSectionHead" type="button"><span>İndir</span><span>Orijinal / Yeni</span><i>⌄</i></button>
+      <div class="compactSectionBody compactTwo" id="compactDownloads"></div>
+    </div>
+    <div class="compactSection" data-section="seam">
+      <button class="compactSectionHead" type="button"><span>Seam</span><span>Offset araçları</span><i>⌄</i></button>
+      <div class="compactSectionBody" id="compactSeam"></div>
+    </div>
+    <div class="compactSection" data-section="tools">
+      <button class="compactSectionHead" type="button"><span>Araçlar</span><span>Varyant · UV · 3D</span><i>⌄</i></button>
+      <div class="compactSectionBody compactTools" id="compactTools"></div>
+    </div>
+    <div class="compactSection" data-section="ai">
+      <button class="compactSectionHead" type="button"><span>AI</span><span>Prompt üretimi</span><i>⌄</i></button>
+      <div class="compactSectionBody" id="compactAi"></div>
+    </div>
+    <div class="compactSection compactAnimSection" data-section="anim">
+      <button class="compactSectionHead" type="button"><span>Animasyon</span><span>Atlas araçları</span><i>⌄</i></button>
+      <div class="compactSectionBody" id="compactAnim"></div>
+    </div>
+    <div class="compactSection" data-section="advanced">
+      <button class="compactSectionHead" type="button"><span>Gelişmiş</span><span>Sıfırla / açıklama</span><i>⌄</i></button>
+      <div class="compactSectionBody" id="compactAdvanced"></div>
+    </div>`;
+  actions.before(compact);
+
+  const move=(id,target)=>{const el=$(id),dest=compact.querySelector(target);if(el&&dest)dest.appendChild(el)};
+  const main=compact.querySelector('#compactMain');
+  const upload=$('uploadEdited');
+  const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
+  if(upload)main.appendChild(upload);
+  if(clean){clean.classList.add('compactClean');main.appendChild(clean)}
+
+  move('downloadOriginal','#compactDownloads');
+  move('downloadEdited','#compactDownloads');
+  move('seamExport','#compactSeam');
+  move('seamImport','#compactSeam');
+  move('detailVariantLab','#compactTools');
+  move('detailIslandStudio','#compactTools');
+  move('open3dPreview','#compactTools');
+
+  compact.querySelector('#compactAi').appendChild(promptBox);
+  if(animBox)compact.querySelector('#compactAnim').appendChild(animBox);
+  move('revert','#compactAdvanced');
+  if(hint)compact.querySelector('#compactAdvanced').appendChild(hint);
+
+  actions.style.display='none';
+  drawer.dataset.compactDetailReady='1';
+
+  compact.querySelectorAll('.compactSectionHead').forEach(head=>{
+    head.addEventListener('click',()=>{
+      const section=head.closest('.compactSection');
+      const open=!section.classList.contains('open');
+      compact.querySelectorAll('.compactSection.open').forEach(x=>{if(x!==section)x.classList.remove('open')});
+      section.classList.toggle('open',open);
+    });
+  });
+}
+
 async function init(){
+  setupCompactMobileDetail();
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
   setSaveState('Kayıt açılıyor…','warn');
