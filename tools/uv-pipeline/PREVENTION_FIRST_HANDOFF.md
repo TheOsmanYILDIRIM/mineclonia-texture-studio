@@ -46,6 +46,8 @@ A generated atlas is accepted only when its original UV faces are geometrically 
 
 ## Continuation / boundaries
 
-**Next concrete action:** obtain a verified successful horse original+AI pair; compare it against failed cat/Enderman examples with a face-level UV and 3D audit. Use results to prototype a **locked face/mask generation path** (not another Creeper-specific coordinate patch), then run controlled A/B trials before changing prompts or browser flows.
+This file captures the earlier **prevention-first** decision and cat/Enderman/pig/Creeper baseline. Subsequent, more specific cat work — square padding vs stretching, connected-net reversible repacking, hidden RGB, cyan matte vs external magenta guard, and the failed guard-pixel detection — is documented in **[`CONNECTED_NET_EXPERIMENTS.md`](CONNECTED_NET_EXPERIMENTS.md)**. That later experiment document and `SESSION_HANDOFF.md` supersede the former horse-first next-step suggestion.
 
-Keep the historical Python baseline and current browser data intact; any new system belongs in modular code. Do not dispatch GitHub Actions or change deployed app behavior as part of this documentation-only handoff.
+**Next concrete action:** make latest cat experimental fixtures reproducible and measure whether the guard truly contaminates pixels *inside* the original UV silhouette, compared with no-guard at identical 3D camera angles. Explicitly do not treat a forced target-alpha IoU of 1.0 as model compliance. Benchmark successful horse original+AI when available, but not as a prerequisite for fixing the present guard detector.
+
+Keep historical Python baseline and browser data intact; no GitHub Actions dispatch or deployed browser behavior changes as part of documentation-only work.
