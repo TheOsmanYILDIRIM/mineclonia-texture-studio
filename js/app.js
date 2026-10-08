@@ -2069,7 +2069,10 @@ function setupCompactMobileDetail(){
       </div>
     </div>
     <div class="compactThumbDock" id="compactThumbDock">
-      <div class="compactPrimaryDock" id="compactMain"></div>
+      <div class="compactPrimaryDock">
+        <button class="compactDockClose" id="compactDockClose" type="button" aria-label="Detay ekranını kapat">←</button>
+        <div id="compactMain"></div>
+      </div>
       <div class="compactModeRow">
         <button class="compactMode" type="button" data-open-section="downloads">İndir</button>
         <button class="compactMode" type="button" data-open-section="seam">Seam</button>
@@ -2082,6 +2085,8 @@ function setupCompactMobileDetail(){
 
   const move=(id,target)=>{const el=$(id),dest=compact.querySelector(target);if(el&&dest)dest.appendChild(el)};
   const main=compact.querySelector('#compactMain');
+  const dockClose=compact.querySelector('#compactDockClose');
+  if(dockClose)dockClose.addEventListener('click',closeDetailSheet);
   const upload=$('uploadEdited');
   const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
   if(upload)main.appendChild(upload);
