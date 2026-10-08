@@ -21,13 +21,15 @@ Prevent GPT Image from shifting, enlarging or destroying Mineclonia entity UV fa
 
 **Committed baseline in this repository:** `tools/uv-pipeline/creeper_outer_rigid_truevoid.py`, `uv_align_guarded_v2.py`, `uv_geometry.py` and tests are *separate* from these latest cat experiments.
 
-**Experimental Python and generated PNGs were run/shared in chat, NOT checked into the repository:** `cat_cube_net_prototype/cube_net_repack.py`, `mapping.json`, `render_b3d_correct.py`, `cat_connected_cube_net_input.png`, `cat_connected_cube_net_input_alpha_safe.png`, `cat_chroma_matte_experiment/`, `119496.png` (A), `119497.png` (B), `cat_guard_cleanup_test/` (including `uv_compare.png`, `render_compare_yaw20.png`, and `summary.json`). Chat artifact ZIP: `cat_connected_cube_net_test.zip`. Path/name mentions here are **provenance pointers, not GitHub download URLs**. Preserve/copy these inputs to durable repo fixtures before depending on them for automation.
+**Recovered exact research source files now committed (commit `e8e81f6`):** [`experiments/cat-connected-net/`](experiments/cat-connected-net/) contains four Python scripts (byte hashes match the 25-file ZIP), mapping JSON, original native 64×32 PNG, prompt, validation JSON and original archive manifest. The folder README explicitly distinguishes actual GitHub files from missing media assets.
 
-The ad-hoc B3D renderer was corrected for UV vertical orientation and separate alpha/overlay treatment in previous local work; it is not the deployed browser renderer. Use consistent front/side/rear views when validating texture placement.
+**Still outside GitHub:** cat B3D model, generated connected-net input variations, two user GPT Image PNG outputs (`119496.png` no guard, `119497.png` guard), restored textures and 3D/UV comparison screenshots. The complete 25-entry `MTS_ConnectedNet_UV_Closeout_2026-10-08.zip` remains available as a conversation artifact; these missing binary assets were **not uploaded** and must not be marked present. See `FILE_MANIFEST.json` for source ZIP paths, exact sizes and SHA-256 digests. The experimental scripts are not wired into the app.
+
+
 
 ## Next controlled experiment
 
-1. **Archive a minimal reproducible cat set** (source 64×32 PNG, true 64×64 mapping, generator outputs A/B, packed/unpacked examples, independent mask detector, fixed renderer) with hashes/licenses. Do not overwrite Creeper baseline. Store model binaries only with proper provenance.
+1. **Complete reproducibility assets:** source code, mapping, source PNG and checksum manifest are now in GitHub; import the remaining two GPT Image outputs, B3D model, and 3D/UV verification fixtures from the conversation ZIP with proper media provenance/licenses. Do not overwrite Creeper baseline.
 2. **Repair guard-line analysis**: inspect pixels in a narrow ring around the *known source contour*, separately inside vs outside; capture actual color distribution rather than assuming exact magenta survives AI. Inpaint only demonstrably contaminated **inside-UV** pixels, using adjacent valid material; do not mark a forced-mask IoU as an improvement. Compare guard and no-guard after applying the *same* geometry/alpha policy.
 3. Measure unmodified generated-mask overlap **and** semantic landmarks/3D renders. Verify no eye duplication/movement, no black/cyan fringe, no missing surfaces and no synthetic-joint texture artifacts.
 4. Re-run multiple samples per condition under the same prompt and model version before selecting a default. Keep bottom-aligned square-transparent and connected-net cyan as comparison candidates; consider a source-controlled internal-only compositing method if prompt-based masking remains unreliable.
