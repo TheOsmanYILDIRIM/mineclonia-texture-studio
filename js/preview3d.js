@@ -442,7 +442,7 @@
   document.getElementById('preview3dMeta').textContent=active.name;
   const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),surfaceBtn=document.getElementById('preview3dSurfaceToggle'),entity=canEntity(active),blockObject=canObject(active),surface=canSurface(active),object=surface;
   obj.textContent=entity?'Entity':blockObject?'Obje':'Küp';
-  obj.style.display=entity?'':'none';
+  obj.style.display=(entity||blockObject)?'':'none';
   w.disabled=entity||!canWorld(active);w.style.display=entity||!canWorld(active)?'none':'';
   if(surfaceBtn){surfaceBtn.hidden=entity||!surface;surfaceBtn.classList.toggle('active',mode==='surface');surfaceBtn.setAttribute('aria-label',mode==='surface'?'Blok/obje görünümüne geç':'İnce yüzey görünümüne geç')}
   obj.classList.toggle('primary',mode==='object');w.classList.toggle('primary',mode==='world');
