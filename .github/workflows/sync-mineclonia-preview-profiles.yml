@@ -2,6 +2,11 @@ name: Sync Mineclonia 3D profiles
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/extract-luanti-node-faces.mjs'
+      - 'scripts/generate-preview3d-profiles.mjs'
+      - '.github/workflows/sync-mineclonia-preview-profiles.yml'
   schedule:
     - cron: '17 4 * * 1'
 
