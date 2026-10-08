@@ -23,6 +23,14 @@ python code/cube_net_repack.py pack --source source/cat_original_64x32.png --out
 python code/cube_net_repack.py unpack --source AI_output.png --original source/cat_original_64x32.png --out restored.png --manifest generated-mapping.json --report diagnostic.json
 ```
 
+To restore the **13 remaining binary files** from the original chat ZIP, use the checksum-guarded helper:
+
+```sh
+python restore_binary_fixtures.py /path/to/MTS_ConnectedNet_UV_Closeout_2026-10-08.zip
+```
+
+It verifies all 14 binary entries against the committed manifest before writing, skips the already-present original PNG, and never overwrites conflicting data. Its isolated local test restored 13 binaries on the first run and 0 on the second. This helper does **not** upload to GitHub or run Actions; the resulting binary files must still be committed explicitly after their license/provenance is checked.
+
 For 3D preview, supply `mobs_mc_cat.b3d` from a matching Mineclonia version and run `code/render_b3d_correct.py`; the original model is in the conversation ZIP but not bundled in this GitHub folder.
 
 **Licensing:** The reference model and texture originated in the user-supplied Mineclonia texturepack, with upstream attribution/license requirements documented in Mineclonia's LEGAL/CREDITS and mod folders. Maintain those notices when redistributing derived media.
