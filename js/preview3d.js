@@ -18,8 +18,16 @@
  async function loadPreviewProfiles(){
   if(previewProfileConfig)return previewProfileConfig;
   try{
-    const r=await fetch('js/data/preview3d-profiles.json',{cache:'no-cache'});
-    previewProfileConfig=r.ok?await r.json():{defaults:{projection:'orthographic'},profiles:[]};
+    const [manualRes,generatedRes]=await Promise.all([
+      fetch('js/data/preview3d-profiles.json',{cache:'no-cache'}),
+      fetch('js/data/preview3d-profiles.generated.json',{cache:'no-cache'})
+    ]);
+    const manual=manualRes.ok?await manualRes.json():{defaults:{projection:'orthographic'},profiles:[]};
+    const generated=generatedRes.ok?await generatedRes.json():{profiles:[]};
+    previewProfileConfig={
+      defaults:manual.defaults||{projection:'orthographic'},
+      profiles:[...(manual.profiles||[]),...(generated.profiles||[])]
+    };
   }catch{previewProfileConfig={defaults:{projection:'orthographic'},profiles:[]}}
   return previewProfileConfig;
  }
