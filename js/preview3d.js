@@ -146,6 +146,7 @@
  function addFace(cube,cls,transform,style,shade=.08){
   const f=document.createElement('div');f.className='preview3dFace '+cls;f.style.transform=transform;
   f.style.backgroundImage=style.backgroundImage;f.style.backgroundSize=style.backgroundSize||'100% 100%';
+  if(shade>0)f.style.filter=`brightness(${Math.max(.55,1-shade)})`;
 
   if(style.overlayTint&&style.overlayUrl){
    const ov=document.createElement('div');ov.style.cssText='position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;pointer-events:none';
@@ -153,7 +154,6 @@
    ov.style.filter='sepia(1) saturate(1.35) hue-rotate(42deg) brightness(.88)';
    f.appendChild(ov);
   }
-  const sh=document.createElement('div');sh.className='preview3dShade';sh.style.opacity=String(shade);f.appendChild(sh);
   cube.appendChild(f);
  }
  function isGrassPreviewAsset(meta){
