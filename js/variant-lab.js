@@ -72,7 +72,7 @@ function renderVariantStage(){
 }
 async function ensurePreview3dLoaded(){
  if(window.MTSPreview3D)return window.MTSPreview3D;
- if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261006-joystick1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
+ if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261008-profiled3d2';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});
  await preview3dLoadPromise;return window.MTSPreview3D;
 }
 function updateVariant3dButton(){
