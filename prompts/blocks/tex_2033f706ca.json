@@ -5,6 +5,6 @@
   "path": "ITEMS/mcl_core/mcl_core_coal_ore.png",
   "name": "mcl_core_coal_ore.png",
   "stages": {
-    "reference": "Create a close visual reference for coal naturally embedded in the world's ordinary native stone. The host rock should remain the dominant dense gray geological material, interrupted by irregular seams, lenses and fractured pockets of dull black coal following plausible weaknesses and sedimentary traces. Coal surfaces can show subtle carbon luster while crushed edges remain matte and dusty. Avoid evenly sprinkled black dots, painted spots, giant isolated gemstones or turning the whole rock into coal. The ore should feel geologically formed inside stone, with host and carbon structures interacting naturally under pressure."
+    "reference": "MINERAL REFERENCE — COAL\n\nSparse irregular seams of dull charcoal-black carbonaceous mineral, compressed and partly buried, with fine granular fracture edges; avoid uniformly scattered black spots.\n\nCreate only the mineral formations and their immediate contact details as an isolated design reference. The completed default_stone.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, illuminate or redesign the host stone. Avoid a full stone-tile rendering; concentrate exclusively on the ore deposits."
   }
 }
