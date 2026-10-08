@@ -126,10 +126,109 @@
   .drawer>.hint{grid-column:2;grid-row:6;margin-top:0}
   .drawer>.actions .btn{min-height:40px}
 }
+
+/* 2026-10-08 locked viewport shell: only catalog scrolls */
+html,body{height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
+body{min-height:100dvh}
+.app{
+  height:100dvh;
+  min-height:0;
+  overflow:hidden;
+  padding:0!important;
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto auto;
+  background:var(--bg);
+}
+.top{
+  position:relative!important;
+  top:auto!important;
+  z-index:5;
+  flex:none;
+}
+.recentTextures{
+  position:relative!important;
+  top:auto!important;
+  z-index:4;
+  flex:none;
+}
+.catalogViewport{
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  background:var(--bg);
+}
+.catalogViewport .grid{
+  margin:0 auto;
+}
+.pager{
+  position:relative!important;
+  inset:auto!important;
+  bottom:auto!important;
+  z-index:6!important;
+  width:100%!important;
+  margin:0!important;
+  padding:6px 10px!important;
+  min-height:48px;
+  flex:none;
+  border-top:1px solid var(--line);
+  border-radius:0!important;
+  background:rgba(13,15,18,.985)!important;
+  backdrop-filter:blur(12px);
+}
+.pager button{
+  min-width:42px;
+  padding:7px 12px;
+}
+.bottom{
+  position:relative!important;
+  inset:auto!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:50px;
+  flex:none;
+  border:0!important;
+  border-top:1px solid var(--line)!important;
+  border-radius:0!important;
+  padding:6px 8px calc(6px + var(--safe))!important;
+  background:rgba(18,21,26,.99)!important;
+}
+@media(max-width:699px){
+  .app{grid-template-rows:auto auto minmax(0,1fr) 48px calc(50px + var(--safe))}
+  .top{padding:7px 9px}
+  .recentTextures{height:42px}
+  .catalogViewport .grid{padding:5px 6px 8px}
+  .pager{height:48px;min-height:48px}
+  .bottom{height:calc(50px + var(--safe));min-height:calc(50px + var(--safe))}
+  .bottom .btn{height:38px;padding:7px 3px!important}
+}
+@media(min-width:700px){
+  .app{grid-template-rows:auto auto minmax(0,1fr) 52px calc(56px + var(--safe))}
+  .catalogViewport .grid{max-width:1320px}
+  .pager{height:52px}
+  .bottom{
+    height:calc(56px + var(--safe));
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    max-width:760px!important;
+    width:min(760px,100%)!important;
+    justify-self:center;
+    border-left:1px solid var(--line)!important;
+    border-right:1px solid var(--line)!important;
+  }
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
-<main><div class="grid" id="grid"></div><div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div></main><div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP İçe</button><button class="btn" id="promptJson">Promptlar</button><button class="btn" id="openVariantLab">Varyant</button><button class="btn primary" id="exportPack">Dışa ZIP</button></div>
+<main class="catalogViewport"><div class="grid" id="grid"></div></main>
+<div class="pager"><button class="btn" id="prev">‹</button><span class="stat" id="pageInfo"></span><button class="btn" id="next">›</button></div>
+<div class="bottom" style="grid-template-columns:repeat(4,1fr)"><button class="btn" id="importZip">ZIP İçe</button><button class="btn" id="promptJson">Promptlar</button><button class="btn" id="openVariantLab">Varyant</button><button class="btn primary" id="exportPack">Dışa ZIP</button></div>
 </div>
 <div class="sheet" id="sheet"><div class="drawer"><div class="handle"></div><div class="meta"><div><h2 id="detailName"></h2><div class="path" id="detailPath"></div><div class="path" id="detailRole"></div></div><button class="btn" id="close" type="button" aria-label="Detay görünümünü kapat">✕</button></div><div class="preview" id="preview"><img id="origImg"><img id="editImg" class="editedClip"></div><div class="compareCtl"><span class="stat">Orijinal</span><input id="compare" type="range" min="0" max="100" value="50"><span class="stat">Yeni</span></div><div class="tileTools"><span class="stat">Tile</span><button class="btn mini active" data-tile="1">1×1</button><button class="btn mini" data-tile="3">3×3</button><button class="btn mini" data-tile="6">6×6</button><button class="btn mini" data-tile="9">9×9</button><button class="btn mini" id="tileSource">Yeni</button></div><div class="tilePreview" id="tilePreview"></div><div class="actions"><button class="btn" id="downloadOriginal">Orijinali indir</button><button class="btn" id="downloadEdited">Yeniyi indir</button><button class="btn primary" id="uploadEdited">Düzenlenmiş PNG yükle</button><label title="Siyah arka planı otomatik temizle (yalnız uygun şeffaf item sprite’larında)" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;white-space:nowrap;cursor:pointer"><input id="autoBlackBgClean" type="checkbox" style="width:15px;height:15px;accent-color:var(--accent)" aria-label="Otomatik siyah arka plan temizleme">✂</label><button class="btn warn" id="seamExport">50% Offset PNG</button><button class="btn warn wide" id="seamImport">Offset düzenlemeyi geri yükle</button><button class="btn" id="detailVariantLab">Varyant Lab</button><button class="btn" id="detailIslandStudio">Ada (opsiyonel)</button><button class="btn" id="open3dPreview">3D Önizleme</button><button class="btn danger" id="revert">Değişikliği sil / orijinale dön</button></div><div class="animBox" id="animBox"><div class="animHead"><div><div class="promptTitle">Animasyon araçları</div><div class="animMeta" id="animMeta"></div></div><button class="btn" id="animToggle">Durdur</button></div><div class="animCanvasWrap"><canvas id="animCanvas" width="256" height="256"></canvas></div><div class="animBtns"><button class="btn" id="exportAtlas">Strip → Kare atlas</button><button class="btn primary" id="importAtlas">Atlası geri yükle</button></div><div class="hint" id="animHint"></div></div><div class="promptBox"><div class="promptHead"><div><div class="promptTitle">AI üretim</div><div class="promptFamily" id="promptFamily"></div><div class="textureId" id="textureId"></div></div></div><div class="promptBtns" id="normalPromptBtns"><button class="btn" id="copyPrompt">Ref prompt</button><button class="btn primary" id="savePrompt">Üretim prompt</button><button class="btn" id="singlePromptJson" style="display:none">Bu prompt JSON</button></div><div class="mobPromptBtns" id="mobPromptBtns"><button class="btn" id="mobHqPrompt">1 · HQ UV</button><button class="btn" id="mobRefPrompt">2 · Armor Ref</button><button class="btn primary" id="mobFinalPrompt">3 · Final UV</button></div><textarea id="promptText" spellcheck="false" style="display:none"></textarea></div><div class="hint" id="hint"></div></div></div>
 <input id="fileEdited" type="file" accept="image/png" hidden><input id="fileSeam" type="file" accept="image/png" hidden><input id="fileAnimAtlas" type="file" accept="image/png" hidden><input id="fileZip" type="file" accept=".zip,application/zip" hidden><input id="filePromptJson" type="file" accept="application/json,.json" hidden><input id="fileProjectBackup" type="file" accept=".zip,application/zip" hidden>
