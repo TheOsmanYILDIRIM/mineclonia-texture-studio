@@ -57,6 +57,12 @@ Branch: `main` · Production: GitHub Pages.
 - Variant Lab and Vertex UV Studio communicate through explicit public bridges; optional feature failure must not block catalog boot.
 - GitHub `main` is canonical; current code outranks stale prose.
 
+## Visual review automation
+- Added `.github/workflows/mts-visual-capture.yml` in commit `f0e45c7`.
+- It captures the live GitHub Pages app at mobile (390×844), tablet (768×1024), and desktop (1440×1000), saving fold + full-page screenshots and console/page-error diagnostics as the `mts-visual-review` artifact.
+- First run `37751309978` completed capture successfully with no console or page errors. Visual findings: mobile header/update controls are cramped and wrap heavily; desktop/tablet waste a large lower viewport area while the fixed bottom action bar dominates; desktop texture cards are oversized relative to information density; top status/build controls do not align as one intentional header system.
+- Next visual-design pass should fix responsive header hierarchy, card density, and bottom action-bar proportions before adding more UI chrome.
+
 ## Verification
 - Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
 - `7b293ac` fixes the reload/import continuity bug: the V3 slot map was persisted, but the exported reference sheet canvas was memory-only. Import now rebuilds that reference automatically from the saved island definitions, so the user no longer has to reopen the wizard and press Forward just to make Import/Düzelt remember the export.
