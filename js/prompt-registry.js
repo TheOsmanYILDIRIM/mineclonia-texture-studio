@@ -13,6 +13,7 @@ const entriesById=new Map();
 const idsByFamily=new Map(Object.keys(FAMILY_MANIFESTS).map(f=>[f,new Set()]));
 const pathsByFamily=new Map(Object.keys(FAMILY_MANIFESTS).map(f=>[f,new Set()]));
 const manifests=new Map();
+const recordLoads=new Map();
 
 function keyOf(target){
   if(!target)return null;
@@ -31,7 +32,7 @@ function stage(target,name){
   const value=r?.stages?.[name];
   return typeof value==='string'&&value.trim()?value:null;
 }
-function has(target){return !!record(target)}
+function has(target){const e=entry(target);return !!record(target)||e?.status==='done'}
 function family(target){return record(target)?.family||entry(target)?.family||null}
 function belongsTo(target,wantedFamily){
   if(!target)return false;
@@ -44,35 +45,39 @@ function authoredCount(family){return idsByFamily.get(family)?.size||0}
 function manifest(family){return manifests.get(family)||null}
 
 async function loadFamily(family,url){
-  const res=await fetch(url,{cache:'no-cache'});
+  const res=await fetch(url,{cache:'force-cache'});
   if(!res.ok)throw new Error(family+' manifest '+res.status);
   const m=await res.json();
   if(m?.schema_version!==2||m?.family!==family||!Array.isArray(m.entries))throw new Error(family+' manifest is not canonical schema v2');
   manifests.set(family,m);
 
-  const done=[];
+  let authored=0;
   for(const e of m.entries){
     if(!e?.id||!e?.texture_path)continue;
     entriesById.set(e.id,{...e,family});
     pathsByFamily.get(family).add(e.texture_path);
-    if(e.status==='done'&&e.file)done.push(e);
+    if(e.status==='done'&&e.file){idsByFamily.get(family).add(e.id);authored++}
   }
+  return {family,total:m.entries.length,authored};
+}
 
-  const rows=await Promise.all(done.map(async e=>{
-    const q=await fetch(e.file,{cache:'no-cache'});
+async function ensure(target){
+  const id=keyOf(target);if(!id)return null;
+  if(recordsById.has(id))return recordsById.get(id);
+  await ready;
+  const e=entriesById.get(id);
+  if(!e||e.status!=='done'||!e.file)return null;
+  if(recordLoads.has(id))return recordLoads.get(id);
+  const p=(async()=>{
+    const q=await fetch(e.file,{cache:'force-cache'});
     if(!q.ok)throw new Error(e.file+' '+q.status);
     const j=await q.json();
-    if(j?.schema_version!==2||j?.family!==family||j?.id!==e.id||j?.path!==e.texture_path||!j?.stages||typeof j.stages!=='object'){
+    if(j?.schema_version!==2||j?.family!==e.family||j?.id!==e.id||j?.path!==e.texture_path||!j?.stages||typeof j.stages!=='object'){
       throw new Error('invalid canonical prompt '+e.id);
     }
-    return j;
-  }));
-
-  for(const row of rows){
-    recordsById.set(row.id,Object.freeze(row));
-    idsByFamily.get(family).add(row.id);
-  }
-  return {family,total:m.entries.length,authored:rows.length};
+    const frozen=Object.freeze(j);recordsById.set(id,frozen);return frozen;
+  })().finally(()=>recordLoads.delete(id));
+  recordLoads.set(id,p);return p;
 }
 
 const ready=Promise.all(Object.entries(FAMILY_MANIFESTS).map(([family,url])=>loadFamily(family,url)))
@@ -96,6 +101,7 @@ window.MTSPromptStore=Object.freeze({
   family,
   belongsTo,
   authoredCount,
-  manifest
+  manifest,
+  ensure
 });
 })();
