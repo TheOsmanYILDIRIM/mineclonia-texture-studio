@@ -770,13 +770,30 @@ async function removeConnectedBlackBackground(blob){
  }
  g.putImageData(im,0,0);return await canvasPngBlob(c)
 }
+// Never infer transparency from darkness on a block or an opaque source texture.
+// Only sprites with verified source-alpha cutouts may use the legacy black-background remover.
+const BLACK_BG_ELIGIBILITY=new Map();
+async function sourceUsesAlphaCutouts(meta){
+ if(!meta?.path||assetTypeOf(meta)!=='Item')return false;
+ if(BLACK_BG_ELIGIBILITY.has(meta.path))return BLACK_BG_ELIGIBILITY.get(meta.path);
+ let eligible=false;
+ try{
+  const source=await decodeBlobToCanvas(await originalBlob(meta.path));
+  const pixels=source.getContext('2d',{willReadFrequently:true}).getImageData(0,0,source.width,source.height).data;
+  let transparent=0;
+  for(let i=3;i<pixels.length;i+=4)if(pixels[i]===0)transparent++;
+  eligible=transparent>0&&transparent<pixels.length/4;
+ }catch(err){console.warn('Source alpha could not be verified; keeping imported pixels unchanged',meta.path,err)}
+ BLACK_BG_ELIGIBILITY.set(meta.path,eligible);
+ return eligible;
+}
 async function prepareImportedTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
- let out=await removeConnectedBlackBackground(blob);
- out=await normalizeTextureBlob(out,meta,targetRes);
- return out
+ // Export/resize must never reinterpret a saved pixel as background.
+ return await normalizeTextureBlob(blob,meta,targetRes);
 }
 async function prepareStoredEditBlob(blob,meta){
- return await removeConnectedBlackBackground(blob)
+ if(!await sourceUsesAlphaCutouts(meta))return blob;
+ return await removeConnectedBlackBackground(blob);
 }
 async function imageBlobTransform(blob, offset=false){return await new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.imageSmoothingEnabled=false;if(!offset){g.drawImage(im,0,0)}else{const w=c.width,h=c.height,dx=Math.floor(w/2),dy=Math.floor(h/2);g.drawImage(im, dx,dy);g.drawImage(im,dx-w,dy);g.drawImage(im,dx,dy-h);g.drawImage(im,dx-w,dy-h)}c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(Error('PNG oluşturulamadı'))},'image/png')};im.onerror=()=>rej(Error('PNG okunamadı'));im.src=u})}
 async function blobsEqual(a,b){
