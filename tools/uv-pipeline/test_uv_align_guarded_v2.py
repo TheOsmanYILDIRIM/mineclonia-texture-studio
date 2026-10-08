@@ -53,6 +53,21 @@ class GuardedUVTests(unittest.TestCase):
         with self.assertRaisesRegex(engine.AlignmentError, 'Component mismatch'):
             engine.run(original, source)
 
+    def test_identical_uv_masks_never_resample_or_move_pixels(self):
+        original = np.zeros((96, 160, 4), np.uint8)
+        ai = original.copy()
+        original[:, :, 3] = ai[:, :, 3] = 255
+        original[12:75, 15:145, :3] = 105
+        ai[12:75, 15:145, :3] = 168
+        original[30:48, 55:72, :3] = 0
+        ai[30:48, 55:72, :3] = 0
+        out, report = engine.run(original, ai)
+        expected = original.copy()
+        occupied = engine.texture_mask(original).astype(bool)
+        expected[occupied, :3] = ai[occupied, :3]
+        self.assertTrue(np.array_equal(out, expected))
+        self.assertEqual(report['method'], 'identity_mask_transfer')
+
     def test_mismatched_sizes_rejected(self):
         with self.assertRaises(engine.AlignmentError):
             engine.run(np.zeros((100, 100, 4), np.uint8), np.zeros((100, 99, 4), np.uint8))
