@@ -1124,7 +1124,7 @@ function referencePromptFor(x){
 function p0ReferencePromptFor(x){
  const dependency=materialDependencyPromptBlock(x);
  const row=promptRecord(x),authored=row?.family==='blocks'?promptStage(x,'reference'):null;
- if(typeof authored==='string'&&authored.length)return dependency?authored+'\n\n'+dependency:authored;
+ if(typeof authored==='string'&&authored.length){if(oreHostOnlyPrompt(x))return authored;return dependency?authored+'\n\n'+dependency:authored;}
  const subject=p0ReferenceSubject(x);
  return `Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.
 
