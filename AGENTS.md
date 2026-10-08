@@ -29,6 +29,14 @@ Do not duplicate large prompt catalogs, source files, or long handoff history in
 - Original UV topology and alpha are authoritative; do not implement texture-specific coordinate patches. Reject low-confidence correspondence and unsafe sampling maps rather than silently producing misregistered mob atlases.
 - Do not wire experimental Python aligners into browser storage, runtime UX or GitHub workflows without a separate verified integration task. Existing browser data must never be wiped.
 
+## 3D block preview profiles
+
+- Block preview behavior is data-driven through `js/data/preview3d-profiles.json`; do not add block-family face rules directly to the renderer when a profile can express them.
+- Default block projection is orthographic; perspective is an optional viewer toggle.
+- Profiles may assign different textures per face and stack layers on a face (for example dirt base + grass overlay). The scene background is separate from face layers.
+- Multi-face families such as logs/stems and grass-like blocks should be extended by adding/updating profile data. Ordinary blocks fall back to the single-texture cube profile.
+- Variant previews replace the selected texture layer while sibling/base textures continue to resolve from the current catalog/edit state.
+
 ## Core project invariants
 
 Texture Studio edits Mineclonia textures while preserving gameplay structure and identity.
