@@ -46,6 +46,39 @@ jobs:
 
           const browser = await chromium.launch({ headless: true });
 
+          async function openReady(page, url, readySelector) {
+            let loaded = false;
+            let lastError = null;
+            for (let attempt = 1; attempt <= 6 && !loaded; attempt++) {
+              try {
+                await page.goto(url, {
+                  waitUntil: 'domcontentloaded',
+                  timeout: 30000
+                });
+                await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+                if (readySelector) {
+                  await page.waitForSelector(readySelector, { state: 'visible', timeout: 15000 });
+                } else {
+                  await page.waitForFunction(
+                    () => document.body && document.body.innerText.length > 80,
+                    null,
+                    { timeout: 15000 }
+                  );
+                }
+                await page.waitForTimeout(2500);
+                loaded = true;
+              } catch (err) {
+                lastError = err;
+                if (attempt < 6) await page.waitForTimeout(10000);
+              }
+            }
+            if (!loaded) throw new Error('Live MTS did not become ready: ' + lastError);
+          }
+
+          async function capture(page, name, fullPage = false) {
+            await page.screenshot({ path: `${out}/${name}.png`, fullPage });
+          }
+
           for (const t of targets) {
             const page = await browser.newPage({
               viewport: { width: t.width, height: t.height },
@@ -54,32 +87,15 @@ jobs:
 
             const consoleErrors = [];
             const pageErrors = [];
+            const stateErrors = [];
             page.on('console', msg => {
               if (msg.type() === 'error') consoleErrors.push(msg.text());
             });
             page.on('pageerror', err => pageErrors.push(String(err)));
 
-            let loaded = false;
-            let lastError = null;
-            for (let attempt = 1; attempt <= 6 && !loaded; attempt++) {
-              try {
-                await page.goto(base + '?visualReview=' + Date.now(), {
-                  waitUntil: 'domcontentloaded',
-                  timeout: 30000
-                });
-                await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-                await page.waitForFunction(() => document.body && document.body.innerText.length > 80, null, { timeout: 15000 });
-                await page.waitForTimeout(5000);
-                loaded = true;
-              } catch (err) {
-                lastError = err;
-                if (attempt < 6) await page.waitForTimeout(10000);
-              }
-            }
-            if (!loaded) throw new Error('Live MTS did not become ready: ' + lastError);
+            await openReady(page, base + '?visualReview=' + Date.now(), '#grid .card');
 
-            await page.screenshot({ path: `${out}/home-${t.name}-fold.png`, fullPage: false });
-
+            await capture(page, `home-${t.name}-fold`);
             await page.evaluate(async () => {
               const height = document.documentElement.scrollHeight;
               for (let y = 0; y < height; y += 700) {
@@ -88,8 +104,53 @@ jobs:
               }
               window.scrollTo(0, 0);
             });
-            await page.waitForTimeout(500);
-            await page.screenshot({ path: `${out}/home-${t.name}-full.png`, fullPage: true });
+            await page.waitForTimeout(350);
+            await capture(page, `home-${t.name}-full`, true);
+
+            try {
+              await page.locator('#grid .card').first().click();
+              await page.waitForSelector('#sheet.open', { timeout: 10000 });
+              await page.waitForTimeout(700);
+              await capture(page, `detail-${t.name}-fold`);
+              await page.locator('#close').click();
+              await page.waitForSelector('#sheet.open', { state: 'detached', timeout: 5000 }).catch(async () => {
+                await page.waitForFunction(() => !document.querySelector('#sheet')?.classList.contains('open'), null, { timeout: 5000 });
+              });
+            } catch (err) {
+              stateErrors.push('detail: ' + String(err));
+            }
+
+            try {
+              await page.locator('#openVariantLab').click();
+              await page.waitForSelector('#variantLab.open', { timeout: 10000 });
+              await page.waitForTimeout(900);
+              await capture(page, `variant-lab-${t.name}-fold`);
+              await page.locator('#closeVariantLab').click();
+            } catch (err) {
+              stateErrors.push('variant-lab: ' + String(err));
+            }
+
+            const layout = await page.evaluate(() => {
+              const rect = sel => {
+                const el = document.querySelector(sel);
+                if (!el) return null;
+                const r = el.getBoundingClientRect();
+                return { x:r.x, y:r.y, width:r.width, height:r.height };
+              };
+              const firstCard = document.querySelector('#grid .card');
+              return {
+                viewport: { width: innerWidth, height: innerHeight },
+                bodyHeight: document.documentElement.scrollHeight,
+                scrollWidth: document.documentElement.scrollWidth,
+                horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1,
+                header: rect('.top'),
+                title: rect('.title'),
+                controls: rect('.controls'),
+                filters: rect('.filterRow'),
+                bottomBar: rect('.bottom'),
+                firstCard: firstCard ? rect('#grid .card') : null
+              };
+            });
 
             fs.writeFileSync(
               `${out}/diagnostics-${t.name}.json`,
@@ -97,12 +158,33 @@ jobs:
                 url: page.url(),
                 viewport: t,
                 title: await page.title(),
-                bodyHeight: await page.evaluate(() => document.documentElement.scrollHeight),
                 consoleErrors,
-                pageErrors
+                pageErrors,
+                stateErrors,
+                layout
               }, null, 2)
             );
 
+            await page.close();
+          }
+
+          for (const t of targets) {
+            const page = await browser.newPage({
+              viewport: { width: t.width, height: t.height },
+              deviceScaleFactor: 1
+            });
+            const errors = [];
+            page.on('pageerror', err => errors.push(String(err)));
+            try {
+              await openReady(page, base + 'model-studio/?visualReview=' + Date.now(), 'body');
+              await capture(page, `model-studio-${t.name}-fold`);
+            } catch (err) {
+              errors.push(String(err));
+            }
+            fs.writeFileSync(
+              `${out}/model-studio-diagnostics-${t.name}.json`,
+              JSON.stringify({ url: page.url(), title: await page.title(), errors }, null, 2)
+            );
             await page.close();
           }
 
