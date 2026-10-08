@@ -11,14 +11,17 @@
 
 Branch: `main` · Production: GitHub Pages. **Do not dispatch Actions for this UV tool.**
 
-## Current focus — Guarded reusable UV alignment (offline Python)
+## Current priority — prevent AI UV damage before postprocessing
 
-- Preserved recovered historical baseline unchanged: `tools/uv-pipeline/creeper_outer_rigid_truevoid.py` (commit `7ab8192`).
-- Added model-independent geometry helpers (`uv_geometry.py`), guarded remapper (`uv_align_guarded_v2.py`) and tests (`test_uv_align_guarded_v2.py`), all under `tools/uv-pipeline/`. Details, supported cases, CLI and limitations in the directory README.
-- Structural contract: original atlas dictates all UV island placement, empty pixels, holes and alpha; AI supplies RGB material only. Repair automatically detected collapsed-axis sampling intervals, preserve healthy maps, reject unsafe cases. **Never hardcode Creeper row positions in production.**
-- Local verification: 12/12 tests passed with actual 1536×768 Creeper fixtures `119110.png` (original) and `119116.png` (AI), including byte-identical 210×142 face regression crop versus baseline, no changed original empty-region pixels, 7 automatically repaired axis intervals. Latest generated output is a chat attachment, not a committed PNG.
-- No UI changes, browser persistence changes, or deployment changes. Commits carry `[skip ci]`; no workflow manually triggered. The two PNG fixtures are documented but **not yet uploaded as binary GitHub assets**.
-- Next: validate V2 on at least two *different mob UV atlases* (not just Creeper), inspect 3D rendering and reject any semantic UV misregistration; add explicit region matching if contour-only correspondence cannot disambiguate. Keep baseline immutable, don't silently broaden supported cases.
+- **Decision (2026-10-08):** Shift focus from repairing malformed generated atlases to **constraining generation so the original UV layout is never changed**. Post-generation remapping is a fallback, not evidence that the generation process is reliable.
+- Canonical detailed handoff: [`tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md`](tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md), including test-case outcomes, the falsely reassuring pre-mask validation, B3D preview limitations, and proposed acceptance criteria.
+- Preserve recovered `creeper_outer_rigid_truevoid.py` untouched. Existing `uv_align_guarded_v2.py` + tests are an **offline prototype** with limited numeric/topology regressions; they do **not** prove correct UV/face placement for arbitrary AI generations.
+- **Observed:** Creeper guard improved stretched strips in local tests; independently detected cat islands remained ambiguously paired; Enderman failed guarded mapping/overlay handling; pig passed one limited independent-island run. No universal correction. A user-reported successful horse AI atlas is an **unverified but high-value comparison case**.
+- **Do not repeat the invalid test:** a prior cat/Enderman/pig path copied the original occupancy mask onto AI before detecting its islands. It then `validated` nearly unchanged outputs, which concealed real registration errors. Original mask may be applied only **after independent AI analysis and correspondence**, not before it.
+- **3D verification:** early local B3D Python renders had a UV-V flip and alpha/overlay mistakes; subsequent local review fixed those, but the corrected renderer and binary fixtures were supplied as chat ZIP, **not committed to this repo**. No 3D result from the initial renderer is authoritative.
+- **Current documentation-only update:** no Python or browser implementation changes, no persistence migration, no manual Actions dispatch. Original/AI PNG pairs and local independent-island V3 experiments are not yet in GitHub.
+- **Next concrete work:** compare horse (successful claim) vs cat/Enderman failed source+AI pairs with authentic B3D UV face mapping, then evaluate per-face locked generation masks/overlays, independent pre-mask auditing, and 3D acceptance tests. Do not fix named pixels by hand.
+
 
 ---
 
@@ -114,4 +117,6 @@ Branch: `main` · Production: GitHub Pages. **Do not dispatch Actions for this U
 - Final device visual validation is still required for the real-contour node placement, centered scale behavior, and the reload→Import/Düzelt path on problematic pig/cat AI atlases.
 
 ## Next concrete step
-On device, export an island sheet once, reload/leave the page, then choose `AI PNG Import / Düzelt` directly. Verify AI objects are detected independently even if AI shifted the old slot layout; selecting an AI object must auto-pair the nearest unused original object after original coordinates are scaled to AI resolution. In `Üst üste getir`, verify one-finger whole-island drag, two-finger whole-island scale, stronger foreground original ghost, and only then advance to vertex deformation. Then validate contour nodes at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting, `Adayı Birleştir`, and save.
+**Entity UV priority:** prevention-first generation experiment and a verified horse-versus-cat/Enderman atlas+3D benchmark. See `tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md`. Current correction prototypes must not be called fully solved.
+
+**Existing UI backlog (separate):** On device, export an island sheet once, reload/leave the page, then choose `AI PNG Import / Düzelt` directly. Verify AI objects are detected independently even if AI shifted the old slot layout; selecting an AI object must auto-pair the nearest unused original object after original coordinates are scaled to AI resolution. In `Üst üste getir`, verify one-finger whole-island drag, two-finger whole-island scale, stronger foreground original ghost, and only then advance to vertex deformation. Then validate contour nodes at 3×3 and 15×15, centered ±1% scale, manual `+ Ada` splitting, `Adayı Birleştir`, and save.
