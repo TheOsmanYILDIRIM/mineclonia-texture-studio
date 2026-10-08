@@ -904,6 +904,8 @@ function p0ProductionMeta(x){
 }
 function p0ProductionPromptFor(x){
  const m=p0ProductionMeta(x);
+ const foliage=/^(?:default_(?:acacia_leaves|jungleleaves|leaves)|mcl_core_leaves_(?:big_oak|birch|spruce))\.png$/i.test(x?.name||'');
+ const porosity=foliage?'FOLIAGE TRANSPARENCY: Match only the approximate overall proportion of opaque foliage and fully transparent gaps in Image A. Freely redesign where gaps appear, their shapes and sizes, and all leaf clusters. Never copy the original alpha mask or fill the entire square. Keep true alpha=0 openings; match density, not arrangement. Opposite edges must tile without closing these gaps.':'';
  return tintPromptText(`Use Image A to understand WHAT the texture is and how it functions in the game.
 Use Image B to determine HOW the final material should actually look.${materialReferenceDependency(x)?' Image B should be the dependency-aware reference generated using the verified Mineclonia base/host texture listed below.':''}
 
@@ -929,7 +931,7 @@ Never fake seamlessness by blurring, smoothing, fading, averaging, flattening li
 Keep the same richness, sharpness, local contrast, depth and micro-detail at boundaries as in the center.`:`STRUCTURAL COMPONENT:
 This selected asset is not treated as a freely tileable generic square. Preserve the functional component/overlay placement communicated by Image A while rebuilding its material appearance from Image B.`}
 
-FINAL PRIORITY:
+${porosity?porosity+'\n\n':''}FINAL PRIORITY:
 1. Preserve what Image A represents, its face/component role, and how it functions.
 2. Make the actual material strongly follow Image B.
 3. ${m.tileable?'Create true physical continuity across opposite canvas edges.':'Preserve the functional placement/role defined by Image A.'}
