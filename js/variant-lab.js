@@ -9,6 +9,7 @@ const getEdit=path=>api().getEdit(path);
 const putEdit=(path,blob)=>api().putEdit(path,blob);
 const assetTypeOf=x=>api().assetTypeOf(x);
 const runtimeRoleInfo=x=>api().runtimeRoleInfo(x);
+const materialReferenceDependency=x=>api().materialReferenceDependency?.(x)||null;
 const prepareVariantTextureBlob=(f,x)=>api().prepareVariantTextureBlob(f,x);
 const lockEntityAlphaToSource=(b,x)=>api().lockEntityAlphaToSource(b,x);
 const applyFilter=()=>api().applyFilter();
@@ -23,6 +24,14 @@ async function refreshVariantSources(){
  const x=variantSelectedMeta();variantSources=[];if(!x)return;
  const orig=await originalBlob(x.path),edit=await getEdit(x.path);
  variantSources.push({blob:orig,name:'Orijinal',enabled:true,url:null,system:true,kind:'original'});
+ const dep=materialReferenceDependency(x);
+ if(dep?.refs?.length){
+   for(const ref of dep.refs){
+     const refEdit=await getEdit(ref.path);
+     const refBlob=refEdit?.blob||await originalBlob(ref.path);
+     variantSources.push({blob:refBlob,name:'Ref · '+(ref.name||ref.path.split('/').pop()),enabled:true,url:null,system:true,kind:'reference',referencePath:ref.path});
+   }
+ }
  variantSources.push({blob:edit?.blob||orig,name:'Aktif',enabled:true,url:null,system:true,kind:'active'});
 }
 function variantUrl(rec){if(!rec.url)rec.url=URL.createObjectURL(rec.blob);return rec.url}
@@ -51,7 +60,7 @@ function renderVariantStage(){
    if(!enabled.length){stage.classList.add('single');stage.innerHTML='<div class="variantNone">Tüm varyantlar kapalı. Üstteki thumbnail’lere dokunup geri açabilirsin.</div>';$('variantStatus').textContent='0 aktif varyant';return}
    const n=Math.max(variantTileN,1),cells=n*n;stage.style.gridTemplateColumns=`repeat(${n},1fr)`;stage.style.gridTemplateRows=`repeat(${n},1fr)`;
    for(let i=0;i<cells;i++){const rec=enabled[variantMixIndex(i,enabled.length)],cell=document.createElement('div');cell.className='variantMixCell';cell.style.backgroundImage=`url("${variantUrl(rec)}")`;cell.title=rec.name;stage.appendChild(cell)}
-   $('variantStatus').textContent=`Karışık · ${enabled.length}/${list.length} aktif · thumbnail’e dokunarak ele/geri ekle`;
+   $('variantStatus').textContent=`Karışık · ${enabled.length}/${list.length} aktif · Orijinal / Ref / Aktif dahil thumbnail’e dokunarak aç-kapat`;
  }else{
    stage.classList.add('single');
    if(!selected){stage.innerHTML='<div class="variantNone">Bir varyant seç.</div>';return}
@@ -115,7 +124,7 @@ function bindVariantLabUi(){
    if(t.id==='variantUvManual'){await window.MTSUvRepair?.openPrimary?.();return}
    if(t.id==='variant3dToggle'){const x=variantSelectedMeta(),rec=variantList()[variantSelectedIndex];if(!x||!rec||variantMixMode)return;try{const p=await ensurePreview3dLoaded();await p?.openVariant?.(x,rec.blob,rec.name,variantList(),variantSelectedIndex)}catch(err){console.error(err);toast(err?.message||'3D varyant önizleme açılamadı')}return}
    if(t.dataset.vtile){variantTileN=Number(t.dataset.vtile);renderVariantStage();return}
-   if(t.dataset.variantIndex!=null){const idx=Number(t.dataset.variantIndex);if(variantMixMode){const rec=variantList()[idx];if(rec&&!rec.system){rec.enabled=rec.enabled===false;renderVariantLab()}}else{variantSelectedIndex=idx;renderVariantLab()}}
+   if(t.dataset.variantIndex!=null){const idx=Number(t.dataset.variantIndex);if(variantMixMode){const rec=variantList()[idx];if(rec){rec.enabled=rec.enabled===false;renderVariantLab()}}else{variantSelectedIndex=idx;renderVariantLab()}}
  });
  const files=$('variantFiles');if(files)files.addEventListener('change',async e=>{await addVariantFiles([...e.target.files]);e.target.value=''});
 }
