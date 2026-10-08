@@ -5,6 +5,6 @@
   "path": "ITEMS/mcl_core/mcl_core_redstone_ore.png",
   "name": "mcl_core_redstone_ore.png",
   "stages": {
-    "reference": "MINERAL REFERENCE — REDSTONE\n\nIrregular compact redstone mineral veins and inclusions with dark iron-red granules and subtle localized internal energy; no broad neon illumination.\n\nCreate only the mineral formations and their immediate contact details as an isolated design reference. The completed default_stone.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, illuminate or redesign the host stone. Avoid a full stone-tile rendering; concentrate exclusively on the ore deposits."
+    "reference": "MINERAL REFERENCE — REDSTONE\n\nIrregular redstone mineral veins with dark iron-red grains and restrained localized energy, never broad neon light.\n\nCreate only the mineral formations and their immediate contact details as a standalone design reference. The completed default_stone.png texture is supplied separately for final composition and must remain unchanged outside mineral-occupied areas. Do not generate, depict, recolor, relight or redesign the host stone. Do not render a full stone tile; concentrate exclusively on the ore deposits."
   }
 }
