@@ -1,6 +1,19 @@
-# ACTIVE HANDOFF — 2026-10-07
+# ACTIVE HANDOFF — 2026-10-08
 
-Branch: `main` · Production: GitHub Pages.
+Branch: \`main\` · Production: GitHub Pages. **Do not dispatch Actions for this UV tool.**
+
+## Current focus — Guarded reusable UV alignment (offline Python)
+
+- Preserved recovered historical baseline unchanged: \`tools/uv-pipeline/creeper_outer_rigid_truevoid.py\` (commit \`7ab8192\`).
+- Added model-independent geometry helpers (\`uv_geometry.py\`), guarded remapper (\`uv_align_guarded_v2.py\`) and tests (\`test_uv_align_guarded_v2.py\`), all under \`tools/uv-pipeline/\`. Details, supported cases, CLI and limitations in the directory README.
+- Structural contract: original atlas dictates all UV island placement, empty pixels, holes and alpha; AI supplies RGB material only. Repair automatically detected collapsed-axis sampling intervals, preserve healthy maps, reject unsafe cases. **Never hardcode Creeper row positions in production.**
+- Local verification: 10/10 tests passed with actual 1536×768 Creeper fixtures \`119110.png\` (original) and \`119116.png\` (AI), including byte-identical 210×142 face regression crop versus baseline, no changed original empty-region pixels, 7 automatically repaired axis intervals. Latest generated output is a chat attachment, not a committed PNG.
+- No UI changes, browser persistence changes, or deployment changes. Commits carry \`[skip ci]\`; no workflow manually triggered. The two PNG fixtures are documented but **not yet uploaded as binary GitHub assets**.
+- Next: validate V2 on at least two *different mob UV atlases* (not just Creeper), inspect 3D rendering and reject any semantic UV misregistration; add explicit region matching if contour-only correspondence cannot disambiguate. Keep baseline immutable, don't silently broaden supported cases.
+
+---
+
+## Previous work — 2026-10-07
 
 ## Current focus — Canonical prompt system
 - Authored prompt storage is now standardized to one file per texture: `prompts/<family>/tex_<id>.json`.
