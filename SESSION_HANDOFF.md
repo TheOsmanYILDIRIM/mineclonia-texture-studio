@@ -58,10 +58,11 @@ Branch: `main` · Production: GitHub Pages.
 - GitHub `main` is canonical; current code outranks stale prose.
 
 ## Visual review automation
-- Added `.github/workflows/mts-visual-capture.yml` in commit `f0e45c7`.
-- It captures the live GitHub Pages app at mobile (390×844), tablet (768×1024), and desktop (1440×1000), saving fold + full-page screenshots and console/page-error diagnostics as the `mts-visual-review` artifact.
-- First run `37751309978` completed capture successfully with no console or page errors. Visual findings: mobile header/update controls are cramped and wrap heavily; desktop/tablet waste a large lower viewport area while the fixed bottom action bar dominates; desktop texture cards are oversized relative to information density; top status/build controls do not align as one intentional header system.
-- Next visual-design pass should fix responsive header hierarchy, card density, and bottom action-bar proportions before adding more UI chrome.
+- `.github/workflows/mts-visual-capture.yml` is the canonical live visual-QA Action. Initial capture: `f0e45c7`; expanded state coverage: `8408219`; interaction-diagnostic fallback: `cae61a0`.
+- Successful run `37752542122` captures mobile (390×844), tablet (768×1024), and desktop (1440×1000) for: home fold/full, first texture detail, Variant Lab, and `model-studio/`. Artifact: `mts-visual-review`. Diagnostics include console/page errors, state-transition errors, layout bounds, and horizontal-overflow checks.
+- Current live run has no console/page errors and no horizontal overflow. The major functional finding is mobile pointer interception: `.pager` (z-index 26) can sit above the fixed `.bottom` bar (z-index 25), so the visible `Varyant Lab` button is not physically clickable at that scroll position. The Action records this as `variant-lab-pointer` and then uses a DOM click only to continue screenshot coverage; do not mistake the fallback for a UI fix.
+- Current visual hierarchy findings: mobile header is 229px tall (tablet 161px, desktop 136px) and title/status/build/update controls are cramped; the mobile bottom bar is 96px tall and four labels wrap aggressively; desktop cards are 170px square and visually too dominant for a utility catalog; the detail sheet is structurally coherent but its main preview pushes secondary tools below the fold; Variant Lab is comparatively clean and readable.
+- Next visual-design pass: fix pager/bottom-bar hit layering first, then redesign responsive header hierarchy and mobile action-bar proportions, then tune desktop catalog density. Re-run this Action after each UI pass.
 
 ## Verification
 - Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
