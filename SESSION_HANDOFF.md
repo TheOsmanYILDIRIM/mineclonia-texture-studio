@@ -69,6 +69,13 @@ Branch: `main` · Production: GitHub Pages.
 - Visual-review artifact for the final run contains 27 files, including screenshots for all covered states and diagnostics JSON.
 
 
+## Mobile texture detail simplification
+- First staged simplification pass completed. On mobile, the texture detail sheet now keeps preview/compare/tile controls visible and collapses secondary actions into one-open-at-a-time sections: `İndir`, `Seam`, `Araçlar`, `AI`, optional `Animasyon`, and `Gelişmiş`.
+- Existing DOM nodes/buttons are moved into the compact mobile layout rather than duplicated, so existing IDs, event handlers, upload/download, prompt, UV, 3D, revert, and animation behavior remain intact. Desktop layout is unchanged.
+- Commits: `6468d9d` behavior/layout orchestration, `25806c7` compact mobile styling, `572c49f` single-row mobile tile controls.
+- Visual review run `37763557651` on deployed `25806c7` succeeded; the mobile detail screenshot shows the intended compact accordion hierarchy. Runtime Guards and Pages deploy also succeeded. A follow-up visual run for `572c49f` is in progress/expected to only keep all five tile controls on one row.
+- Do not continue simplifying other screens until the user approves this detail-screen direction; work is intentionally staged one screen at a time.
+
 ## Verification
 - Latest Vertex UV Studio JavaScript passed syntax validation after the contour/scale changes.
 - `7b293ac` fixes the reload/import continuity bug: the V3 slot map was persisted, but the exported reference sheet canvas was memory-only. Import now rebuilds that reference automatically from the saved island definitions, so the user no longer has to reopen the wizard and press Forward just to make Import/Düzelt remember the export.
