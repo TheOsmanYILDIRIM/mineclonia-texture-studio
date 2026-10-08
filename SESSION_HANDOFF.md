@@ -69,6 +69,12 @@ Branch: `main` · Production: GitHub Pages.
 - Visual-review artifact for the final run contains 27 files, including screenshots for all covered states and diagnostics JSON.
 
 
+## One-hand mobile detail ergonomics
+- Mobile texture detail now uses a thumb-zone dock rather than stacked accordions. Primary action `Düzenlenmiş PNG yükle` is pinned in the lower reach area; mode switches `İndir / Seam / Araçlar / AI / •••` sit directly below it. Selecting a mode opens its content immediately above the dock while keeping the preview/compare/tile area stable.
+- Research basis: Android recommends keeping the highest-priority action prominent/persistent and moving additional actions to secondary/overflow UI; Apple recommends deliberate toolbar item counts and respecting safe areas; thumb-zone research supports concentrating frequent controls in lower/easier reach regions.
+- Commits: `8b637e4` thumb-dock behavior, `c79f06a` one-hand full-height mobile layout.
+- Verified on deployed visual run `37764502243`: mobile detail shows full-width preview/compare/tile at top and persistent thumb dock at bottom; Runtime Guards and Pages deploy both succeeded.
+
 ## Mobile texture detail simplification
 - First staged simplification pass completed. On mobile, the texture detail sheet now keeps preview/compare/tile controls visible and collapses secondary actions into one-open-at-a-time sections: `İndir`, `Seam`, `Araçlar`, `AI`, optional `Animasyon`, and `Gelişmiş`.
 - Existing DOM nodes/buttons are moved into the compact mobile layout rather than duplicated, so existing IDs, event handlers, upload/download, prompt, UV, 3D, revert, and animation behavior remain intact. Desktop layout is unchanged.
