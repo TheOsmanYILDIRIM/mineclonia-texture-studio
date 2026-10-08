@@ -51,7 +51,7 @@ Preserve this baseline byte-for-byte. Develop a `v2` separately, compare outputs
 
 ## General-purpose guarded aligner (V2)
 
-**Status: working offline prototype, not connected to the Texture Studio browser UI.** This is a repeatable algorithm, not a collection of Creeper-only pixel patches.
+**Status: working offline prototype, not connected to the Texture Studio browser UI.** Known-good validation environment: Python 3.13.5 and versions in `requirements-tested.txt` (install with `python -m pip install -r tools/uv-pipeline/requirements-tested.txt`). This is a repeatable algorithm, not a collection of Creeper-only pixel patches.
 
 - `uv_geometry.py` — independent contour, component and ordered-edge helpers extracted from the recovered baseline without changing it.
 - `uv_align_guarded_v2.py` — guarded alignment engine and CLI; **no Creeper-specific pixel coordinates or face strips**.
