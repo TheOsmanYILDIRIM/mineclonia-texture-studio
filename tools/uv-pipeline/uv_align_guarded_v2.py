@@ -177,6 +177,16 @@ def run(original: np.ndarray, ai: np.ndarray, min_area: int | None = None) -> tu
     height, width = original.shape[:2]
     min_area = min_area or max(20, int(round(width * height * 0.00020)))
     target_mask, source_mask = texture_mask(original), texture_mask(ai)
+    # Geometry-identical AI textures need NO warp. Remapping an already aligned
+    # atlas would introduce interpolation noise at UV edges for no benefit.
+    if np.array_equal(target_mask, source_mask):
+        output = original.copy()
+        material = target_mask.astype(bool)
+        output[material, :3] = ai[material, :3]
+        return output, {"status": "validated", "method": "identity_mask_transfer",
+                        "dimensions": [width, height], "components": [],
+                        "outside_pixels_preserved": int((~material).sum()),
+                        "source": "AI texture", "geometry": "Original UV atlas"}
     target_labels, target_comp = components(target_mask, min_area)
     source_labels, source_comp = components(source_mask, min_area)
     matches = component_pairs(target_comp, source_comp, width, height)
