@@ -27,6 +27,9 @@ Do not duplicate large prompt catalogs, source files, or long handoff history in
 - Keep `tools/uv-pipeline/creeper_outer_rigid_truevoid.py` unchanged as the recovered historical baseline.
 - Reusable work lives in `tools/uv-pipeline/uv_geometry.py` and `uv_align_guarded_v2.py`; test with `test_uv_align_guarded_v2.py`. See local README for commands and supported inputs.
 - Original UV topology and alpha are authoritative; do not implement texture-specific coordinate patches. Reject low-confidence correspondence and unsafe sampling maps rather than silently producing misregistered mob atlases.
+- **Prevention-first entity workflow (2026-10-08):** prioritize source-constrained *generation*, not fixing named examples after distortion. See `tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md`. Original B3D UV faces, separate overlays, alpha/void topology, and semantic face landmarks must be checked before accepting new AI atlases.
+- Do not copy original occupancy/mask onto the raw AI output **before** independently detecting its islands; that produced misleading `validated` outcomes on cat/Enderman/pig. Mask restoration at final composition is not proof of correct face correspondence.
+- A valid mesh render depends on correct B3D UV-V orientation, real alpha, and layered textures such as Enderman eyes. Prototype Python renderers are not authoritative until compared to known authentic models. Keep successful horse-atlas behavior as a *user report* pending verification, not a passing benchmark.
 - Do not wire experimental Python aligners into browser storage, runtime UX or GitHub workflows without a separate verified integration task. Existing browser data must never be wiped.
 
 ## 3D block preview profiles
