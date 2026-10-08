@@ -2,6 +2,22 @@
 
 This directory preserves the recovered Python implementation of the Creeper UV alignment pipeline. **Do not overwrite the reference script when experimenting.** New fixes belong in separately named versioned scripts.
 
+## Purpose and success criteria
+
+This pipeline solves a specific problem in Mineclonia Texture Studio: AI-generated mob texture atlases can contain much better surface materials than the game's original texture, but their UV islands, boundaries, and enclosed transparent/black voids may shift. Simply placing the AI image on the mob's original UV mesh then misaligns faces and openings.
+
+**Goal:** Use the **original Creeper PNG as the geometric/topological authority**, while transferring the **AI PNG's new surface detail** onto that layout. Keep each UV island in its expected position and size, preserve the original occupied/empty structure (including Creeper face openings), and minimize deformation, stretched edge streaks, seams, blur, and loss of AI material detail. The output is a texture atlas intended to fit the existing in-game Creeper UV mapping **without modifying the 3D model**.
+
+This is a *geometry-constrained texture transfer*, not a new image generator, not a generic background remover, and not a license to redraw the atlas or change its UV layout. The recovered baseline is useful but **not yet artifact-free**; especially edge streaks remain to be fixed in a separate version.
+
+## Reference PNGs
+
+- `original.png`: original Creeper texture; reference for UV island boundaries, dimensions, placement, and enclosed voids. Supplied in chat as `119110.png` (1536×768).
+- `ai.png`: AI-generated Creeper texture to correct; source for the realistic moss/rock material. Supplied in chat as `119116.png` (1536×768).
+- `creeper_final.png`: output of the script; not an accepted pixel-perfect historical reference.
+
+**Asset status:** The two images were supplied in the conversation; this README records their identities and intended names. Do not assume they are committed until their binary files can be verified in GitHub. Do not substitute screenshots or resized images.
+
 ## Reference implementation
 
 - `creeper_outer_rigid_truevoid.py` — recovered, working baseline (commit `7ab8192`).
