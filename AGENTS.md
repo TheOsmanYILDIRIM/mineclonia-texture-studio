@@ -94,6 +94,7 @@ Key non-negotiables:
 - Browser data compatibility is a hard invariant. Do not rename or version-bump persistent storage without an explicit, tested migration that preserves existing user data. Current identities that must remain readable: IndexedDB `MinecloniaTextureStudio` v1 store `edits`; local edit prefix `mts:`; scaled cache DB `MinecloniaTextureStudioScaled` store `scaled`; prompt override key `mts:promptOverrides:v1`; recent texture key `mts_recent_textures_v1`; resolution key `mineclonia_texture_target_resolution_v1`; Island Studio prefix `mts_uv_islands_v1:`.
 - Core runtime functions must have one implementation only. Do not reintroduce shadowed duplicate definitions for edit storage, import/export, filter/render, or normalization paths.
 - UV repair launchers must route through `js/uv-repair-router.js`. Vertex UV Studio is primary; Island Studio / legacy mapper are explicit optional paths behind the router.
+- Island-sheet deformation and atlas repack are separate responsibilities. Ordered contour fitting lives in `js/ordered-contour-warp.js`; reverse packing lives in `js/island-repack.js`. Repack must use persisted V3 `slot.rects` / `slot.src` metadata deterministically and must not re-detect, resize-fit, or guess island identity from the corrected sheet.
 - Canonical prompt imports use the single family-agnostic workflow `.github/workflows/import-prompts.yml` and trigger `imports/mts-prompt-import.json`. Do not add family-specific prompt import workflows.
 
 
