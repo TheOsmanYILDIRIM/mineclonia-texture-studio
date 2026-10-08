@@ -231,34 +231,18 @@ function islandFitFilledToMask(source,targetMask){
 async function islandStudioRestore(){
  const src=islandStudio.imported;if(!src)return islandStudioStatus('Önce AI PNG Import yap.');
  const m=islandStudio.map;if(!m?.slots?.length||m.v!==3)return islandStudioStatus('Bu import için V3 slot mapping yok. Yeni Export PNG ile tekrar başla.');
- const scaleX=src.width/Math.max(1,m.sheetW),scaleY=src.height/Math.max(1,m.sheetH),density=Math.min(scaleX,scaleY);
- const outW=Math.max(1,Math.round(m.sourceW*density)),outH=Math.max(1,Math.round(m.sourceH*density)),out=document.createElement('canvas');out.width=outW;out.height=outH;
- const g=out.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
- let ok=0;const failed=[];
- for(const slot of m.slots){
-   const cx=slot.cell.x*scaleX,cy=slot.cell.y*scaleY,cw=Math.max(1,slot.cell.w*scaleX),ch=Math.max(1,slot.cell.h*scaleY);
-   const cell=document.createElement('canvas');cell.width=Math.max(1,Math.round(cw));cell.height=Math.max(1,Math.round(ch));
-   cell.getContext('2d').drawImage(src,cx,cy,cw,ch,0,0,cell.width,cell.height);
-   const expected={x:(slot.content.x-slot.cell.x)*scaleX,y:(slot.content.y-slot.cell.y)*scaleY,w:slot.content.w*scaleX,h:slot.content.h*scaleY};
-   const mask=islandForegroundMask(cell),bb=islandMaskBounds(mask,cell.width,cell.height,expected);
-   if(!bb){failed.push(slot.ai+1);continue}
-   const detected=document.createElement('canvas');detected.width=bb.w;detected.height=bb.h;
-   detected.getContext('2d').drawImage(cell,bb.x,bb.y,bb.w,bb.h,0,0,bb.w,bb.h);
-   const detectedMask=islandCropMask(mask,cell.width,bb);
-   // Keep the corrected island's own high-resolution silhouette. The original
-   // low-res UV mask is NOT reapplied here. slot.src controls placement only.
-   const fr=islandStudio.finalRects?.[slot.slotId],targetW=Math.max(1,Math.round(fr?.w||slot.src.w*density)),targetH=Math.max(1,Math.round(fr?.h||slot.src.h*density));
-   const fitted=document.createElement('canvas');fitted.width=targetW;fitted.height=targetH;
-   const fg=fitted.getContext('2d');fg.imageSmoothingEnabled=true;fg.imageSmoothingQuality='high';
-   fg.drawImage(detected,0,0,detected.width,detected.height,0,0,targetW,targetH);
-   const frx=islandStudio.finalRects?.[slot.slotId];const dx=frx?Math.round(slot.src.x*density+(frx.x-slot.content.x*scaleX)):Math.round(slot.src.x*density),dy=frx?Math.round(slot.src.y*density+(frx.y-slot.content.y*scaleY)):Math.round(slot.src.y*density);g.drawImage(fitted,dx,dy);ok++
+ const R=window.MTSIslandRepack;if(!R?.restore)return islandStudioStatus('Deterministik ada repack modülü yüklenmedi.');
+ try{
+   const result=R.restore({sheet:src,map:m,finalRects:islandStudio.finalRects||{}});
+   islandStudio.restored=result.canvas;
+   if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
+   if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
+   const scales=Math.abs(result.scaleX-result.scaleY)<.001?result.scaleX.toFixed(2)+'×':('X '+result.scaleX.toFixed(2)+' / Y '+result.scaleY.toFixed(2));
+   islandStudioStatus('V3 deterministik repack · '+result.restoredRects+' rect · '+result.canvas.width+'×'+result.canvas.height+' · ölçek '+scales+(result.failed.length?' · boş slot: '+result.failed.map(x=>x+1).join(', '):'')+' · onay bekliyor');
+   islandStudioSetTab('restored');
+ }catch(e){
+   console.error(e);islandStudio.restored=null;islandStudioStatus('UV geri toplama başarısız: '+(e?.message||e));
  }
- if(!ok){islandStudio.restored=null;islandStudioStatus('Slotlarda AI adası bulunamadı.');return}
- islandStudio.restored=out;
- if($('islandStudioApprove')){$('islandStudioApprove').disabled=false;$('islandStudioApprove').textContent='✓ Onayla / Aktif Yap'}
- if($('islandStudioRestoredExport'))$('islandStudioRestoredExport').disabled=false;
- islandStudioStatus('V3 slot restore · '+ok+'/'+m.slots.length+' ada · '+outW+'×'+outH+(failed.length?' · bulunamadı: '+failed.join(', '):'')+' · onay bekliyor');
- islandStudioSetTab('restored')
 }
 
 async function islandStudioExportRestored(){
