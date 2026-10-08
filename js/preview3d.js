@@ -428,8 +428,23 @@
  }
  function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
  function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
+ async function makeTextureCube(meta,size=S){
+  const st=await faceStyle(meta);
+  const c=document.createElement('div');c.className='preview3dCube';c.style.setProperty('--s',size+'px');const z=size/2;
+  addFace(c,'front',`translateZ(${z}px)`,st,.04);
+  addFace(c,'back',`rotateY(180deg) translateZ(${z}px)`,st,.12);
+  addFace(c,'right',`rotateY(90deg) translateZ(${z}px)`,st,.09);
+  addFace(c,'left',`rotateY(-90deg) translateZ(${z}px)`,st,.07);
+  addFace(c,'top',`rotateX(90deg) translateZ(${z}px)`,st,0);
+  addFace(c,'bottom',`rotateX(-90deg) translateZ(${z}px)`,st,.16);
+  return c;
+ }
  async function renderObject(meta){
-  scene.innerHTML='';const multipart=await makeMultipart(meta);const c=multipart||await makeCube(meta,S);scene.appendChild(c);
+  scene.innerHTML='';
+  // "Obje" is intentionally a literal six-faced cube for block textures.
+  // Specialized node geometry remains available in world/other previews.
+  const c=canObject(meta)?await makeTextureCube(meta,S):await makeCube(meta,S);
+  scene.appendChild(c);
  }
  async function renderWorld(meta){
   scene.innerHTML='';
