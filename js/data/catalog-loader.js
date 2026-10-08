@@ -36,7 +36,7 @@ function loadNodeTagsInBackground(){
    if(extra.length)x.tags=[...new Set([...(x.tags||[]),...extra])].sort();
   }
   return NODE_TAG_INDEX;
- }).catch(()=>{NODE_TAG_INDEX=new Map();return NODE_TAG_INDEX});
+ }).catch(()=>{NODE_TAG_INDEX=new Map()});
  return NODE_TAGS_READY;
 }
 const CATALOG_READY=Promise.all(CATALOG_TECH_FILES.map(async id=>{
