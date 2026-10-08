@@ -152,6 +152,31 @@ jobs:
             }
 
             try {
+              const search = page.locator('#search');
+              await search.fill('mcl_core_bone_block_side');
+              await page.waitForTimeout(500);
+              const boneCard = page.locator('#grid .card').filter({ hasText: 'mcl_core_bone_block_side' }).first();
+              if (await boneCard.count()) {
+                await boneCard.click();
+                await page.waitForSelector('#sheet.open', { timeout: 10000 });
+                await page.locator('#open3dPreview').evaluate(el => el.click());
+                await page.waitForSelector('#preview3d.open', { timeout: 10000 });
+                await page.waitForTimeout(900);
+                const boneProfile = await page.locator('#preview3d').getAttribute('data-preview-profile');
+                if (boneProfile !== 'node:mcl_core:bone_block') stateErrors.push('bone-profile:' + String(boneProfile));
+                await capture(page, `preview3d-bone-${t.name}-fold`);
+                await page.locator('#preview3dClose').evaluate(el => el.click());
+                await page.evaluate(() => document.querySelector('#sheet')?.classList.remove('open'));
+              } else {
+                stateErrors.push('bone-card:not-found');
+              }
+              await search.fill('');
+              await page.waitForTimeout(350);
+            } catch (err) {
+              stateErrors.push('bone-preview:' + String(err));
+            }
+
+            try {
               try {
                 await page.locator('#openVariantLab').click({ timeout: 3000 });
               } catch (err) {
