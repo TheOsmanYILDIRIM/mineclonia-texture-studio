@@ -105,6 +105,27 @@
   .uvToolGroup>summary{padding:7px 9px}
   .uvSaveBar .stat{font-size:9px}
 }
+
+/* final visual QA layout pass */
+@media(max-width:699px){
+  .pager{position:sticky;bottom:calc(43px + var(--safe));z-index:30;width:max-content;margin:0 auto;padding:5px 8px;background:rgba(13,15,18,.94);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(10px)}
+  .pager button{min-width:40px;padding:7px 10px}
+  .pager .stat{min-width:58px}
+}
+@media(min-width:900px){
+  .drawer{max-width:980px;display:grid;grid-template-columns:minmax(320px,420px) minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto;column-gap:14px;row-gap:8px;align-items:start}
+  .drawer>.handle{grid-column:1/-1;grid-row:1;margin-bottom:0}
+  .drawer>.meta{grid-column:1/-1;grid-row:2}
+  .drawer>.preview{grid-column:1;grid-row:3;width:100%;margin:0}
+  .drawer>.compareCtl{grid-column:1;grid-row:4;margin:0}
+  .drawer>.tileTools{grid-column:1;grid-row:5;margin:0}
+  .drawer>.tilePreview{grid-column:1;grid-row:6;width:100%;margin:0}
+  .drawer>.actions{grid-column:2;grid-row:3;align-content:start}
+  .drawer>.animBox{grid-column:2;grid-row:4;margin-top:0}
+  .drawer>.promptBox{grid-column:2;grid-row:5;margin-top:0}
+  .drawer>.hint{grid-column:2;grid-row:6;margin-top:0}
+  .drawer>.actions .btn{min-height:40px}
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
