@@ -381,7 +381,9 @@
  }
  async function selectVariant3D(i){
   if(!variantSession)return;const rec=variantSession.variants[i];if(!rec)return;variantSession.index=i;
-  await swapEntityTexture(rec.blob);document.getElementById('preview3dMeta').textContent=variantSession.meta.name+' · '+(i+1)+'/'+variantSession.variants.length+' · '+rec.name;renderVariantStrip();
+  if(canEntity(variantSession.meta))await swapEntityTexture(rec.blob);
+  else if(canObject(variantSession.meta)){mode='object';await renderCubeGL(variantSession.meta,rec.blob);resetView()}
+  document.getElementById('preview3dMeta').textContent=variantSession.meta.name+' · '+(i+1)+'/'+variantSession.variants.length+' · '+rec.name;renderVariantStrip();
  }
  function cleanupEntityGL(){if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
  async function renderEntity(meta,textureBlob=null){
@@ -438,7 +440,7 @@
     0,  0,      0,     1
   ]);
  }
- async function renderCubeGL(meta){
+ async function renderCubeGL(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';
   const canvas=document.createElement('canvas');
   canvas.className='preview3dBlockCanvas';
@@ -475,7 +477,7 @@
   const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(I),gl.STATIC_DRAW);
 
   const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);
-  const bmp=await createImageBitmap(await displayBlob(meta.path));gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();
+  const bmp=await createImageBitmap(textureBlob||await displayBlob(meta.path));gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
@@ -551,13 +553,21 @@
  stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
  stage.addEventListener('wheel',e=>{e.preventDefault();zoom*=e.deltaY>0?.9:1.1;zoom=Math.max(.35,Math.min(2.4,zoom));applyView()},{passive:false});
  async function openVariant(meta,blob,label='Varyant',variants=null,index=0){
-  if(!canEntity(meta))throw Error('Bu UV map için gerçek Mineclonia .b3d mesh eşleşmesi yok');
+  if(!canEntity(meta)&&!canObject(meta))throw Error('Bu asset için 3D varyant önizleme yok');
   variantSession=Array.isArray(variants)&&variants.length?{meta,variants,index:Math.max(0,Math.min(index,variants.length-1))}:null;
+  const selectedBlob=variantSession?variantSession.variants[variantSession.index].blob:blob;
   mode='object';root.classList.add('open');document.getElementById('preview3dMeta').textContent=meta.name+' · '+label;
-  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),s=document.getElementById('preview3dSurfaceToggle');obj.textContent='Entity';w.style.display='none';if(s)s.hidden=true;
-  await renderEntity(meta,variantSession?variantSession.variants[variantSession.index].blob:blob);resetView();renderVariantStrip();
+  const obj=document.getElementById('preview3dObject'),w=document.getElementById('preview3dWorld'),s=document.getElementById('preview3dSurfaceToggle');
+  if(canEntity(meta)){
+    obj.textContent='Entity';w.style.display='none';if(s)s.hidden=true;
+    await renderEntity(meta,selectedBlob);
+  }else{
+    obj.textContent='Obje';obj.style.display='';w.style.display='none';if(s){s.hidden=false;s.classList.remove('active')}
+    await renderCubeGL(meta,selectedBlob);
+  }
+  resetView();renderVariantStrip();
  }
- function canVariant3D(meta){return canEntity(meta)}
+ function canVariant3D(meta){return canEntity(meta)||canObject(meta)}
  document.getElementById('preview3dVariants')?.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)selectVariant3D(Number(b.dataset.i))});
  window.MTSPreview3D={open,close,openVariant,canVariant3D,selectVariant3D};
 })();
