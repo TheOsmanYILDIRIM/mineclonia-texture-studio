@@ -127,9 +127,19 @@ function fitMesh({mesh,sourceComp,sourceAnalysis,targetComp,targetAnalysis,sourc
   source=resampleClosed(source,refs.length);
   target=resampleClosed(target,refs.length);
 
-  // Pick target orientation that minimizes endpoint/perimeter mismatch.
+  // Pick target orientation by comparing normalized perimeter shapes.
   const targetRev=[target[0]].concat(target.slice(1).reverse());
-  const score=arr=>arr.reduce((s,p,i)=>s+Math.hypot(p.x-target[i].x,p.y-target[i].y),0);
+  const normalize=arr=>{
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    for(const p of arr){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y)}
+    const w=Math.max(1e-6,maxX-minX),h=Math.max(1e-6,maxY-minY);
+    return arr.map(p=>({x:(p.x-minX)/w,y:(p.y-minY)/h}));
+  };
+  const ns=normalize(source),score=arr=>{
+    const nt=normalize(arr);let sum=0;
+    for(let i=0;i<ns.length;i++)sum+=Math.hypot(ns[i].x-nt[i].x,ns[i].y-nt[i].y);
+    return sum;
+  };
   if(score(targetRev)<score(target))target=targetRev;
 
   for(let i=0;i<refs.length;i++){
