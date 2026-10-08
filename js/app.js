@@ -2254,7 +2254,7 @@ async function init(){
   setupCompactMobileDetail();
   loadPromptOverrides();
   $('stat').textContent='Arayüz hazır';
-  setSaveState('Kayıt hazırlanıyor…','warn');
+  setSaveState('Kayıt açılıyor…','warn');
   // Do not block first paint on IndexedDB or prompt manifests.
   storageBootPromise=initStorage();
   await buildFilters();
