@@ -270,6 +270,42 @@ body{min-height:100dvh}
   .pager{display:flex!important;justify-content:center!important}
   .bottom{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}
 }
+
+/* pager visibility lock */
+.pager{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:var(--txt)!important;
+}
+.pager #prev,.pager #next{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:44px!important;
+  height:34px!important;
+  min-width:44px!important;
+  padding:0!important;
+  visibility:visible!important;
+  opacity:1!important;
+  background:#1a2028!important;
+  color:#f5f7fa!important;
+  border:1px solid #303641!important;
+  border-radius:10px!important;
+}
+.pager #pageInfo{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:58px!important;
+  height:34px!important;
+  color:#aab3bf!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
 </style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
