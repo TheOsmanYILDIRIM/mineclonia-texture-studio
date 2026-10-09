@@ -674,7 +674,7 @@ const RECENT_TEXTURES_KEY='mts_recent_textures_v1';
 function recentTexturePaths(){try{const x=JSON.parse(localStorage.getItem(RECENT_TEXTURES_KEY)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}}
 function rememberRecentTexture(x){if(!x?.path)return;const list=[x.path,...recentTexturePaths().filter(p=>p!==x.path)].slice(0,10);try{localStorage.setItem(RECENT_TEXTURES_KEY,JSON.stringify(list))}catch(_){}renderRecentTextures()}
 async function renderRecentTextures(){const root=$('recentTextures'),strip=$('recentTextureStrip');if(!root||!strip)return;const items=recentTexturePaths().map(p=>CATALOG.find(x=>x.path===p)).filter(Boolean).slice(0,8);root.classList.add('show');strip.innerHTML='';if(!items.length){const empty=document.createElement('div');empty.className='recentTextureEmpty';empty.textContent='Henüz açılan texture yok';strip.appendChild(empty);return}for(const x of items){const b=document.createElement('button');b.className='recentTexture';b.title=x.path;b.innerHTML='<img><span></span>';b.querySelector('span').textContent=x.name||x.path.split('/').pop();b.onclick=()=>openDetail(x);strip.appendChild(b);try{b.querySelector('img').src=await previewUrl(x.path,true,96)}catch(_){}}}
-async function openDetail(x){active=x;await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);const gridAllowed=assetTypeOf(x)==='Entity'&&!isAnimatedStrip(x);$('downloadGridUv').disabled=!gridAllowed;$('importGridUv').disabled=!gridAllowed;$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -2208,6 +2208,8 @@ function setupCompactMobileDetail(){
 
   move('downloadOriginal','#compactDownloads');
   move('downloadEdited','#compactDownloads');
+  move('downloadGridUv','#compactDownloads');
+  move('importGridUv','#compactDownloads');
   const refDownload=document.createElement('button');
   refDownload.className='btn compactRefDownload';
   refDownload.id='downloadMaterialRef';
@@ -2290,6 +2292,28 @@ async function init(){
   $('downloadOriginal').onclick=async()=>dl(await originalBlob(active.path),active.name);
   $('downloadEdited').onclick=async()=>{const e=await getEdit(active.path);if(!e)return toast('Henüz yeni sürüm yok');dl(e.blob,active.name)};
   $('uploadEdited').onclick=()=>$('fileEdited').click();$('fileEdited').onchange=e=>importPng(e.target.files[0],false);
+  $('downloadGridUv').onclick=async()=>{
+    if(!active||assetTypeOf(active)!=='Entity')return toast('Grid UV yalnız mob/entity atlaslarında kullanılır');
+    const target={...active};
+    try{
+      const [mod,orig]=await Promise.all([import('./uv-detail-grid.mjs?v=20261009-1'),originalBlob(target.path)]);
+      const out=await window.MTSDetailUv.exportGrid(target,orig);
+      dl(out.blob,out.name);toast('Magenta grid indirildi • dönüşüm haritası bu texture için saklandı');
+    }catch(error){console.error(error);toast('UV grid: '+error.message)}
+  };
+  $('importGridUv').onclick=()=>{if(active&&assetTypeOf(active)==='Entity')$('fileGridUv').click();else toast('Grid UV yalnız mob/entity atlaslarında kullanılır')};
+  $('fileGridUv').onchange=async e=>{
+    const file=e.target.files?.[0];e.target.value='';if(!file||!active)return;
+    const target={...active};
+    try{
+      const [mod,orig]=await Promise.all([import('./uv-detail-grid.mjs?v=20261009-1'),originalBlob(target.path)]);
+      const out=await window.MTSDetailUv.importGrid(target,orig,file);
+      if(!active||active.path!==target.path)throw Error('Texture değişti; kayıt yapılmadı');
+      await importPng(new File([out.blob],target.name,{type:'image/png'}),false);
+      toast('AI grid → Mineclonia UV dönüştürüldü • 3D inceleme önerilir');
+    }catch(error){console.error(error);toast('UV içe aktarma: '+error.message)}
+  };
+
   $('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};
   $('seamImport').onclick=()=>$('fileSeam').click();$('fileSeam').onchange=e=>importPng(e.target.files[0],true);
   $('animToggle').onclick=()=>{if(!active||!isAnimatedStrip(active))return;animPlaying=!animPlaying;$('animToggle').textContent=animPlaying?'Durdur':'Oynat'};
