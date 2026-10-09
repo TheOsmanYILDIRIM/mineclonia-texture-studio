@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>AI UV Round-trip · Mineclonia Texture Studio</title>
+<link rel="stylesheet" href="css/uv-generation.css"></head><body>
+<header><a href="index.html" class="back">← Texture Studio</a><h1>AI UV Grid Studio</h1><p>Orijinal atlası gridli üretim görseline çevir, AI çıktısını aynı UV konumlarına geri getir.</p></header>
+<main>
+<section><h2>1 · Orijinal UV</h2>
+<label>Orijinal Mineclonia PNG <input id="sourceFile" type="file" accept="image/png"></label><p id="originalInfo" class="muted">Henüz seçilmedi</p>
+<div class="fields"><label>UV yerleşimi<select id="align"><option value="center">Kare · ortada (Enderman)</option><option value="bottom">Kare · altta</option><option value="top">Kare · üstte</option><option value="cat">Kedi · ConnectedNet (doğrulanmış harita)</option></select></label><label>Ölçek (×)<input id="scale" type="number" min="1" max="48" value="24"></label>
+<label>Grid aralığı (px)<input id="spacing" type="number" min="8" max="512" value="48"></label><label>UV güvenlik boşluğu (px)<input id="clearance" type="number" min="0" max="48" value="8"></label></div>
+<button id="pack" class="primary">Gridli üretim atlasını oluştur</button><div class="downloads"><a id="gridDownload" hidden>Grid PNG indir</a><a id="mapDownload" hidden>UV eşleme JSON indir</a></div>
+<p class="hint">Grid: magenta #FF00FF. Sınırlarla temas etmez. Orijinal alfa maskesi kullanılır; koyu Enderman pikselleri silinmez.</p></section>
+<section><h2>2 · AI çıktısı → UV</h2>
+<label>Üretilmiş kare PNG <input id="generatedFile" type="file" accept="image/png"></label><p id="generatedInfo" class="muted">AI çıktısı henüz seçilmedi</p>
+<label>Önceki oturumdan kaydedilmiş harita (.json) <input id="manifestFile" type="file" accept="application/json,.json"></label>
+<details><summary>Hafif düzeltme toleransı</summary>
+<div class="fields"><label><span><input id="autoShift" type="checkbox" checked> Grid kaymasını otomatik bul</span></label><label>Otomatik kayma sınırı (px)<input id="maxShift" type="number" min="0" max="12" value="6"></label>
+<label>İlave X kaydır (px)<input id="offsetX" type="number" min="-12" max="12" value="0"></label><label>İlave Y kaydır (px)<input id="offsetY" type="number" min="-12" max="12" value="0"></label>
+<label><span><input id="repairMagenta" type="checkbox" checked> Kenardaki magentayı onar</span></label><label>Kenar bandı (px)<input id="edgeBand" type="number" min="0" max="8" value="3"></label><label>Onarım menzili (px)<input id="repairRadius" type="number" min="0" max="12" value="6"></label>
+<label>İsteğe bağlı grup düzeltmesi<select id="groupId"></select></label><label>Grup X (px)<input id="groupDx" type="number" min="-12" max="12" value="0"></label><label>Grup Y (px)<input id="groupDy" type="number" min="-12" max="12" value="0"></label></div>
+<p class="hint">Düzeltme yalnız ±12 px kadar yer değiştirebilir; UV şekli, orijinal alfa ve B3D geometrisi değişmez. Grup ayarları yalnız bilinçli manuel düzeltme içindir.</p></details>
+<button id="restore" class="primary">Mineclonia UV çıktısını oluştur</button><div class="downloads"><a id="restoreDownload" hidden>Mineclonia PNG indir</a><a id="reportDownload" hidden>Doğrulama raporu indir</a></div><p class="hint">AI resmi otomatik yeniden boyutlandırılmaz. Yanlış kare boyutu hata verir; yanlış UV uyumu raporlandıktan sonra 3D'de kontrol edilir.</p></section>
+<section><h2>Önizleme</h2><div class="preview"><canvas id="preview" aria-label="UV önizlemesi"></canvas></div><p class="muted" id="previewMeta"></p><p id="status" role="status">Orijinal PNG yükle veya Texture Studio kataloğundan aç.</p>
+<details id="reportBox" hidden><summary>Detaylı UV raporu</summary><pre id="report"></pre></details></section>
+</main><script src="js/uv-generation.bundle.js" defer></script></body></html>

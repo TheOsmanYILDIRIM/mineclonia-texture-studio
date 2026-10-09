@@ -49,6 +49,12 @@ Do not manually dispatch Actions for documentation, UV experiments, or a closeou
 - Favor *preventing* AI UV damage during generation over Creeper-specific coordinate repairs. Test generated geometry, semantic landmarks, real B3D views and masked-edge contamination independently. Treat successful-horse-atlas claim as user observation until original+AI are measured.
 - Experimental Python aligners, source fixtures or model changes do **not** automatically enter browser runtime/IndexedDB, production builds or workflows.
 
+## AI UV generation round-trip (opt-in)
+
+- `uv-generation.html` plus modular `js/uv-generation-roundtrip.mjs` and `js/uv-generation-ui.mjs` form a separate, no-storage, reversible AI presentation tool. Build the standalone single-file production runtime via `node scripts/build-uv-generation.mjs`; never hand-edit the generated bundle.
+- The original PNG alpha and explicit manifest mappings are authoritative; for the verified cat ConnectedNet use the committed source mapping, for Enderman/general 2:1 source use square centering. Never infer cat-region topology for other entities, classify black as outside, or claim perfect AI UV accuracy from the forced output mask.
+- Grid registration and magenta boundary fixes are small bounded optional image repairs, not verified semantic correspondence. Preserve raw AI output and separate 3D/landmark validation. See `docs/UV_GENERATION_ROUNDTRIP.md`.
+
 ## Pages build and cache discipline
 
 - Production is **GitHub Pages**, not legacy Netlify config. Verify real Pages/Runtime Guards outcome before claiming deployment.

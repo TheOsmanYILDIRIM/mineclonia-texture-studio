@@ -5,6 +5,9 @@ Last code-work baseline checked before this documentation close: `53fc5ca79be5be
 
 ## Current working priority — experimental UV generation reliability
 
+**New in this implementation:** Opt-in browser `uv-generation.html` (AI UV Grid Studio) and standalone ES modules + deterministic single-file production bundle. A native Mineclonia PNG becomes a square magenta-grid AI reference (8px UV clearance by default) plus inverse mapping JSON; generated PNG returns to the original native UV coordinates with optional bounded grid-shift recognition and magenta-edge repair. Cat ConnectedNet uses the committed explicit map; Enderman/general square-center does not guess islands by brightness. Unlike earlier one-off enderman crops, every output has an inverse manifest. See `docs/UV_GENERATION_ROUNDTRIP.md` for limits. Node synthetic regression and bundle freshness test were run locally; deployed Pages and real-device 3D need verification after the merge. No user edit store, B3D UV or animation tracks changed.
+
+
 Prevent AI image generation from distorting true Mineclonia entity UV layout; use postprocessing only as a guarded fallback. **Read [`tools/uv-pipeline/CONNECTED_NET_EXPERIMENTS.md`](tools/uv-pipeline/CONNECTED_NET_EXPERIMENTS.md)** for verified dimensions, experiments, A/B metrics, invalid claims and next experiment. Historical policy/limits: `tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md` and directory `README.md`.
 
 - Keep `creeper_outer_rigid_truevoid.py` immutable. The guarded V2 aligner is offline, *not universally validated*; old cat/Enderman `validated` claims obtained by pre-applying target mask to AI were circular.
@@ -34,7 +37,7 @@ Prevent AI image generation from distorting true Mineclonia entity UV layout; us
 
 **Confirmed previously:** runtime guards and Pages deployment both succeeded at documentation commit `082077b`; offline recovered Creeper regression was previously 12/12 (not re-run at closure); connected-net pure pack/unpack was verified pixel-exact. Experiment measurements above are single local examples, not repeated model benchmarks. Documentation-only changes have no production verification claim.
 
-**Next concrete UV step:** finish archiving missing binary AI/B3D fixtures from the chat ZIP; implement **actual** inside/outside guard-pixel detection near the source contour; perform controlled no-guard vs guard comparison *without* pre-masking raw AI, then 3D landmark/edge checks at identical camera angles. Repeat multiple generations before selecting a default. Keep source face semantics/alpha fixed; no hard-coded creature-specific pixel patches as a purported general solution.
+**Next concrete UV step:** Verify the new AI UV Grid Studio on the actual MTS Pages build with the user's enderman 1536×1536 AI output and original 64×32 texture, plus cat ConnectedNet mapping. Check 3D UV landmarks/eye overlay, magenta halo at black borders, and source-mask IoU **on raw AI before restoration**. Add a safe same-image real fixture pair to tests and finish binary archive recovery (13 files still external). Compare multiple grid/no-grid generations before picking a global default; do not claim output-mask equality measures AI geometry.
 
 **Separate app checks remaining:** real-device Diamond Ore mask paint/erase, unchanged parent pixels, save/reload, touch-size/mismatch handling, and `Mineral birleştir` discoverability; spot-check Bone Block/barrel/beehive/TNT multi-face previews; measure first usable catalog paint if startup slows.
 
