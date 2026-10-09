@@ -27,4 +27,16 @@ assert.deepEqual(scaleSavedRects([{x:1,y:1,w:2,h:2}],6,4,12,8),[{x:2,y:2,w:4,h:4
 const empty=rgba(4,3,()=>[0,0,0,0]);
 assert.deepEqual([...compositeRegion(base,empty,chosen).image.data],[...base.data],'transparent imported pixels do not erase alpha or colors');
 assert.throws(()=>extractRegion(base,[{x:99,y:99,w:2,h:2}]));
+
+const colored=rgba(8,4,(x,y)=>x<4?[20+x,5,7,255]:[140+x,9,12,255]);
+const dst=rgba(4,4,()=>[13,17,19,255]);
+const onlyRight=compositeRegion(dst,colored,[{x:1,y:1,w:2,h:2}],{sourceRect:{x:4,y:0,w:4,h:4}});
+for(let y=0;y<4;y++)for(let x=0;x<4;x++){
+ const i=(y*4+x)*4;
+ if(x>=1&&x<=2&&y>=1&&y<=2)assert.ok(onlyRight.image.data[i]>=144,'only source island from RIGHT is sampled');
+ else assert.deepEqual([...onlyRight.image.data.slice(i,i+4)],[13,17,19,255],'all unselected target pixels untouched');
+}
+assert.equal(onlyRight.image.data[(1*4+1)*4],145,'selected crop maps its own left edge, not imported atlas left');
+assert.throws(()=>compositeRegion(dst,colored,[{x:0,y:0,w:1,h:1}],{sourceRect:{x:99,y:0,w:2,h:2}}),/outside PNG/);
+
 console.log('UV partial-region extraction, masking, alpha lock, atlas mapping and saved rectangle scaling: PASS');
