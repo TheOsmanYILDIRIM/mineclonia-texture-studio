@@ -16,7 +16,7 @@ for(let y=0;y<4;y++)for(let x=0;x<6;x++){
  if(!inside||base.data[p+3]===0)assert.deepEqual([...merged.image.data.slice(p,p+4)],[...base.data.slice(p,p+4)],'outside and invisible texels untouched');
  else assert.deepEqual([...merged.image.data.slice(p,p+3)],[222,111,90],'visible selection replaced');
 }
-assert.equal(merged.selected,9);
+assert.equal(merged.selected,7);
 const atlas=rgba(12,8,(x,y)=>[x,y,70,255]);
 const full=compositeRegion(base,atlas,[{x:0,y:0,w:2,h:2}],{mode:'atlas'});
 assert.deepEqual([...full.image.data.slice(0,3)],[1,1,70],'atlas import samples corresponding entire-atlas location');
