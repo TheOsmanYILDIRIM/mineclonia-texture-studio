@@ -12,7 +12,9 @@ function attach({animation,model,gl,positionBuffer,redraw,stage}){
  destroy();if(!animation||!animation.animated||!animation.frames)return null;ensureCSS();
  const host=document.createElement('section');host.className='mts-b3d-anim';host.setAttribute('aria-label','Model animasyonu');
  const limit=animation.frames,known=nativeClips[String(model||'').toLowerCase()]||[];
- const clips=[['Tüm kareler',0,limit,Math.min(animation.fps||25,60)],...known.filter(c=>c[1]<=limit).map(c=>[c[0],c[1],Math.min(c[2],limit),c[3]])];
+ const boundaries=[...new Set((animation.keyframes||[]).filter(n=>Number.isFinite(n)&&n>=0&&n<=limit))].sort((a,b)=>a-b);
+ const intervals=[];for(let i=0;i<boundaries.length-1&&intervals.length<80;i++){const a=boundaries[i],b=boundaries[i+1];if(b-a>=2)intervals.push(['Kare '+a+'–'+b,a,b,Math.min(animation.fps||25,60)])}
+ const clips=[['Tüm kareler',0,limit,Math.min(animation.fps||25,60)],...known.filter(c=>c[1]<=limit).map(c=>[c[0],c[1],Math.min(c[2],limit),c[3]]),...intervals];
  const option=clips.map((c,i)=>'<option value="'+i+'">'+c[0]+'</option>').join('');
  host.innerHTML='<div class="mts-b3d-anim-head"><strong>Animasyon</strong><select aria-label="Animasyon türü" class="mts-anim-clip">'+option+'</select><button type="button" class="mts-anim-play" aria-label="Oynat">▶</button><button type="button" class="mts-anim-reset" aria-label="İlk kareye dön">↶</button></div>'+
  '<div class="mts-b3d-anim-rail"><input class="mts-anim-frame" type="range" min="0" max="'+limit+'" step="1" value="0" aria-label="Kare"/><span class="mts-anim-indicator">0 / '+limit+'</span></div>'+
