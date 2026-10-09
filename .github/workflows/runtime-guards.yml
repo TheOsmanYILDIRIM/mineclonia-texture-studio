@@ -29,5 +29,7 @@ jobs:
         run: |
           node tests/uv-generation-roundtrip.test.mjs
           node scripts/build-uv-generation.mjs --check
+      - name: Check UV detail production bundle
+        run: node scripts/build-uv-detail-grid.mjs --check
       - name: Check B3D skeletal animation regression
         run: node tests/b3d-animation.test.cjs
