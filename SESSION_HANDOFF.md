@@ -1,88 +1,24 @@
-# SESSION_HANDOFF — 2026-10-09 · ACTIVE-UV REGIONAL EDITOR
+# SESSION_HANDOFF — Mineclonia Texture Studio
+Updated: 2026-10-09. Canonical branch: `main`.
 
-## Saved-island thumbnail gallery and adjustable joystick steps (2026-10-09)
+## Current verified repository state
+- Last checked code HEAD before closeout: `696538e0f3f8c7042966c0f238b3cc8b72fa84ef` (regional UV editor visual-flow diagnostics). Documentation closeout updates follow; inspect GitHub HEAD when resuming.
+- B3D animation safety guard: PR #26, `eea87f84`. On animated bind-mesh mismatch against the static parser (positions, UV, triangle indices), the viewer falls back to static geometry. This is a safety fallback, **not a rig repair**.
+- PR #25, `77d3611`, reverted the unverified owner-node rigid deformation from PR #24. The zero-length B3D chunk parser fix remains.
+- The latest animated-rig state is **NOT VALIDATED**. User reports several models malformed immediately on opening, before pressing Play. Do not infer all models are affected; do not assume the last commit introduced the original fault.
+- GitHub combined status for code HEAD `696538e0` and B3D PR #26 commit had no statuses; commit-associated workflow query yielded no runs. **Pages deployment and CI success are not confirmed** from these checks. Do not claim the live site is fixed.
 
-Added a compact `1 · 2 · 4 · 8 px` segmented picker underneath the joystick. Default fine mode remains 1 px with the previous enlarged dead zone and 260 ms repeat interval; selected step persists separately at `mts_uv_joystick_step_v1` and applies only to Edit movement of the whole selection or selected corner (Pan behavior stays unchanged). Replaced the registered-island text dropdown with horizontally scrollable cards: each thumbnail draws *only* persisted selection rectangles from the **current active** UV, with clear selected state, item count, and tap-to-reuse. No change to existing `mts_uv_islands_v1:` schema or export/import semantics. The saved gallery rerenders after confirmed active edits. Visual capture QA now checks mode switching and nonempty thumbnails at mobile/tablet/desktop. Verify Runtime Guards / Pages / visual-capture outcomes and Android touch placement before claiming fully validated.
+## Main application functionality
+- Texture detail: grid PNG export and AI-grid import with saved per-texture mapping; aspect-preserving input resize; controls hidden for non-mob-UV textures. Normal import/export and persisted edits retained.
+- Regional UV editor: active UV, Pan/Edit, source/target region selection, 1–12× zoom, joystick step 1/2/4/8 px, saved-island thumbnails. Browser/device touch and visual QA remain open.
+- UV roundtrip: original → grid → original was pixel-exact in prior local tests; this is **not** AI geometric fidelity proof. Source geometry/alpha is authoritative.
+- Original B3D animations: 85 models parsed in an earlier local check, 75 had animation timelines; parsing/sampling is not a correct-rig or real-device rendering test. Only four named-clip mappings are hardcoded; remaining models use generic timeline/keyframe intervals.
 
-## Simplified Pan/Edit and two-sided island mapping (2026-10-09)
+## Highest priority next session — actual B3D rig diagnosis
+1. Inspect current `js/preview3d.js` static `parseB3D` and `js/b3d-animation.js` animation parser on the **same authentic** Mineclonia B3D buffers, including cat and Enderman plus representative rigs. Do not apply speculative rig transforms.
+2. Compare vertex count/order, positions, UV, indices, bind pose, mesh-owner hierarchy, BONE weight indexing, matrix convention and weighted skinning at frame 0 and representative frames. Save a compact per-model parity report and reproducible failing fixtures.
+3. Fix the actual parser/skinning mismatch; keep the static fallback until authentic B3D tests prove parity. Then validate animation playback and Lua clip ranges, plus Android WebGL rendering.
+4. Check GitHub Actions Runtime Guards, visual capture and GitHub Pages **for the actual code commit**. Do not confuse documentation-only commits with deploys.
 
-Rebuilt the regional editor UI: only two small left-hand modes (Pan/Edit), a zoom slider, and a single joystick. Removed the entire row of adjustment buttons and arrow controls; island management and numeric registration are collapsed by default. Corner/center markers on the selection itself choose joystick adjustment mode, with a larger dead zone and a 260ms throttle at one source pixel per deliberate step. On PNG import the **loaded source image** becomes the active canvas in Edit mode and the user MUST draw its source island separately; there is no automatic whole-PNG fit or save-enabled preview. Only an explicitly selected sourceRect is mapped to the active target rect union, preserving all unselected RGBA bytes and active alpha. Updated the browser QA workflow to assert the target/source two-step selection and hidden save state; follow up on Android touch UX and visually confirm source-to-target landmarks.
-
-## Zoom and corner-control update (2026-10-09)
-
-Added 1×–12× zoom slider, ± and fit controls, a scrollable image viewport, explicit corner modes and direct on-canvas corner handles. The existing joystick moves the selected corner/whole rectangle by one source pixel per input step; pan mode scrolls the zoomed viewport instead of changing UV coordinates. Crop / import / composite APIs and saved island records are unchanged. Browser visual test and Android touch validation remain necessary.
-
-## Regional UV editing (2026-10-09)
-
-The **Ada / Bölgesel UV** entry routes to lazy ES module `js/island-region-studio.mjs`; legacy Island Studio/repack remains available as historical code but is not the primary flow. Opening a texture loads its current active edit (otherwise original). The editor allows direct manual rectangles or reuse/add/cycle/delete of persisted `mts_uv_islands_v1:` groups, with automatic saved-geometry remapping when current texture resolution differs. A selected cropped PNG is exported with transparent pixels outside the chosen rect union. Imported PNG can map as a region or a full atlas; numeric x/y/scale adjustments update a **preview**, then explicit confirmation stores the *full* alpha-locked composite through `MTSIslandBridge.saveRestored`. The pure ES-module core preserves all RGBA bytes outside the chosen region, preserves all original alpha bytes, and ignores transparent source pixels. `tests/island-region-core.test.mjs` is included in Runtime Guards. Real Android pointer/PNG/3D integration must still be checked; a geometrically changed AI PNG may require finer correspondence than global x/y/scale.
-
-## URGENT B3D rig rollback (2026-10-09)
-
-User reported all animated rigs distorted. PR #25 merged at `77d3611`, reverting the unverified rigid owner-node delta introduced by PR #24 and its test. B3D zero-length chunk parsing remains. Browser script cache keys updated. This is a containment rollback, **not** validation that the previous animation rig was correct. Do not reintroduce owner-node transform heuristics without authentic B3D bind-pose and skinning tests. Next: inspect original B3D node/mesh hierarchy, weighted vertex indices, matrix conventions, bind pose vs static mesh, real cat/Enderman/other models; verify deployment and Android 3D.
-
-## B3D rigid-node animation correction (2026-10-09)
-
-PR #24 merged as `a04003c`: `js/b3d-animation.js` previously left unweighted vertices at bind positions, ignoring animated owner NODE transforms. Corrected rigid fallback to `delta[mesh.owner]` before weighted bone blending; added synthetic animated mesh with zero BONE weights regression to `tests/b3d-animation.test.cjs`. Bumped lazy preview and parser cache keys. This fixes a concrete engine-level issue affecting cats and potentially other models; **not** proof that all model clips or cat Lua ranges are correct. Next: verify new Runtime Guards/Pages deployment, real cat B3D in mobile WebGL and compare all model animation clip ranges to Mineclonia Lua definitions. Avoid treating every B3D keyframe interval as a semantically named clip.
-
-## B3D animation repair — 2026-10-09
-
-Fixed the real cause of missing cat animations: `js/b3d-animation.js` rejected valid zero-payload B3D chunks because it checked `cur <= begin` even after consuming the 8-byte chunk header. In Mineclonia's `mobs_mc_cat.b3d` an empty `BONE` chunk exists for non-weighted head controls. The parser now accepts zero-length bodies and rejects only backwards movement. Updated the synthetic regression with a zero-payload `BONE`, and bumped both lazy preview and parser cache query tokens. In a local test using the attached `mineclonia_texturepack.zip`, all **85 .b3d** files parsed/sampled without exceptions after the repair; **75** exposed animated timelines, and the cat's 278 keyframes were sampled with finite deforming vertices. This is parsing/pose validation, **not** Android WebGL visual verification; run Runtime Guards and Pages for the new commit, then test cats and several other entity models in the deployed 3D viewer. Lua-named clip coverage beyond the four confirmed model definitions is still open.
-
-Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio` · branch `main`.
-Last code-work baseline checked before this documentation close: `53fc5ca79be5bef5bad1e9f2392722dfdd10e6e8`. Pre-close documentation HEAD `082077b14f6efa57c5106fd75151333848903733` had **successful** Runtime Guards and Pages deployment; later `[skip ci]` documentation commits are **not** evidence of a new deployed build. GitHub current code/Actions always outranks this snapshot.
-
-## UV import resolution compatibility (2026-10-09)
-
-PR #23 merged at `5e15bd7`: the main texture-detail UV import now accepts AI outputs with the **same aspect ratio** as the saved grid even if dimensions differ (e.g. 1024² vs 1536²). It resamples proportionally into manifest coordinates before inverse UV reconstruction, records the original dimensions and resize flag in the report, and still rejects aspect mismatch without cropping/stretching. Main app and lazy adapter cache tokens bumped. Verify real Android upload and edge quality; proportional resampling is not pixel-exact AI geometry proof.
-
-## Texture-detail UV integration (2026-10-09)
-
-PR #21 merged to `main` at `7785ce4`: the **main texture detail screen**, including mobile **İndir** drawer, now has `Gridli PNG indir` and `AI grid PNG içe aktar`. The first uses canonical original Mineclonia PNG, magenta grid with 8px clearance, and saves a small `mts_uv_grid_export_v1:<path>` manifest in localStorage. The second imports AI PNG and applies recorded inverse mapping with bounded grid shift and optional edge-magenta cleanup, then forwards restored PNG to existing `importPng` / normal edit persistence and 3D preview. Ordinary original/edited PNG buttons and upload remain untouched. Non-entity/animated assets have buttons disabled. Cat ConnectedNet is selected only for explicitly named calico 64×32; otherwise square-centered reversible packing. A session requires grid export on this browser first; missing mapping blocks guessed reconstruction. Lazy compiled `js/uv-detail-grid.bundle.js` comes from ES modules using `scripts/build-uv-detail-grid.mjs`. Runtime Guards now include roundtrip and bundle freshness tests. **Still verify** CI/Pages for this merge, mobile export→AI PNG→import→saved texture→3D on actual device; grid mask completion is not independent AI alignment proof.
-
-## AI UV quick import/export — 2026-10-09
-
-Merged PR #20 as `bf893218`: `uv-generation.html` now offers a single ZIP containing `original.png`, `grid.png`, `mapping.json`; a later session can import this ZIP and select the AI PNG, and restoration automatically downloads the Mineclonia PNG. Source remains modular (`js/uv-generation-ui.mjs`), production bundle rebuilt to match `scripts/build-uv-generation.mjs`. Original UV math, saved edits and B3D untouched. Verify Runtime Guards/Pages for merge commit and perform Android smoke test: ZIP export → reload → ZIP import → AI PNG → restore download. Browser-generated downloads may require mobile permission. Existing detailed/manual JSON options remain available.
-
-## Current working priority — experimental UV generation reliability
-
-**New in this implementation:** Opt-in browser `uv-generation.html` (AI UV Grid Studio) and standalone ES modules + deterministic single-file production bundle. A native Mineclonia PNG becomes a square magenta-grid AI reference (8px UV clearance by default) plus inverse mapping JSON; generated PNG returns to the original native UV coordinates with optional bounded grid-shift recognition and magenta-edge repair. Cat ConnectedNet uses the committed explicit map; Enderman/general square-center does not guess islands by brightness. Unlike earlier one-off enderman crops, every output has an inverse manifest. See `docs/UV_GENERATION_ROUNDTRIP.md` for limits. Node synthetic regression and bundle freshness test were run locally; deployed Pages and real-device 3D need verification after the merge. No user edit store, B3D UV or animation tracks changed.
-
-
-Prevent AI image generation from distorting true Mineclonia entity UV layout; use postprocessing only as a guarded fallback. **Read [`tools/uv-pipeline/CONNECTED_NET_EXPERIMENTS.md`](tools/uv-pipeline/CONNECTED_NET_EXPERIMENTS.md)** for verified dimensions, experiments, A/B metrics, invalid claims and next experiment. Historical policy/limits: `tools/uv-pipeline/PREVENTION_FIRST_HANDOFF.md` and directory `README.md`.
-
-- Keep `creeper_outer_rigid_truevoid.py` immutable. The guarded V2 aligner is offline, *not universally validated*; old cat/Enderman `validated` claims obtained by pre-applying target mask to AI were circular.
-- Cat source: native **64×32**, temporary connected-net **64×64**, ×24 AI presentation. Original→pack→unpack is pixel-exact by integer translation, but this proves mapping only — **not** generated texture semantics.
-- Latest user-created cat outputs: **solid cyan matte (no line)** vs **cyan + external 1-px magenta guard**. Before final mask restoration, measured source-mask IoU **0.983031 vs 0.964209** respectively; in 3D they differ especially in eyes/face. Both still need semantic UV approval. Exact original alpha is applied only *after* the independent mask audit.
-- Attempted guard-line cleanup did **not** actually detect/inpaint the visible line: detected magenta pixels **0**. A reported cleaned IoU **1.0** came solely from forcing the original target mask; it is *not evidence* guard pixels are gone or semantically aligned.
-- Transparent output is not guaranteed even from RGBA-transparent input. Hidden-RGB/edge-bleed experiment did **not** demonstrate a clear benefit. Gray-square, stretched-square and independently generated head-crop trials were not winners in these individual samples. A successful horse AI atlas remains a user observation, unverified as a benchmark.
-- **Recovery committed:** `tools/uv-pipeline/experiments/cat-connected-net/` now contains the four *byte-identical archived* Python scripts, native 64×32 PNG, mapping, prompt, validation JSON, two historical READMEs, guard comparison JSON, manifest, and a verified `restore_binary_fixtures.py` helper. Primary source commit `e8e81f6`; follow-up archival commits `055e5fe` and `a183160`; all checked through GitHub. **13 larger binary fixtures** (B3D model, four AI-input variations, five AI/restored PNGs, three visual reports) still exist only in the conversation ZIP `MTS_ConnectedNet_UV_Closeout_2026-10-08.zip`, not in GitHub. Local restore helper validated 14 binary checksums, restored 13 missing files and was idempotent, but this does not itself push them to GitHub.
-
-## Entity 3D animation preview (2026-10-09)
-
-- Latest main commits `e8484c3`, `adcc769`, `04aa4a8`: clamp key sampling correctly outside first/last B3D keyframe, expose sorted native keyframe boundaries and show up to 80 nontrivial native keyframe intervals for any animated B3D model, retaining verified named clips for four models. Lazy JS cache version bumped. These intervals are **not** independently verified semantic Lua animation names. No new actual Mineclonia Lua definitions imported yet; full per-model named animation coverage is **unfinished**.
-- Next: generate authoritative per-model animation clip manifest from Mineclonia Lua sources, resolve by model identity and verify real B3D fixtures/rigged mesh deformation; extend tests for boundary clamping, mesh hierarchy and per-mesh weights. Check Runtime Guards and Pages deployment for latest code. Do not claim all-model animation complete until verified.
-
-
-- Added isolated `js/b3d-animation.js` (B3D node hierarchy + ANIM / BONE / KEYS decoding, interpolated node transforms and CPU skinning), `js/b3d-preview-controls.js` and `css/b3d-animation.css`. The existing `js/preview3d.js` lazily loads them only for entity skins and writes sampled positions to a dynamic WebGL vertex buffer. `js/app.js` lazy viewer cache version changed.
-- UI: play/pause, restart, animation presets sourced from inspected Mineclonia `ocelot.lua` (cat), `pig.lua`, `creeper.lua`, `enderman.lua`; arbitrary start/end frame, frame scrub and speed. Entities lacking valid animation data still use the static preview; stop/close cancels animation frames.
-- Fixed B3D root chunk byte-length calculation in both animation parser and existing static parser. Original UV coordinates, texture blobs and IndexedDB/localStorage remain untouched.
-- `tests/b3d-animation.test.cjs` checks a synthetic weighted B3D triangle: static UV, index integrity and expected half/end-keyframe translations. Added to `.github/workflows/runtime-guards.yml`; run `37938833902` succeeded (initial assertion error corrected in commit `d532769b`). Deploy run `37938833929` succeeded.
-- **Verification:** all three JS files compiled; synthetic weighted B3D test passed in Runtime Guards for commit `d532769b`, and GitHub Pages deployment for that commit completed successfully. Authentic Mineclonia B3D samples include cat 277 frames / pig 81 / Enderman 200 across subtrees, but **interactive mobile WebGL animation is not yet visually verified** in this chat. Confirm B3D skin deformation, per-clip model pose, optional overlays, and static fallback on actual device before treating as finished. Never claim the test proves all real model animation tracks.
-- Keep entity animation modules lazy and isolated; browser edit storage / UV atlas data are not changed. Any remaining animation parser fallback should be surfaced in console as a warning.
-
-## Browser application — stable separate workstream
-
-- Startup no longer eagerly hydrates node-face metadata, prompt records or offscreen thumbnails; preserve lazy loading. Relevant commits: `d93da3b`, `25e843d`, `5ff593a`, `fb5071f`, `ac89e94`.
-- Mineclonia-source-driven 3D block profile/face resolution includes sibling texture lookup; key commits `29552911`, `ee9cc1e5`, `fda4285b`, `5aa65f05`. Keep block faces/profile data authoritative rather than cube fallback.
-- Schema-v2 per-texture prompts use `js/prompt-registry.js`. `js/locked-parent-composite.js` is opt-in ore mask compositing: completed Stone/Deepslate remains byte-identical outside a user-confirmed mineral mask. Relevant commits `1c2277a`, `be51540`.
-- Browser persistent edits, import/export, UV wizard/routing and build-cache semantics are protected by `AGENTS.md`; no runtime files or storage were changed during this closeout.
-
-## Verification and open work
-
-**Confirmed previously:** runtime guards and Pages deployment both succeeded at documentation commit `082077b`; offline recovered Creeper regression was previously 12/12 (not re-run at closure); connected-net pure pack/unpack was verified pixel-exact. Experiment measurements above are single local examples, not repeated model benchmarks. Documentation-only changes have no production verification claim.
-
-**Next concrete UV step:** Verify the new AI UV Grid Studio on the actual MTS Pages build with the user's enderman 1536×1536 AI output and original 64×32 texture, plus cat ConnectedNet mapping. Check 3D UV landmarks/eye overlay, magenta halo at black borders, and source-mask IoU **on raw AI before restoration**. Add a safe same-image real fixture pair to tests and finish binary archive recovery (13 files still external). Compare multiple grid/no-grid generations before picking a global default; do not claim output-mask equality measures AI geometry.
-
-**Separate app checks remaining:** real-device Diamond Ore mask paint/erase, unchanged parent pixels, save/reload, touch-size/mismatch handling, and `Mineral birleştir` discoverability; spot-check Bone Block/barrel/beehive/TNT multi-face previews; measure first usable catalog paint if startup slows.
-
-No manual GitHub Actions dispatch, no browser storage migration, no deployed feature changes as part of this closure.
+## Durable rules
+Read `AGENTS.md`, `README.md`, `PROMPT_AUTHORING_GUIDE.md`, and relevant UV documentation before changes. Keep source modular; build production bundles deterministically. Preserve existing IndexedDB/localStorage data and original UV, alpha, and game-facing textures. Never clear or silently migrate edits. Keep handoff short and replace stale sections on future closeout.
