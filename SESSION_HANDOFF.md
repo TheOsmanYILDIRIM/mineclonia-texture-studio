@@ -1,5 +1,9 @@
 # SESSION_HANDOFF — 2026-10-09 · B3D ANIMATION EXPANSION
 
+## B3D rigid-node animation correction (2026-10-09)
+
+PR #24 merged as `a04003c`: `js/b3d-animation.js` previously left unweighted vertices at bind positions, ignoring animated owner NODE transforms. Corrected rigid fallback to `delta[mesh.owner]` before weighted bone blending; added synthetic animated mesh with zero BONE weights regression to `tests/b3d-animation.test.cjs`. Bumped lazy preview and parser cache keys. This fixes a concrete engine-level issue affecting cats and potentially other models; **not** proof that all model clips or cat Lua ranges are correct. Next: verify new Runtime Guards/Pages deployment, real cat B3D in mobile WebGL and compare all model animation clip ranges to Mineclonia Lua definitions. Avoid treating every B3D keyframe interval as a semantically named clip.
+
 ## B3D animation repair — 2026-10-09
 
 Fixed the real cause of missing cat animations: `js/b3d-animation.js` rejected valid zero-payload B3D chunks because it checked `cur <= begin` even after consuming the 8-byte chunk header. In Mineclonia's `mobs_mc_cat.b3d` an empty `BONE` chunk exists for non-weighted head controls. The parser now accepts zero-length bodies and rejects only backwards movement. Updated the synthetic regression with a zero-payload `BONE`, and bumped both lazy preview and parser cache query tokens. In a local test using the attached `mineclonia_texturepack.zip`, all **85 .b3d** files parsed/sampled without exceptions after the repair; **75** exposed animated timelines, and the cat's 278 keyframes were sampled with finite deforming vertices. This is parsing/pose validation, **not** Android WebGL visual verification; run Runtime Guards and Pages for the new commit, then test cats and several other entity models in the deployed 3D viewer. Lua-named clip coverage beyond the four confirmed model definitions is still open.
