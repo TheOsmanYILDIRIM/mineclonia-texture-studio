@@ -40,7 +40,7 @@ function parse(buffer){
  // Skin indices attached to original mesh-vertex records, not flattened duplicate indices.
  function pose(frame){const worlds=new Array(nodes.length);function walk(i){const n=nodes[i],k=sampleKeys(n,frame);worlds[i]=mul(n.parent===null?ident():worlds[n.parent],matrix(k.p,k.s,k.q));for(const j of n.children)walk(j)}nodes.forEach((n,i)=>{if(n.parent===null)walk(i)});
  const delta=nodes.map((n,i)=>mul(worlds[i],n.inverse));
- for(let i=0;i<allVertices.length;i++){const vx=allVertices[i],p=bindWorld[i],inf=vx.mesh.weights[vx.vi],sum=inf.reduce((s,w)=>s+w[1],0),keep=Math.max(0,1-sum);const dest=[p[0]*keep,p[1]*keep,p[2]*keep];let total=keep;for(const [node,weight] of inf){const q=point(delta[node],p);for(let k=0;k<3;k++)dest[k]+=q[k]*weight;total+=weight}for(let k=0;k<3;k++)positions[i*3+k]=((dest[k]/(total||1))-mid[k])*norm}return positions}
+ for(let i=0;i<allVertices.length;i++){const vx=allVertices[i],p=bindWorld[i],inf=vx.mesh.weights[vx.vi],sum=inf.reduce((s,w)=>s+w[1],0),keep=Math.max(0,1-sum);const rigid=point(delta[vx.mesh.owner],p);const dest=[rigid[0]*keep,rigid[1]*keep,rigid[2]*keep];let total=keep;for(const [node,weight] of inf){const q=point(delta[node],p);for(let k=0;k<3;k++)dest[k]+=q[k]*weight;total+=weight}for(let k=0;k<3;k++)positions[i*3+k]=((dest[k]/(total||1))-mid[k])*norm}return positions}
  return {mesh:{p:Array.from(base),uv:uvs,idx:indices,groups},frames:frameMax,fps,animated:nodes.some(n=>n.keys.length&&n.weights.length)||nodes.some(n=>n.keys.length),bones:nodes.filter(n=>n.weights.length).length,nodes:nodes.length,keyframes:[...keyFrames].sort((a,b)=>a-b),sample:pose,bindPositions:base};
 }
 window.MTSB3DAnimation={parse};
