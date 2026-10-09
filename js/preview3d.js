@@ -701,12 +701,14 @@
  document.getElementById('preview3dSurfaceToggle')?.addEventListener('click',async()=>{if(!active||!canSurface(active))return;mode=mode==='surface'?'object':'surface';await render()});
  document.getElementById('preview3dProjection')?.addEventListener('click',()=>{if(!entityGL?.isBlockCube)return;projection=projection==='orthographic'?'perspective':'orthographic';const b=document.getElementById('preview3dProjection');b?.classList.toggle('perspective',projection==='perspective');const s=b?.querySelector('span');if(s)s.textContent=projection==='perspective'?'Persp':'Ortho';b?.setAttribute('aria-label','Projection: '+projection);drawEntityGL()});
 
- stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
+ stage.style.touchAction='none';
+ stage.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')e.preventDefault();stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const a=[...pointers.values()];lastPinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
  stage.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')e.preventDefault();
   const prev=pointers.get(e.pointerId);if(!prev)return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(pointers.size===1){ry-=e.clientX-prev.x;rx-=e.clientY-prev.y;rx=Math.max(-85,Math.min(85,rx));applyView();return}
-  if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);panX+=(e.clientX-prev.x)/2;panY+=(e.clientY-prev.y)/2;panX=Math.max(-stage.clientWidth,Math.min(stage.clientWidth,panX));panY=Math.max(-stage.clientHeight,Math.min(stage.clientHeight,panY));if(lastPinch)zoom=Math.max(.35,Math.min(2.4,zoom*d/lastPinch));lastPinch=d;applyView()}
+  if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);panX+=e.clientX-prev.x;panY+=e.clientY-prev.y;panX=Math.max(-stage.clientWidth,Math.min(stage.clientWidth,panX));panY=Math.max(-stage.clientHeight,Math.min(stage.clientHeight,panY));if(lastPinch)zoom=Math.max(.35,Math.min(2.4,zoom*d/lastPinch));lastPinch=d;applyView()}
  });
  const end=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinch=0};
  stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
