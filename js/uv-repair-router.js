@@ -6,10 +6,13 @@ async function openPrimary(){
   toast('Vertex UV Studio yüklenemedi');
   return false;
 }
+let regionEditorPromise=null;
 async function openIsland(path=null){
-  if(window.MTSIslandStudio?.open)return await window.MTSIslandStudio.open(path);
-  toast('Ada seçim ekranı yüklenemedi');
-  return false;
+  try{
+    if(!regionEditorPromise)regionEditorPromise=import('./island-region-studio.mjs?v=20261009-region1').catch(e=>{regionEditorPromise=null;throw e});
+    const editor=await regionEditorPromise;
+    return await editor.open(path);
+  }catch(e){console.error('Regional UV editor',e);toast('Bölgesel UV editörü açılamadı');return false}
 }
 async function openLegacyMapper(){
   if(window.MTSUvMapper?.open)return await window.MTSUvMapper.open();
