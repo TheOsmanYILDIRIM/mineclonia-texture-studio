@@ -17,7 +17,7 @@
  function loadB3DRuntime(){
   if(window.MTSB3DAnimation&&window.MTSB3DPreviewControls)return Promise.resolve();
   if(!b3dRuntimePromise)b3dRuntimePromise=(async()=>{
-   for(const src of ['js/b3d-animation.js','js/b3d-preview-controls.js']){
+   for(const src of ['js/b3d-animation.js?v=20261009-animation1','js/b3d-preview-controls.js?v=20261009-animation1']){
     if(src.includes('b3d-animation.js')&&window.MTSB3DAnimation)continue;
     if(src.includes('b3d-preview-controls.js')&&window.MTSB3DPreviewControls)continue;
     await new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=src;el.onload=resolve;el.onerror=()=>reject(Error('B3D animasyon modülü yüklenemedi: '+src));document.head.appendChild(el)});
@@ -492,7 +492,7 @@
     }else pos=ce;
    }pos=end;
   }
-  if(tag()!=='BB3D')throw Error('B3D header bulunamadı');const rootEnd=Math.min(v.byteLength,pos+i32());if(pos+4<=rootEnd)i32();chunks(rootEnd,I4);
+  if(tag()!=='BB3D')throw Error('B3D header bulunamadı');const rootSize=i32(),rootEnd=Math.min(v.byteLength,pos+rootSize);if(pos+4<=rootEnd)i32();chunks(rootEnd,I4);
   if(out.p.length<9||out.idx.length<3)throw Error('B3D mesh/UV bulunamadı');
   let min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
   for(let i=0;i<out.p.length;i+=3)for(let k=0;k<3;k++){min[k]=Math.min(min[k],out.p[i+k]);max[k]=Math.max(max[k],out.p[i+k])}
