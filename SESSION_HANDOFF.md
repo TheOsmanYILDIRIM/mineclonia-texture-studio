@@ -1,4 +1,4 @@
-# SESSION_HANDOFF — 2026-10-09 · B3D ANIMATION IMPLEMENTATION
+# SESSION_HANDOFF — 2026-10-09 · B3D ANIMATION EXPANSION
 
 Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio` · branch `main`.
 Last code-work baseline checked before this documentation close: `53fc5ca79be5bef5bad1e9f2392722dfdd10e6e8`. Pre-close documentation HEAD `082077b14f6efa57c5106fd75151333848903733` had **successful** Runtime Guards and Pages deployment; later `[skip ci]` documentation commits are **not** evidence of a new deployed build. GitHub current code/Actions always outranks this snapshot.
@@ -17,7 +17,11 @@ Prevent AI image generation from distorting true Mineclonia entity UV layout; us
 - Transparent output is not guaranteed even from RGBA-transparent input. Hidden-RGB/edge-bleed experiment did **not** demonstrate a clear benefit. Gray-square, stretched-square and independently generated head-crop trials were not winners in these individual samples. A successful horse AI atlas remains a user observation, unverified as a benchmark.
 - **Recovery committed:** `tools/uv-pipeline/experiments/cat-connected-net/` now contains the four *byte-identical archived* Python scripts, native 64×32 PNG, mapping, prompt, validation JSON, two historical READMEs, guard comparison JSON, manifest, and a verified `restore_binary_fixtures.py` helper. Primary source commit `e8e81f6`; follow-up archival commits `055e5fe` and `a183160`; all checked through GitHub. **13 larger binary fixtures** (B3D model, four AI-input variations, five AI/restored PNGs, three visual reports) still exist only in the conversation ZIP `MTS_ConnectedNet_UV_Closeout_2026-10-08.zip`, not in GitHub. Local restore helper validated 14 binary checksums, restored 13 missing files and was idempotent, but this does not itself push them to GitHub.
 
-## New entity 3D animation preview (2026-10-09)
+## Entity 3D animation preview (2026-10-09)
+
+- Latest main commits `e8484c3`, `adcc769`, `04aa4a8`: clamp key sampling correctly outside first/last B3D keyframe, expose sorted native keyframe boundaries and show up to 80 nontrivial native keyframe intervals for any animated B3D model, retaining verified named clips for four models. Lazy JS cache version bumped. These intervals are **not** independently verified semantic Lua animation names. No new actual Mineclonia Lua definitions imported yet; full per-model named animation coverage is **unfinished**.
+- Next: generate authoritative per-model animation clip manifest from Mineclonia Lua sources, resolve by model identity and verify real B3D fixtures/rigged mesh deformation; extend tests for boundary clamping, mesh hierarchy and per-mesh weights. Check Runtime Guards and Pages deployment for latest code. Do not claim all-model animation complete until verified.
+
 
 - Added isolated `js/b3d-animation.js` (B3D node hierarchy + ANIM / BONE / KEYS decoding, interpolated node transforms and CPU skinning), `js/b3d-preview-controls.js` and `css/b3d-animation.css`. The existing `js/preview3d.js` lazily loads them only for entity skins and writes sampled positions to a dynamic WebGL vertex buffer. `js/app.js` lazy viewer cache version changed.
 - UI: play/pause, restart, animation presets sourced from inspected Mineclonia `ocelot.lua` (cat), `pig.lua`, `creeper.lua`, `enderman.lua`; arbitrary start/end frame, frame scrub and speed. Entities lacking valid animation data still use the static preview; stop/close cancels animation frames.
