@@ -286,6 +286,8 @@ jobs:
               }, null, 2)
             );
 
+            const regionFailures = stateErrors.filter(s => s.startsWith('island-studio-state:'));
+            if (regionFailures.length) throw new Error('Regional UV browser smoke failed: ' + regionFailures.join('; '));
             await page.close();
           }
 
