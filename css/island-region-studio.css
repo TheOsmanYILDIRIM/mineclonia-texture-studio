@@ -198,3 +198,14 @@
 .islandRegionRoot .regionUvActions{position:static!important;bottom:auto!important;box-shadow:none!important}
 .islandRegionRoot #regionUvSelection{display:none!important}
 @media(max-width:520px){.regionUvControlRow{gap:9px}.regionUvFixedControls{padding:6px;margin:5px}.regionUvNodePad{grid-template-columns:repeat(3,24px)}.regionUvFixedControls .regionUvStepPicker button{min-width:26px}}
+
+.regionUvIslandWrap{position:relative;width:72px;height:72px}
+.regionUvIslandInspect{position:absolute;right:2px;bottom:2px;z-index:2;border:1px solid #607a86;background:#15222de8;color:#e4f3f8;border-radius:6px;width:25px;height:25px;font-size:17px;cursor:pointer}
+.regionUvDetail[hidden]{display:none!important}
+.regionUvDetail{position:fixed;inset:0;z-index:10200;background:#0c1117;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.regionUvDetailTop{display:flex;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid #33434e}
+.regionUvDetailTop strong{font-size:13px}
+.regionUvDetailStage{flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;justify-content:flex-start;padding:16px;overscroll-behavior:contain;background:repeating-conic-gradient(#25303a 0% 25%,#131c24 0% 50%) 50% / 16px 16px}
+.regionUvDetailStage canvas{display:block;flex:none;max-width:none;height:auto;image-rendering:pixelated;object-fit:contain}
+.regionUvDetailZoom{display:flex;gap:12px;align-items:center;padding:12px 18px;border-top:1px solid #33434e;color:#c0cdd5;font-size:12px}
+.regionUvDetailZoom input{flex:1;accent-color:#a7ef86}.regionUvDetailZoom strong{min-width:34px;text-align:right}
