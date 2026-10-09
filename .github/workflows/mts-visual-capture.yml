@@ -259,6 +259,29 @@ jobs:
                     return {left:(x0+.1)/w,top:(y0+.1)/h,right:(Math.min(w-1,x0+sizeX)+.1)/w,bottom:(Math.min(h-1,y0+sizeY)+.1)/h};
                   });
                   await dragCanvas(targetBox.left,targetBox.top,targetBox.right,targetBox.bottom);
+                  // Joystick pixel presets are explicit and retain the existing slow repeat cadence.
+                  await page.locator('[data-region-step="4"]').click();
+                  if (await page.locator('[data-region-step="4"]').getAttribute('aria-pressed') !== 'true') throw new Error('4px joystick step not selected');
+                  if (!(await page.locator('#regionUvHandleStatus').textContent()).includes('4 px / adım')) throw new Error('4px joystick step status not updated');
+                  await page.locator('[data-region-step="1"]').click();
+                  if (await page.locator('[data-region-step="1"]').getAttribute('aria-pressed') !== 'true') throw new Error('1px precision mode not restorable');
+
+                  // Existing saved rectangles should render as thumbnails derived from active UV.
+                  await page.locator('.regionUvSaved').evaluate(el => { el.open = true; });
+                  await page.locator('#regionUvAddIsland').click();
+                  await page.locator('#regionUvAdd').click();
+                  const islandCard = page.locator('#regionUvIslandGallery .regionUvIslandCard.selected').first();
+                  if (await islandCard.count() !== 1) throw new Error('Saved island thumbnail card missing');
+                  const rendered = await islandCard.locator('canvas').evaluate(cv => {
+                    if (cv.width !== 72 || cv.height !== 72) return false;
+                    const pixels = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+                    for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) return true;
+                    return false;
+                  });
+                  if (!rendered) throw new Error('Saved island thumbnail is empty for visible UV region');
+                  await capture(page, `regional-uv-islands-${t.name}-fold`);
+                  await islandCard.click();
+
                   await page.locator('#regionUvFile').setInputFiles({
                     name: 'regional-red-test.png',
                     mimeType: 'image/png',
