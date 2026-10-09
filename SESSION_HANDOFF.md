@@ -14,6 +14,13 @@ Updated: 2026-10-09. Canonical branch: `main`.
 - UV roundtrip: original → grid → original was pixel-exact in prior local tests; this is **not** AI geometric fidelity proof. Source geometry/alpha is authoritative.
 - Original B3D animations: 85 models parsed in an earlier local check, 75 had animation timelines; parsing/sampling is not a correct-rig or real-device rendering test. Only four named-clip mappings are hardcoded; remaining models use generic timeline/keyframe intervals.
 
+
+## 2026-10-09 original-B3D diagnosis (PR #27; branch-only)
+- Authentic `mineclonia_texturepack.zip` contained 85 B3D files; inspected structural records of cat, Enderman, skeleton, zombie, horse, and pig. Valid zero-length BONE sections and multiple TRIS groups appear; BONE weight totals observed equal 1 for tested cat/Enderman/skeleton/zombie meshes. Quaternion lengths were near 1.
+- Definitive preview-on-open bug: `b3d-preview-controls.js` called `setClip()` during `attach`, which called `sample(0)` and overwrote bind geometry before the user played the animation. PR #27 prevents that automatic initial sample. Not a proof of correct skinning when playback starts.
+- Independent frame-1 numerical probe found substantial differences from bind pose for some original models, especially zombie (up to ~8.81 source units), while Enderman and pig were essentially unchanged at frame 1. Such differences may be valid animation poses and are not themselves evidence of a parser error. Continue rig validation against a reference renderer and the Lua frame ranges; do not infer all models are broken.
+- PR #27 commit `6a155b5` currently unmerged; GitHub Actions query for that SHA returned no runs. No deployed fix confirmed.
+
 ## Highest priority next session — actual B3D rig diagnosis
 1. Inspect current `js/preview3d.js` static `parseB3D` and `js/b3d-animation.js` animation parser on the **same authentic** Mineclonia B3D buffers, including cat and Enderman plus representative rigs. Do not apply speculative rig transforms.
 2. Compare vertex count/order, positions, UV, indices, bind pose, mesh-owner hierarchy, BONE weight indexing, matrix convention and weighted skinning at frame 0 and representative frames. Save a compact per-model parity report and reproducible failing fixtures.
