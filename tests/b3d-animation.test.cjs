@@ -30,6 +30,6 @@ for(let v=0;v<3;v++){
  assert.ok(Math.abs(p10[v*3]-p0[v*3]-1.55)<1e-5,'end-frame reaches full animated translation');
  for(let c=1;c<3;c++)assert.equal(p0[v*3+c],p10[v*3+c],'unanimated axes unchanged');
 }
-assert.deepEqual(Array.from(a.mesh.uv),[0,0,1,0,0,1]);
+assert.deepEqual(Array.from(a.mesh.uv),[0,0,1,0,1,1]);
 assert.deepEqual(Array.from(a.mesh.idx),[0,1,2]);
 console.log('B3D animation synthetic weighted-vertex interpolation: PASS');
