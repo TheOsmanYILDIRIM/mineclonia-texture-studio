@@ -232,12 +232,31 @@ jobs:
                     g.fillStyle = '#ef354c'; g.fillRect(0,0,64,64);
                     return c.toDataURL('image/png').split(',')[1];
                   });
+                  // Explicitly choose target UV rectangle first; never use entire atlas implicitly.
+                  const dragCanvas = async (left, top, right, bottom) => {
+                    const r = await page.locator('#regionUvCanvas').boundingBox();
+                    if (!r) throw new Error('Regional canvas missing');
+                    await page.mouse.move(r.x + r.width * left, r.y + r.height * top);
+                    await page.mouse.down();
+                    await page.mouse.move(r.x + r.width * right, r.y + r.height * bottom, { steps: 5 });
+                    await page.mouse.up();
+                  };
+                  await dragCanvas(.38,.37,.56,.55);
                   await page.locator('#regionUvFile').setInputFiles({
                     name: 'regional-red-test.png',
                     mimeType: 'image/png',
                     buffer: Buffer.from(inputPng, 'base64')
                   });
-                  await page.waitForFunction(() => (document.querySelector('#regionUvStatus')?.textContent || '').includes('Bölgesel önizleme'), null, { timeout: 15000 });
+                  await page.waitForFunction(() => document.querySelector('#regionUvStatus')?.textContent?.includes('Yüklenen PNG üzerinde'), null, { timeout: 15000 });
+                  if (await page.locator('.regionUvHandles button').count() || await page.locator('#regionUvLeft').count()) {
+                    throw new Error('Obsolete arrow/corner button cluster still present');
+                  }
+                  if (await page.locator('[data-region-tool]').count() !== 2) throw new Error('Pan/Edit mini rail missing');
+                  if (await page.locator('#regionUvSave').isEnabled()) throw new Error('Saved-enabled before source island selection');
+                  await dragCanvas(.25,.25,.65,.65);
+                  await page.locator('#regionUvPreview').click();
+                  await page.waitForFunction(() => (document.querySelector('#regionUvStatus')?.textContent || '').includes('Birleşim hazır'), null, { timeout: 15000 });
+                  if (!await page.locator('#regionUvSave').isEnabled()) throw new Error('Source island did not produce a valid preview');
                   await capture(page, `regional-uv-preview-${t.name}-fold`);
                   // Preview-only smoke test: never click save or mutate user edit data.
                   await page.evaluate(() => document.querySelector('#regionalUvStudio')?.classList.remove('open'));
