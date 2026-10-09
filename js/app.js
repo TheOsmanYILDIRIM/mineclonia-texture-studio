@@ -1956,6 +1956,21 @@ async function render(){
    setTimeout(pump,120);
  }
 }
+let uvDetailLoader=null;
+function loadUvDetailBridge(){
+  if(window.MTSDetailUv)return Promise.resolve(window.MTSDetailUv);
+  if(!uvDetailLoader){
+    uvDetailLoader=new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src='js/uv-detail-grid.bundle.js?v=20261009-detail1';
+      script.onload=()=>window.MTSDetailUv?resolve(window.MTSDetailUv):reject(Error('UV dönüşüm modülü yüklenemedi'));
+      script.onerror=()=>reject(Error('UV modülü yüklenemedi; bağlantıyı denetle'));
+      document.head.appendChild(script);
+    }).catch(error=>{uvDetailLoader=null;throw error});
+  }
+  return uvDetailLoader;
+}
+
 async function importPng(file,seam=false){
   if(!active||!file)return;
   const target={...active};
@@ -2296,7 +2311,7 @@ async function init(){
     if(!active||assetTypeOf(active)!=='Entity')return toast('Grid UV yalnız mob/entity atlaslarında kullanılır');
     const target={...active};
     try{
-      const [mod,orig]=await Promise.all([import('./uv-detail-grid.mjs?v=20261009-1'),originalBlob(target.path)]);
+      const [mod,orig]=await Promise.all([loadUvDetailBridge(),originalBlob(target.path)]);
       const out=await window.MTSDetailUv.exportGrid(target,orig);
       dl(out.blob,out.name);toast('Magenta grid indirildi • dönüşüm haritası bu texture için saklandı');
     }catch(error){console.error(error);toast('UV grid: '+error.message)}
@@ -2306,7 +2321,7 @@ async function init(){
     const file=e.target.files?.[0];e.target.value='';if(!file||!active)return;
     const target={...active};
     try{
-      const [mod,orig]=await Promise.all([import('./uv-detail-grid.mjs?v=20261009-1'),originalBlob(target.path)]);
+      const [mod,orig]=await Promise.all([loadUvDetailBridge(),originalBlob(target.path)]);
       const out=await window.MTSDetailUv.importGrid(target,orig,file);
       if(!active||active.path!==target.path)throw Error('Texture değişti; kayıt yapılmadı');
       await importPng(new File([out.blob],target.name,{type:'image/png'}),false);
