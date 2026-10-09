@@ -23,7 +23,7 @@ function setZoom(value){
  stage.scrollLeft=Math.max(0,cx*frame.offsetWidth-stage.clientWidth/2);stage.scrollTop=Math.max(0,cy*frame.offsetHeight-stage.clientHeight/2);
  draw();
 }
-function selectHandle(mode){state.mode=mode;document.querySelectorAll('[data-region-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.regionMode===mode));const selected=$('regionUvHandleStatus');if(selected)selected.textContent=({move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt'})[mode]+' · joystick 1 px hassasiyet';}
+function selectHandle(mode){state.mode=mode;document.querySelectorAll('[data-region-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.regionMode===mode));const selected=$('regionUvHandleStatus');if(selected)selected.textContent=({move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt',pan:'Görüntüyü kaydır'})[mode]+' · joystick 1 px hassasiyet';}
 function draw(){
  const base=state.base;if(!base)return;
  const image=state.view==='preview'&&state.preview?state.preview:state.view==='uploaded'&&state.imported?state.imported:base;
@@ -113,7 +113,7 @@ function initJoystick(){
    const r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,rad=r.width*.34,mag=Math.hypot(dx,dy),k=Math.min(1,rad/(mag||1));
    stick.style.transform='translate('+(dx*k)+'px,'+(dy*k)+'px)';
    const sx=Math.abs(dx)>r.width*.16?Math.sign(dx):0,sy=Math.abs(dy)>r.height*.16?Math.sign(dy):0;
-   if((sx||sy)&&performance.now()-last>55){editRect(sx,sy,state.mode);last=performance.now()}
+   if((sx||sy)&&performance.now()-last>55){if(state.mode==='pan'){const stage=$('regionUvStage');stage.scrollLeft+=sx*8;stage.scrollTop+=sy*8}else editRect(sx,sy,state.mode);last=performance.now()}
    e.preventDefault();
  });
  const stop=e=>{if(e.pointerId===pid){pid=null;stick.style.transform='translate(0,0)'}};
@@ -122,7 +122,7 @@ function initJoystick(){
 function initPointer(){
  const stage=$('regionUvStage');
  stage.addEventListener('pointerdown',e=>{
-   if(!state.base||state.view!=='active')return;
+   if(!state.base||state.view!=='active'||state.mode==='pan')return;
    const p=point(e),isGrip=e.target.closest('[data-region-handle]');
    const mode=isGrip?isGrip.dataset.regionHandle:'draw';if(isGrip)selectHandle(mode);
    state.pointer={id:e.pointerId,start:p,old:clone(state.rect),mode};
@@ -211,7 +211,7 @@ function create(){
  '<div class="regionUvZoombar"><button class="btn" id="regionUvZoomOut" aria-label="Uzaklaştır">−</button><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1" aria-label="UV yakınlaştırma"><button class="btn" id="regionUvZoomIn" aria-label="Yakınlaştır">+</button><strong id="regionUvZoomValue">1×</strong><button class="btn" id="regionUvZoomReset">Sığdır</button><span>Yakınlaştırınca görüntüyü kaydırabilirsin.</span></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div>',
  '<div class="islandStudioTools"><button class="btn primary" id="regionUvDirect">Çizili alanı kullan</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Adaya ekle</button><button class="btn" id="regionUvPrev">← Ada</button><button class="btn" id="regionUvNext">Ada →</button><button class="btn" id="regionUvUseIsland">Adayı kullan</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div>',
- '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
+ '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="pan" class="btn">Görseli kaydır</button><button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
  '<div class="islandJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · joystick 1 px hassasiyet</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
  '<div class="regionUvOptions"><label>Yüklenen PNG <select id="regionUvInputMode"><option value="region">Seçilen bölge</option><option value="atlas">Tam UV atlası</option></select></label><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Bölge PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle / eşleştir</button><button class="btn" id="regionUvPreview">Birleşimi önizle</button><button class="btn" id="regionUvFull">Tam UV PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Aktif texture’a kaydet</button><button class="btn" id="regionUv3D">3D bak</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
@@ -243,7 +243,7 @@ function create(){
    if(b.id==='regionUvSave')save();
    if(b.id==='regionUv3D')show3D();
    const steps={regionUvLeft:[-1,0],regionUvUp:[0,-1],regionUvDown:[0,1],regionUvRight:[1,0]};
-   if(steps[b.id])editRect(...steps[b.id],state.mode);
+   if(steps[b.id]){if(state.mode==='pan'){$('regionUvStage').scrollLeft+=steps[b.id][0]*12;$('regionUvStage').scrollTop+=steps[b.id][1]*12}else editRect(...steps[b.id],state.mode)}
  });
  $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)loadPng(f)});
  ['regionUvInputMode','regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(state.imported)makePreview()}));
