@@ -1962,7 +1962,7 @@ function loadUvDetailBridge(){
   if(!uvDetailLoader){
     uvDetailLoader=new Promise((resolve,reject)=>{
       const script=document.createElement('script');
-      script.src='js/uv-detail-grid.bundle.js?v=20261009-detail1';
+      script.src='js/uv-detail-grid.bundle.js?v=20261009-resize2';
       script.onload=()=>window.MTSDetailUv?resolve(window.MTSDetailUv):reject(Error('UV dönüşüm modülü yüklenemedi'));
       script.onerror=()=>reject(Error('UV modülü yüklenemedi; bağlantıyı denetle'));
       document.head.appendChild(script);
