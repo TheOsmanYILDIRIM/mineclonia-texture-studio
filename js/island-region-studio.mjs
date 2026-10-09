@@ -24,6 +24,7 @@ function draw(){
    for(const r of selected()){g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));g.fillRect(r.x,r.y,r.w,r.h)}
  }
  const stats=$('regionUvScope');if(stats)stats.textContent=selected().length+' alan · '+(state.base.width+'×'+state.base.height)+' aktif UV';
+ const grip=$('regionUvSelection');if(grip){const renderRect=$('regionUvCanvas').getBoundingClientRect(),stageRect=$('regionUvStage').getBoundingClientRect(),r=state.rect;grip.style.display=state.view==='active'&&r?'block':'none';if(r){grip.style.left=(renderRect.left-stageRect.left+r.x*renderRect.width/cv.width)+'px';grip.style.top=(renderRect.top-stageRect.top+r.y*renderRect.height/cv.height)+'px';grip.style.width=Math.max(2,r.w*renderRect.width/cv.width)+'px';grip.style.height=Math.max(2,r.h*renderRect.height/cv.height)+'px'}}
  const meta=$('regionUvMeta');if(meta)meta.textContent='Ada '+(state.index>=0?state.index+1:'–')+'/'+state.islands.length+' · '+(state.islands[state.index]?.rects?.length||0)+' kayıtlı alan';
 }
 function view(v){state.view=v;document.querySelectorAll('[data-region-view]').forEach(b=>b.classList.toggle('primary',b.dataset.regionView===v));draw()}
@@ -180,7 +181,7 @@ function create(){
  '<div class="regionUvHint">Aktif UV üzerinde bölge seç. PNG indirip düzenle veya bölgeye başka PNG yerleştir. <strong>Seçim dışı pikseller ve bütün alfa korunur.</strong></div>',
  '<div class="islandStudioTabs"><button class="btn primary" data-region-view="active">Aktif UV</button><button class="btn" data-region-view="uploaded">Yüklenen</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
  '<div class="islandStudioStatus" id="regionUvStatus">Alan seç.</div>',
- '<div class="islandStudioStage" id="regionUvStage"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas></div>',
+ '<div class="islandStudioStage" id="regionUvStage"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div>',
  '<div class="islandStudioTools"><button class="btn primary" id="regionUvDirect">Çizili alanı kullan</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Adaya ekle</button><button class="btn" id="regionUvPrev">← Ada</button><button class="btn" id="regionUvNext">Ada →</button><button class="btn" id="regionUvUseIsland">Adayı kullan</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div>',
  '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
  '<div class="regionUvOptions"><label>Yüklenen PNG <select id="regionUvInputMode"><option value="region">Seçilen bölge</option><option value="atlas">Tam UV atlası</option></select></label><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div>',
@@ -189,6 +190,7 @@ function create(){
  document.body.append(root);
  const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href='css/island-region-studio.css?v=20261009-region1';document.head.append(sheet);
  initPointer();
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvCanvas'));
  root.addEventListener('click',e=>{
    const b=e.target.closest('button');if(!b)return;
    if(b.id==='regionUvClose')root.classList.remove('open');
