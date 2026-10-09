@@ -24,10 +24,10 @@ function draw(){
  cv.width=canvas.width;cv.height=canvas.height;cv.getContext('2d').drawImage(canvas,0,0);
  const over=$('regionUvOverlay');over.width=canvas.width;over.height=canvas.height;
  const g=over.getContext('2d');g.clearRect(0,0,over.width,over.height);
- const areas=S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):(S.view==='preview'&&!S.preview?[]:activeRects());
- g.lineWidth=Math.max(1,canvas.width/180);g.strokeStyle=S.view==='uploaded'?'#ffce55':'#80ffb3';
- g.fillStyle=S.view==='uploaded'?'rgba(248,198,108,.20)':'rgba(88,216,160,.20)';
- for(const r of areas){g.fillRect(r.x,r.y,r.w,r.h);g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1))}
+ // Never paint inside selected pixels. Preview is always the clean, exact merged texture.
+ const areas=S.view==='preview'?[]:S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):activeRects();
+ g.lineWidth=1;g.strokeStyle=S.view==='uploaded'?'#ffd36b':'#a5f7bd';
+ for(const r of areas)g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));
  const grip=$('regionUvSelection'),r=rectInView();
  if(grip){
   grip.style.display=S.view!=='preview'&&!!r?'block':'none';
