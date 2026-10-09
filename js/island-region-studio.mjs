@@ -3,7 +3,7 @@ import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './i
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
 const core=()=>window.MTSVariantBridge||{};
-const state={meta:null,base:null,imported:null,preview:null,rect:null,scope:null,islands:[],index:-1,view:'active',mode:'move',pointer:null,epoch:0,busy:false};
+const state={meta:null,base:null,imported:null,preview:null,rect:null,scope:null,islands:[],index:-1,view:'active',mode:'move',pointer:null,epoch:0,busy:false,zoom:1};
 const clone=r=>r&&({...r});
 const label=s=>{const e=$('regionUvStatus');if(e)e.textContent=s};
 const inform=s=>{label(s);bridge().toast?.(s)};
@@ -13,6 +13,17 @@ function imageOf(c){return c.getContext('2d',{willReadFrequently:true}).getImage
 function selected(){return state.scope?.length?state.scope:(state.rect?[state.rect]:[])}
 function snapshot(){return normalizedRects(selected(),state.base.width,state.base.height)}
 function setPendingClear(){state.preview=null;state.imported=null;if($('regionUvFile'))$('regionUvFile').value='';$('regionUvSave').disabled=true;view('active')}
+function setZoom(value){
+ const stage=$('regionUvStage'),frame=$('regionUvFrame');if(!stage||!frame)return;
+ const old=state.zoom,next=Math.max(1,Math.min(12,Number(value)||1));
+ const cx=(stage.scrollLeft+stage.clientWidth/2)/(frame.offsetWidth||1),cy=(stage.scrollTop+stage.clientHeight/2)/(frame.offsetHeight||1);
+ state.zoom=next;frame.style.width=(next*100)+'%';
+ const slider=$('regionUvZoom');if(slider)slider.value=String(next);
+ const indicator=$('regionUvZoomValue');if(indicator)indicator.textContent=next.toFixed(next%1?1:0)+'×';
+ stage.scrollLeft=Math.max(0,cx*frame.offsetWidth-stage.clientWidth/2);stage.scrollTop=Math.max(0,cy*frame.offsetHeight-stage.clientHeight/2);
+ draw();
+}
+function selectHandle(mode){state.mode=mode;document.querySelectorAll('[data-region-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.regionMode===mode));const selected=$('regionUvHandleStatus');if(selected)selected.textContent=({move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt'})[mode]+' · joystick 1 px hassasiyet';}
 function draw(){
  const base=state.base;if(!base)return;
  const image=state.view==='preview'&&state.preview?state.preview:state.view==='uploaded'&&state.imported?state.imported:base;
@@ -24,7 +35,7 @@ function draw(){
    for(const r of selected()){g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));g.fillRect(r.x,r.y,r.w,r.h)}
  }
  const stats=$('regionUvScope');if(stats)stats.textContent=selected().length+' alan · '+(state.base.width+'×'+state.base.height)+' aktif UV';
- const grip=$('regionUvSelection');if(grip){const renderRect=$('regionUvCanvas').getBoundingClientRect(),stageRect=$('regionUvStage').getBoundingClientRect(),r=state.rect;grip.style.display=state.view==='active'&&r?'block':'none';if(r){grip.style.left=(renderRect.left-stageRect.left+r.x*renderRect.width/cv.width)+'px';grip.style.top=(renderRect.top-stageRect.top+r.y*renderRect.height/cv.height)+'px';grip.style.width=Math.max(2,r.w*renderRect.width/cv.width)+'px';grip.style.height=Math.max(2,r.h*renderRect.height/cv.height)+'px'}}
+ const grip=$('regionUvSelection');if(grip){const renderRect=$('regionUvCanvas').getBoundingClientRect(),stageRect=$('regionUvFrame').getBoundingClientRect(),r=state.rect;grip.style.display=state.view==='active'&&r?'block':'none';if(r){grip.style.left=(renderRect.left-stageRect.left+r.x*renderRect.width/cv.width)+'px';grip.style.top=(renderRect.top-stageRect.top+r.y*renderRect.height/cv.height)+'px';grip.style.width=Math.max(2,r.w*renderRect.width/cv.width)+'px';grip.style.height=Math.max(2,r.h*renderRect.height/cv.height)+'px'}}
  const meta=$('regionUvMeta');if(meta)meta.textContent='Ada '+(state.index>=0?state.index+1:'–')+'/'+state.islands.length+' · '+(state.islands[state.index]?.rects?.length||0)+' kayıtlı alan';
 }
 function view(v){state.view=v;document.querySelectorAll('[data-region-view]').forEach(b=>b.classList.toggle('primary',b.dataset.regionView===v));draw()}
@@ -113,7 +124,8 @@ function initPointer(){
  stage.addEventListener('pointerdown',e=>{
    if(!state.base||state.view!=='active')return;
    const p=point(e),isGrip=e.target.closest('[data-region-handle]');
-   state.pointer={id:e.pointerId,start:p,old:clone(state.rect),mode:isGrip?isGrip.dataset.regionHandle:'draw'};
+   const mode=isGrip?isGrip.dataset.regionHandle:'draw';if(isGrip)selectHandle(mode);
+   state.pointer={id:e.pointerId,start:p,old:clone(state.rect),mode};
    if(!isGrip)state.rect={x:p.x,y:p.y,w:1,h:1};
    state.scope=null;setPendingClear();draw();stage.setPointerCapture?.(e.pointerId);e.preventDefault()
  });
@@ -196,22 +208,27 @@ function create(){
  '<div class="regionUvHint">Aktif UV üzerinde bölge seç. PNG indirip düzenle veya bölgeye başka PNG yerleştir. <strong>Seçim dışı pikseller ve bütün alfa korunur.</strong></div>',
  '<div class="islandStudioTabs"><button class="btn primary" data-region-view="active">Aktif UV</button><button class="btn" data-region-view="uploaded">Yüklenen</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
  '<div class="islandStudioStatus" id="regionUvStatus">Alan seç.</div>',
- '<div class="islandStudioStage" id="regionUvStage"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div>',
+ '<div class="regionUvZoombar"><button class="btn" id="regionUvZoomOut" aria-label="Uzaklaştır">−</button><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1" aria-label="UV yakınlaştırma"><button class="btn" id="regionUvZoomIn" aria-label="Yakınlaştır">+</button><strong id="regionUvZoomValue">1×</strong><button class="btn" id="regionUvZoomReset">Sığdır</button><span>Yakınlaştırınca görüntüyü kaydırabilirsin.</span></div>',
+ '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div>',
  '<div class="islandStudioTools"><button class="btn primary" id="regionUvDirect">Çizili alanı kullan</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Adaya ekle</button><button class="btn" id="regionUvPrev">← Ada</button><button class="btn" id="regionUvNext">Ada →</button><button class="btn" id="regionUvUseIsland">Adayı kullan</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div>',
  '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
- '<div class="islandJoystickDock"><span class="stat">Joystick · seçimi/kenarlarını hassas ayarla</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
+ '<div class="islandJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · joystick 1 px hassasiyet</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
  '<div class="regionUvOptions"><label>Yüklenen PNG <select id="regionUvInputMode"><option value="region">Seçilen bölge</option><option value="atlas">Tam UV atlası</option></select></label><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Bölge PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle / eşleştir</button><button class="btn" id="regionUvPreview">Birleşimi önizle</button><button class="btn" id="regionUvFull">Tam UV PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Aktif texture’a kaydet</button><button class="btn" id="regionUv3D">3D bak</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
  document.body.append(root);
  const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href='css/island-region-studio.css?v=20261009-region1';document.head.append(sheet);
  initPointer();initJoystick();
+ $('regionUvZoom').addEventListener('input',e=>setZoom(e.target.value));
  if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvCanvas'));
  root.addEventListener('click',e=>{
    const b=e.target.closest('button');if(!b)return;
    if(b.id==='regionUvClose')root.classList.remove('open');
    if(b.dataset.regionView)view(b.dataset.regionView);
-   if(b.dataset.regionMode){state.mode=b.dataset.regionMode;root.querySelectorAll('[data-region-mode]').forEach(x=>x.classList.toggle('primary',x===b))}
+   if(b.dataset.regionMode)selectHandle(b.dataset.regionMode);
+   if(b.id==='regionUvZoomIn')setZoom(state.zoom+.5);
+   if(b.id==='regionUvZoomOut')setZoom(state.zoom-.5);
+   if(b.id==='regionUvZoomReset')setZoom(1);
    if(b.id==='regionUvDirect')selection();
    if(b.id==='regionUvAddIsland')addIsland();
    if(b.id==='regionUvAdd')addRect();
@@ -242,7 +259,7 @@ async function choose(path){
    const canvas=await bridge().decodeBlobToCanvas(blob);if(old!==state.epoch)return;
    state.base=canvas;
    state.rect={x:0,y:0,w:Math.max(1,Math.round(canvas.width*.25)),h:Math.max(1,Math.round(canvas.height*.25))};
-   loadIslands();$('regionUvSave').disabled=true;view('active');
+   loadIslands();$('regionUvSave').disabled=true;view('active');setZoom(1);selectHandle('move');
    label(meta.name+' · aktif '+canvas.width+'×'+canvas.height+' · sol tuş/parmakla alan çiz, ardından kullan.');
  }catch(e){inform('Aktif UV yüklenemedi: '+e.message)}
 }
