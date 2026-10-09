@@ -209,3 +209,8 @@
 .regionUvDetailStage canvas{display:block;flex:none;max-width:none;height:auto;image-rendering:pixelated;object-fit:contain}
 .regionUvDetailZoom{display:flex;gap:12px;align-items:center;padding:12px 18px;border-top:1px solid #33434e;color:#c0cdd5;font-size:12px}
 .regionUvDetailZoom input{flex:1;accent-color:#a7ef86}.regionUvDetailZoom strong{min-width:34px;text-align:right}
+
+.regionUvB3DPicker[hidden]{display:none!important}
+.regionUvB3DPicker{position:fixed;inset:0;z-index:10210;display:flex;flex-direction:column;background:#0b1219;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.regionUvB3DStage{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;align-items:flex-start;justify-content:center;background:repeating-conic-gradient(#24303a 0% 25%,#111a22 0% 50%) 50% / 16px 16px}
+.regionUvB3DStage canvas{width:100%;max-width:850px;height:auto;image-rendering:pixelated;touch-action:manipulation}
