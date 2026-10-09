@@ -33,5 +33,7 @@ jobs:
         run: node tests/uv-generation-roundtrip.test.mjs
       - name: Check UV detail production bundle
         run: node scripts/build-uv-detail-grid.mjs --check
+      - name: Test selected-region UV compositing and alpha preservation
+        run: node tests/island-region-core.test.mjs
       - name: Check B3D skeletal animation regression
         run: node tests/b3d-animation.test.cjs
