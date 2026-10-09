@@ -1,4 +1,4 @@
-# SESSION_HANDOFF — 2026-10-08 · CLOSED
+# SESSION_HANDOFF — 2026-10-09 · B3D ANIMATION IMPLEMENTATION
 
 Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio` · branch `main`.
 Last code-work baseline checked before this documentation close: `53fc5ca79be5bef5bad1e9f2392722dfdd10e6e8`. Pre-close documentation HEAD `082077b14f6efa57c5106fd75151333848903733` had **successful** Runtime Guards and Pages deployment; later `[skip ci]` documentation commits are **not** evidence of a new deployed build. GitHub current code/Actions always outranks this snapshot.
@@ -13,6 +13,15 @@ Prevent AI image generation from distorting true Mineclonia entity UV layout; us
 - Attempted guard-line cleanup did **not** actually detect/inpaint the visible line: detected magenta pixels **0**. A reported cleaned IoU **1.0** came solely from forcing the original target mask; it is *not evidence* guard pixels are gone or semantically aligned.
 - Transparent output is not guaranteed even from RGBA-transparent input. Hidden-RGB/edge-bleed experiment did **not** demonstrate a clear benefit. Gray-square, stretched-square and independently generated head-crop trials were not winners in these individual samples. A successful horse AI atlas remains a user observation, unverified as a benchmark.
 - **Recovery committed:** `tools/uv-pipeline/experiments/cat-connected-net/` now contains the four *byte-identical archived* Python scripts, native 64×32 PNG, mapping, prompt, validation JSON, two historical READMEs, guard comparison JSON, manifest, and a verified `restore_binary_fixtures.py` helper. Primary source commit `e8e81f6`; follow-up archival commits `055e5fe` and `a183160`; all checked through GitHub. **13 larger binary fixtures** (B3D model, four AI-input variations, five AI/restored PNGs, three visual reports) still exist only in the conversation ZIP `MTS_ConnectedNet_UV_Closeout_2026-10-08.zip`, not in GitHub. Local restore helper validated 14 binary checksums, restored 13 missing files and was idempotent, but this does not itself push them to GitHub.
+
+## New entity 3D animation preview (2026-10-09)
+
+- Added isolated `js/b3d-animation.js` (B3D node hierarchy + ANIM / BONE / KEYS decoding, interpolated node transforms and CPU skinning), `js/b3d-preview-controls.js` and `css/b3d-animation.css`. The existing `js/preview3d.js` lazily loads them only for entity skins and writes sampled positions to a dynamic WebGL vertex buffer. `js/app.js` lazy viewer cache version changed.
+- UI: play/pause, restart, animation presets sourced from inspected Mineclonia `ocelot.lua` (cat), `pig.lua`, `creeper.lua`, `enderman.lua`; arbitrary start/end frame, frame scrub and speed. Entities lacking valid animation data still use the static preview; stop/close cancels animation frames.
+- Fixed B3D root chunk byte-length calculation in both animation parser and existing static parser. Original UV coordinates, texture blobs and IndexedDB/localStorage remain untouched.
+- `tests/b3d-animation.test.cjs` checks a synthetic weighted B3D triangle: static UV, index integrity and expected half/end-keyframe translations. Added to `.github/workflows/runtime-guards.yml`.
+- **Verification needed:** JS syntax and synthetic bone test checked in-session. Authentic Mineclonia B3D samples include cat 277 frames / pig 81 / Enderman 200 across subtrees, but interactive mobile WebGL animation was not visually tested in this chat. Confirm B3D skin deformation, per-clip model pose, optional overlays, and static fallback on actual device before treating as finished. Never claim the test proves all real model animation tracks.
+- Keep entity animation modules lazy and isolated; browser edit storage / UV atlas data are not changed. Any remaining animation parser fallback should be surfaced in console as a warning.
 
 ## Browser application — stable separate workstream
 
