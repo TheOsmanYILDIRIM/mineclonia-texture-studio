@@ -15,7 +15,7 @@ function fixture(){
  const weights=chunk('BONE',...[0,1,2].flatMap(n=>[i(n),f(1)]));
  const key=(frame,x)=>cat(i(frame),f(x),f(0),f(0));
  const keys=chunk('KEYS',i(1),key(0,0),key(10,1));
- const root=node('mesh',[0,0,0],chunk('MESH',i(0),vt,tri),node('bone',[0,0,0],weights,keys));
+ const root=node('mesh',[0,0,0],chunk('MESH',i(0),vt,tri),node('bone',[0,0,0],chunk('BONE'),weights,keys));
  const b=chunk('BB3D',i(1),root,chunk('ANIM',i(0),i(10),f(10)));
  return b.buffer;
 }
@@ -32,4 +32,4 @@ for(let v=0;v<3;v++){
 }
 assert.deepEqual(Array.from(a.mesh.uv),[0,0,1,0,1,1]);
 assert.deepEqual(Array.from(a.mesh.idx),[0,1,2]);
-console.log('B3D animation synthetic weighted-vertex interpolation: PASS');
+console.log('B3D animation synthetic weighted-vertex interpolation + valid empty BONE chunk: PASS');

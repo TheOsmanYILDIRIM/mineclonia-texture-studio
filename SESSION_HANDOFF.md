@@ -1,5 +1,9 @@
 # SESSION_HANDOFF — 2026-10-09 · B3D ANIMATION EXPANSION
 
+## B3D animation repair — 2026-10-09
+
+Fixed the real cause of missing cat animations: `js/b3d-animation.js` rejected valid zero-payload B3D chunks because it checked `cur <= begin` even after consuming the 8-byte chunk header. In Mineclonia's `mobs_mc_cat.b3d` an empty `BONE` chunk exists for non-weighted head controls. The parser now accepts zero-length bodies and rejects only backwards movement. Updated the synthetic regression with a zero-payload `BONE`, and bumped both lazy preview and parser cache query tokens. In a local test using the attached `mineclonia_texturepack.zip`, all **85 .b3d** files parsed/sampled without exceptions after the repair; **75** exposed animated timelines, and the cat's 278 keyframes were sampled with finite deforming vertices. This is parsing/pose validation, **not** Android WebGL visual verification; run Runtime Guards and Pages for the new commit, then test cats and several other entity models in the deployed 3D viewer. Lua-named clip coverage beyond the four confirmed model definitions is still open.
+
 Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio` · branch `main`.
 Last code-work baseline checked before this documentation close: `53fc5ca79be5bef5bad1e9f2392722dfdd10e6e8`. Pre-close documentation HEAD `082077b14f6efa57c5106fd75151333848903733` had **successful** Runtime Guards and Pages deployment; later `[skip ci]` documentation commits are **not** evidence of a new deployed build. GitHub current code/Actions always outranks this snapshot.
 

@@ -23,7 +23,8 @@ function parse(buffer){
    else if(t==='BONE'&&parent!==null&&activeMesh){while(cur+8<=stop){const vi=i32(stop),weight=f32(stop);if(vi>=0&&vi<activeMesh.weights.length&&weight>0){activeMesh.weights[vi].push([parent,weight]);nodes[parent].weights.push(weight)}}}
    else if(t==='KEYS'&&parent!==null){const flags=i32(stop),stride=4+4*((flags&1?3:0)+(flags&2?3:0)+(flags&4?4:0));if(stride<4)throw Error('Invalid key format');while(cur+stride<=stop){const key={frame:i32(stop)};if(flags&1)key.pos=[f32(stop),f32(stop),f32(stop)];if(flags&2)key.scale=[f32(stop),f32(stop),f32(stop)];if(flags&4)key.rot=[f32(stop),f32(stop),f32(stop),f32(stop)];nodes[parent].keys.push(key);keyFrames.add(key.frame);frameMax=Math.max(frameMax,key.frame)}}
    else if(t==='ANIM'&&cur+12<=stop){i32(stop);frameMax=Math.max(frameMax,i32(stop));fps=f32(stop)||fps}
-   cur=stop;if(cur<=begin)throw Error('B3D parser did not advance');
+   // Empty payloads are valid (e.g. a cat BONE with no weights); the 8-byte header advanced.
+   cur=stop;if(cur<begin)throw Error('B3D parser moved backwards');
   }
  }
  if(tag(len)!=='BB3D')throw Error('B3D header missing');const rootSize=u32(len),rootEnd=cur+rootSize;if(rootEnd>len)throw Error('Invalid B3D root');i32(rootEnd);chunks(rootEnd,null,null);
