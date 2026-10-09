@@ -23,8 +23,7 @@ function draw(){
  cv.width=canvas.width;cv.height=canvas.height;cv.getContext('2d').drawImage(canvas,0,0);
  const over=$('regionUvOverlay');over.width=canvas.width;over.height=canvas.height;
  const g=over.getContext('2d');g.clearRect(0,0,over.width,over.height);
- const areas=S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):activeRects();
- if(S.view==='preview'&&!S.preview)areas.length=0;
+ const areas=S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):(S.view==='preview'&&!S.preview?[]:activeRects());
  g.lineWidth=Math.max(1,canvas.width/280);g.strokeStyle=S.view==='uploaded'?'#f8c66c':'#89edba';
  g.fillStyle=S.view==='uploaded'?'rgba(248,198,108,.12)':'rgba(88,216,160,.11)';
  for(const r of areas){g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));g.fillRect(r.x,r.y,r.w,r.h)}
@@ -51,6 +50,7 @@ function view(name){
 }
 function setTool(tool){
  S.tool=tool;
+ $('regionalUvStudio').dataset.regionTool=tool;
  document.querySelectorAll('[data-region-tool]').forEach(el=>el.classList.toggle('primary',el.dataset.regionTool===tool));
  draw();
 }
