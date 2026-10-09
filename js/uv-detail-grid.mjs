@@ -26,14 +26,30 @@ async function exportGrid(meta,sourceBlob){
  try{localStorage.setItem(key(meta),JSON.stringify(plan.manifest));}catch(error){throw Error('Grid eşleme kaydedilemedi; tarayıcı depolamasını kontrol et: '+error.message);}
  return {blob,name:meta.name.replace(/\.png$/i,'')+'_MTS_UVGRID.png',manifest:plan.manifest};
 }
+/** Reconcile a model's resized output with the saved grid coordinate system.
+ * No crop or stretch: nonmatching aspect ratios are rejected.
+ */
+function normalizeGeneratedCanvas(image,width,height){
+ if(image.width===width&&image.height===height)return {image,resized:false,originalSize:[image.width,image.height]};
+ if(image.width*height!==image.height*width)throw Error('AI çıktısının en-boy oranı UV gridinden farklı: '+image.width+'×'+image.height+'. Kırpma veya esnetme yapılmadı.');
+ const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+ const source=document.createElement('canvas');source.width=image.width;source.height=image.height;
+ source.getContext('2d').putImageData(new ImageData(image.data,image.width,image.height),0,0);
+ const context=canvas.getContext('2d',{willReadFrequently:true});
+ context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';
+ context.drawImage(source,0,0,width,height);
+ return {image:context.getImageData(0,0,width,height),resized:true,originalSize:[image.width,image.height]};
+}
 async function importGrid(meta,sourceBlob,generatedBlob){
  const saved=localStorage.getItem(key(meta));
  if(!saved)throw Error('Bu texture için önce Gridli PNG indir. UV haritası bulunamadı; tahmini kırpma yapılmadı.');
  const source=await readPng(sourceBlob),manifest=JSON.parse(saved);
- const plan=loadPlan(source,manifest),generated=await readPng(generatedBlob);
- if(generated.width!==manifest.layout_size[0]*manifest.scale||generated.height!==manifest.layout_size[1]*manifest.scale)
-   throw Error('AI çıktı boyutu grid ile uyuşmuyor. Beklenen: '+(manifest.layout_size[0]*manifest.scale)+'×'+(manifest.layout_size[1]*manifest.scale));
- const result=unpack(source,generated,plan,{autoShift:true,maxShift:6,repairMagenta:true,edgeBand:3,repairRadius:6});
+ const plan=loadPlan(source,manifest),rawGenerated=await readPng(generatedBlob);
+ const normalized=normalizeGeneratedCanvas(rawGenerated,manifest.layout_size[0]*manifest.scale,manifest.layout_size[1]*manifest.scale);
+ const result=unpack(source,normalized.image,plan,{autoShift:true,maxShift:6,repairMagenta:true,edgeBand:3,repairRadius:6});
+ result.report.inputSize=normalized.originalSize;
+ result.report.resizedToGrid=normalized.resized;
+ result.report.resizeNote=normalized.resized?'AI çıktısı orantılı olarak grid çözünürlüğüne yeniden örneklendi; piksel düzeyinde birebirlik iddiası yok.':'AI çıktı boyutu grid ile aynı.';
  if(result.report.clippedSamples)throw Error('UV dönüşümünde '+result.report.clippedSamples+' piksel taşma bulundu; otomatik kaydetme durduruldu.');
  return {blob:await writePng(result.image),report:result.report};
 }
