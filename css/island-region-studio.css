@@ -162,3 +162,11 @@
  position:absolute!important;left:50%!important;top:50%!important;
  transform:translate(-50%,-50%)!important;pointer-events:auto!important
 }
+
+/* UV accuracy: unpainted interior and a crisp one-pixel boundary. */
+.islandRegionRoot #regionUvSelection{
+ background:transparent!important;
+ border:1px solid #b6ffca!important;
+ box-shadow:none!important;
+}
+.islandRegionRoot #regionUvOverlay{image-rendering:pixelated}
