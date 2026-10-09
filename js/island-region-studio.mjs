@@ -33,8 +33,8 @@ function draw(){
  if(S.grid>0&&S.view!=='preview'){const sx=gridStep('x'),sy=gridStep('y');g.save();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1;g.beginPath();for(let x=sx;x<canvas.width;x+=sx){const px=Math.round(x)+.5;g.moveTo(px,0);g.lineTo(px,canvas.height)}for(let y=sy;y<canvas.height;y+=sy){const py=Math.round(y)+.5;g.moveTo(0,py);g.lineTo(canvas.width,py)}g.stroke();g.restore()}
  // Never paint inside selected pixels. Preview is always the clean, exact merged texture.
  const areas=S.view==='preview'?[]:S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):activeRects();
- g.lineWidth=1;g.strokeStyle=S.view==='uploaded'?'#ffd36b':'#a5f7bd';
- for(const r of areas)g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));
+ g.lineWidth=Math.max(1,Math.min(canvas.width,canvas.height)/256);g.strokeStyle=S.view==='uploaded'?'#ffd36b':'#a5f7bd';
+ for(const r of areas){g.save();g.setLineDash([Math.max(3,canvas.width/100),Math.max(2,canvas.width/200)]);g.strokeRect(r.x+g.lineWidth/2,r.y+g.lineWidth/2,Math.max(0,r.w-g.lineWidth),Math.max(0,r.h-g.lineWidth));g.restore()}
  const grip=$('regionUvSelection'),r=rectInView();
  if(grip){
   grip.style.display='none'; // Corner targets live in the fixed joystick control, never over the image.
@@ -48,7 +48,7 @@ function draw(){
   }
  }
  const info=$('regionUvScope');
- if(info)info.textContent=S.view==='uploaded'?'Kaynak: '+canvas.width+'×'+canvas.height:S.base.width+'×'+S.base.height+' · '+activeRects().length+' hedef';
+ if(info)info.textContent=S.view==='uploaded'?'Kaynak seçim: '+(S.sourceRect?`${S.sourceRect.x},${S.sourceRect.y} · ${S.sourceRect.w}×${S.sourceRect.h}`:'yok')+' / '+canvas.width+'×'+canvas.height:S.base.width+'×'+S.base.height+' · '+activeRects().length+' hedef';
  const meta=$('regionUvMeta');if(meta)meta.textContent=S.islands.length?'Ada '+(S.index+1)+'/'+S.islands.length:'Kayıtlı ada yok';
 }
 function view(name){
@@ -274,9 +274,9 @@ async function loadPng(file){
   hint('Kaynak yükleniyor: '+file.name);
   const c=await bridge().decodeBlobToCanvas(file);
   if(generation!==S.epoch||importGeneration!==S.importEpoch)return;
-  S.imported=c;S.sourceRect=null;clearPreview();setTool('edit');setHandle('move');
+  S.imported=c;S.sourceRect={x:0,y:0,w:c.width,h:c.height};clearPreview();setTool('edit');setHandle('move');
   view('uploaded');
-  hint('Kaynak PNG: '+file.name+' ('+c.width+'×'+c.height+'). Yüklenen PNG üzerinde değiştirmek istediğin kaynak adayı parmağınla seç. Bütün PNG otomatik eşlenmez.');
+  hint('Kaynak PNG: '+file.name+' ('+c.width+'×'+c.height+'). Yüklenen PNG tamamı başlangıçta kaynak seçili. İstersen dokunup sürükleyerek seçimi daralt; yalnız hedef UV bölgesine uygulanır.');
  }catch(e){if(generation===S.epoch&&importGeneration===S.importEpoch)toast('PNG açılamadı: '+e.message)}
 }
 function merged(){
