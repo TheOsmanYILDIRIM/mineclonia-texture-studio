@@ -1,273 +1,320 @@
-import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './island-region-core.mjs?v=20261009-regional1';
+import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './island-region-core.mjs?v=20261009-sourcecrop1';
 
+// The active PNG is authoritative. Two independent selections: target UV and imported source.
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
-const core=()=>window.MTSVariantBridge||{};
-const state={meta:null,base:null,imported:null,preview:null,rect:null,scope:null,islands:[],index:-1,view:'active',mode:'move',pointer:null,epoch:0,busy:false,zoom:1};
-const clone=r=>r&&({...r});
-const label=s=>{const e=$('regionUvStatus');if(e)e.textContent=s};
-const inform=s=>{label(s);bridge().toast?.(s)};
-function canvasFromImage(image){const c=document.createElement('canvas');c.width=image.width;c.height=image.height;c.getContext('2d').putImageData(new ImageData(image.data,image.width,image.height),0,0);return c}
-function baseImage(){const c=state.base;return c?.getContext('2d',{willReadFrequently:true}).getImageData(0,0,c.width,c.height)}
-function imageOf(c){return c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,c.width,c.height)}
-function selected(){return state.scope?.length?state.scope:(state.rect?[state.rect]:[])}
-function snapshot(){return normalizedRects(selected(),state.base.width,state.base.height)}
-function setPendingClear(){state.preview=null;state.imported=null;if($('regionUvFile'))$('regionUvFile').value='';$('regionUvSave').disabled=true;view('active')}
-function setZoom(value){
- const stage=$('regionUvStage'),frame=$('regionUvFrame');if(!stage||!frame)return;
- const old=state.zoom,next=Math.max(1,Math.min(12,Number(value)||1));
- const cx=(stage.scrollLeft+stage.clientWidth/2)/(frame.offsetWidth||1),cy=(stage.scrollTop+stage.clientHeight/2)/(frame.offsetHeight||1);
- state.zoom=next;frame.style.width=(next*100)+'%';
- const slider=$('regionUvZoom');if(slider)slider.value=String(next);
- const indicator=$('regionUvZoomValue');if(indicator)indicator.textContent=next.toFixed(next%1?1:0)+'×';
- stage.scrollLeft=Math.max(0,cx*frame.offsetWidth-stage.clientWidth/2);stage.scrollTop=Math.max(0,cy*frame.offsetHeight-stage.clientHeight/2);
- draw();
+const legacy=()=>window.MTSVariantBridge||{};
+const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,busy:false,zoom:1};
+const clone=r=>r?{...r}:null;
+const toast=t=>{const status=$('regionUvStatus');if(status)status.textContent=t;bridge().toast?.(t)};
+const hint=t=>{const status=$('regionUvStatus');if(status)status.textContent=t};
+const image=c=>c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,c.width,c.height);
+const activeRects=()=>S.scope?.length?S.scope:(S.rect?[S.rect]:[]);
+const targetRects=()=>normalizedRects(activeRects(),S.base.width,S.base.height);
+function makeCanvas(img){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').putImageData(new ImageData(img.data,img.width,img.height),0,0);return c}
+function clearPreview(){
+ S.preview=null;const save=$('regionUvSave');if(save)save.disabled=true;
 }
-function selectHandle(mode){state.mode=mode;document.querySelectorAll('[data-region-mode]').forEach(b=>b.classList.toggle('primary',b.dataset.regionMode===mode));const selected=$('regionUvHandleStatus');if(selected)selected.textContent=({move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt',pan:'Görüntüyü kaydır'})[mode]+' · joystick 1 px hassasiyet';}
+function currentCanvas(){return S.view==='uploaded'&&S.imported?S.imported:S.view==='preview'&&S.preview?S.preview:S.base}
+function rectInView(){return S.view==='uploaded'?S.sourceRect:S.scope?.length?null:S.rect}
+function frameDims(){const c=currentCanvas();return c?{w:c.width,h:c.height}:null}
 function draw(){
- const base=state.base;if(!base)return;
- const image=state.view==='preview'&&state.preview?state.preview:state.view==='uploaded'&&state.imported?state.imported:base;
- const cv=$('regionUvCanvas'),outline=$('regionUvOverlay'),ctx=cv.getContext('2d');
- cv.width=image.width;cv.height=image.height;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(image,0,0);
- outline.width=cv.width;outline.height=cv.height;const g=outline.getContext('2d');g.clearRect(0,0,outline.width,outline.height);
- if(state.view!=='uploaded'){
-   g.lineWidth=Math.max(1,Math.round(cv.width/256));g.strokeStyle='#87edc1';g.fillStyle='rgba(76,216,170,.09)';
-   for(const r of selected()){g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));g.fillRect(r.x,r.y,r.w,r.h)}
+ const canvas=currentCanvas(),cv=$('regionUvCanvas');if(!canvas||!cv)return;
+ cv.width=canvas.width;cv.height=canvas.height;cv.getContext('2d').drawImage(canvas,0,0);
+ const over=$('regionUvOverlay');over.width=canvas.width;over.height=canvas.height;
+ const g=over.getContext('2d');g.clearRect(0,0,over.width,over.height);
+ const areas=S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):activeRects();
+ if(S.view==='preview'&&!S.preview)areas.length=0;
+ g.lineWidth=Math.max(1,canvas.width/280);g.strokeStyle=S.view==='uploaded'?'#f8c66c':'#89edba';
+ g.fillStyle=S.view==='uploaded'?'rgba(248,198,108,.12)':'rgba(88,216,160,.11)';
+ for(const r of areas){g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));g.fillRect(r.x,r.y,r.w,r.h)}
+ const grip=$('regionUvSelection'),r=rectInView();
+ if(grip){
+  grip.style.display=S.tool==='edit'&&S.view!=='preview'&&!!r?'block':'none';
+  if(r){
+   const a=cv.getBoundingClientRect(),b=$('regionUvFrame').getBoundingClientRect();
+   grip.style.left=(a.left-b.left+r.x*a.width/canvas.width)+'px';
+   grip.style.top=(a.top-b.top+r.y*a.height/canvas.height)+'px';
+   grip.style.width=Math.max(3,r.w*a.width/canvas.width)+'px';
+   grip.style.height=Math.max(3,r.h*a.height/canvas.height)+'px';
+   grip.querySelectorAll('[data-region-handle]').forEach(el=>el.classList.toggle('active',el.dataset.regionHandle===S.handle));
+  }
  }
- const stats=$('regionUvScope');if(stats)stats.textContent=selected().length+' alan · '+(state.base.width+'×'+state.base.height)+' aktif UV';
- const grip=$('regionUvSelection');if(grip){const renderRect=$('regionUvCanvas').getBoundingClientRect(),stageRect=$('regionUvFrame').getBoundingClientRect(),r=state.rect;grip.style.display=state.view==='active'&&r?'block':'none';if(r){grip.style.left=(renderRect.left-stageRect.left+r.x*renderRect.width/cv.width)+'px';grip.style.top=(renderRect.top-stageRect.top+r.y*renderRect.height/cv.height)+'px';grip.style.width=Math.max(2,r.w*renderRect.width/cv.width)+'px';grip.style.height=Math.max(2,r.h*renderRect.height/cv.height)+'px'}}
- const meta=$('regionUvMeta');if(meta)meta.textContent='Ada '+(state.index>=0?state.index+1:'–')+'/'+state.islands.length+' · '+(state.islands[state.index]?.rects?.length||0)+' kayıtlı alan';
+ const info=$('regionUvScope');
+ if(info)info.textContent=S.view==='uploaded'?'Kaynak: '+canvas.width+'×'+canvas.height:S.base.width+'×'+S.base.height+' · '+activeRects().length+' hedef';
+ const meta=$('regionUvMeta');if(meta)meta.textContent=S.islands.length?'Ada '+(S.index+1)+'/'+S.islands.length:'Kayıtlı ada yok';
 }
-function view(v){state.view=v;document.querySelectorAll('[data-region-view]').forEach(b=>b.classList.toggle('primary',b.dataset.regionView===v));draw()}
-function scoped(rects){
- const good=normalizedRects(rects,state.base.width,state.base.height);
- if(!good.length)return inform('Önce bir UV bölgesi seç');
- state.scope=good;setPendingClear();draw();label(good.length+' bölge seçildi. İndir veya PNG yükle.');
-}
-function selection(){if(state.rect)scoped([state.rect])}
-function islandSelect(){
- const rects=state.islands[state.index]?.rects||[];
- if(!rects.length)return inform('Bu adada kayıtlı alan yok');
- scoped(rects);
-}
-function key(){return 'mts_uv_islands_v1:'+(state.meta?.path||'unknown')}
-function loadIslands(){
- let saved=null;try{saved=JSON.parse(localStorage.getItem(key())||'null')}catch{}
- const w=state.base.width,h=state.base.height,oldW=Number(saved?.width)||Number(state.meta.w)||w,oldH=Number(saved?.height)||Number(state.meta.h)||h;
- state.islands=(Array.isArray(saved?.islands)?saved.islands:[]).map((a,i)=>({
-   id:a.id||'island_'+i,
-   rects:oldW===w&&oldH===h?normalizedRects(a.rects||[],w,h):scaleSavedRects(a.rects||[],oldW,oldH,w,h)
- }));
- state.index=state.islands.length?0:-1;
- try{
-   const m=JSON.parse(localStorage.getItem('mts_uv_region_export_v1:'+state.meta.path)||'null');
-   if(m?.sourceW===w&&m?.sourceH===h&&Array.isArray(m.rects))state.scope=normalizedRects(m.rects,w,h);
- }catch{}
-}
-function saveIslands(){
- try{localStorage.setItem(key(),JSON.stringify({v:1,width:state.base.width,height:state.base.height,updatedAt:Date.now(),islands:state.islands}))}
- catch(e){label('Ada verisi saklanamadı: '+e.message)}
+function view(name){
+ S.view=name;
+ document.querySelectorAll('[data-region-view]').forEach(el=>el.classList.toggle('primary',el.dataset.regionView===name));
  draw();
 }
-function addIsland(){
- state.islands.push({id:'island_'+Date.now().toString(36),rects:[]});state.index=state.islands.length-1;
- state.scope=null;saveIslands();setPendingClear()
+function setTool(tool){
+ S.tool=tool;
+ document.querySelectorAll('[data-region-tool]').forEach(el=>el.classList.toggle('primary',el.dataset.regionTool===tool));
+ draw();
 }
-function addRect(){
- if(!state.rect)return inform('Önce alan çiz');
- if(state.index<0)addIsland();
- const rec=state.islands[state.index];rec.rects=normalizedRects([...rec.rects,state.rect],state.base.width,state.base.height);
- saveIslands();scoped(rec.rects)
+function setHandle(value){
+ S.handle=value;
+ const label={move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt'}[value]||'Tüm seçim';
+ const el=$('regionUvHandleStatus');if(el)el.textContent=label+' · 1 px / adım';
+ draw();
 }
-function cycle(d){
- if(!state.islands.length)return;
- state.index=(state.index+d+state.islands.length)%state.islands.length;
- islandSelect();draw()
+function zoom(value){
+ const stage=$('regionUvStage'),frame=$('regionUvFrame');if(!stage||!frame)return;
+ const cx=(stage.scrollLeft+stage.clientWidth/2)/Math.max(1,frame.offsetWidth),cy=(stage.scrollTop+stage.clientHeight/2)/Math.max(1,frame.offsetHeight);
+ S.zoom=Math.max(1,Math.min(12,Number(value)||1));
+ frame.style.width=(S.zoom*100)+'%';
+ $('regionUvZoom').value=String(S.zoom);$('regionUvZoomValue').textContent=S.zoom+'×';
+ stage.scrollLeft=cx*frame.offsetWidth-stage.clientWidth/2;
+ stage.scrollTop=cy*frame.offsetHeight-stage.clientHeight/2;
+ draw();
 }
-function deleteIsland(){
- if(state.index<0)return;
- state.islands.splice(state.index,1);state.index=Math.min(state.index,state.islands.length-1);
- state.scope=null;saveIslands();setPendingClear()
-}
-function editRect(dx,dy,mode){
- const r=state.rect;if(!r)return;
+function updateRect(dx,dy,where){
+ const uploaded=S.view==='uploaded',canvas=uploaded?S.imported:S.base;
+ const prop=uploaded?'sourceRect':'rect',r=S[prop];
+ if(!canvas||!r)return;
  let x=r.x,y=r.y,right=r.x+r.w,bottom=r.y+r.h;
- if(mode==='move'){x+=dx;right+=dx;y+=dy;bottom+=dy}
- if(mode==='tl'||mode==='bl')x+=dx;
- if(mode==='tr'||mode==='br')right+=dx;
- if(mode==='tl'||mode==='tr')y+=dy;
- if(mode==='bl'||mode==='br')bottom+=dy;
- x=Math.max(0,Math.min(state.base.width-1,x));y=Math.max(0,Math.min(state.base.height-1,y));
- right=Math.max(x+1,Math.min(state.base.width,right));bottom=Math.max(y+1,Math.min(state.base.height,bottom));
- state.rect={x,y,w:right-x,h:bottom-y};state.scope=null;setPendingClear();draw()
+ if(where==='move'){
+  const mx=Math.max(-x,Math.min(canvas.width-right,dx)),my=Math.max(-y,Math.min(canvas.height-bottom,dy));
+  x+=mx;right+=mx;y+=my;bottom+=my;
+ }else{
+  if(where==='tl'||where==='bl')x=Math.max(0,Math.min(right-1,x+dx));
+  if(where==='tr'||where==='br')right=Math.min(canvas.width,Math.max(x+1,right+dx));
+  if(where==='tl'||where==='tr')y=Math.max(0,Math.min(bottom-1,y+dy));
+  if(where==='bl'||where==='br')bottom=Math.min(canvas.height,Math.max(y+1,bottom+dy));
+ }
+ S[prop]={x,y,w:right-x,h:bottom-y};
+ if(!uploaded)S.scope=null;
+ clearPreview();draw();
 }
-function point(e){
- const r=$('regionUvCanvas').getBoundingClientRect();
- return {x:Math.max(0,Math.min(state.base.width-1,Math.floor((e.clientX-r.left)*state.base.width/Math.max(1,r.width)))),y:Math.max(0,Math.min(state.base.height-1,Math.floor((e.clientY-r.top)*state.base.height/Math.max(1,r.height))))};
+function location(e){
+ const cv=$('regionUvCanvas'),r=cv.getBoundingClientRect();
+ const x=Math.floor((e.clientX-r.left)*cv.width/Math.max(1,r.width)),y=Math.floor((e.clientY-r.top)*cv.height/Math.max(1,r.height));
+ return {x:Math.max(0,Math.min(cv.width-1,x)),y:Math.max(0,Math.min(cv.height-1,y))};
 }
-function initJoystick(){
- const joy=$('regionUvJoystick'),stick=$('regionUvStick');let pid=null,last=0;
- joy.addEventListener('pointerdown',e=>{pid=e.pointerId;joy.setPointerCapture?.(pid);e.preventDefault()});
- joy.addEventListener('pointermove',e=>{
-   if(e.pointerId!==pid||!state.rect)return;
-   const r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,rad=r.width*.34,mag=Math.hypot(dx,dy),k=Math.min(1,rad/(mag||1));
-   stick.style.transform='translate('+(dx*k)+'px,'+(dy*k)+'px)';
-   const sx=Math.abs(dx)>r.width*.16?Math.sign(dx):0,sy=Math.abs(dy)>r.height*.16?Math.sign(dy):0;
-   if((sx||sy)&&performance.now()-last>55){if(state.mode==='pan'){const stage=$('regionUvStage');stage.scrollLeft+=sx*8;stage.scrollTop+=sy*8}else editRect(sx,sy,state.mode);last=performance.now()}
-   e.preventDefault();
- });
- const stop=e=>{if(e.pointerId===pid){pid=null;stick.style.transform='translate(0,0)'}};
- joy.addEventListener('pointerup',stop);joy.addEventListener('pointercancel',stop);
-}
-function initPointer(){
+function initSelection(){
  const stage=$('regionUvStage');
  stage.addEventListener('pointerdown',e=>{
-   if(!state.base||state.view!=='active'||state.mode==='pan')return;
-   const p=point(e),isGrip=e.target.closest('[data-region-handle]');
-   const mode=isGrip?isGrip.dataset.regionHandle:'draw';if(isGrip)selectHandle(mode);
-   state.pointer={id:e.pointerId,start:p,old:clone(state.rect),mode};
-   if(!isGrip)state.rect={x:p.x,y:p.y,w:1,h:1};
-   state.scope=null;setPendingClear();draw();stage.setPointerCapture?.(e.pointerId);e.preventDefault()
+  if(!S.base||S.tool!=='edit'||S.view==='preview')return;
+  const p=location(e),handle=e.target.closest('[data-region-handle]')?.dataset.regionHandle;
+  if(handle){
+   setHandle(handle);S.drag=null;e.preventDefault();return; // Handles select; joystick does fine adjustment.
+  }
+  const canvas=currentCanvas();
+  if(!canvas)return;
+  const prop=S.view==='uploaded'?'sourceRect':'rect',r=S[prop];
+  const inside=r&&p.x>=r.x&&p.x<r.x+r.w&&p.y>=r.y&&p.y<r.y+r.h;
+  const operation=inside?'move':'draw';
+  S.drag={id:e.pointerId,start:p,origin:clone(r),operation,prop};
+  if(operation==='draw')S[prop]={x:p.x,y:p.y,w:1,h:1};
+  if(prop==='rect')S.scope=null;
+  clearPreview();draw();stage.setPointerCapture?.(e.pointerId);e.preventDefault();
  });
  stage.addEventListener('pointermove',e=>{
-   const drag=state.pointer;if(!drag||drag.id!==e.pointerId)return;
-   const p=point(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y;
-   if(drag.mode==='draw')state.rect={x:Math.min(p.x,drag.start.x),y:Math.min(p.y,drag.start.y),w:Math.abs(p.x-drag.start.x)+1,h:Math.abs(p.y-drag.start.y)+1};
-   else{state.rect=clone(drag.old);editRect(dx,dy,drag.mode)}
-   draw();e.preventDefault()
+  const d=S.drag;if(!d||d.id!==e.pointerId)return;
+  const p=location(e),dx=p.x-d.start.x,dy=p.y-d.start.y;
+  if(d.operation==='draw')S[d.prop]={x:Math.min(p.x,d.start.x),y:Math.min(p.y,d.start.y),w:Math.abs(p.x-d.start.x)+1,h:Math.abs(p.y-d.start.y)+1};
+  else{S[d.prop]=clone(d.origin);updateRect(dx,dy,'move')}
+  clearPreview();draw();e.preventDefault();
  });
- const done=e=>{if(state.pointer?.id===e.pointerId){state.pointer=null;draw()}};
- stage.addEventListener('pointerup',done);stage.addEventListener('pointercancel',done);
+ const stop=e=>{if(S.drag?.id===e.pointerId){S.drag=null;draw()}};
+ stage.addEventListener('pointerup',stop);stage.addEventListener('pointercancel',stop);
 }
-function options(){
- return {mode:$('regionUvInputMode').value,dx:Number($('regionUvX').value),dy:Number($('regionUvY').value),scale:Number($('regionUvScale').value)}
+function initJoystick(){
+ const joy=$('regionUvJoystick'),stick=$('regionUvStick');let id=null,last=0,prev='';
+ joy.addEventListener('pointerdown',e=>{id=e.pointerId;prev='';last=0;joy.setPointerCapture?.(id);e.preventDefault()});
+ joy.addEventListener('pointermove',e=>{
+  if(id!==e.pointerId)return;
+  const r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;
+  const magnitude=Math.hypot(dx,dy),reach=r.width*.31;
+  const k=Math.min(1,reach/(magnitude||1));stick.style.transform='translate('+(dx*k)+'px,'+(dy*k)+'px)';
+  const sx=Math.abs(dx)>r.width*.25?Math.sign(dx):0,sy=Math.abs(dy)>r.height*.25?Math.sign(dy):0;
+  const direction=sx+','+sy,now=performance.now();
+  if(!sx&&!sy){prev='';return}
+  // Deliberately restrained: 1 source pixel per 260 ms, with a larger dead zone.
+  if(S.tool==='edit'&&S.view!=='preview'&&(direction!==prev||now-last>=260)){
+   if(rectInView())updateRect(sx,sy,S.handle);
+   prev=direction;last=now;
+  }
+  if(S.tool==='pan'&&(direction!==prev||now-last>=120)){
+   const stage=$('regionUvStage');stage.scrollLeft+=sx*7;stage.scrollTop+=sy*7;
+   prev=direction;last=now;
+  }
+  e.preventDefault();
+ });
+ const stop=e=>{if(id===e.pointerId){id=null;prev='';stick.style.transform='translate(0,0)'}};
+ joy.addEventListener('pointerup',stop);joy.addEventListener('pointercancel',stop);
 }
-async function exportRegion(){
- if(!state.base)return;
- try{
-   const region=extractRegion(baseImage(),snapshot());
-   const png=canvasFromImage(region.image);
-   const blob=await bridge().canvasPngBlob(png);
-   download(blob,(state.meta.name||'entity').replace(/\.png$/i,'')+'_region.png');
-   localStorage.setItem('mts_uv_region_export_v1:'+state.meta.path,JSON.stringify({version:1,sourceW:state.base.width,sourceH:state.base.height,rects:region.rects}));
-   inform('Seçilen '+region.image.width+'×'+region.image.height+' PNG indirildi. Diğer alanlar dışarı aktarılmadı.');
- }catch(e){inform('Bölge export hatası: '+e.message)}
+function islandKey(){return 'mts_uv_islands_v1:'+(S.meta?.path||'unknown')}
+function savedIslands(){
+ let raw;try{raw=JSON.parse(localStorage.getItem(islandKey())||'null')}catch{}
+ const w=S.base.width,h=S.base.height,oldW=Number(raw?.width)||Number(S.meta.w)||w,oldH=Number(raw?.height)||Number(S.meta.h)||h;
+ S.islands=(Array.isArray(raw?.islands)?raw.islands:[]).map((a,i)=>({id:a.id||'island_'+i,rects:oldW===w&&oldH===h?normalizedRects(a.rects||[],w,h):scaleSavedRects(a.rects||[],oldW,oldH,w,h)}));
+ S.index=S.islands.length?0:-1;showIslandChoices();
 }
-function download(blob,name){
- const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+function showIslandChoices(){
+ const picker=$('regionUvIslandPicker');picker.innerHTML='';
+ S.islands.forEach((a,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent='Ada '+(i+1)+' · '+a.rects.length+' alan';picker.add(o)});
+ picker.value=String(S.index);draw();
+}
+function persistIslands(){
+ try{localStorage.setItem(islandKey(),JSON.stringify({v:1,width:S.base.width,height:S.base.height,updatedAt:Date.now(),islands:S.islands}))}
+ catch(e){hint('Ada kaydı yapılamadı: '+e.message)}
+ showIslandChoices();
+}
+function newIsland(){
+ S.islands.push({id:'island_'+Date.now().toString(36),rects:[]});S.index=S.islands.length-1;
+ persistIslands();
+}
+function addArea(){
+ if(!S.rect)return toast('Önce aktif UV üzerinde alan çiz');
+ if(S.index<0)newIsland();
+ const island=S.islands[S.index];island.rects=normalizedRects([...island.rects,S.rect],S.base.width,S.base.height);
+ persistIslands();hint('Seçim adaya eklendi');
+}
+function useIsland(){
+ const a=S.islands[S.index];if(!a?.rects?.length)return toast('Bu adada kayıtlı alan yok');
+ S.scope=normalizedRects(a.rects,S.base.width,S.base.height);
+ clearPreview();view('active');hint(S.scope.length+' kayıtlı UV alanı hedef seçildi');
+}
+function removeIsland(){
+ if(S.index<0)return;
+ S.islands.splice(S.index,1);S.index=Math.min(S.index,S.islands.length-1);S.scope=null;
+ persistIslands();clearPreview();
+}
+function pickSource(){
+ if(!S.sourceRect)return toast('Önce Yüklenen PNG sekmesinde kaynak adayı çiz');
+ const r=S.sourceRect;hint('Kaynak ada: '+r.w+'×'+r.h+' px. Birleşimi önizleyebilirsin.');
 }
 async function loadPng(file){
- if(!file||!state.base)return;
- if(file.type&&!/png/.test(file.type)&&!file.name.toLowerCase().endsWith('.png'))return inform('PNG dosyası seç');
- const stamp=state.epoch;
+ if(!file||!S.base)return;
+ if(file.type&&!file.type.includes('png')&&!file.name.toLowerCase().endsWith('.png'))return toast('PNG seç');
+ const generation=S.epoch;
  try{
-   if(!snapshot().length)return inform('Önce hedef bölgeyi seç');
-   const canvas=await bridge().decodeBlobToCanvas(file);
-   if(stamp!==state.epoch)return;
-   state.scope=snapshot();state.imported=canvas;state.preview=null;
-   label('Yüklendi: '+canvas.width+'×'+canvas.height+'. Kaydırma/ölçekle eşleştir, sonra birleşimi önizle.');
-   makePreview();
- }catch(e){inform('PNG okunamadı: '+e.message)}
+  if(!targetRects().length)return toast('Önce aktif UV üzerindeki hedef alanı seç');
+  const c=await bridge().decodeBlobToCanvas(file);
+  if(generation!==S.epoch)return;
+  S.imported=c;S.sourceRect=null;clearPreview();setTool('edit');setHandle('move');
+  view('uploaded');
+  hint('Yüklenen PNG üzerinde değiştirmek istediğin kaynak adayı parmağınla seç. Bütün PNG otomatik eşlenmez.');
+ }catch(e){toast('PNG açılamadı: '+e.message)}
 }
-function makePreview(){
- if(!state.imported||!state.base)return inform('Önce PNG yükle');
+function merged(){
+ if(!S.base||!S.imported)return toast('Önce PNG yükle');
+ if(!S.sourceRect)return toast('Yüklenen PNG üzerinde kaynak adayı seç');
  try{
-   const result=compositeRegion(baseImage(),imageOf(state.imported),snapshot(),options());
-   state.preview=canvasFromImage(result.image);
-   $('regionUvSave').disabled=result.changed===0;
-   view('preview');
-   label('Bölgesel önizleme · '+result.selected+' seçili piksel · '+result.changed+' RGB değişimi · dış alan ve alfa kilitli. Kaydetmeden önce 3D ile kontrol edebilirsin.');
- }catch(e){state.preview=null;$('regionUvSave').disabled=true;inform('Eşleme hatası: '+e.message)}
+  const r=compositeRegion(image(S.base),image(S.imported),targetRects(),{
+   sourceRect:S.sourceRect,mode:'region',
+   dx:Number($('regionUvX').value||0),dy:Number($('regionUvY').value||0),
+   scale:Number($('regionUvScale').value||1)
+  });
+  S.preview=makeCanvas(r.image);$('regionUvSave').disabled=r.changed===0;
+  view('preview');hint('Birleşim hazır · '+r.changed+' piksel güncellendi. Seçim dışı ve alfa aynı.');
+ }catch(e){clearPreview();toast('Eşleme başarısız: '+e.message)}
+}
+function download(blob,name){
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+async function exportRegion(){
+ if(!S.base)return;
+ try{
+  const patch=extractRegion(image(S.base),targetRects()),blob=await bridge().canvasPngBlob(makeCanvas(patch.image));
+  download(blob,(S.meta.name||'entity').replace(/\.png$/i,'')+'_region.png');
+  localStorage.setItem('mts_uv_region_export_v1:'+S.meta.path,JSON.stringify({version:1,sourceW:S.base.width,sourceH:S.base.height,rects:patch.rects}));
+  hint('Seçim PNG indirildi: '+patch.image.width+'×'+patch.image.height);
+ }catch(e){toast('PNG çıkarılamadı: '+e.message)}
+}
+async function exportWhole(){
+ if(!S.preview)return toast('Önce birleşimi önizle');
+ download(await bridge().canvasPngBlob(S.preview),(S.meta.name||'entity').replace(/\.png$/i,'')+'_region_merged.png');
 }
 async function save(){
- if(!state.preview||!state.meta||state.busy)return;
- state.busy=true;const button=$('regionUvSave');button.disabled=true;const stamp=state.epoch,preview=state.preview,path=state.meta.path;
+ if(!S.preview||S.busy)return;
+ const generation=S.epoch,preview=S.preview,path=S.meta.path;
+ S.busy=true;$('regionUvSave').disabled=true;
  try{
-   const blob=await bridge().canvasPngBlob(preview);
-   const ok=await bridge().saveRestored(path,blob);
-   if(!ok)throw Error('Edit store confirmation missing');
-   if(stamp!==state.epoch)return;
-   state.base=preview;state.preview=null;state.imported=null;state.scope=null;
-   view('active');label('Aktif texture güncellendi. Seçilmeyen bölgelerde hiçbir piksel değişmedi.');
- }catch(e){if(stamp===state.epoch){button.disabled=false;inform('Kaydedilemedi: '+e.message)}}finally{state.busy=false}
+  const blob=await bridge().canvasPngBlob(preview);
+  const ok=await bridge().saveRestored(path,blob);
+  if(!ok)throw Error('Aktif texture kaydedilemedi');
+  if(S.epoch!==generation)return;
+  S.base=preview;S.preview=null;S.imported=null;S.sourceRect=null;S.scope=null;
+  view('active');hint('Yalnız hedef UV bölgesi aktif texture’a kaydedildi');
+ }catch(e){if(generation===S.epoch){$('regionUvSave').disabled=false;toast(e.message)}}
+ finally{S.busy=false}
 }
-async function fullExport(){if(!state.preview)return inform('Önce birleşimi önizle');const blob=await bridge().canvasPngBlob(state.preview);download(blob,(state.meta.name||'entity').replace(/\.png$/i,'')+'_region_merged.png')}
-async function show3D(){
- if(!state.preview)return inform('Önce birleşimi önizle');
+async function preview3d(){
+ if(!S.preview)return toast('Önce birleşimi önizle');
  try{
-   const viewer=await bridge().ensurePreview3dLoaded?.();if(!viewer?.openVariant)throw Error('3D önizleme bulunamadı');
-   const a=await bridge().canvasPngBlob(state.base),b=await bridge().canvasPngBlob(state.preview);
-   await viewer.openVariant(state.meta,b,'Bölgesel değişim',[{blob:a,name:'Aktif texture'},{blob:b,name:'Bölgesel değişim'}],1);
- }catch(e){inform('3D açılamadı: '+e.message)}
+  const viewer=await bridge().ensurePreview3dLoaded?.();
+  if(!viewer?.openVariant)throw Error('3D görüntüleyici yüklenemedi');
+  const before=await bridge().canvasPngBlob(S.base),after=await bridge().canvasPngBlob(S.preview);
+  await viewer.openVariant(S.meta,after,'Bölgesel UV',[{blob:before,name:'Aktif UV'},{blob:after,name:'Bölgesel UV'}],1);
+ }catch(e){toast('3D açılamadı: '+e.message)}
 }
-function create(){
+function buildUI(){
  if($('regionalUvStudio'))return;
  const root=document.createElement('div');root.id='regionalUvStudio';root.className='islandStudio islandRegionRoot';
  root.innerHTML=[
  '<div class="islandStudioTop"><button class="btn" id="regionUvClose">←</button><b>Bölgesel UV</b><select class="select" id="regionUvTexture"></select></div>',
- '<div class="regionUvHint">Aktif UV üzerinde bölge seç. PNG indirip düzenle veya bölgeye başka PNG yerleştir. <strong>Seçim dışı pikseller ve bütün alfa korunur.</strong></div>',
- '<div class="islandStudioTabs"><button class="btn primary" data-region-view="active">Aktif UV</button><button class="btn" data-region-view="uploaded">Yüklenen</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
- '<div class="islandStudioStatus" id="regionUvStatus">Alan seç.</div>',
- '<div class="regionUvZoombar"><button class="btn" id="regionUvZoomOut" aria-label="Uzaklaştır">−</button><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1" aria-label="UV yakınlaştırma"><button class="btn" id="regionUvZoomIn" aria-label="Yakınlaştır">+</button><strong id="regionUvZoomValue">1×</strong><button class="btn" id="regionUvZoomReset">Sığdır</button><span>Yakınlaştırınca görüntüyü kaydırabilirsin.</span></div>',
- '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div>',
- '<div class="islandStudioTools"><button class="btn primary" id="regionUvDirect">Çizili alanı kullan</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Adaya ekle</button><button class="btn" id="regionUvPrev">← Ada</button><button class="btn" id="regionUvNext">Ada →</button><button class="btn" id="regionUvUseIsland">Adayı kullan</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div>',
- '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="pan" class="btn">Görseli kaydır</button><button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
- '<div class="islandJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · joystick 1 px hassasiyet</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
- '<div class="regionUvOptions"><label>Yüklenen PNG <select id="regionUvInputMode"><option value="region">Seçilen bölge</option><option value="atlas">Tam UV atlası</option></select></label><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div>',
- '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Bölge PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle / eşleştir</button><button class="btn" id="regionUvPreview">Birleşimi önizle</button><button class="btn" id="regionUvFull">Tam UV PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Aktif texture’a kaydet</button><button class="btn" id="regionUv3D">3D bak</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
+ '<div class="islandStudioTabs regionUvTabs"><button class="btn primary" data-region-view="active">Aktif UV · Hedef</button><button class="btn" data-region-view="uploaded">Yüklenen · Kaynak</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
+ '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
+ '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
+ '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
+ '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div></div>',
+ '<div class="islandJoystickDock regionUvJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
+ '<details class="regionUvSaved"><summary>Kayıtlı adalar</summary><div class="regionUvSavedRow"><select id="regionUvIslandPicker" aria-label="Kayıtlı ada"></select><button class="btn" id="regionUvUseIsland">Adayı seç</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
+ '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
+ '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
  document.body.append(root);
- const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href='css/island-region-studio.css?v=20261009-region1';document.head.append(sheet);
- initPointer();initJoystick();
- $('regionUvZoom').addEventListener('input',e=>setZoom(e.target.value));
- if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvCanvas'));
+ const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.href='css/island-region-studio.css?v=20261009-sourcecrop2';document.head.append(stylesheet);
+ initSelection();initJoystick();
+ $('regionUvZoom').addEventListener('input',e=>zoom(e.target.value));
  root.addEventListener('click',e=>{
-   const b=e.target.closest('button');if(!b)return;
-   if(b.id==='regionUvClose')root.classList.remove('open');
-   if(b.dataset.regionView)view(b.dataset.regionView);
-   if(b.dataset.regionMode)selectHandle(b.dataset.regionMode);
-   if(b.id==='regionUvZoomIn')setZoom(state.zoom+.5);
-   if(b.id==='regionUvZoomOut')setZoom(state.zoom-.5);
-   if(b.id==='regionUvZoomReset')setZoom(1);
-   if(b.id==='regionUvDirect')selection();
-   if(b.id==='regionUvAddIsland')addIsland();
-   if(b.id==='regionUvAdd')addRect();
-   if(b.id==='regionUvPrev')cycle(-1);
-   if(b.id==='regionUvNext')cycle(1);
-   if(b.id==='regionUvUseIsland')islandSelect();
-   if(b.id==='regionUvDel')deleteIsland();
-   if(b.id==='regionUvExport')exportRegion();
-   if(b.id==='regionUvImport')$('regionUvFile').click();
-   if(b.id==='regionUvPreview')makePreview();
-   if(b.id==='regionUvFull')fullExport();
-   if(b.id==='regionUvSave')save();
-   if(b.id==='regionUv3D')show3D();
-   const steps={regionUvLeft:[-1,0],regionUvUp:[0,-1],regionUvDown:[0,1],regionUvRight:[1,0]};
-   if(steps[b.id]){if(state.mode==='pan'){$('regionUvStage').scrollLeft+=steps[b.id][0]*12;$('regionUvStage').scrollTop+=steps[b.id][1]*12}else editRect(...steps[b.id],state.mode)}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='regionUvClose')root.classList.remove('open');
+  if(b.dataset.regionTool)setTool(b.dataset.regionTool);
+  if(b.dataset.regionView)view(b.dataset.regionView);
+  if(b.id==='regionUvAddIsland')newIsland();
+  if(b.id==='regionUvAdd')addArea();
+  if(b.id==='regionUvUseIsland')useIsland();
+  if(b.id==='regionUvDel')removeIsland();
+  if(b.id==='regionUvImport')$('regionUvFile').click();
+  if(b.id==='regionUvPreview')merged();
+  if(b.id==='regionUvExport')exportRegion();
+  if(b.id==='regionUvFull')exportWhole();
+  if(b.id==='regionUvSave')save();
+  if(b.id==='regionUv3D')preview3d();
  });
- $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)loadPng(f)});
- ['regionUvInputMode','regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(state.imported)makePreview()}));
+ $('regionUvIslandPicker').addEventListener('change',e=>{S.index=Number(e.target.value);draw()});
+ $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)loadPng(f);e.target.value=''});
+ ['regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(S.preview)clearPreview();if(S.imported&&S.sourceRect)merged()}));
  $('regionUvTexture').addEventListener('change',e=>choose(e.target.value));
+ if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvFrame'));
 }
 async function choose(path){
- const old=++state.epoch,meta=bridge().catalog?.().find(x=>x.path===path);
+ const generation=++S.epoch,meta=bridge().catalog?.().find(x=>x.path===path);
  if(!meta)return;
- state.meta=meta;state.base=null;state.preview=null;state.imported=null;state.scope=null;state.rect=null;
+ S.meta=meta;S.base=null;S.imported=null;S.preview=null;S.rect=null;S.sourceRect=null;S.scope=null;
  try{
-   const rec=await core().getEdit?.(path);
-   const blob=rec?.blob||await bridge().originalBlob(path);
-   const canvas=await bridge().decodeBlobToCanvas(blob);if(old!==state.epoch)return;
-   state.base=canvas;
-   state.rect={x:0,y:0,w:Math.max(1,Math.round(canvas.width*.25)),h:Math.max(1,Math.round(canvas.height*.25))};
-   loadIslands();$('regionUvSave').disabled=true;view('active');setZoom(1);selectHandle('move');
-   label(meta.name+' · aktif '+canvas.width+'×'+canvas.height+' · sol tuş/parmakla alan çiz, ardından kullan.');
- }catch(e){inform('Aktif UV yüklenemedi: '+e.message)}
+  const edit=await legacy().getEdit?.(path);
+  const blob=edit?.blob||await bridge().originalBlob(path);
+  const c=await bridge().decodeBlobToCanvas(blob);if(generation!==S.epoch)return;
+  S.base=c;
+  savedIslands();
+  setTool('edit');setHandle('move');view('active');zoom(1);
+  clearPreview();
+  hint(meta.name+' · aktif '+c.width+'×'+c.height+' · Edit ile hedef UV alanını çiz');
+ }catch(e){toast('UV açılamadı: '+e.message)}
 }
 export async function open(path){
- create();const entries=(bridge().catalog?.()||[]).filter(x=>core().assetTypeOf?.(x)==='Entity');
+ buildUI();const records=(bridge().catalog?.()||[]).filter(x=>legacy().assetTypeOf?.(x)==='Entity');
  const picker=$('regionUvTexture');picker.innerHTML='';
- for(const x of entries){const o=document.createElement('option');o.value=x.path;o.textContent=x.name;picker.append(o)}
- if(path&&entries.some(x=>x.path===path))picker.value=path;
+ records.forEach(x=>{const el=document.createElement('option');el.value=x.path;el.textContent=x.name;picker.add(el)});
+ if(path&&records.some(x=>x.path===path))picker.value=path;
  $('regionalUvStudio').classList.add('open');if(picker.value)await choose(picker.value);
  return true;
 }
