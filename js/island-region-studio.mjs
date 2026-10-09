@@ -4,7 +4,7 @@ import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './i
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
 const legacy=()=>window.MTSVariantBridge||{};
-const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,busy:false,zoom:1};
+const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,busy:false,zoom:1,nudge:1};
 const clone=r=>r?{...r}:null;
 const toast=t=>{const status=$('regionUvStatus');if(status)status.textContent=t;bridge().toast?.(t)};
 const hint=t=>{const status=$('regionUvStatus');if(status)status.textContent=t};
@@ -57,8 +57,20 @@ function setTool(tool){
 function setHandle(value){
  S.handle=value;
  const label={move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt'}[value]||'Tüm seçim';
- const el=$('regionUvHandleStatus');if(el)el.textContent=label+' · 1 px / adım';
+ const el=$('regionUvHandleStatus');if(el)el.textContent=label+' · '+S.nudge+' px / adım';
  draw();
+}
+function setNudge(value){
+ const step=Number(value);
+ if(![1,2,4,8].includes(step))return;
+ S.nudge=step;
+ document.querySelectorAll('[data-region-step]').forEach(el=>{
+  const selected=Number(el.dataset.regionStep)===step;
+  el.classList.toggle('active',selected);
+  el.setAttribute('aria-pressed',String(selected));
+ });
+ setHandle(S.handle);
+ try{localStorage.setItem('mts_uv_joystick_step_v1',String(step))}catch{}
 }
 function zoom(value){
  const stage=$('regionUvStage'),frame=$('regionUvFrame');if(!stage||!frame)return;
@@ -134,7 +146,7 @@ function initJoystick(){
   if(!sx&&!sy){prev='';return}
   // Deliberately restrained: 1 source pixel per 260 ms, with a larger dead zone.
   if(S.tool==='edit'&&S.view!=='preview'&&(direction!==prev||now-last>=260)){
-   if(rectInView())updateRect(sx,sy,S.handle);
+   if(rectInView())updateRect(sx*S.nudge,sy*S.nudge,S.handle);
    prev=direction;last=now;
   }
   if(S.tool==='pan'&&(direction!==prev||now-last>=120)){
@@ -153,10 +165,38 @@ function savedIslands(){
  S.islands=(Array.isArray(raw?.islands)?raw.islands:[]).map((a,i)=>({id:a.id||'island_'+i,rects:oldW===w&&oldH===h?normalizedRects(a.rects||[],w,h):scaleSavedRects(a.rects||[],oldW,oldH,w,h)}));
  S.index=S.islands.length?0:-1;showIslandChoices();
 }
+function renderIslandThumbnail(canvas,island){
+ const ctx=canvas.getContext('2d');
+ canvas.width=72;canvas.height=72;ctx.clearRect(0,0,72,72);
+ const rects=normalizedRects(island.rects||[],S.base.width,S.base.height);
+ if(!rects.length)return;
+ const left=Math.min(...rects.map(r=>r.x)),top=Math.min(...rects.map(r=>r.y));
+ const right=Math.max(...rects.map(r=>r.x+r.w)),bottom=Math.max(...rects.map(r=>r.y+r.h));
+ const scale=Math.min(64/Math.max(1,right-left),64/Math.max(1,bottom-top));
+ const x0=(72-(right-left)*scale)/2,y0=(72-(bottom-top)*scale)/2;
+ ctx.imageSmoothingEnabled=false;
+ // Only the saved source UV rectangles are drawn. No background or irrelevant islands.
+ for(const r of rects){
+  ctx.drawImage(S.base,r.x,r.y,r.w,r.h,x0+(r.x-left)*scale,y0+(r.y-top)*scale,r.w*scale,r.h*scale);
+ }
+}
 function showIslandChoices(){
- const picker=$('regionUvIslandPicker');picker.innerHTML='';
- S.islands.forEach((a,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent='Ada '+(i+1)+' · '+a.rects.length+' alan';picker.add(o)});
- picker.value=String(S.index);draw();
+ const gallery=$('regionUvIslandGallery');if(!gallery)return;
+ gallery.replaceChildren();
+ const total=$('regionUvIslandCount');if(total)total.textContent=String(S.islands.length);
+ S.islands.forEach((a,i)=>{
+  const card=document.createElement('button');
+  card.type='button';card.className='regionUvIslandCard'+(S.index===i?' selected':'');
+  card.dataset.regionIsland=String(i);card.setAttribute('aria-pressed',String(S.index===i));
+  card.setAttribute('aria-label','Ada '+(i+1)+', '+(a.rects?.length||0)+' alan');
+  const thumb=document.createElement('canvas');thumb.className='regionUvIslandThumb';
+  renderIslandThumbnail(thumb,a);
+  const name=document.createElement('strong');name.textContent='Ada '+(i+1);
+  const count=document.createElement('small');count.textContent=(a.rects?.length||0)?a.rects.length+' alan':'Boş';
+  card.append(thumb,name,count);gallery.append(card);
+ });
+ if(!S.islands.length){const empty=document.createElement('span');empty.className='regionUvIslandEmpty';empty.textContent='Henüz kayıtlı ada yok';gallery.append(empty)}
+ draw();
 }
 function persistIslands(){
  try{localStorage.setItem(islandKey(),JSON.stringify({v:1,width:S.base.width,height:S.base.height,updatedAt:Date.now(),islands:S.islands}))}
@@ -241,7 +281,7 @@ async function save(){
   if(!ok)throw Error('Aktif texture kaydedilemedi');
   if(S.epoch!==generation)return;
   S.base=preview;S.preview=null;S.imported=null;S.sourceRect=null;S.scope=null;
-  view('active');hint('Yalnız hedef UV bölgesi aktif texture’a kaydedildi');
+  showIslandChoices();view('active');hint('Yalnız hedef UV bölgesi aktif texture’a kaydedildi');
  }catch(e){if(generation===S.epoch){$('regionUvSave').disabled=false;toast(e.message)}}
  finally{S.busy=false}
 }
@@ -264,8 +304,8 @@ function buildUI(){
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div></div>',
- '<div class="islandJoystickDock regionUvJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
- '<details class="regionUvSaved"><summary>Kayıtlı adalar</summary><div class="regionUvSavedRow"><select id="regionUvIslandPicker" aria-label="Kayıtlı ada"></select><button class="btn" id="regionUvUseIsland">Adayı seç</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
+ '<div class="islandJoystickDock regionUvJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div><div class="regionUvStepPicker" role="group" aria-label="Joystick hareket adımı"><span>Adım</span><button type="button" class="active" data-region-step="1" aria-pressed="true">1</button><button type="button" data-region-step="2" aria-pressed="false">2</button><button type="button" data-region-step="4" aria-pressed="false">4</button><button type="button" data-region-step="8" aria-pressed="false">8</button><span>px</span></div></div>',
+ '<details class="regionUvSaved"><summary>Kayıtlı adalar <span class="regionUvIslandCount" id="regionUvIslandCount">0</span></summary><div class="regionUvIslandGallery" id="regionUvIslandGallery" aria-label="Kayıtlı UV adaları"></div><div class="regionUvSavedRow"><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Seçileni sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
  '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
@@ -278,9 +318,10 @@ function buildUI(){
   if(b.id==='regionUvClose')root.classList.remove('open');
   if(b.dataset.regionTool)setTool(b.dataset.regionTool);
   if(b.dataset.regionView)view(b.dataset.regionView);
+  if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
+  if(b.dataset.regionIsland!==undefined){S.index=Number(b.dataset.regionIsland);if(S.islands[S.index]?.rects?.length)useIsland();else{S.scope=null;clearPreview();hint('Ada '+(S.index+1)+' boş; bir alan ekle')}showIslandChoices()}
   if(b.id==='regionUvAddIsland')newIsland();
   if(b.id==='regionUvAdd')addArea();
-  if(b.id==='regionUvUseIsland')useIsland();
   if(b.id==='regionUvDel')removeIsland();
   if(b.id==='regionUvImport')$('regionUvFile').click();
   if(b.id==='regionUvPreview')merged();
@@ -289,7 +330,6 @@ function buildUI(){
   if(b.id==='regionUvSave')save();
   if(b.id==='regionUv3D')preview3d();
  });
- $('regionUvIslandPicker').addEventListener('change',e=>{S.index=Number(e.target.value);draw()});
  $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)loadPng(f);e.target.value=''});
  ['regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(S.preview)clearPreview();if(S.imported&&S.sourceRect)merged()}));
  $('regionUvTexture').addEventListener('change',e=>choose(e.target.value));
@@ -306,6 +346,7 @@ async function choose(path){
   S.base=c;
   savedIslands();
   setTool('edit');setHandle('move');view('active');zoom(1);
+  let stored=1;try{stored=Number(localStorage.getItem('mts_uv_joystick_step_v1'))||1}catch{}setNudge([1,2,4,8].includes(stored)?stored:1);
   clearPreview();
   hint(meta.name+' · aktif '+c.width+'×'+c.height+' · Edit ile hedef UV alanını çiz');
  }catch(e){toast('UV açılamadı: '+e.message)}
