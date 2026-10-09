@@ -539,7 +539,18 @@
   const buffer=await res.arrayBuffer();let animation=null;
   try{await loadB3DRuntime();animation=window.MTSB3DAnimation.parse(buffer);if(!animation.animated)animation=null}
   catch(err){console.warn('B3D animation disabled for',model,err);animation=null;const notice=document.createElement('div');notice.className='mts-b3d-animation-error';notice.setAttribute('role','status');notice.style.cssText='padding:8px 12px;font-size:12px;color:#ffd8a8;background:#38251c;border-radius:8px;margin:6px 0';notice.textContent='Animasyon yüklenemedi ('+model+'): '+(err?.message||String(err));stage.parentNode.insertBefore(notice,stage.nextSibling);stage._animationNotice=notice}
-  const mesh=animation?.mesh||parseB3D(buffer),indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
+  const staticMesh=parseB3D(buffer);
+  if(animation){
+    const candidate=animation.mesh;
+    const sameArray=(a,b,tolerance=0)=>a?.length===b?.length&&a.every((value,i)=>Math.abs(value-b[i])<=tolerance);
+    const topologyOK=sameArray(candidate.idx,staticMesh.idx)&&sameArray(candidate.uv,staticMesh.uv,1e-5);
+    const positionsOK=sameArray(candidate.p,staticMesh.p,1e-4);
+    if(!topologyOK||!positionsOK){
+      console.warn('B3D animation mesh differs from static reference; using verified static mesh',model,{topologyOK,positionsOK});
+      animation=null;
+    }
+  }
+  const mesh=animation?.mesh||staticMesh,indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
   const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
   const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
   const fs=glShader(gl,gl.FRAGMENT_SHADER,'precision mediump float;uniform sampler2D tex;varying vec2 u;void main(){vec4 c=texture2D(tex,u);if(c.a<0.02)discard;gl_FragColor=c;}');
