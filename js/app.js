@@ -1202,6 +1202,7 @@ try{creativeP0PromptFor=()=>null}catch{}
 window.MTSVariantBridge={catalog:()=>CATALOG,active:()=>active,toast,originalBlob,getEdit,putEdit,assetTypeOf,runtimeRoleInfo,materialReferenceDependency,prepareVariantTextureBlob,lockEntityAlphaToSource,applyFilter,markChanged:path=>changedPathsFast?.add?.(path)};
 // Island Studio is isolated in js/island-studio.js so failures cannot block the catalog.
 window.MTSIslandBridge={
+ runtimeRoleInfo,
  catalog:()=>CATALOG,
  active:()=>active,
  toast,
