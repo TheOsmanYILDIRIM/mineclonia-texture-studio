@@ -17,7 +17,7 @@
  function loadB3DRuntime(){
   if(window.MTSB3DAnimation&&window.MTSB3DPreviewControls)return Promise.resolve();
   if(!b3dRuntimePromise)b3dRuntimePromise=(async()=>{
-   for(const src of ['js/b3d-animation.js?v=20261009-animation2','js/b3d-preview-controls.js?v=20261009-animation2']){
+   for(const src of ['js/b3d-animation.js?v=20261009-animation3','js/b3d-preview-controls.js?v=20261009-animation3']){
     if(src.includes('b3d-animation.js')&&window.MTSB3DAnimation)continue;
     if(src.includes('b3d-preview-controls.js')&&window.MTSB3DPreviewControls)continue;
     await new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=src;el.onload=resolve;el.onerror=()=>reject(Error('B3D animasyon modülü yüklenemedi: '+src));document.head.appendChild(el)});
@@ -531,14 +531,14 @@
   else if(canObject(variantSession.meta)){mode='object';await renderCubeGL(variantSession.meta,rec.blob);resetView()}
   document.getElementById('preview3dMeta').textContent=variantSession.meta.name+' · '+(i+1)+'/'+variantSession.variants.length+' · '+rec.name;renderVariantStrip();
  }
- function cleanupEntityGL(){window.MTSB3DPreviewControls?.destroy();if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
+ function cleanupEntityGL(){stage._animationNotice?.remove();stage._animationNotice=null;window.MTSB3DPreviewControls?.destroy();if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
  async function renderEntity(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';const model=entityModelFile(meta);if(!model)throw Error('Bu entity için Mineclonia mesh eşleşmesi yok');
   const modelUrl=MINECLONIA_RAW_BASE+'/ENTITIES/mobs_mc/models/'+encodeURIComponent(model);
   const [res,blob]=await Promise.all([fetch(modelUrl,{cache:'force-cache'}),textureBlob?Promise.resolve(textureBlob):displayBlob(meta.path)]);if(!res.ok)throw Error('Entity mesh yüklenemedi: '+model);
   const buffer=await res.arrayBuffer();let animation=null;
   try{await loadB3DRuntime();animation=window.MTSB3DAnimation.parse(buffer);if(!animation.animated)animation=null}
-  catch(err){console.warn('B3D animation disabled for',model,err);animation=null}
+  catch(err){console.warn('B3D animation disabled for',model,err);animation=null;const notice=document.createElement('div');notice.className='mts-b3d-animation-error';notice.setAttribute('role','status');notice.style.cssText='padding:8px 12px;font-size:12px;color:#ffd8a8;background:#38251c;border-radius:8px;margin:6px 0';notice.textContent='Animasyon yüklenemedi ('+model+'): '+(err?.message||String(err));stage.parentNode.insertBefore(notice,stage.nextSibling);stage._animationNotice=notice}
   const mesh=animation?.mesh||parseB3D(buffer),indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
   const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
   const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
