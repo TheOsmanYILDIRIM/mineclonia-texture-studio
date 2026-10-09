@@ -187,6 +187,25 @@ function renderIslandThumbnail(canvas,island){
   ctx.drawImage(S.base,r.x,r.y,r.w,r.h,x0+(r.x-left)*scale,y0+(r.y-top)*scale,r.w*scale,r.h*scale);
  }
 }
+function islandDetail(index){
+ const island=S.islands[index];if(!S.base||!island?.rects?.length)return toast('Önizlenecek kayıtlı ada yok');
+ const rects=normalizedRects(island.rects,S.base.width,S.base.height);
+ const x=Math.min(...rects.map(r=>r.x)),y=Math.min(...rects.map(r=>r.y));
+ const right=Math.max(...rects.map(r=>r.x+r.w)),bottom=Math.max(...rects.map(r=>r.y+r.h));
+ const box=$('regionUvDetail'),cv=$('regionUvDetailCanvas');
+ cv.width=right-x;cv.height=bottom-y;
+ const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);ctx.imageSmoothingEnabled=false;
+ for(const r of rects)ctx.drawImage(S.base,r.x,r.y,r.w,r.h,r.x-x,r.y-y,r.w,r.h);
+ $('regionUvDetailTitle').textContent='Ada '+(index+1)+' · '+cv.width+'×'+cv.height+' px';
+ $('regionUvDetailZoom').value='1';$('regionUvDetailZoomValue').textContent='1×';
+ cv.style.width='100%';box.hidden=false;
+}
+function detailZoom(v){
+ const cv=$('regionUvDetailCanvas'),stage=$('regionUvDetailStage');
+ const n=Math.max(1,Math.min(16,Number(v)||1));
+ cv.style.width=(n*100)+'%';$('regionUvDetailZoomValue').textContent=n+'×';$('regionUvDetailZoom').value=String(n);
+ stage.scrollLeft=Math.max(0,(cv.scrollWidth-stage.clientWidth)/2);
+}
 function showIslandChoices(){
  const gallery=$('regionUvIslandGallery');if(!gallery)return;
  gallery.replaceChildren();
@@ -200,7 +219,9 @@ function showIslandChoices(){
   renderIslandThumbnail(thumb,a);
   const name=document.createElement('strong');name.textContent='Ada '+(i+1);
   const count=document.createElement('small');count.textContent=(a.rects?.length||0)?a.rects.length+' alan':'Boş';
-  card.append(thumb,name,count);gallery.append(card);
+  const detail=document.createElement('button');detail.type='button';detail.className='regionUvIslandInspect';detail.dataset.regionInspect=String(i);detail.textContent='⛶';detail.setAttribute('aria-label','Ada '+(i+1)+' tam ekran incele');
+  const wrap=document.createElement('div');wrap.className='regionUvIslandWrap';wrap.append(thumb,detail);
+  card.append(wrap,name,count);gallery.append(card);
  });
  if(!S.islands.length){const empty=document.createElement('span');empty.className='regionUvIslandEmpty';empty.textContent='Henüz kayıtlı ada yok';gallery.append(empty)}
  draw();
@@ -321,6 +342,7 @@ function buildUI(){
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
  '<div class="regionUvFixedControls"><div class="regionUvControlRow"><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div><div class="regionUvNodePad" role="group" aria-label="Hareket ettirilecek nokta"><button type="button" data-region-handle-choice="tl" aria-label="Sol üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="tr" aria-label="Sağ üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="move" class="active" aria-label="Tüm seçimi taşı" aria-pressed="true"></button><button type="button" data-region-handle-choice="bl" aria-label="Sol alt" aria-pressed="false"></button><button type="button" data-region-handle-choice="br" aria-label="Sağ alt" aria-pressed="false"></button></div><div class="regionUvStepPicker" role="group" aria-label="Joystick hareket adımı"><button type="button" class="active" data-region-step="1" aria-pressed="true">1</button><button type="button" data-region-step="2" aria-pressed="false">2</button><button type="button" data-region-step="4" aria-pressed="false">4</button><button type="button" data-region-step="8" aria-pressed="false">8</button><span>px</span></div></div><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span></div>',
  '<details class="regionUvSaved"><summary>Kayıtlı adalar <span class="regionUvIslandCount" id="regionUvIslandCount">0</span></summary><div class="regionUvIslandGallery" id="regionUvIslandGallery" aria-label="Kayıtlı UV adaları"></div><div class="regionUvSavedRow"><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Seçileni sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
+ '<div class="regionUvDetail" id="regionUvDetail" hidden><div class="regionUvDetailTop"><button class="btn" id="regionUvDetailClose">← Geri</button><strong id="regionUvDetailTitle">Ada</strong></div><div class="regionUvDetailStage" id="regionUvDetailStage"><canvas id="regionUvDetailCanvas"></canvas></div><div class="regionUvDetailZoom"><span>Yakınlaştır</span><input id="regionUvDetailZoom" type="range" min="1" max="16" step=".5" value="1"><strong id="regionUvDetailZoomValue">1×</strong></div></div>',
  '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
@@ -331,6 +353,8 @@ function buildUI(){
  root.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='regionUvClose')root.classList.remove('open');
+  if(b.id==='regionUvDetailClose')$('regionUvDetail').hidden=true;
+  if(b.dataset.regionInspect!==undefined){e.stopPropagation();islandDetail(Number(b.dataset.regionInspect));return}
   if(b.dataset.regionTool)setTool(b.dataset.regionTool);
   if(b.dataset.regionView)view(b.dataset.regionView);
   if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
@@ -348,6 +372,7 @@ function buildUI(){
   if(b.id==='regionUvSave')save();
   if(b.id==='regionUv3D')preview3d();
  });
+ $('regionUvDetailZoom').addEventListener('input',e=>detailZoom(e.target.value));
  $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f)loadPng(f)});
  ['regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(S.preview)clearPreview();if(S.imported&&S.sourceRect)merged()}));
  $('regionUvTexture').addEventListener('change',e=>choose(e.target.value));
@@ -358,6 +383,7 @@ async function choose(path){
  if(!meta)return;
  S.importEpoch++;
  S.undo=[];S.redo=[];S.editingIsland=false;historyButtons();
+ $('regionUvDetail').hidden=true;
  S.meta=meta;S.base=null;S.imported=null;S.preview=null;S.rect=null;S.sourceRect=null;S.scope=null;
  try{
   const edit=await legacy().getEdit?.(path);
