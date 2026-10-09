@@ -347,7 +347,7 @@ function buildUI(){
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
  document.body.append(root);
- const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.href='css/island-region-studio.css?v=20261009-nodepad1';document.head.append(stylesheet);
+ const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.href='css/island-region-studio.css?v=20261009-detail1';document.head.append(stylesheet);
  initSelection();initJoystick();
  $('regionUvZoom').addEventListener('input',e=>zoom(e.target.value));
  root.addEventListener('click',e=>{
