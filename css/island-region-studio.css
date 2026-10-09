@@ -135,3 +135,30 @@
  box-shadow:0 0 0 2px #132018,0 0 0 4px #a7ef86
 }
 .islandRegionRoot #regionUvSelection .islandCenter{width:12px;height:12px;z-index:7}
+
+/* Pixel-accurate visible selection, not an invisible overlay inferred from preview. */
+.islandRegionRoot #regionUvSelection{
+ box-sizing:border-box!important;border:2px solid #a6ffc0!important;
+ background:rgba(100,240,154,.12)!important;z-index:11;
+ box-shadow:0 0 0 1px #0b2416,0 0 9px #51ec9a55;
+ overflow:visible!important;pointer-events:none
+}
+.islandRegionRoot #regionUvSelection [data-region-handle]{
+ display:block!important;position:absolute!important;width:16px!important;height:16px!important;
+ margin:0!important;transform:translate(-50%,-50%)!important;
+ border-radius:50%!important;background:#e9fff1!important;border:2px solid #17402c!important;
+ box-shadow:0 0 0 2px #0c1418,0 0 0 3px #a4f9bd!important;
+ pointer-events:auto!important;z-index:12
+}
+.islandRegionRoot #regionUvSelection [data-region-handle="tl"]{left:0;top:0}
+.islandRegionRoot #regionUvSelection [data-region-handle="tr"]{left:100%;top:0}
+.islandRegionRoot #regionUvSelection [data-region-handle="bl"]{left:0;top:100%}
+.islandRegionRoot #regionUvSelection [data-region-handle="br"]{left:100%;top:100%}
+.islandRegionRoot #regionUvSelection [data-region-handle].active{
+ background:#ffcc6a!important;border-color:#5b3810!important;
+ box-shadow:0 0 0 2px #0b141a,0 0 0 4px #ffcc6a!important
+}
+.islandRegionRoot #regionUvSelection .islandCenter{
+ position:absolute!important;left:50%!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;pointer-events:auto!important
+}
