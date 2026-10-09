@@ -1,5 +1,9 @@
 # SESSION_HANDOFF — 2026-10-09 · ACTIVE-UV REGIONAL EDITOR
 
+## Simplified Pan/Edit and two-sided island mapping (2026-10-09)
+
+Rebuilt the regional editor UI: only two small left-hand modes (Pan/Edit), a zoom slider, and a single joystick. Removed the entire row of adjustment buttons and arrow controls; island management and numeric registration are collapsed by default. Corner/center markers on the selection itself choose joystick adjustment mode, with a larger dead zone and a 260ms throttle at one source pixel per deliberate step. On PNG import the **loaded source image** becomes the active canvas in Edit mode and the user MUST draw its source island separately; there is no automatic whole-PNG fit or save-enabled preview. Only an explicitly selected sourceRect is mapped to the active target rect union, preserving all unselected RGBA bytes and active alpha. Updated the browser QA workflow to assert the target/source two-step selection and hidden save state; follow up on Android touch UX and visually confirm source-to-target landmarks.
+
 ## Zoom and corner-control update (2026-10-09)
 
 Added 1×–12× zoom slider, ± and fit controls, a scrollable image viewport, explicit corner modes and direct on-canvas corner handles. The existing joystick moves the selected corner/whole rectangle by one source pixel per input step; pan mode scrolls the zoomed viewport instead of changing UV coordinates. Crop / import / composite APIs and saved island records are unchanged. Browser visual test and Android touch validation remain necessary.
