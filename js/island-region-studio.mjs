@@ -12,10 +12,10 @@ const image=c=>c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,c.w
 const activeRects=()=>S.scope?.length?S.scope:(S.rect?[S.rect]:[]);
 const targetRects=()=>normalizedRects(activeRects(),S.base.width,S.base.height);
 function makeCanvas(img){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').putImageData(new ImageData(img.data,img.width,img.height),0,0);return c}
-function snapshot(){return {rect:clone(S.rect),sourceRect:clone(S.sourceRect),scope:S.scope?.map(clone)||null,islands:S.islands.map(a=>({id:a.id,rects:a.rects.map(clone)})),index:S.index,editingIsland:S.editingIsland,view:S.view}}
+function snapshot(){return {imported:S.imported,rect:clone(S.rect),sourceRect:clone(S.sourceRect),scope:S.scope?.map(clone)||null,islands:S.islands.map(a=>({id:a.id,rects:a.rects.map(clone)})),index:S.index,editingIsland:S.editingIsland,view:S.view}}
 function historyButtons(){$('regionUvUndo').disabled=!S.undo.length;$('regionUvRedo').disabled=!S.redo.length}
 function remember(){S.undo.push(snapshot());if(S.undo.length>100)S.undo.shift();S.redo=[];historyButtons()}
-function restoreHistory(s){S.rect=clone(s.rect);S.sourceRect=clone(s.sourceRect);S.scope=s.scope?.map(clone)||null;S.islands=s.islands.map(a=>({id:a.id,rects:a.rects.map(clone)}));S.index=s.index;S.editingIsland=s.editingIsland;persistIslands();clearPreview();view(s.view==='preview'?'active':s.view);showIslandChoices()}
+function restoreHistory(s){S.imported=s.imported;S.rect=clone(s.rect);S.sourceRect=clone(s.sourceRect);S.scope=s.scope?.map(clone)||null;S.islands=s.islands.map(a=>({id:a.id,rects:a.rects.map(clone)}));S.index=s.index;S.editingIsland=s.editingIsland;persistIslands();clearPreview();view(s.view==='preview'?'active':s.view);showIslandChoices()}
 function travel(direction){const from=direction==='undo'?S.undo:S.redo,to=direction==='undo'?S.redo:S.undo;if(!from.length)return;to.push(snapshot());restoreHistory(from.pop());historyButtons()}
 function syncIslandRect(){if(S.editingIsland&&S.index>=0&&S.islands[S.index]?.rects.length===1&&S.rect){S.islands[S.index].rects=[clone(S.rect)];S.scope=[clone(S.rect)];persistIslands()}}
 function clearPreview(){
@@ -263,6 +263,18 @@ function pickSource(){
  if(!S.sourceRect)return toast('Önce Yüklenen PNG sekmesinde kaynak adayı çiz');
  const r=S.sourceRect;hint('Kaynak ada: '+r.w+'×'+r.h+' px. Birleşimi önizleyebilirsin.');
 }
+function rotateImported(clockwise=true){
+ if(!S.imported||S.busy)return toast('Önce kaynak PNG yükle');
+ remember();
+ const source=S.imported,w=source.width,h=source.height;
+ const next=document.createElement('canvas');next.width=h;next.height=w;
+ const ctx=next.getContext('2d');ctx.translate(clockwise?h:0,clockwise?0:w);ctx.rotate(clockwise?Math.PI/2:-Math.PI/2);
+ ctx.drawImage(source,0,0);
+ const r=S.sourceRect;
+ if(r)S.sourceRect=clockwise?{x:h-r.y-r.h,y:r.x,w:r.h,h:r.w}:{x:r.y,y:w-r.x-r.w,w:r.h,h:r.w};
+ S.imported=next;S.drag=null;clearPreview();view('uploaded');
+ hint('Kaynak PNG '+(clockwise?'90° sağa':'90° sola')+' döndürüldü · '+next.width+'×'+next.height+' · seçim korundu');
+}
 async function loadPng(file){
  if(!file||!S.base)return;
  if(file.type&&!file.type.includes('png')&&!file.name.toLowerCase().endsWith('.png'))return toast('PNG seç');
@@ -270,7 +282,7 @@ async function loadPng(file){
  try{
   // Source import must be independent of target selection. Users can choose the target afterwards.
   // Invalidate the previous image immediately; never display stale source while decoding.
-  S.imported=null;S.sourceRect=null;clearPreview();S.view='uploaded';draw();
+  S.imported=null;S.sourceRect=null;S.undo=[];S.redo=[];historyButtons();clearPreview();S.view='uploaded';draw();
   hint('Kaynak yükleniyor: '+file.name);
   const c=await bridge().decodeBlobToCanvas(file);
   if(generation!==S.epoch||importGeneration!==S.importEpoch)return;
@@ -368,6 +380,7 @@ function buildUI(){
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
  '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button><button class="btn" id="regionUvB3DOpen">B3D UV’den seç</button></div>',
  '<div class="regionUvGridBar"><span>Orijinal UV ızgarası</span><button class="btn" data-region-grid="0">Hassas</button><button class="btn primary" data-region-grid="1">1×</button><button class="btn" data-region-grid="2">2×</button><button class="btn" data-region-grid="4">4×</button><button class="btn" data-region-grid="8">8×</button></div>',
+ '<div class="regionUvRotateBar"><span>Yüklenen PNG</span><button class="btn" id="regionUvRotateLeft" type="button">↶ 90°</button><button class="btn" id="regionUvRotateRight" type="button">↷ 90°</button></div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
@@ -401,6 +414,8 @@ function buildUI(){
   if(b.id==='regionUvAdd')addArea();
   if(b.id==='regionUvDel')removeIsland();
   if(b.id==='regionUvImport')$('regionUvFile').click();
+  if(b.id==='regionUvRotateLeft')rotateImported(false);
+  if(b.id==='regionUvRotateRight')rotateImported(true);
   if(b.id==='regionUvPreview')merged();
   if(b.id==='regionUvExport')exportRegion();
   if(b.id==='regionUvFull')exportWhole();
