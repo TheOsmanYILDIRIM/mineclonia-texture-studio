@@ -170,3 +170,31 @@
  box-shadow:none!important;
 }
 .islandRegionRoot #regionUvOverlay{image-rendering:pixelated}
+
+/* Fixed editing cockpit: only joystick + five-node selector stay in view. */
+.islandRegionRoot .regionUvFixedControls{
+ position:sticky;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:50;
+ margin:6px 8px;padding:8px 10px;border:1px solid #3c5057;border-radius:14px;
+ background:rgba(15,23,29,.97);box-shadow:0 -6px 24px #0009;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)
+}
+.regionUvControlRow{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+.regionUvNodePad{display:grid;grid-template-columns:repeat(3,27px);grid-template-rows:repeat(3,22px);align-items:center;justify-items:center;gap:1px;flex:0 0 auto}
+.regionUvNodePad button{
+ appearance:none;border:2px solid #65818a;border-radius:50%;width:19px;height:19px;
+ padding:0;background:#cbdce2;box-shadow:0 0 0 1px #121a21;touch-action:manipulation;cursor:pointer
+}
+.regionUvNodePad [data-region-handle-choice="tl"]{grid-area:1/1}
+.regionUvNodePad [data-region-handle-choice="tr"]{grid-area:1/3}
+.regionUvNodePad [data-region-handle-choice="move"]{grid-area:2/2;width:22px;height:22px;border-radius:6px}
+.regionUvNodePad [data-region-handle-choice="bl"]{grid-area:3/1}
+.regionUvNodePad [data-region-handle-choice="br"]{grid-area:3/3}
+.regionUvNodePad button.active{background:#f6c76a;border-color:#855f1c;box-shadow:0 0 0 2px #ffe0a0}
+.regionUvFixedControls #regionUvJoystick{width:68px;height:68px;flex:0 0 68px;touch-action:none}
+.regionUvFixedControls #regionUvStick{left:22px;top:22px}
+.regionUvFixedControls #regionUvHandleStatus{display:block;text-align:center;margin-top:4px;font-size:10px}
+.regionUvFixedControls .regionUvStepPicker{margin:0;max-width:none}
+.regionUvFixedControls .regionUvStepPicker button{min-width:27px;padding:4px}
+.islandRegionRoot .regionUvActions{position:static!important;bottom:auto!important;box-shadow:none!important}
+.islandRegionRoot #regionUvSelection{display:none!important}
+@media(max-width:520px){.regionUvControlRow{gap:9px}.regionUvFixedControls{padding:6px;margin:5px}.regionUvNodePad{grid-template-columns:repeat(3,24px)}.regionUvFixedControls .regionUvStepPicker button{min-width:26px}}
