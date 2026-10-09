@@ -4,7 +4,7 @@ import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './i
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
 const legacy=()=>window.MTSVariantBridge||{};
-const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,importEpoch:0,busy:false,zoom:1,nudge:1};
+const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,importEpoch:0,busy:false,zoom:1,nudge:1,undo:[],redo:[],editingIsland:false};
 const clone=r=>r?{...r}:null;
 const toast=t=>{const status=$('regionUvStatus');if(status)status.textContent=t;bridge().toast?.(t)};
 const hint=t=>{const status=$('regionUvStatus');if(status)status.textContent=t};
@@ -12,6 +12,12 @@ const image=c=>c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,c.w
 const activeRects=()=>S.scope?.length?S.scope:(S.rect?[S.rect]:[]);
 const targetRects=()=>normalizedRects(activeRects(),S.base.width,S.base.height);
 function makeCanvas(img){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').putImageData(new ImageData(img.data,img.width,img.height),0,0);return c}
+function snapshot(){return {rect:clone(S.rect),sourceRect:clone(S.sourceRect),scope:S.scope?.map(clone)||null,islands:S.islands.map(a=>({id:a.id,rects:a.rects.map(clone)})),index:S.index,editingIsland:S.editingIsland,view:S.view}}
+function historyButtons(){$('regionUvUndo').disabled=!S.undo.length;$('regionUvRedo').disabled=!S.redo.length}
+function remember(){S.undo.push(snapshot());if(S.undo.length>100)S.undo.shift();S.redo=[];historyButtons()}
+function restoreHistory(s){S.rect=clone(s.rect);S.sourceRect=clone(s.sourceRect);S.scope=s.scope?.map(clone)||null;S.islands=s.islands.map(a=>({id:a.id,rects:a.rects.map(clone)}));S.index=s.index;S.editingIsland=s.editingIsland;persistIslands();clearPreview();view(s.view==='preview'?'active':s.view);showIslandChoices()}
+function travel(direction){const from=direction==='undo'?S.undo:S.redo,to=direction==='undo'?S.redo:S.undo;if(!from.length)return;to.push(snapshot());restoreHistory(from.pop());historyButtons()}
+function syncIslandRect(){if(S.editingIsland&&S.index>=0&&S.islands[S.index]?.rects.length===1&&S.rect){S.islands[S.index].rects=[clone(S.rect)];S.scope=[clone(S.rect)];persistIslands()}}
 function clearPreview(){
  S.preview=null;const save=$('regionUvSave');if(save)save.disabled=true;
 }
@@ -101,7 +107,7 @@ function updateRect(dx,dy,where){
   if(where==='bl'||where==='br')bottom=Math.min(canvas.height,Math.max(y+1,bottom+dy));
  }
  S[prop]={x,y,w:right-x,h:bottom-y};
- if(!uploaded)S.scope=null;
+ if(!uploaded){if(S.editingIsland)syncIslandRect();else S.scope=null;}
  clearPreview();draw();
 }
 function location(e){
@@ -119,9 +125,9 @@ function initSelection(){
   const prop=S.view==='uploaded'?'sourceRect':'rect',r=S[prop];
   const inside=r&&p.x>=r.x&&p.x<r.x+r.w&&p.y>=r.y&&p.y<r.y+r.h;
   const operation=inside?'move':'draw';
-  S.drag={id:e.pointerId,start:p,origin:clone(r),operation,prop};
+  remember();S.drag={id:e.pointerId,start:p,origin:clone(r),operation,prop};
   if(operation==='draw')S[prop]={x:p.x,y:p.y,w:1,h:1};
-  if(prop==='rect')S.scope=null;
+  if(prop==='rect'&&!S.editingIsland)S.scope=null;
   clearPreview();draw();stage.setPointerCapture?.(e.pointerId);e.preventDefault();
  });
  stage.addEventListener('pointermove',e=>{
@@ -147,7 +153,7 @@ function initJoystick(){
   if(!sx&&!sy){prev='';return}
   // Deliberately restrained: 1 source pixel per 260 ms, with a larger dead zone.
   if(S.tool==='edit'&&S.view!=='preview'&&(direction!==prev||now-last>=260)){
-   if(rectInView())updateRect(sx*S.nudge,sy*S.nudge,S.handle);
+   if(rectInView()){remember();updateRect(sx*S.nudge,sy*S.nudge,S.handle)}
    prev=direction;last=now;
   }
   if(S.tool==='pan'&&(direction!==prev||now-last>=120)){
@@ -205,10 +211,12 @@ function persistIslands(){
  showIslandChoices();
 }
 function newIsland(){
+ remember();S.editingIsland=false;
  S.islands.push({id:'island_'+Date.now().toString(36),rects:[]});S.index=S.islands.length-1;
  S.scope=null;clearPreview();persistIslands();
 }
 function addArea(){
+ remember();
  if(!S.rect)return toast('Önce aktif UV üzerinde alan çiz');
  if(S.index<0)newIsland();
  const island=S.islands[S.index];island.rects=normalizedRects([...island.rects,S.rect],S.base.width,S.base.height);
@@ -216,11 +224,13 @@ function addArea(){
 }
 function useIsland(){
  const a=S.islands[S.index];if(!a?.rects?.length)return toast('Bu adada kayıtlı alan yok');
- S.scope=normalizedRects(a.rects,S.base.width,S.base.height);
+ remember();S.scope=normalizedRects(a.rects,S.base.width,S.base.height);
+ S.editingIsland=S.scope.length===1;S.rect=clone(S.scope[0]);
  clearPreview();view('active');hint(S.scope.length+' kayıtlı UV alanı hedef seçildi');
 }
 function removeIsland(){
  if(S.index<0)return;
+ remember();S.editingIsland=false;
  S.islands.splice(S.index,1);S.index=Math.min(S.index,S.islands.length-1);S.scope=null;
  persistIslands();clearPreview();
 }
@@ -305,6 +315,7 @@ function buildUI(){
  '<div class="islandStudioTop"><button class="btn" id="regionUvClose">←</button><b>Bölgesel UV</b><select class="select" id="regionUvTexture"></select></div>',
  '<div class="islandStudioTabs regionUvTabs"><button class="btn primary" data-region-view="active">Aktif UV · Hedef</button><button class="btn" data-region-view="uploaded">Yüklenen · Kaynak</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
+ '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button></div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
@@ -325,6 +336,8 @@ function buildUI(){
   if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
   if(b.dataset.regionHandleChoice)setHandle(b.dataset.regionHandleChoice);
   if(b.dataset.regionIsland!==undefined){S.index=Number(b.dataset.regionIsland);if(S.islands[S.index]?.rects?.length)useIsland();else{S.scope=null;clearPreview();hint('Ada '+(S.index+1)+' boş; bir alan ekle')}showIslandChoices()}
+  if(b.id==='regionUvUndo')travel('undo');
+  if(b.id==='regionUvRedo')travel('redo');
   if(b.id==='regionUvAddIsland')newIsland();
   if(b.id==='regionUvAdd')addArea();
   if(b.id==='regionUvDel')removeIsland();
@@ -344,6 +357,7 @@ async function choose(path){
  const generation=++S.epoch,meta=bridge().catalog?.().find(x=>x.path===path);
  if(!meta)return;
  S.importEpoch++;
+ S.undo=[];S.redo=[];S.editingIsland=false;historyButtons();
  S.meta=meta;S.base=null;S.imported=null;S.preview=null;S.rect=null;S.sourceRect=null;S.scope=null;
  try{
   const edit=await legacy().getEdit?.(path);
