@@ -25,5 +25,9 @@ jobs:
         run: node scripts/check-runtime-overrides.mjs
       - name: Check architecture standardization
         run: node scripts/check-standardization.mjs
+      - name: Verify reversible AI UV grid runtime
+        run: |
+          node tests/uv-generation-roundtrip.test.mjs
+          node scripts/build-uv-generation.mjs --check
       - name: Check B3D skeletal animation regression
         run: node tests/b3d-animation.test.cjs

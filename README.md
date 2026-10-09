@@ -12,3 +12,7 @@ Project working rules and continuation state:
 - `AGENTS.md` — repository contract and invariants.
 - `SESSION_HANDOFF.md` — concise current implementation state and next work.
 - `PROMPT_AUTHORING_GUIDE.md` — persistent prompt methodology.
+
+## AI UV generation round-trip (experimental)
+
+Use **AI UV** in the catalog header or entity detail to open [AI UV Grid Studio](uv-generation.html). It creates a square magenta-grid production input with an 8px UV clearance, saves a source-authoritative inverse map, and restores a generated PNG to native Mineclonia UV without rescaling individual faces. Includes limited grid shift registration and near-edge magenta repair; exact final alpha is by construction and **not** a geometry-success score. See [UV pipeline documentation](docs/UV_GENERATION_ROUNDTRIP.md). Run `node tests/uv-generation-roundtrip.test.mjs` and `node scripts/build-uv-generation.mjs --check`.
