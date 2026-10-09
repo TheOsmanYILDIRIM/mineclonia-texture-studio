@@ -251,7 +251,7 @@ jobs:
                   if (await page.locator('.regionUvHandles button').count() || await page.locator('#regionUvLeft').count()) {
                     throw new Error('Obsolete arrow/corner button cluster still present');
                   }
-                  if (await page.locator('[data-region-tool]').count() !== 2) throw new Error('Pan/Edit mini rail missing');
+                  if (await page.locator('.regionUvModeRail button[data-region-tool]').count() !== 2) throw new Error('Pan/Edit mini rail missing');
                   if (await page.locator('#regionUvSave').isEnabled()) throw new Error('Saved-enabled before source island selection');
                   await dragCanvas(.25,.25,.65,.65);
                   await page.locator('#regionUvPreview').click();
