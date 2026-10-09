@@ -44,7 +44,18 @@ export function compositeRegion(base,source,rects,options={}){
   const mode=options.mode==='atlas'?'atlas':'region';
   const dx=Number(options.dx||0),dy=Number(options.dy||0),scale=Number(options.scale??1);
   if(![dx,dy,scale].every(Number.isFinite)||scale<=0||scale>20)throw Error('Invalid region alignment');
-  const frame=mode==='atlas'?{x:0,y:0,w:base.width,h:base.height}:box;
+  // An imported PNG may contain multiple unrelated UV islands. Map ONLY an explicitly
+  // selected source rect into the target union; never implicitly fit its whole canvas.
+  let sourceRect=null;
+  if(options.sourceRect){
+    const r=options.sourceRect;
+    if(![r.x,r.y,r.w,r.h].every(Number.isFinite)||r.w<=0||r.h<=0)throw Error('Invalid imported source region');
+    const x=Math.max(0,Math.round(r.x)),y=Math.max(0,Math.round(r.y));
+    const right=Math.min(source.width,Math.round(r.x+r.w)),bottom=Math.min(source.height,Math.round(r.y+r.h));
+    if(right<=x||bottom<=y)throw Error('Imported source region outside PNG');
+    sourceRect={x,y,w:right-x,h:bottom-y};
+  }
+  const frame=sourceRect?box:mode==='atlas'?{x:0,y:0,w:base.width,h:base.height}:box;
   const out=new Uint8ClampedArray(base.data);
   let changed=0,selected=0;
   for(let y=box.y;y<box.y+box.h;y++)for(let x=box.x;x<box.x+box.w;x++){
@@ -56,7 +67,8 @@ export function compositeRegion(base,source,rects,options={}){
     const u=.5+((x+.5-frame.x-frame.w/2)-dx)/(frame.w*scale);
     const v=.5+((y+.5-frame.y-frame.h/2)-dy)/(frame.h*scale);
     if(u<0||u>=1||v<0||v>=1)continue;
-    const sx=Math.max(0,Math.min(source.width-1,Math.floor(u*source.width+1e-9))),sy=Math.max(0,Math.min(source.height-1,Math.floor(v*source.height+1e-9)));
+    const sr=sourceRect||{x:0,y:0,w:source.width,h:source.height};
+    const sx=Math.max(sr.x,Math.min(sr.x+sr.w-1,Math.floor(sr.x+u*sr.w+1e-9))),sy=Math.max(sr.y,Math.min(sr.y+sr.h-1,Math.floor(sr.y+v*sr.h+1e-9)));
     const src=(sy*source.width+sx)*4;
     if(source.data[src+3]===0)continue;
     if(out[dst]!==source.data[src]||out[dst+1]!==source.data[src+1]||out[dst+2]!==source.data[src+2])changed++;
