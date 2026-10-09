@@ -1,0 +1,29 @@
+/* Active texture regional editor. Legacy Island Studio remains loaded but is not shown. */
+.islandRegionRoot{z-index:10100;background:#0d1116}
+.islandRegionRoot .islandStudioTop{background:rgba(13,17,22,.98)}
+.regionUvHint{margin:10px 12px 8px;padding:11px 13px;border-radius:11px;background:#18232a;border:1px solid #344650;color:#c6d7df;font:12px/1.55 system-ui}
+.islandRegionRoot .islandStudioStage{min-height:unset;max-width:min(94vw,850px);margin:4px auto 8px;border-radius:11px;background:repeating-conic-gradient(#1a2530 0% 25%,#121a21 0% 50%) 50% / 18px 18px}
+.islandRegionRoot .islandStudioStage>canvas:first-child{position:relative;display:block;width:100%;height:auto;image-rendering:pixelated}
+.islandRegionRoot canvas.regionUvOverlay{position:absolute;inset:0;width:100%;height:auto;pointer-events:none;image-rendering:pixelated}
+.islandRegionRoot .islandStudioTabs .stat{margin-left:auto;font-size:11px;color:#a2c5c5}
+.regionUvHandles{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 12px;color:#bac8d2;font-size:12px}
+.regionUvHandles button{min-width:35px;min-height:34px}
+.regionUvHandles .btn:first-of-type{min-width:64px}
+.regionUvOptions{display:flex;flex-wrap:wrap;gap:8px;margin:6px 12px;padding:10px;background:#141d24;border:1px solid #34434d;border-radius:10px}
+.regionUvOptions label{display:flex;align-items:center;gap:6px;font-size:12px;color:#c9d7df}
+.regionUvOptions select,.regionUvOptions input{background:#0b1118;color:#ebf4f9;border:1px solid #3e525e;border-radius:7px;padding:7px 6px;font:12px system-ui}
+.regionUvOptions input{width:68px;box-sizing:border-box}
+.islandRegionRoot .islandStudioTools{gap:6px}
+.islandRegionRoot .islandStudioTools .btn{min-height:34px}
+.islandRegionRoot .islandStudioStatus{line-height:1.5;min-height:28px}
+.islandRegionRoot .regionUvActions{position:sticky;bottom:0;z-index:4;background:rgba(13,17,22,.97);padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid #33424b}
+.islandRegionRoot button:disabled{opacity:.42;cursor:not-allowed}
+@media(max-width:640px){
+ .islandRegionRoot .islandStudioStage{width:calc(100% - 14px);margin-inline:7px;min-height:unset}
+ .islandRegionRoot .islandStudioTabs,.islandRegionRoot .islandStudioTools{flex-wrap:wrap;overflow:visible}
+ .islandRegionRoot .islandStudioTools .btn{flex:0 0 auto}
+ .regionUvHandles{padding:7px;gap:5px}
+ .regionUvHandles button{min-width:32px}
+ .regionUvOptions{margin:6px 7px}
+ .regionUvHint{margin-inline:7px}
+}
