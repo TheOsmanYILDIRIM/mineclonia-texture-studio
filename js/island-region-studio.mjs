@@ -4,7 +4,7 @@ import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './i
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
 const legacy=()=>window.MTSVariantBridge||{};
-const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,importEpoch:0,busy:false,zoom:1,nudge:1,undo:[],redo:[],editingIsland:false};
+const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,importEpoch:0,busy:false,zoom:1,nudge:1,grid:1,originalDims:null,undo:[],redo:[],editingIsland:false};
 const clone=r=>r?{...r}:null;
 const toast=t=>{const status=$('regionUvStatus');if(status)status.textContent=t;bridge().toast?.(t)};
 const hint=t=>{const status=$('regionUvStatus');if(status)status.textContent=t};
@@ -30,6 +30,7 @@ function draw(){
  cv.width=canvas.width;cv.height=canvas.height;cv.getContext('2d').drawImage(canvas,0,0);
  const over=$('regionUvOverlay');over.width=canvas.width;over.height=canvas.height;
  const g=over.getContext('2d');g.clearRect(0,0,over.width,over.height);
+ if(S.grid>0&&S.view!=='preview'){const sx=gridStep('x'),sy=gridStep('y');g.save();g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=1;g.beginPath();for(let x=sx;x<canvas.width;x+=sx){const px=Math.round(x)+.5;g.moveTo(px,0);g.lineTo(px,canvas.height)}for(let y=sy;y<canvas.height;y+=sy){const py=Math.round(y)+.5;g.moveTo(0,py);g.lineTo(canvas.width,py)}g.stroke();g.restore()}
  // Never paint inside selected pixels. Preview is always the clean, exact merged texture.
  const areas=S.view==='preview'?[]:S.view==='uploaded'?(S.sourceRect?[S.sourceRect]:[]):activeRects();
  g.lineWidth=1;g.strokeStyle=S.view==='uploaded'?'#ffd36b':'#a5f7bd';
@@ -82,6 +83,9 @@ function setNudge(value){
  setHandle(S.handle);
  try{localStorage.setItem('mts_uv_joystick_step_v1',String(step))}catch{}
 }
+function gridStep(axis){const c=S.view==='uploaded'?S.imported:S.base;if(!c)return 1;const original=S.originalDims||{w:S.base.width,h:S.base.height};return (axis==='x'?c.width/original.w:c.height/original.h)*S.grid}
+function gridSnap(value,axis){const c=S.view==='uploaded'?S.imported:S.base;if(!c)return value;const size=axis==='x'?c.width:c.height;const step=gridStep(axis);return Math.max(0,Math.min(size,Math.round(value/step)*step))}
+function setGrid(value){S.grid=[0,1,2,4,8].includes(Number(value))?Number(value):1;document.querySelectorAll('[data-region-grid]').forEach(el=>el.classList.toggle('primary',Number(el.dataset.regionGrid)===S.grid));draw()}
 function zoom(value){
  const stage=$('regionUvStage'),frame=$('regionUvFrame');if(!stage||!frame)return;
  const cx=(stage.scrollLeft+stage.clientWidth/2)/Math.max(1,frame.offsetWidth),cy=(stage.scrollTop+stage.clientHeight/2)/Math.max(1,frame.offsetHeight);
@@ -119,7 +123,7 @@ function initSelection(){
  const stage=$('regionUvStage');
  stage.addEventListener('pointerdown',e=>{
   if(!S.base||S.tool!=='edit'||S.view==='preview')return;
-  const p=location(e);
+  const raw=location(e),p=S.grid?{x:Math.min(raw.x,gridSnap(raw.x,'x')),y:Math.min(raw.y,gridSnap(raw.y,'y'))}:raw;
   const canvas=currentCanvas();
   if(!canvas)return;
   const prop=S.view==='uploaded'?'sourceRect':'rect',r=S[prop];
@@ -132,7 +136,7 @@ function initSelection(){
  });
  stage.addEventListener('pointermove',e=>{
   const d=S.drag;if(!d||d.id!==e.pointerId)return;
-  const p=location(e),dx=p.x-d.start.x,dy=p.y-d.start.y;
+  const raw=location(e),p=S.grid?{x:gridSnap(raw.x,'x'),y:gridSnap(raw.y,'y')}:raw,dx=p.x-d.start.x,dy=p.y-d.start.y;
   if(d.operation==='draw')S[d.prop]={x:Math.min(p.x,d.start.x),y:Math.min(p.y,d.start.y),w:Math.abs(p.x-d.start.x)+1,h:Math.abs(p.y-d.start.y)+1};
   else{S[d.prop]=clone(d.origin);updateRect(dx,dy,'move')}
   clearPreview();draw();e.preventDefault();
@@ -153,7 +157,7 @@ function initJoystick(){
   if(!sx&&!sy){prev='';return}
   // Deliberately restrained: 1 source pixel per 260 ms, with a larger dead zone.
   if(S.tool==='edit'&&S.view!=='preview'&&(direction!==prev||now-last>=260)){
-   if(rectInView()){remember();updateRect(sx*S.nudge,sy*S.nudge,S.handle)}
+   if(rectInView()){remember();if(S.grid){const r=rectInView(),stepX=gridStep('x'),stepY=gridStep('y');const anchorX=S.handle==='tr'||S.handle==='br'?r.x+r.w:r.x,anchorY=S.handle==='bl'||S.handle==='br'?r.y+r.h:r.y;const dx=gridSnap(anchorX+sx*stepX*S.nudge,'x')-anchorX,dy=gridSnap(anchorY+sy*stepY*S.nudge,'y')-anchorY;updateRect(dx,dy,S.handle)}else updateRect(sx*S.nudge,sy*S.nudge,S.handle)}
    prev=direction;last=now;
   }
   if(S.tool==='pan'&&(direction!==prev||now-last>=120)){
@@ -363,6 +367,7 @@ function buildUI(){
  '<div class="islandStudioTabs regionUvTabs"><button class="btn primary" data-region-view="active">Aktif UV · Hedef</button><button class="btn" data-region-view="uploaded">Yüklenen · Kaynak</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
  '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button><button class="btn" id="regionUvB3DOpen">B3D UV’den seç</button></div>',
+ '<div class="regionUvGridBar"><span>Orijinal UV ızgarası</span><button class="btn" data-region-grid="0">Hassas</button><button class="btn primary" data-region-grid="1">1×</button><button class="btn" data-region-grid="2">2×</button><button class="btn" data-region-grid="4">4×</button><button class="btn" data-region-grid="8">8×</button></div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
@@ -385,6 +390,7 @@ function buildUI(){
   if(b.dataset.regionTool)setTool(b.dataset.regionTool);
   if(b.dataset.regionView)view(b.dataset.regionView);
   if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
+  if(b.dataset.regionGrid!==undefined)setGrid(b.dataset.regionGrid);
   if(b.dataset.regionHandleChoice)setHandle(b.dataset.regionHandleChoice);
   if(b.dataset.regionIsland!==undefined){S.index=Number(b.dataset.regionIsland);if(S.islands[S.index]?.rects?.length)useIsland();else{S.scope=null;clearPreview();hint('Ada '+(S.index+1)+' boş; bir alan ekle')}showIslandChoices()}
   if(b.id==='regionUvB3DOpen')openB3DUvPicker();
@@ -419,6 +425,9 @@ async function choose(path){
   const blob=edit?.blob||await bridge().originalBlob(path);
   const c=await bridge().decodeBlobToCanvas(blob);if(generation!==S.epoch)return;
   S.base=c;
+  const original=await bridge().originalBlob(path).then(blob=>bridge().decodeBlobToCanvas(blob)).catch(()=>null);
+  if(generation!==S.epoch)return;
+  S.originalDims=original?{w:original.width,h:original.height}:{w:c.width,h:c.height};
   savedIslands();
   setTool('edit');setHandle('move');view('active');zoom(1);
   let stored=1;try{stored=Number(localStorage.getItem('mts_uv_joystick_step_v1'))||1}catch{}setNudge([1,2,4,8].includes(stored)?stored:1);
