@@ -17,7 +17,7 @@
  function loadB3DRuntime(){
   if(window.MTSB3DAnimation&&window.MTSB3DPreviewControls)return Promise.resolve();
   if(!b3dRuntimePromise)b3dRuntimePromise=(async()=>{
-   for(const src of ['js/b3d-animation.js?v=20261009-animation4','js/b3d-preview-controls.js?v=20261009-animation3']){
+   for(const src of ['js/b3d-animation.js?v=20261009-rigid5','js/b3d-preview-controls.js?v=20261009-animation3']){
     if(src.includes('b3d-animation.js')&&window.MTSB3DAnimation)continue;
     if(src.includes('b3d-preview-controls.js')&&window.MTSB3DPreviewControls)continue;
     await new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=src;el.onload=resolve;el.onerror=()=>reject(Error('B3D animasyon modülü yüklenemedi: '+src));document.head.appendChild(el)});
