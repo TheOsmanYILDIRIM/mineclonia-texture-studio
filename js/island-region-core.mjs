@@ -56,7 +56,7 @@ export function compositeRegion(base,source,rects,options={}){
     const u=.5+((x+.5-frame.x-frame.w/2)-dx)/(frame.w*scale);
     const v=.5+((y+.5-frame.y-frame.h/2)-dy)/(frame.h*scale);
     if(u<0||u>=1||v<0||v>=1)continue;
-    const sx=Math.max(0,Math.min(source.width-1,Math.floor(u*source.width))),sy=Math.max(0,Math.min(source.height-1,Math.floor(v*source.height)));
+    const sx=Math.max(0,Math.min(source.width-1,Math.floor(u*source.width+1e-9))),sy=Math.max(0,Math.min(source.height-1,Math.floor(v*source.height+1e-9)));
     const src=(sy*source.width+sx)*4;
     if(source.data[src+3]===0)continue;
     if(out[dst]!==source.data[src]||out[dst+1]!==source.data[src+1]||out[dst+2]!==source.data[src+2])changed++;
