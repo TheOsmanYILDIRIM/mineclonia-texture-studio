@@ -13,7 +13,18 @@
  const canEntity=x=>{if(!x||assetTypeOf(x)!=='Entity'||!entityModelFile(x))return false;const r=entityPreviewRole(x);return /^Entity /.test(r)&&!/(Overlay|Layer|Marking|Equipment|Effect|Particle|Template|Mask)/.test(r)};
  const canWorld=x=>!!x&&assetTypeOf(x)==='Block';
  const canSurface=x=>!!x&&assetTypeOf(x)!=='Entity';
- let entityGL=null,variantSession=null;
+ let entityGL=null,variantSession=null,b3dRuntimePromise=null;
+ function loadB3DRuntime(){
+  if(window.MTSB3DAnimation&&window.MTSB3DPreviewControls)return Promise.resolve();
+  if(!b3dRuntimePromise)b3dRuntimePromise=(async()=>{
+   for(const src of ['js/b3d-animation.js','js/b3d-preview-controls.js']){
+    if(src.includes('b3d-animation.js')&&window.MTSB3DAnimation)continue;
+    if(src.includes('b3d-preview-controls.js')&&window.MTSB3DPreviewControls)continue;
+    await new Promise((resolve,reject)=>{const el=document.createElement('script');el.src=src;el.onload=resolve;el.onerror=()=>reject(Error('B3D animasyon modülü yüklenemedi: '+src));document.head.appendChild(el)});
+   }
+  })().catch(err=>{b3dRuntimePromise=null;throw err});
+  return b3dRuntimePromise;
+ }
 
  async function loadPreviewProfiles(){
   if(previewProfileConfig)return previewProfileConfig;
@@ -520,23 +531,28 @@
   else if(canObject(variantSession.meta)){mode='object';await renderCubeGL(variantSession.meta,rec.blob);resetView()}
   document.getElementById('preview3dMeta').textContent=variantSession.meta.name+' · '+(i+1)+'/'+variantSession.variants.length+' · '+rec.name;renderVariantStrip();
  }
- function cleanupEntityGL(){if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
+ function cleanupEntityGL(){window.MTSB3DPreviewControls?.destroy();if(!entityGL)return;try{const e=entityGL;e.canvas.remove();e.gl.deleteTexture(e.tex);e.gl.deleteBuffer(e.pb);e.gl.deleteBuffer(e.tb);e.gl.deleteBuffer(e.ib);e.gl.deleteProgram(e.program)}catch{}entityGL=null;scene.style.display=''}
  async function renderEntity(meta,textureBlob=null){
   cleanupEntityGL();scene.innerHTML='';scene.style.display='none';const model=entityModelFile(meta);if(!model)throw Error('Bu entity için Mineclonia mesh eşleşmesi yok');
   const modelUrl=MINECLONIA_RAW_BASE+'/ENTITIES/mobs_mc/models/'+encodeURIComponent(model);
   const [res,blob]=await Promise.all([fetch(modelUrl,{cache:'force-cache'}),textureBlob?Promise.resolve(textureBlob):displayBlob(meta.path)]);if(!res.ok)throw Error('Entity mesh yüklenemedi: '+model);
-  const mesh=parseB3D(await res.arrayBuffer()),indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
+  const buffer=await res.arrayBuffer();let animation=null;
+  try{await loadB3DRuntime();animation=window.MTSB3DAnimation.parse(buffer);if(!animation.animated)animation=null}
+  catch(err){console.warn('B3D animation disabled for',model,err);animation=null}
+  const mesh=animation?.mesh||parseB3D(buffer),indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
   const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
   const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
   const fs=glShader(gl,gl.FRAGMENT_SHADER,'precision mediump float;uniform sampler2D tex;varying vec2 u;void main(){vec4 c=texture2D(tex,u);if(c.a<0.02)discard;gl_FragColor=c;}');
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
-  const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.p),gl.STATIC_DRAW);const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
+  const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.p),animation?gl.DYNAMIC_DRAW:gl.STATIC_DRAW);const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
   const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.uv),gl.STATIC_DRAW);const ta=gl.getAttribLocation(program,'t');gl.enableVertexAttribArray(ta);gl.vertexAttribPointer(ta,2,gl.FLOAT,false,0,0);
   const maxIdx=Math.max(...indices),use32=maxIdx>65535&&!!gl.getExtension('OES_element_index_uint'),IndexArray=use32?Uint32Array:Uint16Array,indexType=use32?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT;if(maxIdx>65535&&!use32)throw Error('Entity mesh cihazın WebGL index sınırını aşıyor');
   const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new IndexArray(indices),gl.STATIC_DRAW);
   const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,1);const bmp=await createImageBitmap(blob);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,bmp);bmp.close?.();gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   gl.enable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.clearColor(0,0,0,0);
-  entityGL={canvas,gl,program,pb,tb,ib,tex,count:indices.length,indexType,uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s')};drawEntityGL();
+  entityGL={canvas,gl,program,pb,tb,ib,tex,count:indices.length,indexType,uRot:gl.getUniformLocation(program,'r'),uScale:gl.getUniformLocation(program,'s'),animation};drawEntityGL();
+  if(animation)window.MTSB3DPreviewControls.attach({animation,model,gl,positionBuffer:pb,redraw:drawEntityGL,stage});
+  
  }
 
  async function alphaInfo(meta){
