@@ -329,6 +329,32 @@ async function preview3d(){
   await viewer.openVariant(S.meta,after,'Bölgesel UV',[{blob:before,name:'Aktif UV'},{blob:after,name:'Bölgesel UV'}],1);
  }catch(e){toast('3D açılamadı: '+e.message)}
 }
+async function openB3DUvPicker(){
+ if(!S.meta||!S.base)return;
+ try{
+  const model=String(bridge().runtimeRoleInfo?.(S.meta)?.model||'').match(/[A-Za-z0-9_.-]+\\.b3d/i)?.[0];
+  if(!model)throw Error('Bu texture için B3D modeli eşleşmedi');
+  const url='https://raw.githubusercontent.com/mark-wiemer/mineclonia/209ec2dc96adbf7f5ba083816d90596492ec53b5b/mods/ENTITIES/mobs_mc/models/'+encodeURIComponent(model);
+  const response=await fetch(url);if(!response.ok)throw Error('B3D indirilemedi');
+  const buffer=await response.arrayBuffer();
+  if(!window.MTSB3DAnimation)await new Promise((resolve,reject)=>{const e=document.createElement('script');e.src='js/b3d-animation.js?v=20261009-rigrollback6';e.onload=resolve;e.onerror=reject;document.head.append(e)});
+  const mesh=window.MTSB3DAnimation.parse(buffer).mesh;
+  const util=await import('./b3d-uv-selection.mjs?v=1');
+  const pane=$('regionUvB3DPicker'),cv=$('regionUvB3DCanvas');cv.width=S.base.width;cv.height=S.base.height;
+  const g=cv.getContext('2d');g.drawImage(S.base,0,0);
+  g.lineWidth=.65;g.strokeStyle='#7bdab0';
+  for(let t=0;t<mesh.idx.length/3;t++){const p=util.triangleUV(mesh,t);g.beginPath();g.moveTo(p[0].u*cv.width,p[0].v*cv.height);for(let i=1;i<3;i++)g.lineTo(p[i].u*cv.width,p[i].v*cv.height);g.closePath();g.stroke()}
+  pane.hidden=false;
+  cv.onclick=e=>{
+   const rect=cv.getBoundingClientRect(),u=(e.clientX-rect.left)/rect.width,v=(e.clientY-rect.top)/rect.height;
+   const triangle=util.findUVTriangle(mesh,u,v);
+   if(triangle<0)return hint('Bu noktada B3D UV üçgeni yok');
+   const bounds=util.uvBounds(util.triangleUV(mesh,triangle),S.base.width,S.base.height);
+   remember();S.editingIsland=false;S.scope=null;S.rect=bounds;pane.hidden=true;view('active');
+   hint('B3D üçgen '+(triangle+1)+' seçildi; sınırları joystick ile düzenleyebilirsin.');
+  };
+ }catch(e){toast('B3D UV seçimi: '+e.message)}
+}
 function buildUI(){
  if($('regionalUvStudio'))return;
  const root=document.createElement('div');root.id='regionalUvStudio';root.className='islandStudio islandRegionRoot';
@@ -336,12 +362,13 @@ function buildUI(){
  '<div class="islandStudioTop"><button class="btn" id="regionUvClose">←</button><b>Bölgesel UV</b><select class="select" id="regionUvTexture"></select></div>',
  '<div class="islandStudioTabs regionUvTabs"><button class="btn primary" data-region-view="active">Aktif UV · Hedef</button><button class="btn" data-region-view="uploaded">Yüklenen · Kaynak</button><button class="btn" data-region-view="preview">Birleşim</button><span class="stat" id="regionUvScope"></span></div>',
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
- '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button></div>',
+ '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button><button class="btn" id="regionUvB3DOpen">B3D UV’den seç</button></div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
  '<div class="regionUvFixedControls"><div class="regionUvControlRow"><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div><div class="regionUvNodePad" role="group" aria-label="Hareket ettirilecek nokta"><button type="button" data-region-handle-choice="tl" aria-label="Sol üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="tr" aria-label="Sağ üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="move" class="active" aria-label="Tüm seçimi taşı" aria-pressed="true"></button><button type="button" data-region-handle-choice="bl" aria-label="Sol alt" aria-pressed="false"></button><button type="button" data-region-handle-choice="br" aria-label="Sağ alt" aria-pressed="false"></button></div><div class="regionUvStepPicker" role="group" aria-label="Joystick hareket adımı"><button type="button" class="active" data-region-step="1" aria-pressed="true">1</button><button type="button" data-region-step="2" aria-pressed="false">2</button><button type="button" data-region-step="4" aria-pressed="false">4</button><button type="button" data-region-step="8" aria-pressed="false">8</button><span>px</span></div></div><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span></div>',
  '<details class="regionUvSaved"><summary>Kayıtlı adalar <span class="regionUvIslandCount" id="regionUvIslandCount">0</span></summary><div class="regionUvIslandGallery" id="regionUvIslandGallery" aria-label="Kayıtlı UV adaları"></div><div class="regionUvSavedRow"><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Seçileni sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
+ '<div class="regionUvB3DPicker" id="regionUvB3DPicker" hidden><div class="regionUvDetailTop"><button class="btn" id="regionUvB3DClose">← Geri</button><strong>B3D UV üçgenleri · dokunarak seç</strong></div><div class="regionUvB3DStage"><canvas id="regionUvB3DCanvas"></canvas></div></div>',
  '<div class="regionUvDetail" id="regionUvDetail" hidden><div class="regionUvDetailTop"><button class="btn" id="regionUvDetailClose">← Geri</button><strong id="regionUvDetailTitle">Ada</strong></div><div class="regionUvDetailStage" id="regionUvDetailStage"><canvas id="regionUvDetailCanvas"></canvas></div><div class="regionUvDetailZoom"><span>Yakınlaştır</span><input id="regionUvDetailZoom" type="range" min="1" max="16" step=".5" value="1"><strong id="regionUvDetailZoomValue">1×</strong></div></div>',
  '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
@@ -360,6 +387,8 @@ function buildUI(){
   if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
   if(b.dataset.regionHandleChoice)setHandle(b.dataset.regionHandleChoice);
   if(b.dataset.regionIsland!==undefined){S.index=Number(b.dataset.regionIsland);if(S.islands[S.index]?.rects?.length)useIsland();else{S.scope=null;clearPreview();hint('Ada '+(S.index+1)+' boş; bir alan ekle')}showIslandChoices()}
+  if(b.id==='regionUvB3DOpen')openB3DUvPicker();
+  if(b.id==='regionUvB3DClose')$('regionUvB3DPicker').hidden=true;
   if(b.id==='regionUvUndo')travel('undo');
   if(b.id==='regionUvRedo')travel('redo');
   if(b.id==='regionUvAddIsland')newIsland();
@@ -383,7 +412,7 @@ async function choose(path){
  if(!meta)return;
  S.importEpoch++;
  S.undo=[];S.redo=[];S.editingIsland=false;historyButtons();
- $('regionUvDetail').hidden=true;
+ $('regionUvDetail').hidden=true;$('regionUvB3DPicker').hidden=true;
  S.meta=meta;S.base=null;S.imported=null;S.preview=null;S.rect=null;S.sourceRect=null;S.scope=null;
  try{
   const edit=await legacy().getEdit?.(path);
