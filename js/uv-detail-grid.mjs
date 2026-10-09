@@ -1,6 +1,6 @@
 import {createPlan,loadPlan,pack,unpack} from './uv-generation-roundtrip.mjs';
 const KEY='mts_uv_grid_export_v1:';
-const MAPPING_URL='../tools/uv-pipeline/experiments/cat-connected-net/config/mapping.json';
+const MAPPING_URL='./tools/uv-pipeline/experiments/cat-connected-net/config/mapping.json';
 async function readPng(blob){
  const bitmap=await createImageBitmap(blob);
  try{const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bitmap,0,0);return ctx.getImageData(0,0,canvas.width,canvas.height);}finally{bitmap.close?.();}
