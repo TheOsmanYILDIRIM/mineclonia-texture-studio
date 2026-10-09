@@ -235,10 +235,10 @@ async function loadPng(file){
  if(file.type&&!file.type.includes('png')&&!file.name.toLowerCase().endsWith('.png'))return toast('PNG seç');
  const generation=S.epoch,importGeneration=++S.importEpoch;
  try{
-  if(!targetRects().length)return toast('Önce aktif UV üzerindeki hedef alanı seç');
+  // Source import must be independent of target selection. Users can choose the target afterwards.
   // Invalidate the previous image immediately; never display stale source while decoding.
-  S.imported=null;S.sourceRect=null;clearPreview();S.view='active';draw();
-  hint('Yeni PNG yükleniyor: '+file.name);
+  S.imported=null;S.sourceRect=null;clearPreview();S.view='uploaded';draw();
+  hint('Kaynak yükleniyor: '+file.name);
   const c=await bridge().decodeBlobToCanvas(file);
   if(generation!==S.epoch||importGeneration!==S.importEpoch)return;
   S.imported=c;S.sourceRect=null;clearPreview();setTool('edit');setHandle('move');
