@@ -94,6 +94,20 @@ function point(e){
  const r=$('regionUvCanvas').getBoundingClientRect();
  return {x:Math.max(0,Math.min(state.base.width-1,Math.floor((e.clientX-r.left)*state.base.width/Math.max(1,r.width)))),y:Math.max(0,Math.min(state.base.height-1,Math.floor((e.clientY-r.top)*state.base.height/Math.max(1,r.height))))};
 }
+function initJoystick(){
+ const joy=$('regionUvJoystick'),stick=$('regionUvStick');let pid=null,last=0;
+ joy.addEventListener('pointerdown',e=>{pid=e.pointerId;joy.setPointerCapture?.(pid);e.preventDefault()});
+ joy.addEventListener('pointermove',e=>{
+   if(e.pointerId!==pid||!state.rect)return;
+   const r=joy.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,rad=r.width*.34,mag=Math.hypot(dx,dy),k=Math.min(1,rad/(mag||1));
+   stick.style.transform='translate('+(dx*k)+'px,'+(dy*k)+'px)';
+   const sx=Math.abs(dx)>r.width*.16?Math.sign(dx):0,sy=Math.abs(dy)>r.height*.16?Math.sign(dy):0;
+   if((sx||sy)&&performance.now()-last>55){editRect(sx,sy,state.mode);last=performance.now()}
+   e.preventDefault();
+ });
+ const stop=e=>{if(e.pointerId===pid){pid=null;stick.style.transform='translate(0,0)'}};
+ joy.addEventListener('pointerup',stop);joy.addEventListener('pointercancel',stop);
+}
 function initPointer(){
  const stage=$('regionUvStage');
  stage.addEventListener('pointerdown',e=>{
@@ -155,14 +169,15 @@ function makePreview(){
 }
 async function save(){
  if(!state.preview||!state.meta||state.busy)return;
- state.busy=true;const button=$('regionUvSave');button.disabled=true;
+ state.busy=true;const button=$('regionUvSave');button.disabled=true;const stamp=state.epoch,preview=state.preview,path=state.meta.path;
  try{
-   const blob=await bridge().canvasPngBlob(state.preview);
-   const ok=await bridge().saveRestored(state.meta.path,blob);
+   const blob=await bridge().canvasPngBlob(preview);
+   const ok=await bridge().saveRestored(path,blob);
    if(!ok)throw Error('Edit store confirmation missing');
-   state.base=state.preview;state.preview=null;state.imported=null;state.scope=null;
+   if(stamp!==state.epoch)return;
+   state.base=preview;state.preview=null;state.imported=null;state.scope=null;
    view('active');label('Aktif texture güncellendi. Seçilmeyen bölgelerde hiçbir piksel değişmedi.');
- }catch(e){button.disabled=false;inform('Kaydedilemedi: '+e.message)}finally{state.busy=false}
+ }catch(e){if(stamp===state.epoch){button.disabled=false;inform('Kaydedilemedi: '+e.message)}}finally{state.busy=false}
 }
 async function fullExport(){if(!state.preview)return inform('Önce birleşimi önizle');const blob=await bridge().canvasPngBlob(state.preview);download(blob,(state.meta.name||'entity').replace(/\.png$/i,'')+'_region_merged.png')}
 async function show3D(){
@@ -184,12 +199,13 @@ function create(){
  '<div class="islandStudioStage" id="regionUvStage"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl"></i><i class="islandHandle" data-region-handle="tr"></i><i class="islandHandle" data-region-handle="bl"></i><i class="islandHandle" data-region-handle="br"></i><i class="islandCenter" data-region-handle="move"></i></div></div>',
  '<div class="islandStudioTools"><button class="btn primary" id="regionUvDirect">Çizili alanı kullan</button><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Adaya ekle</button><button class="btn" id="regionUvPrev">← Ada</button><button class="btn" id="regionUvNext">Ada →</button><button class="btn" id="regionUvUseIsland">Adayı kullan</button><button class="btn danger" id="regionUvDel">Sil</button><span class="stat" id="regionUvMeta"></span></div>',
  '<div class="regionUvHandles">Seçimi ayarla: <button data-region-mode="move" class="btn primary">Taşı</button><button data-region-mode="tl" class="btn">↖</button><button data-region-mode="tr" class="btn">↗</button><button data-region-mode="bl" class="btn">↙</button><button data-region-mode="br" class="btn">↘</button><button class="btn" id="regionUvLeft">←</button><button class="btn" id="regionUvUp">↑</button><button class="btn" id="regionUvDown">↓</button><button class="btn" id="regionUvRight">→</button></div>',
+ '<div class="islandJoystickDock"><span class="stat">Joystick · seçimi/kenarlarını hassas ayarla</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div></div>',
  '<div class="regionUvOptions"><label>Yüklenen PNG <select id="regionUvInputMode"><option value="region">Seçilen bölge</option><option value="atlas">Tam UV atlası</option></select></label><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Bölge PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle / eşleştir</button><button class="btn" id="regionUvPreview">Birleşimi önizle</button><button class="btn" id="regionUvFull">Tam UV PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Aktif texture’a kaydet</button><button class="btn" id="regionUv3D">3D bak</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
  document.body.append(root);
  const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href='css/island-region-studio.css?v=20261009-region1';document.head.append(sheet);
- initPointer();
+ initPointer();initJoystick();
  if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvCanvas'));
  root.addEventListener('click',e=>{
    const b=e.target.closest('button');if(!b)return;
