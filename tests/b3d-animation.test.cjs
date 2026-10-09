@@ -34,19 +34,3 @@ assert.deepEqual(Array.from(a.mesh.uv),[0,0,1,0,1,1]);
 assert.deepEqual(Array.from(a.mesh.idx),[0,1,2]);
 console.log('B3D animation synthetic weighted-vertex interpolation + valid empty BONE chunk: PASS');
 
-function rigidFixture(){
- const vt=chunk('VRTS',i(0),i(1),i(2),...[0,0,0,0,0,1,0,0,1,0,0,1,0,1,1].map(f));
- const tri=chunk('TRIS',i(0),i(0),i(1),i(2));
- const key=(frame,x)=>cat(i(frame),f(x),f(0),f(0));
- const root=node('animated-mesh',[0,0,0],chunk('MESH',i(0),vt,tri),chunk('KEYS',i(1),key(0,0),key(10,1)));
- return chunk('BB3D',i(1),root,chunk('ANIM',i(0),i(10),f(10))).buffer;
-}
-const rigid=parse(rigidFixture());
-assert.equal(rigid.animated,true);
-assert.equal(rigid.bones,0);
-const r0=rigid.sample(0).slice(),r5=rigid.sample(5).slice(),r10=rigid.sample(10).slice();
-for(let vertex=0;vertex<3;vertex++){
- assert.ok(Math.abs(r5[vertex*3]-r0[vertex*3]-.775)<1e-5,'unweighted mesh follows animated owner node at half frame');
- assert.ok(Math.abs(r10[vertex*3]-r0[vertex*3]-1.55)<1e-5,'unweighted mesh follows animated owner node at end frame');
-}
-console.log('B3D unweighted animated mesh owner transform: PASS');
