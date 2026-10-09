@@ -3,6 +3,10 @@
 Repository: `TheOsmanYILDIRIM/mineclonia-texture-studio` · branch `main`.
 Last code-work baseline checked before this documentation close: `53fc5ca79be5bef5bad1e9f2392722dfdd10e6e8`. Pre-close documentation HEAD `082077b14f6efa57c5106fd75151333848903733` had **successful** Runtime Guards and Pages deployment; later `[skip ci]` documentation commits are **not** evidence of a new deployed build. GitHub current code/Actions always outranks this snapshot.
 
+## AI UV quick import/export — 2026-10-09
+
+Merged PR #20 as `bf893218`: `uv-generation.html` now offers a single ZIP containing `original.png`, `grid.png`, `mapping.json`; a later session can import this ZIP and select the AI PNG, and restoration automatically downloads the Mineclonia PNG. Source remains modular (`js/uv-generation-ui.mjs`), production bundle rebuilt to match `scripts/build-uv-generation.mjs`. Original UV math, saved edits and B3D untouched. Verify Runtime Guards/Pages for merge commit and perform Android smoke test: ZIP export → reload → ZIP import → AI PNG → restore download. Browser-generated downloads may require mobile permission. Existing detailed/manual JSON options remain available.
+
 ## Current working priority — experimental UV generation reliability
 
 **New in this implementation:** Opt-in browser `uv-generation.html` (AI UV Grid Studio) and standalone ES modules + deterministic single-file production bundle. A native Mineclonia PNG becomes a square magenta-grid AI reference (8px UV clearance by default) plus inverse mapping JSON; generated PNG returns to the original native UV coordinates with optional bounded grid-shift recognition and magenta-edge repair. Cat ConnectedNet uses the committed explicit map; Enderman/general square-center does not guess islands by brightness. Unlike earlier one-off enderman crops, every output has an inverse manifest. See `docs/UV_GENERATION_ROUNDTRIP.md` for limits. Node synthetic regression and bundle freshness test were run locally; deployed Pages and real-device 3D need verification after the merge. No user edit store, B3D UV or animation tracks changed.
