@@ -215,6 +215,7 @@ function unpack(source, generated, plan, options={}) {
 }
 
 
+
 const $=id=>document.getElementById(id);
 let original=null,sourceName='texture',plan=null,generated=null,originalFingerprint='',groupOffsets={};
 const setStatus=(message,error=false)=>{const el=$('status');el.textContent=message;el.dataset.error=String(error);};
