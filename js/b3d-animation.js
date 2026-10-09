@@ -26,7 +26,7 @@ function parse(buffer){
    cur=stop;if(cur<=begin)throw Error('B3D parser did not advance');
   }
  }
- if(tag(len)!=='BB3D')throw Error('B3D header missing');const rootEnd=cur+u32(len);if(rootEnd>len)throw Error('Invalid B3D root');i32(rootEnd);chunks(rootEnd,null,null);
+ if(tag(len)!=='BB3D')throw Error('B3D header missing');const rootSize=u32(len),rootEnd=cur+rootSize;if(rootEnd>len)throw Error('Invalid B3D root');i32(rootEnd);chunks(rootEnd,null,null);
  if(!allVertices.length||!indices.length)throw Error('B3D geometry missing');
  for(const n of nodes)n.keys.sort((a,b)=>a.frame-b.frame);
  function bindNode(i){const n=nodes[i],parent=n.parent===null?ident():nodes[n.parent].bind;n.bind=mul(parent,matrix(n.pos,n.scale,n.rot));n.inverse=inverse(n.bind);for(const j of n.children)bindNode(j)}
