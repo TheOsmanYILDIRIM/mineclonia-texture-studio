@@ -26,10 +26,10 @@ function attach({animation,model,gl,positionBuffer,redraw,stage}){
  function pause(){playing=false;play.textContent='▶';play.setAttribute('aria-label','Oynat');if(raf)cancelAnimationFrame(raf);raf=0;last=0}
  function step(time){if(!playing)return;if(last){frame+=(time-last)/1000*rate*Number(speed.value);if(frame>finish)frame=begin+(frame-begin)%Math.max(1,finish-begin)}last=time;apply(frame);raf=requestAnimationFrame(step)}
  function toggle(){if(playing){pause();return}if(begin===finish){apply(begin);return}playing=true;play.textContent='Ⅱ';play.setAttribute('aria-label','Duraklat');last=0;raf=requestAnimationFrame(step)}
- function setClip(){pause();const c=clips[Number(clip.value)]||clips[0];begin=c[1];finish=c[2];rate=c[3];start.value=String(begin);end.value=String(finish);slider.min=String(begin);slider.max=String(finish);apply(begin)}
+ function setClip({applyPose=true}={}){pause();const c=clips[Number(clip.value)]||clips[0];begin=c[1];finish=c[2];rate=c[3];start.value=String(begin);end.value=String(finish);slider.min=String(begin);slider.max=String(finish);if(applyPose)apply(begin)}
  function setRange(){pause();begin=Math.max(0,Math.min(limit,Math.round(Number(start.value)||0)));finish=Math.max(begin,Math.min(limit,Math.round(Number(end.value)||0)));start.value=String(begin);end.value=String(finish);slider.min=String(begin);slider.max=String(finish);apply(begin);clip.value='0'}
  clip.addEventListener('change',setClip);play.addEventListener('click',toggle);reset.addEventListener('click',()=>{pause();apply(begin)});slider.addEventListener('input',()=>{pause();apply(Number(slider.value))});start.addEventListener('change',setRange);end.addEventListener('change',setRange);
- control={destroy(){pause();host.remove()},pause};setClip();return control
+ control={destroy(){pause();host.remove()},pause};setClip({applyPose:false});return control
 }
 function destroy(){if(control){control.destroy();control=null}}
 window.MTSB3DPreviewControls={attach,destroy};

@@ -32,5 +32,21 @@ for(let v=0;v<3;v++){
 }
 assert.deepEqual(Array.from(a.mesh.uv),[0,0,1,0,1,1]);
 assert.deepEqual(Array.from(a.mesh.idx),[0,1,2]);
+
+ // An animated mesh-owner NODE must carry unweighted vertices rigidly.
+ // Without this, non-BONE model parts remain frozen while weighted parts move.
+function rigidOwnerFixture(){
+ const vt=chunk('VRTS',i(0),i(1),i(2),...[0,0,0,0,0,1,0,0,1,0,0,1,0,1,1].map(f));
+ const tri=chunk('TRIS',i(0),i(0),i(1),i(2));
+ const key=(frame,x)=>cat(i(frame),f(x),f(0),f(0));
+ const keys=chunk('KEYS',i(1),key(0,0),key(10,1));
+ return chunk('BB3D',i(1),node('moving-owner',[0,0,0],chunk('MESH',i(0),vt,tri),keys),chunk('ANIM',i(0),i(10),f(10))).buffer;
+}
+const rigid=parse(rigidOwnerFixture());
+const rigid0=Array.from(rigid.sample(0)),rigid10=Array.from(rigid.sample(10));
+assert.equal(rigid.bones,0);
+for(let v=0;v<3;v++)assert.ok(Math.abs((rigid10[v*3]-rigid0[v*3])-1.55)<1e-5,'owner animated rigid vertex '+v);
+console.log('B3D animated mesh-owner rigid vertices: PASS');
+
 console.log('B3D animation synthetic weighted-vertex interpolation + valid empty BONE chunk: PASS');
 
