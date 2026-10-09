@@ -9,7 +9,7 @@ async function openPrimary(){
 let regionEditorPromise=null;
 async function openIsland(path=null){
   try{
-    if(!regionEditorPromise)regionEditorPromise=import('./island-region-studio.mjs?v=20261009-region1').catch(e=>{regionEditorPromise=null;throw e});
+    if(!regionEditorPromise)regionEditorPromise=import(new URL('js/island-region-studio.mjs?v=20261009-region2',document.baseURI).href).catch(e=>{regionEditorPromise=null;throw e});
     const editor=await regionEditorPromise;
     return await editor.open(path);
   }catch(e){console.error('Regional UV editor',e);toast('Bölgesel UV editörü açılamadı');return false}
