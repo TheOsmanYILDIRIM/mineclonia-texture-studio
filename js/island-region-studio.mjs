@@ -30,7 +30,7 @@ function draw(){
  for(const r of areas)g.strokeRect(r.x+.5,r.y+.5,Math.max(0,r.w-1),Math.max(0,r.h-1));
  const grip=$('regionUvSelection'),r=rectInView();
  if(grip){
-  grip.style.display=S.view!=='preview'&&!!r?'block':'none';
+  grip.style.display='none'; // Corner targets live in the fixed joystick control, never over the image.
   if(r){
    const a=cv.getBoundingClientRect(),b=$('regionUvFrame').getBoundingClientRect();
    grip.style.left=(a.left-b.left+r.x*a.width/canvas.width)+'px';
@@ -61,6 +61,7 @@ function setHandle(value){
  S.handle=value;
  const label={move:'Tüm seçim',tl:'Sol üst',tr:'Sağ üst',bl:'Sol alt',br:'Sağ alt'}[value]||'Tüm seçim';
  const el=$('regionUvHandleStatus');if(el)el.textContent=label+' · '+S.nudge+' px / adım';
+ document.querySelectorAll('[data-region-handle-choice]').forEach(btn=>{const active=btn.dataset.regionHandleChoice===value;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active))});
  draw();
 }
 function setNudge(value){
@@ -112,10 +113,7 @@ function initSelection(){
  const stage=$('regionUvStage');
  stage.addEventListener('pointerdown',e=>{
   if(!S.base||S.tool!=='edit'||S.view==='preview')return;
-  const p=location(e),handle=e.target.closest('[data-region-handle]')?.dataset.regionHandle;
-  if(handle){
-   setHandle(handle);S.drag=null;e.preventDefault();return; // Each corner node becomes the joystick target.
-  }
+  const p=location(e);
   const canvas=currentCanvas();
   if(!canvas)return;
   const prop=S.view==='uploaded'?'sourceRect':'rect',r=S[prop];
@@ -309,8 +307,8 @@ function buildUI(){
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
- '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"><i class="islandHandle" data-region-handle="tl" role="button" aria-label="Sol üst köşe"></i><i class="islandHandle" data-region-handle="tr" role="button" aria-label="Sağ üst köşe"></i><i class="islandHandle" data-region-handle="bl" role="button" aria-label="Sol alt köşe"></i><i class="islandHandle" data-region-handle="br" role="button" aria-label="Sağ alt köşe"></i><i class="islandCenter" data-region-handle="move"></i></div></div></div></div>',
- '<div class="islandJoystickDock regionUvJoystickDock"><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div><div class="regionUvStepPicker" role="group" aria-label="Joystick hareket adımı"><span>Adım</span><button type="button" class="active" data-region-step="1" aria-pressed="true">1</button><button type="button" data-region-step="2" aria-pressed="false">2</button><button type="button" data-region-step="4" aria-pressed="false">4</button><button type="button" data-region-step="8" aria-pressed="false">8</button><span>px</span></div></div>',
+ '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
+ '<div class="regionUvFixedControls"><div class="regionUvControlRow"><div class="islandJoystick" id="regionUvJoystick"><div class="islandStick" id="regionUvStick"></div></div><div class="regionUvNodePad" role="group" aria-label="Hareket ettirilecek nokta"><button type="button" data-region-handle-choice="tl" aria-label="Sol üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="tr" aria-label="Sağ üst" aria-pressed="false"></button><button type="button" data-region-handle-choice="move" class="active" aria-label="Tüm seçimi taşı" aria-pressed="true"></button><button type="button" data-region-handle-choice="bl" aria-label="Sol alt" aria-pressed="false"></button><button type="button" data-region-handle-choice="br" aria-label="Sağ alt" aria-pressed="false"></button></div><div class="regionUvStepPicker" role="group" aria-label="Joystick hareket adımı"><button type="button" class="active" data-region-step="1" aria-pressed="true">1</button><button type="button" data-region-step="2" aria-pressed="false">2</button><button type="button" data-region-step="4" aria-pressed="false">4</button><button type="button" data-region-step="8" aria-pressed="false">8</button><span>px</span></div></div><span class="stat" id="regionUvHandleStatus">Tüm seçim · 1 px / adım</span></div>',
  '<details class="regionUvSaved"><summary>Kayıtlı adalar <span class="regionUvIslandCount" id="regionUvIslandCount">0</span></summary><div class="regionUvIslandGallery" id="regionUvIslandGallery" aria-label="Kayıtlı UV adaları"></div><div class="regionUvSavedRow"><button class="btn" id="regionUvAddIsland">+ Ada</button><button class="btn" id="regionUvAdd">Seçimi ekle</button><button class="btn danger" id="regionUvDel">Seçileni sil</button><span class="stat" id="regionUvMeta"></span></div></details>',
  '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
  '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
@@ -325,6 +323,7 @@ function buildUI(){
   if(b.dataset.regionTool)setTool(b.dataset.regionTool);
   if(b.dataset.regionView)view(b.dataset.regionView);
   if(b.dataset.regionStep)setNudge(b.dataset.regionStep);
+  if(b.dataset.regionHandleChoice)setHandle(b.dataset.regionHandleChoice);
   if(b.dataset.regionIsland!==undefined){S.index=Number(b.dataset.regionIsland);if(S.islands[S.index]?.rects?.length)useIsland();else{S.scope=null;clearPreview();hint('Ada '+(S.index+1)+' boş; bir alan ekle')}showIslandChoices()}
   if(b.id==='regionUvAddIsland')newIsland();
   if(b.id==='regionUvAdd')addArea();
