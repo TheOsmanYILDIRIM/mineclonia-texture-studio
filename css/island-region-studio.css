@@ -27,3 +27,16 @@
  .regionUvOptions{margin:6px 7px}
  .regionUvHint{margin-inline:7px}
 }
+
+/* Zoom canvas and its corner grips together; scroll is viewport-only. */
+.regionUvZoombar{display:flex;align-items:center;gap:7px;padding:6px 11px;flex-wrap:wrap;font-size:11px;color:#b9c8d2}
+.regionUvZoombar .btn{min-height:33px;min-width:34px}.regionUvZoombar input{flex:1;min-width:90px;max-width:280px;accent-color:var(--accent)}
+.regionUvZoombar strong{min-width:30px;text-align:center;color:#ecf3fa}
+.islandRegionRoot #regionUvStage{overflow:auto;overscroll-behavior:contain;max-height:65vh;touch-action:pan-x pan-y}
+.islandRegionRoot .regionUvFrame{position:relative;width:100%;height:max-content;min-width:100%}
+.islandRegionRoot .regionUvFrame>#regionUvCanvas{display:block;position:relative;width:100%;height:auto;image-rendering:pixelated}
+.islandRegionRoot .regionUvFrame>.regionUvOverlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated}
+.islandRegionRoot #regionUvSelection{pointer-events:none}
+.islandRegionRoot #regionUvSelection [data-region-handle]{pointer-events:auto;cursor:crosshair}
+.islandRegionRoot #regionUvSelection [data-region-handle].active{background:#89f0b8}
+.islandRegionRoot #regionUvStage:has(#regionUvSelection[style*="display: block"]) #regionUvCanvas{touch-action:none}
