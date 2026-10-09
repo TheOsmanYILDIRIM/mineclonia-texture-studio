@@ -4,7 +4,7 @@ import {extractRegion,compositeRegion,scaleSavedRects,normalizedRects} from './i
 const $=id=>document.getElementById(id);
 const bridge=()=>window.MTSIslandBridge||{};
 const legacy=()=>window.MTSVariantBridge||{};
-const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,busy:false,zoom:1,nudge:1};
+const S={meta:null,base:null,imported:null,preview:null,rect:null,sourceRect:null,scope:null,islands:[],index:-1,view:'active',tool:'edit',handle:'move',drag:null,epoch:0,importEpoch:0,busy:false,zoom:1,nudge:1};
 const clone=r=>r?{...r}:null;
 const toast=t=>{const status=$('regionUvStatus');if(status)status.textContent=t;bridge().toast?.(t)};
 const hint=t=>{const status=$('regionUvStatus');if(status)status.textContent=t};
@@ -230,15 +230,18 @@ function pickSource(){
 async function loadPng(file){
  if(!file||!S.base)return;
  if(file.type&&!file.type.includes('png')&&!file.name.toLowerCase().endsWith('.png'))return toast('PNG seç');
- const generation=S.epoch;
+ const generation=S.epoch,importGeneration=++S.importEpoch;
  try{
   if(!targetRects().length)return toast('Önce aktif UV üzerindeki hedef alanı seç');
+  // Invalidate the previous image immediately; never display stale source while decoding.
+  S.imported=null;S.sourceRect=null;clearPreview();view('active');
+  hint('Yeni PNG yükleniyor: '+file.name);
   const c=await bridge().decodeBlobToCanvas(file);
-  if(generation!==S.epoch)return;
+  if(generation!==S.epoch||importGeneration!==S.importEpoch)return;
   S.imported=c;S.sourceRect=null;clearPreview();setTool('edit');setHandle('move');
   view('uploaded');
   hint('Yüklenen PNG üzerinde değiştirmek istediğin kaynak adayı parmağınla seç. Bütün PNG otomatik eşlenmez.');
- }catch(e){toast('PNG açılamadı: '+e.message)}
+ }catch(e){if(generation===S.epoch&&importGeneration===S.importEpoch)toast('PNG açılamadı: '+e.message)}
 }
 function merged(){
  if(!S.base||!S.imported)return toast('Önce PNG yükle');
@@ -330,7 +333,7 @@ function buildUI(){
   if(b.id==='regionUvSave')save();
   if(b.id==='regionUv3D')preview3d();
  });
- $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)loadPng(f);e.target.value=''});
+ $('regionUvFile').addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f)loadPng(f)});
  ['regionUvX','regionUvY','regionUvScale'].forEach(id=>$(id).addEventListener('change',()=>{if(S.preview)clearPreview();if(S.imported&&S.sourceRect)merged()}));
  $('regionUvTexture').addEventListener('change',e=>choose(e.target.value));
  if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{if(root.classList.contains('open'))draw()}).observe($('regionUvFrame'));
@@ -338,6 +341,7 @@ function buildUI(){
 async function choose(path){
  const generation=++S.epoch,meta=bridge().catalog?.().find(x=>x.path===path);
  if(!meta)return;
+ S.importEpoch++;
  S.meta=meta;S.base=null;S.imported=null;S.preview=null;S.rect=null;S.sourceRect=null;S.scope=null;
  try{
   const edit=await legacy().getEdit?.(path);
