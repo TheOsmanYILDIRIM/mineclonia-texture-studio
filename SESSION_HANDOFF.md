@@ -1,5 +1,9 @@
 # SESSION_HANDOFF — 2026-10-09 · ACTIVE-UV REGIONAL EDITOR
 
+## Zoom and corner-control update (2026-10-09)
+
+Added 1×–12× zoom slider, ± and fit controls, a scrollable image viewport, explicit corner modes and direct on-canvas corner handles. The existing joystick moves the selected corner/whole rectangle by one source pixel per input step; pan mode scrolls the zoomed viewport instead of changing UV coordinates. Crop / import / composite APIs and saved island records are unchanged. Browser visual test and Android touch validation remain necessary.
+
 ## Regional UV editing (2026-10-09)
 
 The **Ada / Bölgesel UV** entry routes to lazy ES module `js/island-region-studio.mjs`; legacy Island Studio/repack remains available as historical code but is not the primary flow. Opening a texture loads its current active edit (otherwise original). The editor allows direct manual rectangles or reuse/add/cycle/delete of persisted `mts_uv_islands_v1:` groups, with automatic saved-geometry remapping when current texture resolution differs. A selected cropped PNG is exported with transparent pixels outside the chosen rect union. Imported PNG can map as a region or a full atlas; numeric x/y/scale adjustments update a **preview**, then explicit confirmation stores the *full* alpha-locked composite through `MTSIslandBridge.saveRestored`. The pure ES-module core preserves all RGBA bytes outside the chosen region, preserves all original alpha bytes, and ignores transparent source pixels. `tests/island-region-core.test.mjs` is included in Runtime Guards. Real Android pointer/PNG/3D integration must still be checked; a geometrically changed AI PNG may require finer correspondence than global x/y/scale.
