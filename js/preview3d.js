@@ -4,7 +4,7 @@
  const scene=document.getElementById('preview3dScene');
  if(!root||!stage||!scene)return;
 
- let mode='object',projection='orthographic',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0,previewProfileConfig=null,previewBgUrl=null;
+ let mode='object',projection='orthographic',rx=-24,ry=38,zoom=1,pointers=new Map(),lastPinch=0,panX=0,panY=0,previewProfileConfig=null,previewBgUrl=null;
  const S=150;
  const byName=name=>CATALOG.find(x=>String(x.name||'').toLowerCase()===String(name).toLowerCase())||null;
  const canObject=x=>!!x&&['Block','Functional Block'].includes(assetTypeOf(x));
@@ -512,7 +512,7 @@
  function entityRotation(){const ax=rx*Math.PI/180,ay=ry*Math.PI/180,cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Math.sin(ay);return new Float32Array([cy,sx*sy,-cx*sy,0,0,cx,sx,0,sy,-sx*cy,cx*cy,0,0,0,0,1])}
  function drawEntityGL(){
   const e=entityGL;if(!e)return;const {gl,canvas}=e,dpr=Math.min(1.5,devicePixelRatio||1),w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight),cw=Math.round(w*dpr),ch=Math.round(h*dpr);
-  if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());if(e.uPerspective)gl.uniform1f(e.uPerspective,projection==='perspective'?.72:0);const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
+  if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch}gl.viewport(0,0,cw,ch);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(e.program);gl.uniformMatrix4fv(e.uRot,false,entityRotation());gl.uniform2f(gl.getUniformLocation(e.program,'pan'),panX*2/Math.max(1,w),-panY*2/Math.max(1,h));if(e.uPerspective)gl.uniform1f(e.uPerspective,projection==='perspective'?.72:0);const asp=w/h;gl.uniform2f(e.uScale,zoom*(asp<1?1:1/asp),zoom*(asp<1?asp:1));gl.drawElements(gl.TRIANGLES,e.count,e.indexType,0);
  }
  async function swapEntityTexture(blob){
   const e=entityGL;if(!e||!blob)return;
@@ -552,7 +552,7 @@
   }
   const mesh=animation?.mesh||staticMesh,indices=skinIndices(mesh,model),canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;touch-action:none';stage.insertBefore(canvas,stage.firstChild);
   const gl=canvas.getContext('webgl',{alpha:true,antialias:true})||canvas.getContext('experimental-webgl');if(!gl)throw Error('WebGL desteklenmiyor');
-  const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.45,1.0);u=t;}');
+  const vs=glShader(gl,gl.VERTEX_SHADER,'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;uniform vec2 pan;varying vec2 u;void main(){vec4 q=r*vec4(p,1.0);gl_Position=vec4(q.x*s.x+pan.x,q.y*s.y+pan.y,q.z*0.45,1.0);u=t;}');
   const fs=glShader(gl,gl.FRAGMENT_SHADER,'precision mediump float;uniform sampler2D tex;varying vec2 u;void main(){vec4 c=texture2D(tex,u);if(c.a<0.02)discard;gl_FragColor=c;}');
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
   const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.p),animation?gl.DYNAMIC_DRAW:gl.STATIC_DRAW);const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
@@ -590,8 +590,8 @@
   const surface=await makeSurface(meta);scene.appendChild(surface);
   const ai=await alphaInfo(meta);stage.classList.toggle('alphaAware',ai.hasAlpha||ai.hasSemi);
  }
- function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
- function resetView(){rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
+ function applyView(){if(entityGL){drawEntityGL();return}scene.style.transform=`translate(${panX}px,${panY}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;}
+ function resetView(){panX=0;panY=0;rx=entityGL?-12:(mode==='world'?-34:-24);ry=entityGL?28:(mode==='world'?42:38);zoom=mode==='world'?.72:1;applyView();}
 
  function cubeRotationMatrix(){
   const ax=rx*Math.PI/180,ay=ry*Math.PI/180,cx=Math.cos(ax),sx=Math.sin(ax),cy=Math.cos(ay),sy=Math.sin(ay);
@@ -614,7 +614,7 @@
   if(!gl)throw Error('WebGL desteklenmiyor');
 
   const vs=glShader(gl,gl.VERTEX_SHADER,
-    'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;uniform float persp;varying vec2 u;varying float shade;void main(){vec4 q=r*vec4(p,1.0);float w=1.0+persp*max(-0.48,min(0.48,q.z));gl_Position=vec4(q.x*s.x,q.y*s.y,q.z*0.42,w);u=t;shade=.82+.18*max(0.0,q.z+0.5);}'
+    'attribute vec3 p;attribute vec2 t;uniform mat4 r;uniform vec2 s;uniform vec2 pan;uniform float persp;varying vec2 u;varying float shade;void main(){vec4 q=r*vec4(p,1.0);float w=1.0+persp*max(-0.48,min(0.48,q.z));gl_Position=vec4(q.x*s.x+pan.x,q.y*s.y+pan.y,q.z*0.42,w);u=t;shade=.82+.18*max(0.0,q.z+0.5);}'
   );
   const fs=glShader(gl,gl.FRAGMENT_SHADER,
     'precision mediump float;uniform sampler2D tex;varying vec2 u;varying float shade;void main(){vec4 c=texture2D(tex,u);if(c.a<0.015)discard;gl_FragColor=vec4(c.rgb*shade,c.a);}'
@@ -706,7 +706,7 @@
   const prev=pointers.get(e.pointerId);if(!prev)return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(pointers.size===1){ry-=e.clientX-prev.x;rx-=e.clientY-prev.y;rx=Math.max(-85,Math.min(85,rx));applyView();return}
-  if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastPinch){zoom*=d/lastPinch;zoom=Math.max(.35,Math.min(2.4,zoom));applyView()}lastPinch=d}
+  if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);panX+=(e.clientX-prev.x)/2;panY+=(e.clientY-prev.y)/2;panX=Math.max(-stage.clientWidth,Math.min(stage.clientWidth,panX));panY=Math.max(-stage.clientHeight,Math.min(stage.clientHeight,panY));if(lastPinch)zoom=Math.max(.35,Math.min(2.4,zoom*d/lastPinch));lastPinch=d;applyView()}
  });
  const end=e=>{pointers.delete(e.pointerId);if(pointers.size<2)lastPinch=0};
  stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
