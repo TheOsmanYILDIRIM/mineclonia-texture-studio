@@ -120,3 +120,18 @@
  .regionUvIslandCard{flex-basis:82px;width:82px;max-width:82px}
  .regionUvStepPicker button{min-height:30px}
 }
+
+/* Four individually tappable UV corner nodes, linked to the existing joystick. */
+.islandRegionRoot #regionUvSelection [data-region-handle]{
+ width:16px;height:16px;border-radius:50%;pointer-events:auto;
+ background:#dbe6ed;border:2px solid #15212a;box-shadow:0 0 0 1px #86b5b4;
+ cursor:pointer;touch-action:none;z-index:8
+}
+.islandRegionRoot #regionUvSelection [data-region-handle]::after{
+ content:"";position:absolute;inset:-13px;border-radius:50%;
+}
+.islandRegionRoot #regionUvSelection [data-region-handle].active{
+ background:#a7ef86;border-color:#19271d;
+ box-shadow:0 0 0 2px #132018,0 0 0 4px #a7ef86
+}
+.islandRegionRoot #regionUvSelection .islandCenter{width:12px;height:12px;z-index:7}
