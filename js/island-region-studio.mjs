@@ -15,11 +15,12 @@ function makeCanvas(img){const c=document.createElement('canvas');c.width=img.wi
 function clearPreview(){
  S.preview=null;const save=$('regionUvSave');if(save)save.disabled=true;
 }
-function currentCanvas(){return S.view==='uploaded'&&S.imported?S.imported:S.view==='preview'&&S.preview?S.preview:S.base}
+function currentCanvas(){if(S.view==='uploaded')return S.imported;if(S.view==='preview')return S.preview;return S.base}
 function rectInView(){return S.view==='uploaded'?S.sourceRect:S.rect||S.scope?.[0]||null}
 function frameDims(){const c=currentCanvas();return c?{w:c.width,h:c.height}:null}
 function draw(){
- const canvas=currentCanvas(),cv=$('regionUvCanvas');if(!canvas||!cv)return;
+ const canvas=currentCanvas(),cv=$('regionUvCanvas');if(!cv)return;
+ if(!canvas){cv.width=1;cv.height=1;cv.getContext('2d').clearRect(0,0,1,1);const overlay=$('regionUvOverlay');overlay.width=1;overlay.height=1;const selection=$('regionUvSelection');if(selection)selection.style.display='none';return}
  cv.width=canvas.width;cv.height=canvas.height;cv.getContext('2d').drawImage(canvas,0,0);
  const over=$('regionUvOverlay');over.width=canvas.width;over.height=canvas.height;
  const g=over.getContext('2d');g.clearRect(0,0,over.width,over.height);
@@ -44,6 +45,8 @@ function draw(){
  const meta=$('regionUvMeta');if(meta)meta.textContent=S.islands.length?'Ada '+(S.index+1)+'/'+S.islands.length:'Kayıtlı ada yok';
 }
 function view(name){
+ if(name==='uploaded'&&!S.imported){hint('Kaynak PNG henüz yüklenmedi. PNG yükle ile dosya seç.');return}
+ if(name==='preview'&&!S.preview){hint('Önce kaynak adayı seçip birleşimi oluştur.');return}
  S.view=name;
  document.querySelectorAll('[data-region-view]').forEach(el=>el.classList.toggle('primary',el.dataset.regionView===name));
  draw();
@@ -234,13 +237,13 @@ async function loadPng(file){
  try{
   if(!targetRects().length)return toast('Önce aktif UV üzerindeki hedef alanı seç');
   // Invalidate the previous image immediately; never display stale source while decoding.
-  S.imported=null;S.sourceRect=null;clearPreview();view('active');
+  S.imported=null;S.sourceRect=null;clearPreview();S.view='active';draw();
   hint('Yeni PNG yükleniyor: '+file.name);
   const c=await bridge().decodeBlobToCanvas(file);
   if(generation!==S.epoch||importGeneration!==S.importEpoch)return;
   S.imported=c;S.sourceRect=null;clearPreview();setTool('edit');setHandle('move');
   view('uploaded');
-  hint('Yüklenen PNG üzerinde değiştirmek istediğin kaynak adayı parmağınla seç. Bütün PNG otomatik eşlenmez.');
+  hint('Kaynak PNG: '+file.name+' ('+c.width+'×'+c.height+'). Yüklenen PNG üzerinde değiştirmek istediğin kaynak adayı parmağınla seç. Bütün PNG otomatik eşlenmez.');
  }catch(e){if(generation===S.epoch&&importGeneration===S.importEpoch)toast('PNG açılamadı: '+e.message)}
 }
 function merged(){
