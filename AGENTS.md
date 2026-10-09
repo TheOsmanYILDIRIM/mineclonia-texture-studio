@@ -68,3 +68,7 @@ Do not manually dispatch Actions for documentation, UV experiments, or a closeou
 ## Separate Voxel Model Studio
 
 `model-studio/` is an isolated mobile-first cuboid prototype (select, transform, duplicate, delete, save/load); no Texture Studio persistence coupling. It is **not** a lossless B3D rig or animation editor; do not claim otherwise.
+
+## B3D animation safety (2026-10-09 closeout)
+
+The animated B3D mesh may be malformed **before playback**; a successful parser or finite sample does not prove correct bind pose or rig. Static `parseB3D` in `js/preview3d.js` is the reference for initial geometry. Animated `js/b3d-animation.js` must pass vertex/UV/index parity against the static reference on authentic models before its mesh replaces the static one. Keep the PR #26 protective fallback, and do not claim that fallback fixes animation. Do not reintroduce PR #24's owner-node rigid transform without authentic weighted/unweighted B3D tests. Verify cat, Enderman and varied rig types at frame 0, intermediate and last frames; Lua-defined clip ranges must be checked separately. A documentation-only closeout does not prove CI/deployment.
