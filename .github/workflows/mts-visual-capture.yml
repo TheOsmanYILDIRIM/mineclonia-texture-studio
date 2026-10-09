@@ -234,6 +234,7 @@ jobs:
                   });
                   // Explicitly choose target UV rectangle first; never use entire atlas implicitly.
                   const dragCanvas = async (left, top, right, bottom) => {
+                    await page.locator('#regionUvCanvas').scrollIntoViewIfNeeded();
                     const r = await page.locator('#regionUvCanvas').boundingBox();
                     if (!r) throw new Error('Regional canvas missing');
                     await page.mouse.move(r.x + r.width * left, r.y + r.height * top);
@@ -281,13 +282,14 @@ jobs:
                   if (!rendered) throw new Error('Saved island thumbnail is empty for visible UV region');
                   await capture(page, `regional-uv-islands-${t.name}-fold`);
                   await islandCard.click();
+                  await page.locator('.regionUvSaved').evaluate(el => { el.open = false; });
 
                   await page.locator('#regionUvFile').setInputFiles({
                     name: 'regional-red-test.png',
                     mimeType: 'image/png',
                     buffer: Buffer.from(inputPng, 'base64')
                   });
-                  await page.waitForFunction(() => document.querySelector('#regionUvStatus')?.textContent?.includes('Yüklenen PNG üzerinde'), null, { timeout: 15000 });
+                  await page.waitForFunction(() => document.querySelector('#regionUvStatus')?.textContent?.includes('Yüklenen PNG üzerinde'), null, { timeout: 15000 }).catch(async err => { throw new Error('Import selection did not open: ' + await page.locator('#regionUvStatus').textContent() + ' / ' + err.message); });
                   if (await page.locator('.regionUvHandles button').count() || await page.locator('#regionUvLeft').count()) {
                     throw new Error('Obsolete arrow/corner button cluster still present');
                   }
@@ -295,7 +297,7 @@ jobs:
                   if (await page.locator('#regionUvSave').isEnabled()) throw new Error('Saved-enabled before source island selection');
                   await dragCanvas(.25,.25,.65,.65);
                   await page.locator('#regionUvPreview').click();
-                  await page.waitForFunction(() => (document.querySelector('#regionUvStatus')?.textContent || '').includes('Birleşim hazır'), null, { timeout: 15000 });
+                  await page.waitForFunction(() => (document.querySelector('#regionUvStatus')?.textContent || '').includes('Birleşim hazır'), null, { timeout: 15000 }).catch(async err => { throw new Error('Regional source merge failed: ' + await page.locator('#regionUvStatus').textContent() + ' / ' + err.message); });
                   if (!await page.locator('#regionUvSave').isEnabled()) {
                     const detail = await page.evaluate(() => ({
                       status: document.querySelector('#regionUvStatus')?.textContent,
