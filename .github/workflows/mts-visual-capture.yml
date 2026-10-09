@@ -220,10 +220,27 @@ jobs:
                     document.querySelector('#variantLab')?.classList.remove('open');
                     await window.MTSUvRepair.openIsland(meta.path);
                   }, entityId);
-                  await page.waitForSelector('.islandStudio.open', { timeout: 10000 });
-                  await page.waitForTimeout(700);
+                  await page.waitForSelector('#regionalUvStudio.open', { timeout: 10000 });
+                  await page.waitForFunction(() => document.querySelector('#regionUvCanvas')?.width > 1, null, { timeout: 15000 });
+                  await page.waitForTimeout(350);
                   await capture(page, `island-studio-${t.name}-fold`);
-                  await page.evaluate(() => document.querySelector('.islandStudio')?.classList.remove('open'));
+
+                  const inputPng = await page.evaluate(() => {
+                    const c = document.createElement('canvas');
+                    c.width = 64; c.height = 64;
+                    const g = c.getContext('2d');
+                    g.fillStyle = '#ef354c'; g.fillRect(0,0,64,64);
+                    return c.toDataURL('image/png').split(',')[1];
+                  });
+                  await page.locator('#regionUvFile').setInputFiles({
+                    name: 'regional-red-test.png',
+                    mimeType: 'image/png',
+                    buffer: Buffer.from(inputPng, 'base64')
+                  });
+                  await page.waitForFunction(() => (document.querySelector('#regionUvStatus')?.textContent || '').includes('Bölgesel önizleme'), null, { timeout: 15000 });
+                  await capture(page, `regional-uv-preview-${t.name}-fold`);
+                  // Preview-only smoke test: never click save or mutate user edit data.
+                  await page.evaluate(() => document.querySelector('#regionalUvStudio')?.classList.remove('open'));
                 } catch (err) {
                   stateErrors.push('island-studio-state: ' + String(err));
                 }
