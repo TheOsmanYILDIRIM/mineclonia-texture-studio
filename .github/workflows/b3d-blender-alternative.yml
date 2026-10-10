@@ -29,6 +29,16 @@ jobs:
           git clone --depth 1 https://github.com/AvengerAnubis/b3d2blender.git /tmp/io_scene_b3d
           git -C /tmp/mineclonia rev-parse HEAD > mineclonia-source-sha.txt
           git -C /tmp/io_scene_b3d rev-parse HEAD > blender-importer-sha.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/io_scene_b3d/import_b3d.py')
+          src=p.read_text()
+          old='action.fcurve_ensure_for_datablock(arm_obj, '
+          assert src.count(old)==3, 'Unexpected importer API; refusing blind patch'
+          src=src.replace(old, 'action.fcurves.new(')
+          src=src.replace('index=axis, group_name=bone.name)', 'index=axis, action_group=bone.name)')
+          p.write_text(src)
+          PY
       - name: Convert all B3D with Blender
         run: |
           mkdir -p output reports
