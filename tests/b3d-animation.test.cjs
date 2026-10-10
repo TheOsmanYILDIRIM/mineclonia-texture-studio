@@ -50,3 +50,42 @@ console.log('B3D animated mesh-owner rigid vertices: PASS');
 
 console.log('B3D animation synthetic weighted-vertex interpolation + valid empty BONE chunk: PASS');
 
+
+
+// Real Mineclonia pig/cat/wolf rigs use rest-space quaternions whose skeletal
+// rotation direction is opposite the legacy static mesh-owner transform.
+// This fixture reproduces the giant-pivot-radius regression without storing
+// copyrighted model binaries: a bone at +Z=6 must not rotate geometry around -Z=6.
+const nodeWithRotation=(name,p,q,...children)=>chunk('NODE',bytes(name+'\\0'),...p.map(f),...[1,1,1].map(f),...q.map(f),...children);
+const near=(actual,expected,eps=1e-4)=>assert.ok(Math.abs(actual-expected)<eps,actual+' !== '+expected);
+function handednessFixture(){
+ const verts=chunk('VRTS',i(0),i(1),i(2),...[0,0,6,0,0, 1,0,6,1,0, 0,1,6,0,1].map(f));
+ const triangles=chunk('TRIS',i(0),i(0),i(1),i(2));
+ const boneWeights=chunk('BONE',...[0,1,2].flatMap(v=>[i(v),f(1)]));
+ const a=Math.PI/4,b=Math.PI/12;
+ const rotation=chunk('KEYS',i(4),i(0),...[1,0,0,0].map(f),i(10),...[Math.cos(b),Math.sin(b),0,0].map(f));
+ const body=nodeWithRotation('body',[0,0,0],[Math.cos(a),-Math.sin(a),0,0],
+   node('bone',[0,6,0],boneWeights,rotation));
+ const mesh=node('root',[0,0,0],chunk('MESH',i(0),verts,triangles),body);
+ return chunk('BB3D',i(1),mesh,chunk('ANIM',i(0),i(10),f(10))).buffer;
+}
+const handed=parse(handednessFixture());
+const h0=Array.from(handed.sample(0)),h10=Array.from(handed.sample(10));
+for(let axis=0;axis<3;axis++)near(h0[axis],handed.mesh.p[axis]);
+// The first vertex is exactly on the correct bind pivot; it must not fly away.
+near(Math.hypot(...h10.slice(0,3).map((x,j)=>x-h0[j])),0,2e-4);
+// A vertex one unit from the pivot must move, but by less than a model unit.
+const swing=Math.hypot(...h10.slice(6,9).map((x,j)=>x-h0[j+6]));
+assert.ok(swing>0.2&&swing<1.5,'bone swing radius must match its nearby vertex: '+swing);
+
+// Unweighted static meshes retain the original mesh-owner transform and UVs.
+// Changing skeletal handedness must not shift the static reference at rest.
+const v2=chunk('VRTS',i(0),i(1),i(2),...[0,0,0,0,0, 0,1,0,1,0, 1,0,0,0,1].map(f));
+const meshOwner=nodeWithRotation('owner',[0,0,0],[Math.SQRT1_2,-Math.SQRT1_2,0,0],
+ chunk('MESH',i(0),v2,chunk('TRIS',i(0),i(0),i(1),i(2))));
+const staticRotated=parse(chunk('BB3D',i(1),meshOwner).buffer);
+near(staticRotated.mesh.p[0],-0.775);
+near(staticRotated.mesh.p[2],0.775);
+near(staticRotated.mesh.p[8],-0.775);
+assert.deepEqual(Array.from(staticRotated.mesh.uv),[0,0,1,0,0,1]);
+console.log('B3D skeletal handedness + unchanged static mesh-owner parity: PASS');
