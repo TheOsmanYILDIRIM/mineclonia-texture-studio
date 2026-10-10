@@ -11,23 +11,31 @@ export function installChatTargets({getPrompt,notify}){
  settings.innerHTML='<details><summary>ChatGPT sohbet hedefleri · Ayarlar</summary><div class="mts-chat-fields"></div><small>Her aşama için ayrı sohbet ID veya chatgpt.com/c/ bağlantısı. Yalnızca bu tarayıcıda saklanır.</small></details>';
  const fields=settings.querySelector('.mts-chat-fields');
  for(const [id,label] of STAGES){const row=document.createElement('label');row.textContent=label;const input=document.createElement('input');input.type='text';input.autocomplete='off';input.placeholder='Sohbet ID veya URL';input.value=load()[id]||'';input.dataset.stage=id;input.addEventListener('change',()=>{const raw=input.value.trim(),parsed=parseId(raw);if(raw&&!parsed){input.setCustomValidity('Geçerli sohbet ID girin');input.reportValidity();return}input.setCustomValidity('');const data=load();if(parsed)data[id]=parsed;else delete data[id];if(!save(data))notify('Sohbet hedefi kaydedilemedi');else notify('Sohbet hedefi kaydedildi');input.value=parsed});row.append(input);fields.append(row)}
- const stageSelect=document.createElement('select');stageSelect.className='select';stageSelect.setAttribute('aria-label','Prompt aşaması');for(const [id,label] of STAGES){const option=document.createElement('option');option.value=id;option.textContent=label;stageSelect.append(option)}box.append(stageSelect);
- window.addEventListener('mts:chat-stage',event=>{const stage=event.detail?.stage;if(STAGES.some(([id])=>id===stage))stageSelect.value=stage});
- const legacyButtons=[['mobHqPrompt','mob_hq'],['mobRefPrompt','mob_ref'],['mobFinalPrompt','mob_final'],['copyPrompt',null],['savePrompt',null]];
- for(const [id,stage] of legacyButtons){const button=document.getElementById(id);if(button&&stage)button.addEventListener('click',()=>{stageSelect.value=stage})}
- const actions=document.createElement('div');actions.className='mts-chat-actions';actions.innerHTML='<button type="button" class="btn">Promptu kopyala</button><button type="button" class="btn primary">ChatGPT\'de aç</button>';
- const [copyButton,openButton]=actions.querySelectorAll('button');
- async function act(open){
-  const p=getPrompt(stageSelect.value);if(!p?.text){notify('Bu aşamada prompt yok');return}
-  if(!open){notify(await copy(p.text)?'Prompt kopyalandı':'Kopyalama başarısız');return}
-  const id=load()[p.stage];if(!id){notify('Önce bu aşama için sohbet ID kaydedin');settings.querySelector('details').open=true;fields.querySelector('[data-stage="'+p.stage+'"]')?.focus();return}
-  const base='https://chatgpt.com/c/'+id;
-  const url=base+'?q='+encodeURIComponent(p.text);
-  const long=url.length>7500;
-  window.open(long?base:url,'_blank','noopener');
-  const copied=await copy(p.text);
-  notify(long?'Uzun prompt panoya kopyalandı; sohbete yapıştırın':copied?'Sohbet açılması istendi; prompt panoda hazır':'Sohbet açılması istendi; kopyalama başarısız');
+
+ const toggleLabel=document.createElement('label');toggleLabel.className='mts-chat-toggle';
+ const toggle=document.createElement('input');toggle.type='checkbox';toggle.checked=localStorage.getItem('mts:chatAutoOpen:v1')==='1';
+ const toggleText=document.createElement('span');toggleText.textContent='Prompta dokununca ChatGPT sohbetini aç';
+ toggleLabel.append(toggle,toggleText);
+ toggle.addEventListener('change',()=>{try{localStorage.setItem('mts:chatAutoOpen:v1',toggle.checked?'1':'0')}catch{notify('Tercih kaydedilemedi')}});
+ settings.append(toggleLabel);
+ box.append(settings);
+ let activeStage='general';
+ window.addEventListener('mts:chat-stage',event=>{if(STAGES.some(([id])=>id===event.detail?.stage))activeStage=event.detail.stage});
+ const mapping={mobHqPrompt:'mob_hq',mobRefPrompt:'mob_ref',mobFinalPrompt:'mob_final'};
+ const buttons=['mobHqPrompt','mobRefPrompt','mobFinalPrompt','copyPrompt','savePrompt'];
+ for(const buttonId of buttons){
+  const button=document.getElementById(buttonId);if(!button)continue;
+  button.addEventListener('click',()=>{
+   if(!toggle.checked)return;
+   const stage=mapping[buttonId]||(buttonId==='savePrompt'?(activeStage==='item_creative'?'item_correction':activeStage==='block_ref'?'block_production':null):activeStage);
+   if(!stage)return; // "Kaydet" for general prompts must retain its original behavior.
+   const p=getPrompt(stage);if(!p?.text)return;
+   const id=load()[stage];if(!id){notify('Bu aşama için ChatGPT sohbet ID kaydedin');settings.querySelector('details').open=true;return}
+   const base='https://chatgpt.com/c/'+id;
+   const full=base+'?q='+encodeURIComponent(p.text);
+   // Capture phase opens synchronously in the user's click; original clipboard handler still runs.
+   window.open(full.length<=7500?full:base,'_blank','noopener');
+   if(full.length>7500)notify('Uzun prompt kopyalandı; hedef sohbete yapıştırın');
+  },{capture:true});
  }
- copyButton.addEventListener('click',()=>act(false));openButton.addEventListener('click',()=>act(true));
- box.append(settings,actions);
 }
