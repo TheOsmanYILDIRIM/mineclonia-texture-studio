@@ -30,7 +30,13 @@ def safe_signature(item):
     match=re.search(r"has no attribute ['\\\"]([A-Za-z_][A-Za-z_0-9]{0,63})['\\\"]",msg)
     return match.group(1) if match else "unspecified"
 signatures=Counter(safe_signature(x) for x in failed)
-print(json.dumps({"api_attribute_signatures":dict(signatures),"schema":2,"exit_code":exit_code,"report_present":path.exists(),
+
+def safe_object_type(item):
+    message=str(item.get("error") or item.get("export_error") or "")
+    match=re.search(r"['\"]([A-Za-z_][A-Za-z_0-9]{0,63})['\"] object has no attribute ['\"]([A-Za-z_][A-Za-z_0-9]{0,63})['\"]",message)
+    return match.group(1) if match else "unspecified"
+object_types=Counter(safe_object_type(x) for x in failed)
+print(json.dumps({"api_attribute_signatures":dict(signatures),"api_object_types":dict(object_types),"schema":3,"exit_code":exit_code,"report_present":path.exists(),
  "total":len(data),"converted":sum(bool(x.get("ok")) for x in data if isinstance(x,dict)),
  "failed":len(failed),"error_categories":dict(Counter(clean_error(x) for x in failed)),
  "models_with_skins":sum(int(x.get("skins",0))>0 for x in data if isinstance(x,dict)),
