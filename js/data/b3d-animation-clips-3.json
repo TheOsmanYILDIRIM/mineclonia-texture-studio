@@ -1,0 +1,408 @@
+{
+  "mobs_mc_slime.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/slime+magma_cube.lua",
+    "clips": [
+      {
+        "name": "jump",
+        "form": "adult",
+        "start": 1,
+        "end": 20,
+        "speed": 24
+      },
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 1,
+        "end": 1
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 1,
+        "end": 1
+      }
+    ]
+  },
+  "mobs_mc_magmacube.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/slime+magma_cube.lua",
+    "clips": [
+      {
+        "name": "jump",
+        "form": "adult",
+        "start": 0,
+        "end": 50,
+        "speed": 40
+      },
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      }
+    ]
+  },
+  "mobs_mc_snowman.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/snowman.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 20,
+        "end": 40,
+        "speed": 25
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 20,
+        "speed": 25
+      }
+    ]
+  },
+  "mobs_mc_spider.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/spider.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 20,
+        "end": 40,
+        "speed": 10
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 20,
+        "speed": 25
+      }
+    ]
+  },
+  "extra_mobs_strider.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/strider.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 5,
+        "end": 5,
+        "speed": 15
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 1,
+        "end": 20,
+        "speed": 15
+      }
+    ]
+  },
+  "extra_mobs_tropical_fish_a.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/tropical_fish.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 20
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 20,
+        "end": 40,
+        "speed": 50
+      },
+      {
+        "name": "run",
+        "form": "adult",
+        "start": 20,
+        "end": 40,
+        "speed": 50
+      }
+    ]
+  },
+  "mobs_mc_vex.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/vex.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 25
+      }
+    ]
+  },
+  "mobs_mc_villager.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/villager.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 35
+      },
+      {
+        "name": "nitwit",
+        "form": "adult",
+        "start": 41,
+        "end": 81,
+        "speed": 40
+      },
+      {
+        "name": "sleep",
+        "form": "adult",
+        "start": 82,
+        "end": 82
+      }
+    ]
+  },
+  "mobs_mc_evoker.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/villager_evoker.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 35
+      },
+      {
+        "name": "spellcast",
+        "form": "adult",
+        "start": 41,
+        "end": 61,
+        "speed": 20
+      }
+    ]
+  },
+  "mobs_mc_vindicator.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/villager_vindicator.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 20
+      },
+      {
+        "name": "punch",
+        "form": "adult",
+        "start": 41,
+        "end": 61,
+        "speed": 35
+      }
+    ]
+  },
+  "mobs_mc_villager_zombie.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/villager_zombie.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 20,
+        "end": 40
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 20,
+        "speed": 20
+      },
+      {
+        "name": "run",
+        "form": "adult",
+        "start": 0,
+        "end": 20,
+        "speed": 20
+      }
+    ]
+  },
+  "mobs_mc_witch.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/witch.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 30
+      },
+      {
+        "name": "run",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 60
+      },
+      {
+        "name": "hurt",
+        "form": "adult",
+        "start": 85,
+        "end": 115
+      },
+      {
+        "name": "death",
+        "form": "adult",
+        "start": 117,
+        "end": 145
+      },
+      {
+        "name": "shoot",
+        "form": "adult",
+        "start": 50,
+        "end": 82
+      }
+    ]
+  },
+  "mobs_mc_wither.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/wither.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 20,
+        "end": 40,
+        "speed": 12
+      },
+      {
+        "name": "charge",
+        "form": "adult",
+        "start": 40,
+        "end": 46,
+        "speed": 12
+      }
+    ]
+  },
+  "mobs_mc_wolf.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/wolf.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 0,
+        "end": 0
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 40,
+        "speed": 30
+      },
+      {
+        "name": "sit",
+        "form": "adult",
+        "start": 41,
+        "end": 41
+      },
+      {
+        "name": "interest_begin",
+        "form": "adult",
+        "start": 41,
+        "end": 44
+      },
+      {
+        "name": "interest_end",
+        "form": "adult",
+        "start": 44,
+        "end": 47
+      },
+      {
+        "name": "shake",
+        "form": "adult",
+        "start": 48,
+        "end": 71,
+        "speed": 23
+      }
+    ]
+  },
+  "mobs_mc_zombie.b3d": {
+    "source": "mods/ENTITIES/mobs_mc/zombie.lua",
+    "clips": [
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 40,
+        "end": 49,
+        "speed": 2
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 0,
+        "end": 39,
+        "speed": 25
+      },
+      {
+        "name": "punch",
+        "form": "adult",
+        "start": 50,
+        "end": 59,
+        "speed": 20
+      },
+      {
+        "name": "stand",
+        "form": "adult",
+        "start": 100,
+        "end": 109,
+        "speed": 2
+      },
+      {
+        "name": "walk",
+        "form": "adult",
+        "start": 60,
+        "end": 99,
+        "speed": 40
+      },
+      {
+        "name": "run",
+        "form": "adult",
+        "start": 60,
+        "end": 99,
+        "speed": 80
+      },
+      {
+        "name": "punch",
+        "form": "adult",
+        "start": 109,
+        "end": 119
+      }
+    ]
+  }
+}
