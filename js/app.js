@@ -725,26 +725,7 @@ async function refreshExportResolutionPreview(){
  }catch(error){console.warn('Export preview could not update',error);toast('Export önizlemesi güncellenemedi')}
 }
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
-// Keep downloads user-retryable: mobile browsers may delay or block synthetic clicks.
-const MTS_DOWNLOAD_LIMIT=5;
-const mtsDownloadLinks=[];
-function dl(blob,name){
- if(!(blob instanceof Blob)||blob.size===0)throw Error('İndirilecek dosya boş');
- let tray=document.getElementById('mtsDownloadTray');
- if(!tray){
-  tray=document.createElement('div');tray.id='mtsDownloadTray';tray.setAttribute('aria-label','Hazır indirmeler');
-  tray.style.cssText='position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:2147483640;display:flex;flex-direction:column;gap:6px;max-width:min(94vw,420px);width:max-content;pointer-events:none';
-  document.body.appendChild(tray);
- }
- const url=URL.createObjectURL(blob),a=document.createElement('a');
- a.href=url;a.download=String(name||'download.bin').replace(/[\\/]/g,'_');
- a.textContent='↓ '+a.download+' · İndir';
- a.style.cssText='display:block;pointer-events:auto;padding:11px 14px;border-radius:11px;background:#263c28;color:#e9ffdc;border:1px solid #7ca76b;box-shadow:0 4px 22px #0009;font-size:13px;text-decoration:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
- tray.prepend(a);mtsDownloadLinks.push({a,url});
- while(mtsDownloadLinks.length>MTS_DOWNLOAD_LIMIT){const old=mtsDownloadLinks.shift();old.a.remove();URL.revokeObjectURL(old.url)}
- try{a.click()}catch(error){console.warn('Otomatik indirme engellendi; bağlantı hazır',error)}
- return a;
-}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
 const RESOLUTION_KEY='mineclonia_texture_target_resolution_v1';
 let TARGET_RESOLUTION=256;
