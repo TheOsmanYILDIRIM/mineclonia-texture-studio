@@ -766,6 +766,29 @@ body{min-height:100dvh}
  #sheet .compactPrimaryDock{min-height:54px}
  #sheet .compactDownloadBody{padding-bottom:8px}
 }
+</style><style>
+@media(max-width:699px){
+ #sheet .compactMore{display:none!important}
+ #sheet .tileTools{display:flex!important;align-items:center;gap:7px;flex-wrap:nowrap;min-height:52px;overflow-x:auto;overflow-y:hidden;position:relative;z-index:5}
+ #sheet .mtsTileCycle{flex:0 0 auto;min-width:66px;height:43px}
+ #sheet .tileTools #tileSource{flex:0 0 auto;min-width:48px}
+ #sheet .tileTools .compactToolRail{position:static!important}
+ #sheet .tileTools #compactToolRail{display:flex!important;flex:1;gap:7px;justify-content:flex-end;position:static!important;inset:auto!important;width:auto!important;max-width:none!important;transform:none!important}
+ #sheet .tileTools .compactToolOrb{position:relative!important;flex:0 0 43px;width:43px;height:43px;min-width:43px;min-height:43px;border-radius:12px;transform:none!important}
+ #sheet .tileTools .mtsToolName{position:absolute;bottom:calc(100% + 6px);right:0;white-space:nowrap;background:#202b38;border:1px solid #536173;color:#fff;border-radius:7px;padding:5px 8px;font-size:11px;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .2s}
+ #sheet .mtsShowToolLabels .mtsToolName,#sheet .compactToolOrb:focus-visible .mtsToolName{opacity:1;visibility:visible}
+ #sheet .tilePreview.show{display:block!important;position:relative!important;inset:auto!important;transform:none!important;width:100%;aspect-ratio:1/1;max-height:min(54vh,420px);height:auto;flex:none}
+ #sheet .tileTools{order:0}
+ #sheet .mtsCleanToggle{display:flex!important;align-items:center;justify-content:center;gap:5px;width:max-content;max-width:100%;padding:5px 10px;border:1px solid #46505d;border-radius:10px;font-size:11px;cursor:pointer;background:#1c222b}
+ #sheet .mtsCleanToggle input{appearance:none;width:24px!important;height:14px!important;border-radius:20px;background:#59616b;position:relative;margin:0}
+ #sheet .mtsCleanToggle input:after{content:'';position:absolute;width:10px;height:10px;top:2px;left:2px;border-radius:50%;background:white;transition:transform .15s}
+ #sheet .mtsCleanToggle input:checked{background:#75b77e}
+ #sheet .mtsCleanToggle input:checked:after{transform:translateX(10px)}
+ #sheet .mtsCleanToggle.is-on{border-color:#75b77e}
+ #sheet .mtsEditIcon{position:relative}
+ #sheet .mtsEditIcon:after{content:attr(aria-label);position:absolute;left:calc(100% + 6px);top:7px;white-space:nowrap;background:#202b38;color:white;border:1px solid #526071;padding:5px 7px;border-radius:7px;font-size:11px;pointer-events:none;opacity:0;visibility:hidden}
+ #sheet .mtsShowToolLabels .mtsEditIcon:after,#sheet .mtsEditIcon:focus-visible:after{opacity:1;visibility:visible}
+}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -888,4 +911,4 @@ body{min-height:100dvh}
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>\n<script src="js/ordered-contour-warp.js?v=20261008-contour1"></script>\n<script src="js/island-repack.js?v=20261008-repack1"></script>
 <script src="js/prompt-registry.js?v=20261007-canonical2"></script>
-<script src="js/app.js?v=20261010-mobilelayout3"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
+<script src="js/app.js?v=20261010-mobilelayout4"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
