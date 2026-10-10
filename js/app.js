@@ -674,7 +674,7 @@ const RECENT_TEXTURES_KEY='mts_recent_textures_v1';
 function recentTexturePaths(){try{const x=JSON.parse(localStorage.getItem(RECENT_TEXTURES_KEY)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}}
 function rememberRecentTexture(x){if(!x?.path)return;const list=[x.path,...recentTexturePaths().filter(p=>p!==x.path)].slice(0,10);try{localStorage.setItem(RECENT_TEXTURES_KEY,JSON.stringify(list))}catch(_){}renderRecentTextures()}
 async function renderRecentTextures(){const root=$('recentTextures'),strip=$('recentTextureStrip');if(!root||!strip)return;const items=recentTexturePaths().map(p=>CATALOG.find(x=>x.path===p)).filter(Boolean).slice(0,8);root.classList.add('show');strip.innerHTML='';if(!items.length){const empty=document.createElement('div');empty.className='recentTextureEmpty';empty.textContent='Henüz açılan texture yok';strip.appendChild(empty);return}for(const x of items){const b=document.createElement('button');b.className='recentTexture';b.title=x.path;b.innerHTML='<img><span></span>';b.querySelector('span').textContent=x.name||x.path.split('/').pop();b.onclick=()=>openDetail(x);strip.appendChild(b);try{b.querySelector('img').src=await previewUrl(x.path,true,96)}catch(_){}}}
-async function openDetail(x){active=x;refreshEditHistoryButtons();window.MTSSyncActiveGrid?.();await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);const gridAllowed=isMobUvTexture(x)&&!isAnimatedStrip(x);for(const id of ['downloadGridUv','importGridUv']){const button=$(id);if(button){button.hidden=!gridAllowed;button.style.display=gridAllowed?'':'none';button.disabled=!gridAllowed;}}$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;document.querySelector('#sheet .drawer')?.classList.add('mtsShowToolLabels');setTimeout(()=>document.querySelector('#sheet .drawer')?.classList.remove('mtsShowToolLabels'),3200);refreshEditHistoryButtons();window.MTSSyncActiveGrid?.();await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);const gridAllowed=isMobUvTexture(x)&&!isAnimatedStrip(x);for(const id of ['downloadGridUv','importGridUv']){const button=$(id);if(button){button.hidden=!gridAllowed;button.style.display=gridAllowed?'':'none';button.disabled=!gridAllowed;}}$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -2185,7 +2185,7 @@ function setupCompactMobileDetail(){
       <div class="compactModeRow">
         <button class="compactMode" type="button" data-open-section="downloads">İndir</button>
         <button class="compactMode" type="button" data-open-section="ai">AI</button>
-        <button class="compactMode compactMore" type="button" data-open-section="advanced" aria-label="Gelişmiş">•••</button>
+        
       </div>
     </div>
     <div class="compactToolRail" id="compactToolRail" aria-label="Hızlı araçlar"></div>`;
@@ -2252,7 +2252,14 @@ function setupCompactMobileDetail(){
   const upload=$('uploadEdited');
   const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
   if(upload){upload.hidden=true;main.appendChild(upload)}
-  if(clean){clean.classList.add('compactClean');main.appendChild(clean)}
+  if(clean){
+    clean.classList.add('compactClean','mtsCleanToggle');
+    clean.title='Siyah arka plan temizleme';
+    clean.setAttribute('aria-label','Siyah arka plan temizleme');
+    clean.querySelector('input')?.addEventListener('change',()=>clean.classList.toggle('is-on',clean.querySelector('input').checked));
+    clean.classList.toggle('is-on',!!clean.querySelector('input')?.checked);
+    compact.querySelector('#compactDownloads')?.before(clean);
+  }
 
   const downloads=compact.querySelector('#compactDownloads');
   const selector=document.createElement('div');selector.className='mtsGridSource';selector.innerHTML='<button type="button" class="active" data-source="original">Orijinal</button><button type="button" data-source="active">Aktif</button>';
@@ -2300,11 +2307,27 @@ function setupCompactMobileDetail(){
   move('seamExport','#compactSeam');
   move('seamImport','#compactSeam');
   const toolRail=compact.querySelector('#compactToolRail');
+  const tileTools=drawer.querySelector('.tileTools');
+  if(tileTools){
+    const cycle=document.createElement('button');cycle.type='button';cycle.className='btn mini mtsTileCycle';
+    const values=[1,3,6,9];const update=()=>{const selected=tileTools.querySelector('[data-tile].active');cycle.textContent=(selected?.dataset.tile||'1')+'×'+(selected?.dataset.tile||'1')};
+    cycle.addEventListener('click',()=>{const current=Number(tileTools.querySelector('[data-tile].active')?.dataset.tile)||1;tileTools.querySelector('[data-tile="'+values[(values.indexOf(current)+1)%values.length]+'"]')?.click();update()});
+    tileTools.querySelectorAll('[data-tile]').forEach(b=>b.style.display='none');
+    tileTools.querySelector('.stat')?.remove();
+    tileTools.prepend(cycle);update();
+    tileTools.appendChild(toolRail);
+    const tilePreview=$('tilePreview'),preview=$('preview');
+    if(tilePreview&&preview){
+      preview.after(tilePreview);
+      tilePreview.style.minHeight='0';
+    }
+  }
   const makeTool=(id,label,svg)=>{
     const source=$(id);if(!source||!toolRail)return;
     const b=document.createElement('button');b.type='button';b.className='compactToolOrb';b.setAttribute('aria-label',label);b.title=label;
     b.innerHTML=svg;
     b.addEventListener('click',()=>source.click());
+    const name=document.createElement('span');name.className='mtsToolName';name.textContent=label;b.appendChild(name);
     toolRail.appendChild(b);
   };
   makeTool('detailVariantLab','Varyant Lab',`
