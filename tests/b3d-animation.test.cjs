@@ -90,3 +90,29 @@ near(staticRotated.mesh.p[5],-0.775);
 near(staticRotated.mesh.p[8],0.775);
 assert.deepEqual(Array.from(staticRotated.mesh.uv),[0,0,1,0,0,1]);
 console.log('B3D skeletal handedness + unchanged static mesh-owner parity: PASS');
+
+// Authentic Mineclonia cow/rabbit/pig animations contain uniform head-control
+// scale keys (1x -> 2x). Preview must keep nod/translation without inflation.
+function scaleFixture(name){
+ const vt=chunk('VRTS',i(0),i(1),i(2),...[0,0,0,0,0, 1,0,0,1,0, 0,1,0,0,1].map(f));
+ const triangles=chunk('TRIS',i(0),i(0),i(1),i(2));
+ const weights=chunk('BONE',...[0,1,2].flatMap(v=>[i(v),f(1)]));
+ const key=(frame,x,scale)=>cat(i(frame),f(x),f(0),f(0),
+   f(scale),f(scale),f(scale),f(1),f(0),f(0),f(0));
+ const keys=chunk('KEYS',i(7),key(0,0,1),key(10,.5,2));
+ return chunk('BB3D',i(1),node('root',[0,0,0],
+   chunk('MESH',i(0),vt,triangles),node(name,[0,0,0],weights,keys)),
+   chunk('ANIM',i(0),i(10),f(10))).buffer;
+}
+function distance(p,a,b){return Math.hypot(...[0,1,2].map(k=>p[a*3+k]-p[b*3+k]));}
+const headAnimation=parse(scaleFixture('head.control'));
+const headStart=Array.from(headAnimation.sample(0));
+const headEnd=Array.from(headAnimation.sample(10));
+near(distance(headStart,0,1),distance(headEnd,0,1));
+near(headEnd[0]-headStart[0],.775);
+near(headAnimation.mesh.p[0],headStart[0]);
+const bodyAnimation=parse(scaleFixture('body'));
+const bodyStart=Array.from(bodyAnimation.sample(0));
+const bodyEnd=Array.from(bodyAnimation.sample(10));
+near(distance(bodyEnd,0,1),2*distance(bodyStart,0,1));
+console.log('B3D cow/rabbit uniform head scaling guard with preserved motion: PASS');
