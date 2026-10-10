@@ -86,6 +86,7 @@ const meshOwner=nodeWithRotation('owner',[0,0,0],[Math.SQRT1_2,-Math.SQRT1_2,0,0
 const staticRotated=parse(chunk('BB3D',i(1),meshOwner).buffer);
 near(staticRotated.mesh.p[0],-0.775);
 near(staticRotated.mesh.p[2],0.775);
-near(staticRotated.mesh.p[8],-0.775);
+near(staticRotated.mesh.p[5],-0.775);
+near(staticRotated.mesh.p[8],0.775);
 assert.deepEqual(Array.from(staticRotated.mesh.uv),[0,0,1,0,0,1]);
 console.log('B3D skeletal handedness + unchanged static mesh-owner parity: PASS');
