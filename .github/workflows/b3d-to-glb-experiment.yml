@@ -47,7 +47,9 @@ jobs:
               out.mkdir(parents=True,exist_ok=True)
               result=subprocess.run([binary,'--glb','--out',str(out),'--context',str(root),str(model)],capture_output=True,text=True)
               target=out/(model.stem+'.glb')
-              entry={'source':str(rel),'ok':False,'status':'failed','error':(result.stderr or result.stdout)[-2000:]}\n              if result.returncode==0 and 'SKIP (no mesh)' in result.stdout:\n                  entry.update(status='skipped_no_mesh',error='Converter reports no mesh')
+              entry={'source':str(rel),'ok':False,'status':'failed','error':(result.stderr or result.stdout)[-2000:]}
+              if result.returncode==0 and 'SKIP (no mesh)' in result.stdout:
+                  entry.update(status='skipped_no_mesh',error='Converter reports no mesh')
               if result.returncode==0 and target.exists():
                   try:
                       raw=target.read_bytes()
@@ -64,9 +66,11 @@ jobs:
               report.append(entry)
           pathlib.Path('reports/conversion.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
           success=sum(x['ok'] for x in report)
-          print(f'B3D total={len(models)} converted={success} failed={len(models)-success}')
-          if not models or success!=len(models):
-              raise SystemExit('Some models failed conversion; inspect uploaded report')
+          skipped=sum(x['status']=='skipped_no_mesh' for x in report)
+          failed=len(models)-success-skipped
+          print(f'B3D total={len(models)} converted={success} skipped_no_mesh={skipped} failed={failed}')
+          if not models or failed:
+              raise SystemExit('Conversion failures remain; inspect uploaded report')
           PY
       - name: Upload models and report (including partial results)
         if: always()
