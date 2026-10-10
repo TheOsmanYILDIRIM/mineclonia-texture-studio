@@ -43,3 +43,17 @@ jobs:
         run: node tests/b3d-animation.test.cjs
       - name: Check sourced Mineclonia nodeboxes
         run: node tests/preview3d-nodeboxes.test.mjs
+
+  nodebox-geometry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Mineclonia-sourced nodebox geometry
+        run: node tests/preview3d-nodeboxes.test.mjs
+      - name: Check preview renderer syntax
+        run: |
+          node --check js/preview3d.js
+          node --check js/preview3d-nodeboxes.mjs
