@@ -622,27 +622,38 @@
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
   if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
 
-  const P=[],UV=[],I=[];
+  // Lua-derived boxes are opt-in for recognized nodes; unknown assets retain the original cube.
   let geometry=null;
   try {
-    const {resolveNodeGeometry}=await import('./nodebox-geometry.mjs');
-    geometry=resolveNodeGeometry(meta?.name);
-  } catch(error) { console.warn('Nodebox geometry unavailable',error); }
-  const boxes=geometry?.boxes||[[-.5,-.5,-.5,.5,.5,.5]];
-  const faceVertices=[
-    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z1,x1,y0,z1,x1,y1,z1,x0,y1,z1],
-    ([x0,y0,z0,x1,y1,z1])=>[x1,y0,z0,x0,y0,z0,x0,y1,z0,x1,y1,z0],
-    ([x0,y0,z0,x1,y1,z1])=>[x1,y0,z1,x1,y0,z0,x1,y1,z0,x1,y1,z1],
-    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z0,x0,y0,z1,x0,y1,z1,x0,y1,z0],
-    ([x0,y0,z0,x1,y1,z1])=>[x0,y1,z1,x1,y1,z1,x1,y1,z0,x0,y1,z0],
-    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z0,x1,y0,z0,x1,y0,z1,x0,y0,z1]
-  ];
-  for(const box of boxes)for(let f=0;f<6;f++){
-    const o=P.length/3;P.push(...faceVertices[f](box));
+    const lib=await import('./preview3d-nodeboxes.mjs');
+    const kind=lib.nodeboxKind(profile,meta);
+    if(kind){
+      const source=await fetch('js/data/preview3d-nodeboxes.json',{cache:'force-cache'});
+      if(source.ok){
+        const manifest=await source.json();
+        // Isolated fence shows the authoritative central post. Neighbor connections require
+        // explicit adjacency data; do not claim guessed four-way connections.
+        geometry=lib.nodeboxMesh(manifest.profiles?.[kind],[]);
+        if(geometry)root.dataset.previewGeometry=kind;
+      }
+    }
+  }catch(err){console.warn('Source-backed nodebox unavailable; retaining cube',err)}
+  if(!geometry)delete root.dataset.previewGeometry;
+  const P=geometry?.positions||[
+   -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1,
+    1,-1,-1, -1,-1,-1, -1, 1,-1,  1, 1,-1,
+    1,-1, 1,  1,-1,-1,  1, 1,-1,  1, 1, 1,
+   -1,-1,-1, -1,-1, 1, -1, 1, 1, -1, 1,-1,
+   -1, 1, 1,  1, 1, 1,  1, 1,-1, -1, 1,-1,
+   -1,-1,-1,  1,-1,-1,  1,-1, 1, -1,-1, 1
+  ].map(v=>v*.5);
+  const UV=geometry?.uv||[];
+  if(!geometry)for(let f=0;f<6;f++){
     const col=f%3,row=Math.floor(f/3),u0=col/3,u1=(col+1)/3,v0=row/2,v1=(row+1)/2;
     UV.push(u0,v1,u1,v1,u1,v0,u0,v0);
-    I.push(o,o+1,o+2,o,o+2,o+3);
   }
+  const I=geometry?.indices||[];
+  if(!geometry)for(let f=0;f<6;f++){const o=f*4;I.push(o,o+1,o+2,o,o+2,o+3)}
   const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(P),gl.STATIC_DRAW);
   const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
   const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(UV),gl.STATIC_DRAW);
