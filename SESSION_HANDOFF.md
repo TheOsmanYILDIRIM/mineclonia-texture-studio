@@ -1,6 +1,15 @@
 # SESSION_HANDOFF — Mineclonia Texture Studio
 Updated: 2026-10-10. Canonical branch: `main`.
 
+## B3D Lua animation catalog (2026-10-10)
+- `js/data/b3d-animation-clips.json` indexes all 85 source B3D models against pinned `mineclonia-mirror/mineclonia` tree `b5677549`. 47 models have literal Lua or helper-derived named clips; 38 are explicitly unresolved, **not** guessed.
+- `scripts/extract-b3d-animation-clips.mjs` regenerates source-backed ranges from a local Mineclonia checkout. Three initial extraction shards are retained as extraction evidence; the unified manifest is runtime canonical.
+- `js/b3d-preview-controls.js` loads the manifest lazily; adult/child and Enderman block-carrying ranges are distinct. Raw full timeline is an explicit diagnostic choice, never the default when named clips exist.
+- Reverted blanket head-scale suppression: authentic B3D scale keys are necessary for child forms. `tests/b3d-animation.test.cjs` asserts scale preservation; `tests/b3d-animation-clips.test.mjs` checks coverage and cow/rabbit/Enderman.
+- Reused horse/zombie Lua registrations can contain alternative ranges; these are labeled as additional Lua definitions rather than silently merging them as one animation.
+- Verify the latest commit's isolated `b3d-clip-catalog`, `b3d-rig-parity`, Pages, and visual runs. Existing global AI UV bundle guard may still fail independently. Actual game/Android animation parity remains unverified.
+- Next: resolve dynamic Lua animation sources for the remaining 38 models without inventing names, and visually compare adult/child clips on cow/rabbit/pig/cat.
+
 ## Current state and verification
 - B3D skeletal pivot correction on main: `d1acdedf` (inverse quaternion for bone/world pose) while retaining legacy static mesh-owner transforms and untouched UV/texture/IndexedDB. Asset-cache refs refreshed in `b5a171ad` and `b0ef99e5`.
 - Synthetic bind-pivot and static mesh parity regression: `tests/b3d-animation.test.cjs`; isolated GitHub Actions `b3d-rig-parity` **success** on `b0ef99e5`: https://github.com/TheOsmanYILDIRIM/mineclonia-texture-studio/actions/runs/38084125767 ; deploy **success**: https://github.com/TheOsmanYILDIRIM/mineclonia-texture-studio/actions/runs/38084125716 ; Mobile UI visual regression **success**: https://github.com/TheOsmanYILDIRIM/mineclonia-texture-studio/actions/runs/38084125683 . Those tests do not prove real Android skeletal rendering.
