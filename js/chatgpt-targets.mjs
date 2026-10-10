@@ -12,6 +12,9 @@ export function installChatTargets({getPrompt,notify}){
  const fields=settings.querySelector('.mts-chat-fields');
  for(const [id,label] of STAGES){const row=document.createElement('label');row.textContent=label;const input=document.createElement('input');input.type='text';input.autocomplete='off';input.placeholder='Sohbet ID veya URL';input.value=load()[id]||'';input.dataset.stage=id;input.addEventListener('change',()=>{const raw=input.value.trim(),parsed=parseId(raw);if(raw&&!parsed){input.setCustomValidity('Geçerli sohbet ID girin');input.reportValidity();return}input.setCustomValidity('');const data=load();if(parsed)data[id]=parsed;else delete data[id];if(!save(data))notify('Sohbet hedefi kaydedilemedi');else notify('Sohbet hedefi kaydedildi');input.value=parsed});row.append(input);fields.append(row)}
  const stageSelect=document.createElement('select');stageSelect.className='select';stageSelect.setAttribute('aria-label','Prompt aşaması');for(const [id,label] of STAGES){const option=document.createElement('option');option.value=id;option.textContent=label;stageSelect.append(option)}box.append(stageSelect);
+ window.addEventListener('mts:chat-stage',event=>{const stage=event.detail?.stage;if(STAGES.some(([id])=>id===stage))stageSelect.value=stage});
+ const legacyButtons=[['mobHqPrompt','mob_hq'],['mobRefPrompt','mob_ref'],['mobFinalPrompt','mob_final'],['copyPrompt',null],['savePrompt',null]];
+ for(const [id,stage] of legacyButtons){const button=document.getElementById(id);if(button&&stage)button.addEventListener('click',()=>{stageSelect.value=stage})}
  const actions=document.createElement('div');actions.className='mts-chat-actions';actions.innerHTML='<button type="button" class="btn">Promptu kopyala</button><button type="button" class="btn primary">ChatGPT\'de aç</button>';
  const [copyButton,openButton]=actions.querySelectorAll('button');
  async function act(open){
