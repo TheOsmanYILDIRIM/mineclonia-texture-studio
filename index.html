@@ -853,6 +853,14 @@ body{min-height:100dvh}
  #sheet .mtsRailGroup .mtsDownloadIcon[hidden]{display:none!important}
  #sheet .mtsDownloadRail{max-height:min(75vh,610px)!important}
 }
+</style><style>
+.mts-chat-settings{margin-top:12px;padding:10px;border:1px solid #303641;border-radius:10px}
+.mts-chat-settings summary{cursor:pointer;font-weight:650;font-size:12px}
+.mts-chat-fields{display:grid;gap:8px;margin:10px 0}
+.mts-chat-fields label{display:grid;gap:3px;font-size:11px;color:#bfc9d5}
+.mts-chat-fields input{width:100%;padding:9px;background:#0b0d10;color:#fff;border:1px solid #394350;border-radius:7px}
+.mts-chat-settings small{font-size:10px;color:#9aa4b2}
+.mts-chat-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
