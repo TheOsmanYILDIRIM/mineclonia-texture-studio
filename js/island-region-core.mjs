@@ -63,17 +63,18 @@ export function compositeRegion(base,source,rects,options={}){
     selected++;
     const dst=(y*base.width+x)*4;
     // The active atlas owns the alpha/UV occupancy, even when AI outputs an opaque background.
-    if(base.data[dst+3]===0)continue;
+    if(base.data[dst+3]===0 && !options.replaceAlpha)continue;
     const u=.5+((x+.5-frame.x-frame.w/2)-dx)/(frame.w*scale);
     const v=.5+((y+.5-frame.y-frame.h/2)-dy)/(frame.h*scale);
     if(u<0||u>=1||v<0||v>=1)continue;
     const sr=sourceRect||{x:0,y:0,w:source.width,h:source.height};
     const sx=Math.max(sr.x,Math.min(sr.x+sr.w-1,Math.floor(sr.x+u*sr.w+1e-9))),sy=Math.max(sr.y,Math.min(sr.y+sr.h-1,Math.floor(sr.y+v*sr.h+1e-9)));
     const src=(sy*source.width+sx)*4;
-    if(source.data[src+3]===0)continue;
-    if(out[dst]!==source.data[src]||out[dst+1]!==source.data[src+1]||out[dst+2]!==source.data[src+2])changed++;
+    if(source.data[src+3]===0 && !options.replaceAlpha)continue;
+    if(out[dst]!==source.data[src]||out[dst+1]!==source.data[src+1]||out[dst+2]!==source.data[src+2]||(options.replaceAlpha&&out[dst+3]!==source.data[src+3]))changed++;
     out[dst]=source.data[src];out[dst+1]=source.data[src+1];out[dst+2]=source.data[src+2];
-    // The alpha channel remains precisely equal to the active UV's alpha.
+    if(options.replaceAlpha)out[dst+3]=source.data[src+3];
+    // Default mode preserves the active UV alpha; explicit replacement copies source alpha.
   }
   return {image:{width:base.width,height:base.height,data:out},changed,selected,bounds:{x:box.x,y:box.y,w:box.w,h:box.h}};
 }
