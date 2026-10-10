@@ -41,8 +41,6 @@ jobs:
         run: node tests/island-region-core.test.mjs
       - name: Check B3D skeletal animation regression
         run: node tests/b3d-animation.test.cjs
-      - name: Verify Mobs authored reference coverage
-        run: node tests/mob-prompt-coverage.test.mjs
       - name: Check sourced Mineclonia nodeboxes
         run: node tests/preview3d-nodeboxes.test.mjs
 
@@ -73,3 +71,13 @@ jobs:
         run: |
           node --check js/b3d-animation.js
           node --check js/preview3d.js
+
+  mob-reference-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify all authored Mobs reference prompts
+        run: node tests/mob-prompt-coverage.test.mjs
