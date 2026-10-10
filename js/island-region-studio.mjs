@@ -310,17 +310,35 @@ function download(blob,name){
  setTimeout(()=>URL.revokeObjectURL(url),3000);
 }
 async function exportRegion(){
- if(!S.base)return;
+ if(!S.base||S.busy)return toast('Önce texture yüklenmesini bekle');
+ const uploaded=S.view==='uploaded'&&S.imported;
+ const canvas=uploaded?S.imported:S.base;
+ const rects=uploaded?(S.sourceRect?[S.sourceRect]:[]):targetRects();
+ if(!rects.length)return toast('Önce indirilecek adayı seç');
+ const button=$('regionUvExport');button.disabled=true;
  try{
-  const patch=extractRegion(image(S.base),targetRects()),blob=await bridge().canvasPngBlob(makeCanvas(patch.image));
-  download(blob,(S.meta.name||'entity').replace(/\.png$/i,'')+'_region.png');
-  localStorage.setItem('mts_uv_region_export_v1:'+S.meta.path,JSON.stringify({version:1,sourceW:S.base.width,sourceH:S.base.height,rects:patch.rects}));
-  hint('Seçim PNG indirildi: '+patch.image.width+'×'+patch.image.height);
- }catch(e){toast('PNG çıkarılamadı: '+e.message)}
+  const patch=extractRegion(image(canvas),normalizedRects(rects,canvas.width,canvas.height));
+  const blob=await bridge().canvasPngBlob(makeCanvas(patch.image));
+  if(!blob?.size)throw Error('PNG boş üretildi');
+  download(blob,(S.meta.name||'texture').replace(/\\.png$/i,'')+(uploaded?'_source_region':'_region')+'.png');
+  if(!uploaded){
+   try{localStorage.setItem('mts_uv_region_export_v1:'+S.meta.path,JSON.stringify({version:1,sourceW:S.base.width,sourceH:S.base.height,rects:patch.rects}))}catch(e){console.warn('Ada eşleme kaydedilemedi',e)}
+  }
+  hint('Seçili ada indirildi: '+patch.image.width+'×'+patch.image.height);
+ }catch(e){toast('Seçili ada indirilemedi: '+e.message)}
+ finally{button.disabled=false}
 }
 async function exportWhole(){
- if(!S.preview)return toast('Önce birleşimi önizle');
- download(await bridge().canvasPngBlob(S.preview),(S.meta.name||'entity').replace(/\.png$/i,'')+'_region_merged.png');
+ if(!S.base||S.busy)return toast('Önce texture yüklenmesini bekle');
+ const canvas=S.view==='uploaded'&&S.imported?S.imported:S.preview||S.base;
+ const button=$('regionUvFull');button.disabled=true;
+ try{
+  const blob=await bridge().canvasPngBlob(canvas);
+  if(!blob?.size)throw Error('PNG boş üretildi');
+  download(blob,(S.meta.name||'texture').replace(/\\.png$/i,'')+'_full.png');
+  hint('Tam PNG indirildi: '+canvas.width+'×'+canvas.height);
+ }catch(e){toast('Tam PNG indirilemedi: '+e.message)}
+ finally{button.disabled=false}
 }
 async function save(){
  if(!S.preview||S.busy)return;
@@ -389,7 +407,7 @@ function buildUI(){
  '<div class="regionUvB3DPicker" id="regionUvB3DPicker" hidden><div class="regionUvDetailTop"><button class="btn" id="regionUvB3DClose">← Geri</button><strong>B3D UV üçgenleri · dokunarak seç</strong></div><div class="regionUvB3DStage"><canvas id="regionUvB3DCanvas"></canvas></div></div>',
  '<div class="regionUvDetail" id="regionUvDetail" hidden><div class="regionUvDetailTop"><button class="btn" id="regionUvDetailClose">← Geri</button><strong id="regionUvDetailTitle">Ada</strong></div><div class="regionUvDetailStage" id="regionUvDetailStage"><canvas id="regionUvDetailCanvas"></canvas></div><div class="regionUvDetailZoom"><span>Yakınlaştır</span><input id="regionUvDetailZoom" type="range" min="1" max="16" step=".5" value="1"><strong id="regionUvDetailZoomValue">1×</strong></div></div>',
  '<details class="regionUvAdvanced"><summary>İnce eşleme</summary><div class="regionUvOptions"><label>X <input type="number" id="regionUvX" step="1" value="0"></label><label>Y <input type="number" id="regionUvY" step="1" value="0"></label><label>Ölçek <input type="number" id="regionUvScale" min=".1" max="20" step=".05" value="1"></label></div></details>',
- '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Hedef PNG indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
+ '<div class="islandStudioTools regionUvActions"><button class="btn" id="regionUvExport">Seçili adayı indir</button><button class="btn primary" id="regionUvImport">PNG yükle</button><button class="btn primary" id="regionUvPreview">Birleşimi göster</button><button class="btn" id="regionUv3D">3D</button><button class="btn" id="regionUvFull">Tam PNG</button><button class="btn primary" id="regionUvSave" disabled>✓ Kaydet</button><input id="regionUvFile" type="file" accept="image/png" hidden></div>'
  ].join('');
  document.body.append(root);
  const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.href='css/island-region-studio.css?v=20261009-b3duv1';document.head.append(stylesheet);
