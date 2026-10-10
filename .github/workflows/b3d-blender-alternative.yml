@@ -42,7 +42,18 @@ jobs:
       - name: Convert all B3D with Blender
         run: |
           mkdir -p output reports
-          blender --background --factory-startup --python tools/b3d-blender-experiment/convert.py -- /tmp/mineclonia output reports/blender.json
+          set +e
+          blender --background --factory-startup --python tools/b3d-blender-experiment/convert.py -- /tmp/mineclonia output reports/blender.json > /tmp/b3d-blender-full.log 2>&1
+          code=$?
+          set -e
+          python3 tools/b3d-blender-experiment/summarize.py reports/blender.json "$code" > reports/diagnostic-summary.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('reports/diagnostic-summary.json').read_text())
+          print('SAFE_DIAGNOSTIC_SUMMARY',json.dumps(d,ensure_ascii=True))
+          PY
+          exit "$code"
       - name: Upload results even on failure
         if: always()
         uses: actions/upload-artifact@v4
