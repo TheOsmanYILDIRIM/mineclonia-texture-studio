@@ -1,0 +1,82 @@
+name: B3D to GLB batch experiment
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [experiment/b3d2glb-batch-conversion]
+    paths:
+      - '.github/workflows/b3d-to-glb-experiment.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Checkout Mineclonia and converter
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/mineclonia/mineclonia.git /tmp/mineclonia
+          git clone --depth 1 https://github.com/OpenStranded/b3d2glb.git /tmp/b3d2glb
+          echo "Mineclonia: $(git -C /tmp/mineclonia rev-parse HEAD)"
+          echo "Converter: $(git -C /tmp/b3d2glb rev-parse HEAD)"
+          git -C /tmp/mineclonia rev-parse HEAD > mineclonia-source-sha.txt
+          git -C /tmp/b3d2glb rev-parse HEAD > converter-source-sha.txt
+      - name: Build converter
+        run: cargo build --release --manifest-path /tmp/b3d2glb/Cargo.toml
+      - name: Convert and validate all models
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output reports
+          python3 - <<'PY'
+          import json, pathlib, subprocess, struct
+          root=pathlib.Path('/tmp/mineclonia')
+          models=sorted(root.rglob('*.b3d'))
+          binary='/tmp/b3d2glb/target/release/b3d2glb'
+          report=[]
+          for model in models:
+              rel=model.relative_to(root)
+              out=pathlib.Path('output')/rel.parent
+              out.mkdir(parents=True,exist_ok=True)
+              result=subprocess.run([binary,'--glb','--out',str(out),'--context',str(root),str(model)],capture_output=True,text=True)
+              target=out/(model.stem+'.glb')
+              entry={'source':str(rel),'ok':False,'error':(result.stderr or result.stdout)[-2000:]}
+              if result.returncode==0 and target.exists():
+                  try:
+                      raw=target.read_bytes()
+                      assert len(raw)>=20 and raw[:4]==b'glTF'
+                      _,version,length=struct.unpack_from('<III',raw,0)
+                      assert version==2 and length==len(raw)
+                      json_len,json_type=struct.unpack_from('<I4s',raw,12)
+                      assert json_type==b'JSON'
+                      data=json.loads(raw[20:20+json_len])
+                      assert data['asset']['version'].startswith('2')
+                      entry.update(ok=True,error='',meshes=len(data.get('meshes',[])),skins=len(data.get('skins',[])),animations=len(data.get('animations',[])),bytes=len(raw))
+                  except Exception as exc:
+                      entry['error']=f'Invalid GLB: {exc}'
+              report.append(entry)
+          pathlib.Path('reports/conversion.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          success=sum(x['ok'] for x in report)
+          print(f'B3D total={len(models)} converted={success} failed={len(models)-success}')
+          if not models or success!=len(models):
+              raise SystemExit('Some models failed conversion; inspect uploaded report')
+          PY
+      - name: Upload models and report (including partial results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mineclonia-b3d-glb-experiment
+          path: |
+            output/
+            reports/
+            mineclonia-source-sha.txt
+            converter-source-sha.txt
+          retention-days: 14
+          if-no-files-found: warn
