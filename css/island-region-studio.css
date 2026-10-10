@@ -214,3 +214,10 @@
 .regionUvB3DPicker{position:fixed;inset:0;z-index:10210;display:flex;flex-direction:column;background:#0b1219;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .regionUvB3DStage{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;align-items:flex-start;justify-content:center;background:repeating-conic-gradient(#24303a 0% 25%,#111a22 0% 50%) 50% / 16px 16px}
 .regionUvB3DStage canvas{width:100%;max-width:850px;height:auto;image-rendering:pixelated;touch-action:manipulation}
+
+/* Compact source transform cluster: rotation and mirroring share one rail. */
+.islandRegionRoot .regionUvRotateBar{display:flex;align-items:center;justify-content:center;gap:8px;max-width:440px;margin:5px auto;padding:4px 7px;border:1px solid #34434c;border-radius:12px;background:#141d24}
+.islandRegionRoot .regionUvTransformLabel{font-size:10px;font-weight:700;color:#aebec9;white-space:nowrap}
+.islandRegionRoot .regionUvTransformButtons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;flex:1}
+.islandRegionRoot .regionUvTransformButtons .btn{min-width:0;padding:4px 3px;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:18px;line-height:1.1;border-radius:8px;touch-action:manipulation}
+.islandRegionRoot .regionUvTransformButtons small{font-size:9px;font-weight:600;line-height:1.2;color:#aebec9}
