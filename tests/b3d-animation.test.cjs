@@ -56,7 +56,7 @@ console.log('B3D animation synthetic weighted-vertex interpolation + valid empty
 // rotation direction is opposite the legacy static mesh-owner transform.
 // This fixture reproduces the giant-pivot-radius regression without storing
 // copyrighted model binaries: a bone at +Z=6 must not rotate geometry around -Z=6.
-const nodeWithRotation=(name,p,q,...children)=>chunk('NODE',bytes(name+'\\0'),...p.map(f),...[1,1,1].map(f),...q.map(f),...children);
+const nodeWithRotation=(name,p,q,...children)=>chunk('NODE',bytes(name+String.fromCharCode(0)),...p.map(f),...[1,1,1].map(f),...q.map(f),...children);
 const near=(actual,expected,eps=1e-4)=>assert.ok(Math.abs(actual-expected)<eps,actual+' !== '+expected);
 function handednessFixture(){
  const verts=chunk('VRTS',i(0),i(1),i(2),...[0,0,6,0,0, 1,0,6,1,0, 0,1,6,0,1].map(f));
