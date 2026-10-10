@@ -69,6 +69,21 @@ if(fs.existsSync(endermanFile)){
  }
  if(clips.length)entries['mobs_mc_enderman.b3d']={source:'mods/ENTITIES/mobs_mc/enderman.lua',status:'source_helper_select_enderman_animation',clips};
 }
+// The same mesh may be reused by multiple Lua mob variants. Never merge
+// different ranges under the same unlabeled animation name.
+for(const entry of Object.values(entries)){
+ if(entry.status==='source_helper_select_enderman_animation')continue;
+ const seen=new Set(),names=new Set(),clips=[];
+ for(const clip of entry.clips){
+  const key=[clip.form,clip.name,clip.start,clip.end].join(':');
+  if(seen.has(key))continue;
+  seen.add(key);
+  const semantic=clip.form+':'+clip.name;
+  if(names.has(semantic))clip.state='alternate';
+  names.add(semantic);clips.push(clip);
+ }
+ entry.clips=clips;
+}
 for(const model of Object.keys(manifest.models))
  manifest.models[model]=entries[model]||{source:null,clips:[],status:'unresolved'};
 fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');
