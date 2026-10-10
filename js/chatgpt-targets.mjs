@@ -24,10 +24,9 @@ export function installChatTargets({getPrompt,notify}){
   const base='https://chatgpt.com/c/'+id;
   const url=base+'?q='+encodeURIComponent(p.text);
   const long=url.length>7500;
-  const tab=window.open(long?base:url,'_blank','noopener');
+  window.open(long?base:url,'_blank','noopener');
   const copied=await copy(p.text);
-  if(!tab)notify('Tarayıcı yeni sekmeyi engelledi; prompt '+(copied?'panoya kopyalandı':'kopyalanamadı'));
-  else notify(long?'Uzun prompt panoya kopyalandı; sohbete yapıştırın':'Hedef sohbet açıldı; prompt da panoya kopyalandı');
+  notify(long?'Uzun prompt panoya kopyalandı; sohbete yapıştırın':copied?'Sohbet açılması istendi; prompt panoda hazır':'Sohbet açılması istendi; kopyalama başarısız');
  }
  copyButton.addEventListener('click',()=>act(false));openButton.addEventListener('click',()=>act(true));
  box.append(settings,actions);
