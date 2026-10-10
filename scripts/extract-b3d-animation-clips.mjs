@@ -49,6 +49,26 @@ for(const file of files.sort()){
    entries[model]={source:path.relative(sourceRoot,file).replaceAll(path.sep,'/'),clips};
  }
 }
+// Enderman selects animation ranges through a Lua helper, not a literal
+// animation table attached to its mesh registration.
+const endermanFile=path.join(sourceRoot,'mods','ENTITIES','mobs_mc','enderman.lua');
+if(fs.existsSync(endermanFile)){
+ const source=fs.readFileSync(endermanFile,'utf8'),clips=[];
+ const re=/(?:if|elseif)\s+animation_type\s*==\s*["'](block|normal)["'][^{}]{0,120}?return\s*\{/g;
+ let m;
+ while((m=re.exec(source))){
+  const b=table(source,m.index);if(!b)continue;
+  const fields={};
+  for(const x of b.body.matchAll(/\b([a-z][a-z0-9_]*)\s*=\s*(\d+)/g))fields[x[1]]=Number(x[2]);
+  for(const name of new Set(Object.keys(fields).filter(k=>k.endsWith('_start')).map(k=>k.slice(0,-6)))){
+   const start=fields[name+'_start'],end=fields[name+'_end'],speed=fields[name+'_speed'];
+   if(Number.isInteger(start)&&Number.isInteger(end)&&end>=start)
+    clips.push({name,form:'adult',state:m[1],start,end,...(Number.isFinite(speed)&&speed>0?{speed}:{})});
+  }
+  re.lastIndex=b.end;
+ }
+ if(clips.length)entries['mobs_mc_enderman.b3d']={source:'mods/ENTITIES/mobs_mc/enderman.lua',status:'source_helper_select_enderman_animation',clips};
+}
 for(const model of Object.keys(manifest.models))
  manifest.models[model]=entries[model]||{source:null,clips:[],status:'unresolved'};
 fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');
