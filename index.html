@@ -813,6 +813,25 @@ body{min-height:100dvh}
  #sheet .compactActionTray{align-content:start}
  #sheet .compactThumbDock{padding-top:5px!important}
 }
+</style><style>
+@media(max-width:699px){
+ #sheet .drawer{position:relative!important}
+ #sheet .mtsDownloadRail{position:absolute;z-index:13;top:36px;right:8px;display:flex;flex-direction:column;gap:6px;width:42px;max-height:min(340px,48vh);overflow-y:auto;scrollbar-width:none}
+ #sheet .mtsDownloadRail::-webkit-scrollbar{display:none}
+ #sheet .mtsDownloadIcon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border:1px solid #39404d;border-radius:12px;background:#20252d;color:#e4ecf6;box-shadow:0 2px 8px #0003;touch-action:manipulation}
+ #sheet .mtsDownloadIcon svg{width:21px;height:21px}
+ #sheet .mtsDownloadIcon:disabled{opacity:.35}
+ #sheet .mtsDownloadIcon[hidden]{display:none!important}
+ #sheet .mtsDownloadIcon:focus-visible{outline:2px solid #9ec9fa}
+ #sheet .mtsBottomBack{position:absolute!important;right:8px!important;bottom:calc(58px + var(--safe,0px))!important;left:auto!important;top:auto!important;z-index:20!important;width:44px!important;height:44px!important;min-height:44px!important;border-radius:12px!important;background:#522127!important;color:#fff!important}
+ #sheet .compactPrimaryDock{display:none!important}
+ #sheet .compactThumbDock{min-height:62px!important;padding-right:55px!important}
+ #sheet .compactModeRow{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #sheet .compactDownloadsGrid{display:none!important}
+ #sheet .compactInlineGroup#compactSeamGroup{display:none!important}
+ #sheet .mtsGridSource{margin-bottom:0!important}
+ #sheet .compactSectionBody.compactDownloadBody{display:block!important}
+}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -935,4 +954,4 @@ body{min-height:100dvh}
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>\n<script src="js/ordered-contour-warp.js?v=20261008-contour1"></script>\n<script src="js/island-repack.js?v=20261008-repack1"></script>
 <script src="js/prompt-registry.js?v=20261007-canonical2"></script>
-<script src="js/app.js?v=20261010-tiledecode1"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
+<script src="js/app.js?v=20261010-rails1"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
