@@ -2316,6 +2316,47 @@ function setupCompactMobileDetail(){
     if(id==='detailEditUndo'||id==='detailEditRedo')new MutationObserver(()=>{b.disabled=original.disabled}).observe(original,{attributes:true,attributeFilter:['disabled']});
     b.disabled=original.disabled;
   }
+  // Mobile right-side export/import rail. Buttons remain the single source of truth.
+  const rightRail=document.createElement('div');rightRail.className='mtsDownloadRail';rightRail.setAttribute('aria-label','Dışa ve içe aktarma');
+  preview?.after(rightRail);
+  const svgPaths={
+    downloadOriginal:'<path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v4h16v-4"/>',
+    downloadEdited:'<path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v4h16v-4"/><circle cx="19" cy="5" r="2"/>',
+    downloadGridUv:'<path d="M4 4h16v16H4zM4 10h16M4 16h16M10 4v16M16 4v16M12 8v9m0 0-3-3m3 3 3-3"/>',
+    importGridUv:'<path d="M4 4h16v16H4zM4 10h16M4 16h16M10 4v16M16 4v16M12 17V8m0 0-3 3m3-3 3 3"/>',
+    downloadActiveGridUv:'<path d="M4 4h16v16H4zM4 10h16M4 16h16M10 4v16M16 4v16M12 8v9m0 0-3-3m3 3 3-3"/>',
+    importActiveGridUv:'<path d="M4 4h16v16H4zM4 10h16M4 16h16M10 4v16M16 4v16M12 17V8m0 0-3 3m3-3 3 3"/>',
+    seamExport:'<path d="M3 7h18M3 17h18M7 3v18M17 3v18M10 10l4 4m0-4-4 4"/>',
+    seamImport:'<path d="M3 7h18M3 17h18M7 3v18M17 3v18M12 5v14m0 0-3-3m3 3 3-3"/>'
+  };
+  const iconMap=new Map();
+  const addDownloadIcon=(id,label)=>{
+    const original=$(id);if(!original)return;
+    const b=document.createElement('button');b.type='button';b.className='mtsDownloadIcon';b.title=label;b.setAttribute('aria-label',label);
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+svgPaths[id]+'</svg>';
+    b.addEventListener('click',()=>original.click());rightRail.appendChild(b);iconMap.set(id,b);
+  };
+  for(const [id,label] of [['downloadOriginal','Orijinali indir'],['downloadEdited','Aktifi indir'],['downloadGridUv','Orijinal grid indir'],['importGridUv','Orijinal grid yükle'],['downloadActiveGridUv','Aktif grid indir'],['importActiveGridUv','Aktif grid yükle'],['seamExport','Seamless indir'],['seamImport','Seamless yükle']])addDownloadIcon(id,label);
+  const syncDownloadRail=()=>{
+    const source=selector.querySelector('.active')?.dataset.source||'original';
+    const gridAllowed=!!active&&isMobUvTexture(active)&&!isAnimatedStrip(active);
+    for(const [id,b] of iconMap){
+      const grid=id.toLowerCase().includes('grid');
+      const seam=id.startsWith('seam');
+      const isActive=id.includes('ActiveGrid');
+      const visible=grid?(gridAllowed&&(isActive===(source==='active'))):seam?!!active&&!isAnimatedStrip(active)&&assetTypeOf(active)!=='Entity'&&active.w===active.h:(id==='downloadOriginal'?source==='original':source==='active');
+      b.hidden=!visible;b.style.display=visible?'grid':'none';
+      b.disabled=!!$(id)?.disabled;
+    }
+  };
+  selector.addEventListener('click',syncDownloadRail);
+  window.MTSSyncDownloadRail=syncDownloadRail;
+  const previousSync=window.MTSSyncActiveGrid;
+  window.MTSSyncActiveGrid=()=>{previousSync?.();syncDownloadRail()};
+  syncDownloadRail();
+  // Back action belongs to the bottom-right, outside the preview rails.
+  const closeDock=compact.querySelector('#compactDockClose');
+  if(closeDock){compact.querySelector('#compactThumbDock')?.appendChild(closeDock);closeDock.classList.add('mtsBottomBack')}
   const refDownload=document.createElement('button');
   refDownload.className='btn compactRefDownload';
   refDownload.id='downloadMaterialRef';
