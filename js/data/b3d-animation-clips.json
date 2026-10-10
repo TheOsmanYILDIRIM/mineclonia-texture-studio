@@ -610,9 +610,57 @@
       ]
     },
     "mobs_mc_enderman.b3d": {
-      "source": null,
-      "clips": [],
-      "status": "unresolved"
+      "source": "mods/ENTITIES/mobs_mc/enderman.lua",
+      "status": "source_helper_select_enderman_animation",
+      "clips": [
+        {
+          "name": "stand",
+          "form": "adult",
+          "state": "normal",
+          "start": 40,
+          "end": 80,
+          "speed": 25
+        },
+        {
+          "name": "walk",
+          "form": "adult",
+          "state": "normal",
+          "start": 0,
+          "end": 40,
+          "speed": 25
+        },
+        {
+          "name": "attack",
+          "form": "adult",
+          "state": "normal",
+          "start": 81,
+          "end": 120,
+          "speed": 50
+        },
+        {
+          "name": "stand",
+          "form": "adult",
+          "state": "block",
+          "start": 200,
+          "end": 200
+        },
+        {
+          "name": "walk",
+          "form": "adult",
+          "state": "block",
+          "start": 161,
+          "end": 200,
+          "speed": 25
+        },
+        {
+          "name": "attack",
+          "form": "adult",
+          "state": "block",
+          "start": 81,
+          "end": 120,
+          "speed": 50
+        }
+      ]
     },
     "mobs_mc_endermite.b3d": {
       "source": "mods/ENTITIES/mobs_mc/endermite.lua",
