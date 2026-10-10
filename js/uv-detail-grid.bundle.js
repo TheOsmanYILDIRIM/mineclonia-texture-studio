@@ -227,9 +227,9 @@ function isCalico(meta,image){return image.width===64 && image.height===32 && /(
 async function newPlan(image,meta){
  let mapping;
  if(isCalico(meta,image)){const response=await fetch(MAPPING_URL);if(!response.ok)throw Error('Kedi ConnectedNet haritası bulunamadı');mapping=await response.json();}
- const scale=Math.min(24,Math.floor(4096/Math.max(image.width,image.height)));
+ const scale=Math.min(24,Math.floor(2048/Math.max(image.width,image.height)));
  if(scale<1)throw Error('Texture grid sınırını aşıyor');
- return createPlan(image,{scale,spacing:Math.min(48,scale*2),clearance:Math.min(8,Math.max(0,scale-1)),align:'center',grid:'#ff00ff',matte:'#1c1f27',mapping});
+ return createPlan(image,{scale,spacing:Math.min(48,Math.max(8,scale*2)),clearance:Math.min(8,Math.max(0,scale-1)),align:'center',grid:'#ff00ff',matte:'#1c1f27',mapping});
 }
 async function prepare(meta,sourceBlob){
  if(!meta?.path)throw Error('Texture seçilmedi');
