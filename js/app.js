@@ -2586,6 +2586,7 @@ async function init(){
       if(!active || !/\.png$/i.test(active.path||''))return toast('Bu texture UV mob atlası değil');
       const target={...active};
       try{
+        toast('Aktif grid PNG hazırlanıyor…');
         await loadUvDetailBridge();
         const current=await displayBlob(target.path);
         const out=await window.MTSDetailUv.exportGrid(gridMeta(target),current);
