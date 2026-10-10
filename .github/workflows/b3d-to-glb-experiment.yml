@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git clone --depth 1 https://github.com/mineclonia/mineclonia.git /tmp/mineclonia
+          git clone --depth 1 https://github.com/mineclonia-mirror/mineclonia.git /tmp/mineclonia
           git clone --depth 1 https://github.com/OpenStranded/b3d2glb.git /tmp/b3d2glb
           echo "Mineclonia: $(git -C /tmp/mineclonia rev-parse HEAD)"
           echo "Converter: $(git -C /tmp/b3d2glb rev-parse HEAD)"
