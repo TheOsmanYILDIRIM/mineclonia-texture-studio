@@ -41,3 +41,5 @@ jobs:
         run: node tests/island-region-core.test.mjs
       - name: Check B3D skeletal animation regression
         run: node tests/b3d-animation.test.cjs
+      - name: Check sourced Mineclonia nodeboxes
+        run: node tests/preview3d-nodeboxes.test.mjs
