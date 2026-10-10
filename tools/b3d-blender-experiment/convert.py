@@ -14,6 +14,7 @@ for source in sorted(root.rglob("*.b3d")):
     dest.parent.mkdir(parents=True,exist_ok=True)
     entry={"source":str(rel),"ok":False}
     try:
+        io_scene_b3d.import_b3d.imported_armature_objects.clear()
         bpy.ops.object.select_all(action='SELECT')
         bpy.ops.object.delete(use_global=False)
         for block in list(bpy.data.meshes):
