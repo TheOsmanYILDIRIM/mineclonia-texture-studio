@@ -263,6 +263,19 @@ function pickSource(){
  if(!S.sourceRect)return toast('Önce Yüklenen PNG sekmesinde kaynak adayı çiz');
  const r=S.sourceRect;hint('Kaynak ada: '+r.w+'×'+r.h+' px. Birleşimi önizleyebilirsin.');
 }
+function mirrorImported(horizontal=true){
+ if(!S.imported||S.busy)return toast('Önce kaynak PNG yükle');
+ remember();
+ const source=S.imported,w=source.width,h=source.height;
+ const next=document.createElement('canvas');next.width=w;next.height=h;
+ const ctx=next.getContext('2d');
+ ctx.translate(horizontal?w:0,horizontal?0:h);ctx.scale(horizontal?-1:1,horizontal?1:-1);
+ ctx.drawImage(source,0,0);
+ const r=S.sourceRect;
+ if(r)S.sourceRect=horizontal?{...r,x:w-r.x-r.w}:{...r,y:h-r.y-r.h};
+ S.imported=next;S.drag=null;clearPreview();view('uploaded');
+ hint('Kaynak PNG '+(horizontal?'yatay':'dikey')+' aynalandı · seçim korundu');
+}
 function rotateImported(clockwise=true){
  if(!S.imported||S.busy)return toast('Önce kaynak PNG yükle');
  remember();
@@ -298,10 +311,10 @@ function merged(){
   const r=compositeRegion(image(S.base),image(S.imported),targetRects(),{
    sourceRect:S.sourceRect,mode:'region',
    dx:Number($('regionUvX').value||0),dy:Number($('regionUvY').value||0),
-   scale:Number($('regionUvScale').value||1)
+   scale:Number($('regionUvScale').value||1),replaceAlpha:true
   });
   S.preview=makeCanvas(r.image);$('regionUvSave').disabled=r.changed===0;
-  view('preview');hint('Birleşim hazır · '+r.changed+' piksel güncellendi. Seçim dışı ve alfa aynı.');
+  view('preview');hint('Birleşim hazır · '+r.changed+' piksel güncellendi. Seçim dışı aynı; kaynak şeffaflığı hedefe uygulandı.');
  }catch(e){clearPreview();toast('Eşleme başarısız: '+e.message)}
 }
 let lastDownloadUrl=null;
@@ -411,7 +424,7 @@ function buildUI(){
  '<div class="islandStudioStatus" id="regionUvStatus">UV üzerinde hedefi seç.</div>',
  '<div class="regionUvHistory"><button class="btn" id="regionUvUndo" disabled>↶ Geri al</button><button class="btn" id="regionUvRedo" disabled>↷ İleri al</button><button class="btn" id="regionUvB3DOpen">B3D UV’den seç</button></div>',
  '<div class="regionUvGridBar"><span>Orijinal UV ızgarası</span><button class="btn" data-region-grid="0">Hassas</button><button class="btn primary" data-region-grid="1">1×</button><button class="btn" data-region-grid="2">2×</button><button class="btn" data-region-grid="4">4×</button><button class="btn" data-region-grid="8">8×</button></div>',
- '<div class="regionUvRotateBar"><span>Yüklenen PNG</span><button class="btn" id="regionUvRotateLeft" type="button">↶ 90°</button><button class="btn" id="regionUvRotateRight" type="button">↷ 90°</button></div>',
+ '<div class="regionUvRotateBar"><span>Yüklenen PNG</span><button class="btn" id="regionUvRotateLeft" type="button">↶ 90°</button><button class="btn" id="regionUvRotateRight" type="button">↷ 90°</button><button class="btn" id="regionUvMirrorH" type="button">↔ Yatay aynala</button><button class="btn" id="regionUvMirrorV" type="button">↕ Dikey aynala</button></div>',
  '<div class="regionUvZoomBar"><span>Yakınlaştır</span><input id="regionUvZoom" type="range" min="1" max="12" step=".5" value="1"><strong id="regionUvZoomValue">1×</strong></div>',
  '<div class="regionUvViewport"><div class="regionUvModeRail"><button class="btn" data-region-tool="pan" type="button">Pan</button><button class="btn primary" data-region-tool="edit" type="button">Edit</button></div>',
  '<div class="islandStudioStage" id="regionUvStage"><div class="regionUvFrame" id="regionUvFrame"><canvas id="regionUvCanvas"></canvas><canvas class="regionUvOverlay" id="regionUvOverlay"></canvas><div class="islandStudioSelection" id="regionUvSelection"></div></div></div></div>',
@@ -446,6 +459,8 @@ function buildUI(){
   if(b.id==='regionUvAdd')addArea();
   if(b.id==='regionUvDel')removeIsland();
   if(b.id==='regionUvImport')$('regionUvFile').click();
+  if(b.id==='regionUvMirrorH')mirrorImported(true);
+  if(b.id==='regionUvMirrorV')mirrorImported(false);
   if(b.id==='regionUvRotateLeft')rotateImported(false);
   if(b.id==='regionUvRotateRight')rotateImported(true);
   if(b.id==='regionUvPreview')merged();
