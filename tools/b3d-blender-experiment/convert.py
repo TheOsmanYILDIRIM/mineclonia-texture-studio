@@ -14,7 +14,12 @@ for source in sorted(root.rglob("*.b3d")):
     dest.parent.mkdir(parents=True,exist_ok=True)
     entry={"source":str(rel),"ok":False}
     try:
-        bpy.ops.wm.read_factory_settings(use_empty=True)
+        bpy.ops.object.select_all(action='SELECT')
+        bpy.ops.object.delete(use_global=False)
+        for block in list(bpy.data.meshes):
+            if block.users == 0: bpy.data.meshes.remove(block)
+        for block in list(bpy.data.armatures):
+            if block.users == 0: bpy.data.armatures.remove(block)
         result=bpy.ops.import_scene.b3d(filepath=str(source),constrain_size=0.0,use_image_search=False)
         meshes=[o for o in bpy.data.objects if o.type=="MESH"]
         arms=[o for o in bpy.data.objects if o.type=="ARMATURE"]
@@ -44,4 +49,4 @@ report.write_text(json.dumps(results,indent=2))
 print("SUMMARY",json.dumps({"total":len(results),"converted":sum(x["ok"] for x in results),
     "skin_models":sum(x.get("skins",0)>0 for x in results),
     "animated_models":sum(x.get("animations",0)>0 for x in results)}),flush=True)
-if not results: sys.exit(2)
+if not results or not any(x["ok"] for x in results): sys.exit(2)
