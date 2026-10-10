@@ -640,7 +640,7 @@ function downloadJson(obj,name){dl(new Blob([JSON.stringify(obj,null,2)],{type:'
 function parsePromptPayload(obj){let arr;if(Array.isArray(obj))arr=obj;else if(obj&&Array.isArray(obj.prompts))arr=obj.prompts;else if(obj&&(obj.id||obj.path))arr=[obj];else throw Error('JSON formatı tanınmadı');let applied=0,missing=[];for(const e of arr){if(!e||typeof e.prompt!=='string')continue;let meta=null;if(typeof e.id==='string')meta=textureMeta(e.id);if(!meta&&typeof e.path==='string')meta=CATALOG.find(x=>x.path===e.path);if(!meta){missing.push(e.id||e.path||'(kimlik yok)');continue}PROMPT_OVERRIDES.set(meta.id,e.prompt);applied++}savePromptOverrides();return {applied,missing}}
 function applyPromptJsonObject(obj){const r=parsePromptPayload(obj);toast(`${r.applied} prompt güncellendi${r.missing.length?' · '+r.missing.length+' ID bulunamadı':''}`);if(active)openDetail(active);return r}
 let tileN=1,tileEdited=true;
-async function updateTilePreview(){if(!active)return;const box=$('tilePreview');document.querySelectorAll('[data-tile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.tile)===tileN));if(tileN===1){box.classList.remove('show');$('preview').style.display='block';return}$('preview').style.display='none';box.classList.add('show');const url=await blobUrl(active.path,tileEdited);box.style.backgroundImage=`url("${url}")`;box.style.backgroundSize=`${100/tileN}% ${100/tileN}%`;box.style.backgroundPosition='0 0';}
+async function updateTilePreview(){if(!active)return;const box=$('tilePreview');document.querySelectorAll('[data-tile]').forEach(b=>b.classList.toggle('active',Number(b.dataset.tile)===tileN));if(tileN===1){box.classList.remove('show');$('preview').style.display='block';return}$('preview').style.display='block';box.classList.add('show');const url=await blobUrl(active.path,tileEdited);box.style.backgroundImage=`url("${url}")`;box.style.backgroundSize=`${100/tileN}% ${100/tileN}%`;box.style.backgroundPosition='0 0';}
 
 let previewView={scale:1,x:0,y:0,pointers:new Map(),lastDist:0,lastMid:null,lastTap:0};
 function applyPreviewView(){const t=`translate(${previewView.x}px,${previewView.y}px) scale(${previewView.scale})`;$('origImg').style.transform=t;$('editImg').style.transform=t}
@@ -2318,9 +2318,10 @@ function setupCompactMobileDetail(){
     tileTools.appendChild(toolRail);
     const tilePreview=$('tilePreview'),preview=$('preview');
     if(tilePreview&&preview){
-      preview.after(tilePreview);
-      tilePreview.style.minHeight='0';
+      preview.appendChild(tilePreview);
+      tilePreview.classList.add('mtsTileOverlay');
     }
+    const sourceButton=$('tileSource');if(sourceButton)sourceButton.style.display='none';
   }
   const makeTool=(id,label,svg)=>{
     const source=$(id);if(!source||!toolRail)return;
@@ -2389,7 +2390,7 @@ async function init(){
   $('prev').onclick=()=>{if(page>0){page--;render()}};$('next').onclick=()=>{if((page+1)*PAGE_SIZE<filtered.length){page++;render()}};
   bindDetailSheetEvents();
   $('open3dPreview').onclick=open3dPreviewLazy;
-  $('compare').oninput=updateCompare;
+  $('compare').oninput=()=>{updateCompare();if(tileN>1){tileEdited=Number($('compare').value)<50;updateTilePreview()}};
   $('preview').onclick=()=>{const v=Number($('compare').value);$('compare').value=v<50?100:0;updateCompare()};
   $('downloadOriginal').onclick=async()=>dl(await originalBlob(active.path),active.name);
   $('downloadEdited').onclick=async()=>{const e=await getEdit(active.path);if(!e)return toast('Henüz yeni sürüm yok');dl(e.blob,active.name)};
