@@ -771,18 +771,6 @@
           "start": 0,
           "end": 40,
           "speed": 50
-        },
-        {
-          "name": "stand",
-          "form": "adult",
-          "start": 0,
-          "end": 0
-        },
-        {
-          "name": "walk",
-          "form": "adult",
-          "start": 0,
-          "end": 40
         }
       ]
     },
@@ -1590,14 +1578,16 @@
           "form": "adult",
           "start": 100,
           "end": 109,
-          "speed": 2
+          "speed": 2,
+          "state": "alternate"
         },
         {
           "name": "walk",
           "form": "adult",
           "start": 60,
           "end": 99,
-          "speed": 40
+          "speed": 40,
+          "state": "alternate"
         },
         {
           "name": "run",
@@ -1610,7 +1600,8 @@
           "name": "punch",
           "form": "adult",
           "start": 109,
-          "end": 119
+          "end": 119,
+          "state": "alternate"
         }
       ]
     }
