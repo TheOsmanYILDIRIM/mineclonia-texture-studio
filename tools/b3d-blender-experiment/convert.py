@@ -31,7 +31,7 @@ for source in sorted(root.rglob("*.b3d")):
         if not meshes or not any(len(o.data.polygons)>0 for o in meshes):
             raise RuntimeError("Importer produced no triangle mesh")
         try:
-            bpy.ops.export_scene.gltf(filepath=str(dest),export_format="GLB",export_animations=True,export_skins=True,export_texcoords=True)
+            bpy.ops.export_scene.gltf(filepath=str(dest),export_format="GLB",export_animations=True,export_skins=True,export_texcoords=True,export_def_bones=True)
         except Exception as export_exc:
             entry["export_error"] = str(export_exc)
             raise
