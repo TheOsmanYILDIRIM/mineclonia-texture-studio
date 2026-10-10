@@ -6,6 +6,7 @@ args=sys.argv[sys.argv.index("--")+1:]
 root=pathlib.Path(args[0]); output=pathlib.Path(args[1]); report=pathlib.Path(args[2])
 sys.path.insert(0,"/tmp")
 import io_scene_b3d
+from io_scene_b3d import import_b3d
 io_scene_b3d.register()
 results=[]
 for source in sorted(root.rglob("*.b3d")):
@@ -14,7 +15,7 @@ for source in sorted(root.rglob("*.b3d")):
     dest.parent.mkdir(parents=True,exist_ok=True)
     entry={"source":str(rel),"ok":False}
     try:
-        io_scene_b3d.import_b3d.imported_armature_objects.clear()
+        import_b3d.imported_armature_objects.clear()
         bpy.ops.object.select_all(action='SELECT')
         bpy.ops.object.delete(use_global=False)
         for block in list(bpy.data.meshes):
