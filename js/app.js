@@ -2285,6 +2285,7 @@ function setupCompactMobileDetail(){
   const selector=document.createElement('div');selector.className='mtsGridSource';selector.innerHTML='<button type="button" class="active" data-source="original">Orijinal</button><button type="button" data-source="active">Aktif</button>';
   downloads?.before(selector);
   const syncGridMode=()=>{
+    if(window.MTSGridDualRail)return;
     const selected=selector.querySelector('.active')?.dataset.source||'original';
     for(const [id,kind] of [['downloadGridUv','original'],['importGridUv','original'],['downloadActiveGridUv','active'],['importActiveGridUv','active']]){
       const b=$(id);if(!b)continue;
@@ -2317,6 +2318,7 @@ function setupCompactMobileDetail(){
     b.disabled=original.disabled;
   }
   // Mobile right-side export/import rail. Buttons remain the single source of truth.
+  window.MTSGridDualRail=true;
   const rightRail=document.createElement('div');rightRail.className='mtsDownloadRail';rightRail.setAttribute('aria-label','Dışa ve içe aktarma');
   preview?.after(rightRail);
   const svgPaths={
@@ -2348,7 +2350,7 @@ function setupCompactMobileDetail(){
       const isActive=id.includes('ActiveGrid');
       const visible=grid?gridAllowed:seam?!!active&&!isAnimatedStrip(active)&&assetTypeOf(active)!=='Entity'&&active.w===active.h:true;
       b.hidden=!visible;b.style.display=visible?'grid':'none';
-      b.disabled=!!$(id)?.disabled;
+      b.disabled=grid?!gridAllowed:seam?!!$(id)?.disabled:!!$(id)?.disabled;
     }
   };
   window.MTSRegisterDownloadIcon=addDownloadIcon;
@@ -2527,9 +2529,9 @@ async function init(){
       const allowed=!!active&&isMobUvTexture(active)&&!isAnimatedStrip(active);
       for(const b of [activeDownload,activeImport]){b.hidden=!allowed;b.style.display=allowed?'':'none';b.disabled=!allowed}
     };
-    new MutationObserver(syncActiveGrid).observe(gridDownload,{attributes:true,attributeFilter:['hidden','style','disabled']});
+    // Grid visibility is derived on texture change; do not observe and re-hide the dual rail.
     window.MTSSyncActiveGrid=()=>{syncActiveGrid();window.MTSSyncGridMode?.();window.MTSSyncDownloadRail?.()};
-    syncActiveGrid();window.MTSSyncGridMode?.();
+    syncActiveGrid();window.MTSSyncDownloadRail?.();
   }
 
   $('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};
