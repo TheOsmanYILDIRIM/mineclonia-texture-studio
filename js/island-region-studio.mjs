@@ -320,7 +320,7 @@ async function exportRegion(){
   const patch=extractRegion(image(canvas),normalizedRects(rects,canvas.width,canvas.height));
   const blob=await bridge().canvasPngBlob(makeCanvas(patch.image));
   if(!blob?.size)throw Error('PNG boş üretildi');
-  download(blob,(S.meta.name||'texture').replace(/\\.png$/i,'')+(uploaded?'_source_region':'_region')+'.png');
+  download(blob,(S.meta.name||'texture').replace(/\.png$/i,'')+(uploaded?'_source_region':'_region')+'.png');
   if(!uploaded){
    try{localStorage.setItem('mts_uv_region_export_v1:'+S.meta.path,JSON.stringify({version:1,sourceW:S.base.width,sourceH:S.base.height,rects:patch.rects}))}catch(e){console.warn('Ada eşleme kaydedilemedi',e)}
   }
@@ -335,7 +335,7 @@ async function exportWhole(){
  try{
   const blob=await bridge().canvasPngBlob(canvas);
   if(!blob?.size)throw Error('PNG boş üretildi');
-  download(blob,(S.meta.name||'texture').replace(/\\.png$/i,'')+'_full.png');
+  download(blob,(S.meta.name||'texture').replace(/\.png$/i,'')+'_full.png');
   hint('Tam PNG indirildi: '+canvas.width+'×'+canvas.height);
  }catch(e){toast('Tam PNG indirilemedi: '+e.message)}
  finally{button.disabled=false}
