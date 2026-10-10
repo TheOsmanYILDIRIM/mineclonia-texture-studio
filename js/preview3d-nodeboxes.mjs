@@ -19,7 +19,10 @@ export function nodeboxMesh(def,connections=[]) {
   const positions=[],uv=[],indices=[];
   for(const box of boxes){
     if(!Array.isArray(box)||box.length!==6||box.some(v=>!Number.isFinite(v)))continue;
-    const [x0,y0,z0,x1,y1,z1]=box;
+    const [ax,ay,az,bx,by,bz]=box;
+    const x0=Math.min(ax,bx),x1=Math.max(ax,bx);
+    const y0=Math.min(ay,by),y1=Math.max(ay,by);
+    const z0=Math.min(az,bz),z1=Math.max(az,bz);
     if(x1<=x0||y1<=y0||z1<=z0)continue;
     const faces=[
       [x0,y0,z1,x1,y0,z1,x1,y1,z1,x0,y1,z1],
