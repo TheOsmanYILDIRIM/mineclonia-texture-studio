@@ -3,7 +3,9 @@
 const ident=()=>[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
 const mul=(a,b)=>{const o=new Array(16).fill(0);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)o[c*4+r]+=a[k*4+r]*b[c*4+k];return o};
 function inverse(a){const m=Array.from({length:4},(_,r)=>Array.from({length:8},(_,c)=>c<4?a[c*4+r]:Number(c-4===r)));for(let k=0;k<4;k++){let p=k;for(let r=k+1;r<4;r++)if(Math.abs(m[r][k])>Math.abs(m[p][k]))p=r;if(Math.abs(m[p][k])<1e-9)throw Error('Singular B3D bind matrix');[m[p],m[k]]=[m[k],m[p]];const d=m[k][k];for(let c=0;c<8;c++)m[k][c]/=d;for(let r=0;r<4;r++)if(r!==k){const f=m[r][k];for(let c=0;c<8;c++)m[r][c]-=f*m[k][c]}}return Array.from({length:16},(_,i)=>m[i%4][4+Math.floor(i/4)])}
-function matrix(p,s,q){const [w,x,y,z]=q,xx=x*x,yy=y*y,zz=z*z,xy=x*y,xz=x*z,yz=y*z,wx=w*x,wy=w*y,wz=w*z;return [(1-2*(yy+zz))*s[0],(2*(xy+wz))*s[0],(2*(xz-wy))*s[0],0,(2*(xy-wz))*s[1],(1-2*(xx+zz))*s[1],(2*(yz+wx))*s[1],0,(2*(xz+wy))*s[2],(2*(yz-wx))*s[2],(1-2*(xx+yy))*s[2],0,p[0],p[1],p[2],1]}
+// B3D/Luanti node quaternions use the inverse rotation for skeletal pivots.
+// Preserve legacy mesh-owner rotations to keep static B3D geometry/UV parity.
+function matrix(p,s,q,meshSpace=false){const [w,a,b,c]=q,x=meshSpace?a:-a,y=meshSpace?b:-b,z=meshSpace?c:-c,xx=x*x,yy=y*y,zz=z*z,xy=x*y,xz=x*z,yz=y*z,wx=w*x,wy=w*y,wz=w*z;return [(1-2*(yy+zz))*s[0],(2*(xy+wz))*s[0],(2*(xz-wy))*s[0],0,(2*(xy-wz))*s[1],(1-2*(xx+zz))*s[1],(2*(yz+wx))*s[1],0,(2*(xz+wy))*s[2],(2*(yz-wx))*s[2],(1-2*(xx+yy))*s[2],0,p[0],p[1],p[2],1]}
 function point(m,v){const x=v[0],y=v[1],z=v[2];return [m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]]}
 const lerp=(a,b,t)=>a.map((x,i)=>x+(b[i]-x)*t);
 function slerp(a,b,t){let d=a.reduce((s,v,i)=>s+v*b[i],0);let bb=b;if(d<0){bb=b.map(v=>-v);d=-d}if(d>.9995){const q=lerp(a,bb,t),n=Math.hypot(...q)||1;return q.map(v=>v/n)}const theta=Math.acos(Math.min(1,d)),s=Math.sin(theta);return a.map((v,i)=>(Math.sin((1-t)*theta)*v+Math.sin(t*theta)*bb[i])/s)}
@@ -16,7 +18,7 @@ function parse(buffer){
  const str=end=>{let s='';while(cur<end){const c=v.getUint8(cur++);if(!c)break;s+=String.fromCharCode(c)}return s};
  function chunks(end,parent,activeMesh){
   while(cur+8<=end){const t=tag(end),sz=u32(end),stop=cur+sz;if(stop>end||stop>len)throw Error('Invalid B3D chunk size');const begin=cur;
-   if(t==='NODE'){const name=str(stop),p=[f32(stop),f32(stop),f32(stop)],s=[f32(stop),f32(stop),f32(stop)],q=[f32(stop),f32(stop),f32(stop),f32(stop)];const n={name,parent,children:[],pos:p,scale:s,rot:q,keys:[],weights:[],mesh:activeMesh,bind:null,inverse:null};if(parent!==null)nodes[parent].children.push(nodes.length);const ix=nodes.push(n)-1;chunks(stop,ix,activeMesh)}
+   if(t==='NODE'){const name=str(stop),p=[f32(stop),f32(stop),f32(stop)],s=[f32(stop),f32(stop),f32(stop)],q=[f32(stop),f32(stop),f32(stop),f32(stop)];const n={name,parent,children:[],pos:p,scale:s,rot:q,keys:[],weights:[],mesh:activeMesh,bind:null,meshBind:null,inverse:null};if(parent!==null)nodes[parent].children.push(nodes.length);const ix=nodes.push(n)-1;chunks(stop,ix,activeMesh)}
    else if(t==='MESH'){i32(stop);const mesh={owner:parent,vertices:[],uv:[],sets:[],faces:[],weights:[]};meshes.push(mesh);chunks(stop,parent,mesh);activeMesh=mesh}
    else if(t==='VRTS'&&activeMesh){const flags=i32(stop),sets=i32(stop),dim=i32(stop),stride=12+((flags&1)?12:0)+((flags&2)?16:0)+sets*dim*4;if(stride<=0)throw Error('Bad vertex stride');while(cur+stride<=stop){const p=[f32(stop),f32(stop),f32(stop)];if(flags&1)for(let k=0;k<3;k++)f32(stop);if(flags&2)for(let k=0;k<4;k++)f32(stop);let uv=[0,0];for(let set=0;set<sets;set++)for(let k=0;k<dim;k++){const value=f32(stop);if(!set&&k<2)uv[k]=value}activeMesh.vertices.push(p);activeMesh.uv.push(uv)}activeMesh.weights=activeMesh.vertices.map(()=>[])}
    else if(t==='TRIS'&&activeMesh){const brush=i32(stop),start=indices.length,base=allVertices.length;for(let i=0;i<activeMesh.vertices.length;i++){allVertices.push({mesh:activeMesh,vi:i});uvs.push(...activeMesh.uv[i])}while(cur+12<=stop){for(let k=0;k<3;k++){const vi=i32(stop);if(vi<0||vi>=activeMesh.vertices.length)throw Error('B3D triangle out of bounds');indices.push(base+vi)}}groups.push({brush,start,count:indices.length-start})}
@@ -30,10 +32,10 @@ function parse(buffer){
  if(tag(len)!=='BB3D')throw Error('B3D header missing');const rootSize=u32(len),rootEnd=cur+rootSize;if(rootEnd>len)throw Error('Invalid B3D root');i32(rootEnd);chunks(rootEnd,null,null);
  if(!allVertices.length||!indices.length)throw Error('B3D geometry missing');
  for(const n of nodes)n.keys.sort((a,b)=>a.frame-b.frame);
- function bindNode(i){const n=nodes[i],parent=n.parent===null?ident():nodes[n.parent].bind;n.bind=mul(parent,matrix(n.pos,n.scale,n.rot));n.inverse=inverse(n.bind);for(const j of n.children)bindNode(j)}
+ function bindNode(i){const n=nodes[i],parent=n.parent===null?ident():nodes[n.parent].bind,meshParent=n.parent===null?ident():nodes[n.parent].meshBind;n.bind=mul(parent,matrix(n.pos,n.scale,n.rot));n.meshBind=mul(meshParent,matrix(n.pos,n.scale,n.rot,true));n.inverse=inverse(n.bind);for(const j of n.children)bindNode(j)}
  nodes.forEach((n,i)=>{if(n.parent===null)bindNode(i)});
  let lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
- const bindWorld=allVertices.map(vtx=>{const world=point(nodes[vtx.mesh.owner].bind,vtx.mesh.vertices[vtx.vi]);for(let k=0;k<3;k++){lo[k]=Math.min(lo[k],world[k]);hi[k]=Math.max(hi[k],world[k])}return world});
+ const bindWorld=allVertices.map(vtx=>{const world=point(nodes[vtx.mesh.owner].meshBind,vtx.mesh.vertices[vtx.vi]);for(let k=0;k<3;k++){lo[k]=Math.min(lo[k],world[k]);hi[k]=Math.max(hi[k],world[k])}return world});
  const mid=lo.map((v,i)=>(v+hi[i])/2),span=Math.max(...hi.map((v,i)=>v-lo[i]))||1,norm=1.55/span;
  const base=new Float32Array(bindWorld.flatMap(v=>v.map((x,i)=>(x-mid[i])*norm)));
  const positions=new Float32Array(base.length);
