@@ -2329,22 +2329,24 @@ function setupCompactMobileDetail(){
     seamExport:'<path d="M3 7h18M3 17h18M7 3v18M17 3v18M10 10l4 4m0-4-4 4"/>',
     seamImport:'<path d="M3 7h18M3 17h18M7 3v18M17 3v18M12 5v14m0 0-3-3m3 3 3-3"/>'
   };
+  const originalGroup=document.createElement('div');originalGroup.className='mtsRailGroup';originalGroup.dataset.source='original';originalGroup.innerHTML='<span class="mtsRailHeading">Orijinal</span>';
+  const activeGroup=document.createElement('div');activeGroup.className='mtsRailGroup';activeGroup.dataset.source='active';activeGroup.innerHTML='<span class="mtsRailHeading">Aktif</span>';
+  rightRail.append(originalGroup,activeGroup);
   const iconMap=new Map();
   const addDownloadIcon=(id,label)=>{
     const original=$(id);if(!original)return;
     const b=document.createElement('button');b.type='button';b.className='mtsDownloadIcon';b.title=label;b.setAttribute('aria-label',label);
     b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+svgPaths[id]+'</svg>';
-    b.addEventListener('click',()=>original.click());rightRail.appendChild(b);iconMap.set(id,b);
+    b.addEventListener('click',()=>original.click());(id==='downloadEdited'||id.includes('ActiveGrid')?activeGroup:originalGroup).appendChild(b);iconMap.set(id,b);
   };
   for(const [id,label] of [['downloadOriginal','Orijinali indir'],['downloadEdited','Aktifi indir'],['downloadGridUv','Orijinal grid indir'],['importGridUv','Orijinal grid yükle'],['downloadActiveGridUv','Aktif grid indir'],['importActiveGridUv','Aktif grid yükle'],['seamExport','Seamless indir'],['seamImport','Seamless yükle']])addDownloadIcon(id,label);
   const syncDownloadRail=()=>{
-    const source=selector.querySelector('.active')?.dataset.source||'original';
     const gridAllowed=!!active&&isMobUvTexture(active)&&!isAnimatedStrip(active);
     for(const [id,b] of iconMap){
       const grid=id.toLowerCase().includes('grid');
       const seam=id.startsWith('seam');
       const isActive=id.includes('ActiveGrid');
-      const visible=grid?(gridAllowed&&(isActive===(source==='active'))):seam?!!active&&!isAnimatedStrip(active)&&assetTypeOf(active)!=='Entity'&&active.w===active.h:(id==='downloadOriginal'?source==='original':source==='active');
+      const visible=grid?gridAllowed:seam?!!active&&!isAnimatedStrip(active)&&assetTypeOf(active)!=='Entity'&&active.w===active.h:true;
       b.hidden=!visible;b.style.display=visible?'grid':'none';
       b.disabled=!!$(id)?.disabled;
     }
@@ -2357,7 +2359,7 @@ function setupCompactMobileDetail(){
   syncDownloadRail();
   // Back action belongs to the bottom-right, outside the preview rails.
   const closeDock=compact.querySelector('#compactDockClose');
-  if(closeDock){compact.querySelector('#compactThumbDock')?.appendChild(closeDock);closeDock.classList.add('mtsBottomBack')}
+  if(closeDock){compact.querySelector('#compactThumbDock')?.appendChild(closeDock);closeDock.classList.add('mtsBottomBack');closeDock.textContent='← Geri'}
   const refDownload=document.createElement('button');
   refDownload.className='btn compactRefDownload';
   refDownload.id='downloadMaterialRef';
@@ -2525,7 +2527,7 @@ async function init(){
       for(const b of [activeDownload,activeImport]){b.hidden=!allowed;b.style.display=allowed?'':'none';b.disabled=!allowed}
     };
     new MutationObserver(syncActiveGrid).observe(gridDownload,{attributes:true,attributeFilter:['hidden','style','disabled']});
-    window.MTSSyncActiveGrid=()=>{syncActiveGrid();window.MTSSyncGridMode?.()};
+    window.MTSSyncActiveGrid=()=>{syncActiveGrid();window.MTSSyncGridMode?.();window.MTSSyncDownloadRail?.()};
     syncActiveGrid();window.MTSSyncGridMode?.();
   }
 
