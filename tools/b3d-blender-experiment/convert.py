@@ -30,7 +30,11 @@ for source in sorted(root.rglob("*.b3d")):
                      import_vertices=sum(len(o.data.vertices) for o in meshes))
         if not meshes or not any(len(o.data.polygons)>0 for o in meshes):
             raise RuntimeError("Importer produced no triangle mesh")
-        bpy.ops.export_scene.gltf(filepath=str(dest),export_format="GLB",export_animations=True,export_skins=True,export_texcoords=True)
+        try:
+            bpy.ops.export_scene.gltf(filepath=str(dest),export_format="GLB",export_animations=True,export_skins=True,export_texcoords=True)
+        except Exception as export_exc:
+            entry["export_error"] = str(export_exc)
+            raise
         raw=dest.read_bytes()
         if len(raw)<20 or raw[:4]!=b"glTF" or struct.unpack_from("<I",raw,8)[0]!=len(raw):
             raise RuntimeError("Invalid GLB header/length")
