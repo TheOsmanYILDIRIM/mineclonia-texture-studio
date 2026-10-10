@@ -2359,7 +2359,7 @@ function setupCompactMobileDetail(){
   syncDownloadRail();
   // Back action belongs to the bottom-right, outside the preview rails.
   const closeDock=compact.querySelector('#compactDockClose');
-  if(closeDock){compact.querySelector('#compactThumbDock')?.appendChild(closeDock);closeDock.classList.add('mtsBottomBack');closeDock.textContent='← Geri'}
+  if(closeDock){compact.querySelector('#compactThumbDock')?.appendChild(closeDock);closeDock.classList.add('mtsBottomBack');closeDock.textContent='Geri'}
   const refDownload=document.createElement('button');
   refDownload.className='btn compactRefDownload';
   refDownload.id='downloadMaterialRef';
@@ -2491,11 +2491,12 @@ async function init(){
     const activeImport=document.createElement('button');
     activeImport.type='button';activeImport.id='importActiveGridUv';activeImport.className=gridImport.className;
     activeImport.textContent='Aktif UV · Grid yükle';
-    window.MTSRegisterDownloadIcon?.('downloadActiveGridUv','Aktif grid indir');
-    window.MTSRegisterDownloadIcon?.('importActiveGridUv','Aktif grid yükle');
     const mobileDownloads=$('compactDownloads');
     if(mobileDownloads){mobileDownloads.append(activeDownload,activeImport)}
     else{gridImport.after(activeImport);gridDownload.after(activeDownload)}
+    window.MTSRegisterDownloadIcon?.('downloadActiveGridUv','Aktif grid indir');
+    window.MTSRegisterDownloadIcon?.('importActiveGridUv','Aktif grid yükle');
+    window.MTSSyncDownloadRail?.();
     const activeFile=document.createElement('input');activeFile.type='file';activeFile.accept='image/png';activeFile.hidden=true;activeFile.id='fileActiveGridUv';activeImport.after(activeFile);
     const gridMeta=x=>({...x,path:x.path+'#active-uv-grid'});
     activeDownload.onclick=async()=>{
