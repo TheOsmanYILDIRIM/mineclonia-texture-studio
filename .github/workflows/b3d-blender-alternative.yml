@@ -1,0 +1,46 @@
+name: B3D Blender alternative experiment
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [experiment/b3d2glb-batch-conversion]
+    paths:
+      - '.github/workflows/b3d-blender-alternative.yml'
+      - 'tools/b3d-blender-experiment/**'
+
+permissions:
+  contents: read
+
+jobs:
+  blender:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+          blender --background --factory-startup --python-expr "import bpy; print('Blender', bpy.app.version_string)"
+      - name: Fetch official Mineclonia and animated B3D importer
+        run: |
+          git clone --depth 1 https://codeberg.org/mineclonia/mineclonia.git /tmp/mineclonia
+          git clone --depth 1 https://github.com/AvengerAnubis/b3d2blender.git /tmp/io_scene_b3d
+          git -C /tmp/mineclonia rev-parse HEAD > mineclonia-source-sha.txt
+          git -C /tmp/io_scene_b3d rev-parse HEAD > blender-importer-sha.txt
+      - name: Convert all B3D with Blender
+        run: |
+          mkdir -p output reports
+          blender --background --factory-startup --python tools/b3d-blender-experiment/convert.py -- /tmp/mineclonia output reports/blender.json
+      - name: Upload results even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mineclonia-blender-b3d-glb-experiment
+          path: |
+            output/
+            reports/
+            mineclonia-source-sha.txt
+            blender-importer-sha.txt
+          retention-days: 14
+          if-no-files-found: warn
