@@ -595,6 +595,7 @@ function renderActivePrompt(){
  promptViewMode='classic';
  const rec=promptRecord(active),p=promptFor(active,'classic');
  const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isItem=rec?.family==='items',isP0=active.priority==='P0'&&!isUv&&!isItem;
+ window.dispatchEvent(new CustomEvent('mts:chat-stage',{detail:{stage:isUv?'mob_hq':isItem?'item_creative':isP0?'block_ref':'general'}}));
  $('normalPromptBtns').style.display=isUv?'none':'';
  $('mobPromptBtns').classList.toggle('show',isUv);
  $('singlePromptJson').style.display='none';
