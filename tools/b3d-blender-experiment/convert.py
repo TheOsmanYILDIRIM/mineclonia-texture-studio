@@ -49,4 +49,4 @@ report.write_text(json.dumps(results,indent=2))
 print("SUMMARY",json.dumps({"total":len(results),"converted":sum(x["ok"] for x in results),
     "skin_models":sum(x.get("skins",0)>0 for x in results),
     "animated_models":sum(x.get("animations",0)>0 for x in results)}),flush=True)
-if not results or not any(x["ok"] for x in results): sys.exit(2)
+if not results or sum(x["ok"] for x in results) < len(results): sys.exit(2)
