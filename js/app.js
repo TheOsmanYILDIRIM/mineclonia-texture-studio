@@ -2349,6 +2349,7 @@ function setupCompactMobileDetail(){
       b.disabled=!!$(id)?.disabled;
     }
   };
+  window.MTSRegisterDownloadIcon=addDownloadIcon;
   selector.addEventListener('click',syncDownloadRail);
   window.MTSSyncDownloadRail=syncDownloadRail;
   const previousSync=window.MTSSyncActiveGrid;
@@ -2488,6 +2489,8 @@ async function init(){
     const activeImport=document.createElement('button');
     activeImport.type='button';activeImport.id='importActiveGridUv';activeImport.className=gridImport.className;
     activeImport.textContent='Aktif UV · Grid yükle';
+    window.MTSRegisterDownloadIcon?.('downloadActiveGridUv','Aktif grid indir');
+    window.MTSRegisterDownloadIcon?.('importActiveGridUv','Aktif grid yükle');
     const mobileDownloads=$('compactDownloads');
     if(mobileDownloads){mobileDownloads.append(activeDownload,activeImport)}
     else{gridImport.after(activeImport);gridDownload.after(activeDownload)}
