@@ -9,7 +9,7 @@ on:
       - '.github/workflows/mobile-visual-regression.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   screenshot:
     runs-on: ubuntu-latest
@@ -35,3 +35,21 @@ jobs:
           name: mobile-ui-screenshots
           path: artifacts/mobile-ui/
           if-no-files-found: warn
+
+      - name: Save latest screenshots to repository
+        if: success() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p docs/visual-regression/mobile
+          cp artifacts/mobile-ui/01-single.png docs/visual-regression/mobile/01-single.png
+          cp artifacts/mobile-ui/02-three-by-three.png docs/visual-regression/mobile/02-three-by-three.png
+          cp artifacts/mobile-ui/03-nine-by-nine.png docs/visual-regression/mobile/03-nine-by-nine.png
+          printf 'Source commit: %s\n' "$GITHUB_SHA" > docs/visual-regression/mobile/README.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/visual-regression/mobile
+          if ! git diff --cached --quiet; then
+            git commit -m 'test: update latest mobile visual screenshots [skip ci]'
+            git push origin HEAD:main
+          fi
