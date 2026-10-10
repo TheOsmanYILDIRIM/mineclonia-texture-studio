@@ -749,7 +749,24 @@ body{min-height:100dvh}
 .preview3dProjection.perspective{background:#24271d;color:#e6efb5;border-color:#6e7441}
 .preview3dProjection[hidden]{display:none!important}
 @media(max-width:699px){.preview3dProjection{width:38px;padding:0;justify-content:center}.preview3dProjection span{display:none}}
-</style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"></head><body><div class="app">
+</style><link rel="stylesheet" href="css/variant-lab.css?v=20261007-previewtop1"><link rel="stylesheet" href="css/island-studio.css?v=20261007-joycenter1"><link rel="stylesheet" href="css/vertex-uv-studio.css?v=20261007-islandmesh2"><style>
+@media(max-width:699px){
+ #sheet .drawer{position:relative}
+ #sheet .mtsEditRail{position:absolute;z-index:12;top:36px;left:8px;display:flex;flex-direction:column;gap:7px;width:42px}
+ #sheet .mtsEditIcon{display:grid;place-items:center;width:40px;height:40px;border:1px solid #39404d;border-radius:12px;background:#20252d;color:#e4ecf6;box-shadow:0 2px 8px #0003;touch-action:manipulation}
+ #sheet .mtsEditIcon svg{width:21px;height:21px}
+ #sheet .mtsEditIcon:disabled{opacity:.35}
+ #sheet .mtsEditIcon:focus-visible{outline:2px solid #9ec9fa}
+ #sheet .mtsGridSource{display:flex;gap:3px;padding:3px;background:#10141b;border:1px solid #343d49;border-radius:13px;margin:3px 0 10px}
+ #sheet .mtsGridSource button{flex:1;min-height:36px;border:0;border-radius:10px;background:transparent;color:#b4c0ce;font-weight:650}
+ #sheet .mtsGridSource button.active{background:#c8e0fc;color:#172231}
+ #sheet .compactDownloadsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ #sheet .compactDownloadsGrid .btn{min-width:0;min-height:43px;padding:8px;font-size:13px;line-height:1.2}
+ #sheet .compactPrimaryDock #uploadEdited{display:none!important}
+ #sheet .compactPrimaryDock{min-height:54px}
+ #sheet .compactDownloadBody{padding-bottom:8px}
+}
+</style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
 <main class="catalogViewport"><div class="grid" id="grid"></div></main>
@@ -871,4 +888,4 @@ body{min-height:100dvh}
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>\n<script src="js/ordered-contour-warp.js?v=20261008-contour1"></script>\n<script src="js/island-repack.js?v=20261008-repack1"></script>
 <script src="js/prompt-registry.js?v=20261007-canonical2"></script>
-<script src="js/app.js?v=20261010-mobilegridfix2"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
+<script src="js/app.js?v=20261010-mobilelayout3"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
