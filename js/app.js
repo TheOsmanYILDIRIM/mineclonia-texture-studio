@@ -2330,6 +2330,51 @@ async function init(){
     }catch(error){console.error(error);toast('UV içe aktarma: '+error.message)}
   };
 
+  // Active UV grid uses the currently saved edit, not the native source.
+  // A distinct manifest identity prevents original and active round-trips from colliding.
+  const gridDownload=$('downloadGridUv'),gridImport=$('importGridUv');
+  if(gridDownload&&gridImport){
+    const activeDownload=document.createElement('button');
+    activeDownload.type='button';activeDownload.id='downloadActiveGridUv';activeDownload.className=gridDownload.className;
+    activeDownload.textContent='Aktif UV · Grid indir';
+    const activeImport=document.createElement('button');
+    activeImport.type='button';activeImport.id='importActiveGridUv';activeImport.className=gridImport.className;
+    activeImport.textContent='Aktif UV · Grid yükle';
+    gridImport.after(activeImport);gridDownload.after(activeDownload);
+    const activeFile=document.createElement('input');activeFile.type='file';activeFile.accept='image/png';activeFile.hidden=true;activeFile.id='fileActiveGridUv';activeImport.after(activeFile);
+    const gridMeta=x=>({...x,path:x.path+'#active-uv-grid'});
+    activeDownload.onclick=async()=>{
+      if(!active||!isMobUvTexture(active)||isAnimatedStrip(active))return toast('Bu texture UV mob atlası değil');
+      const target={...active};
+      try{
+        await loadUvDetailBridge();
+        const current=await displayBlob(target.path);
+        const out=await window.MTSDetailUv.exportGrid(gridMeta(target),current);
+        dl(out.blob,out.name.replace('_MTS_UVGRID.png','_ACTIVE_MTS_UVGRID.png'));
+        toast('Aktif texture grid indirildi; orijinal harita korunuyor');
+      }catch(error){console.error(error);toast('Aktif UV grid: '+error.message)}
+    };
+    activeImport.onclick=()=>{if(active&&isMobUvTexture(active)&&!isAnimatedStrip(active))activeFile.click();else toast('Bu texture UV mob atlası değil')};
+    activeFile.onchange=async e=>{
+      const file=e.target.files?.[0];e.target.value='';if(!file||!active)return;
+      const target={...active};
+      try{
+        await loadUvDetailBridge();
+        const current=await displayBlob(target.path);
+        const out=await window.MTSDetailUv.importGrid(gridMeta(target),current,file);
+        if(!active||active.path!==target.path)throw Error('Texture değişti; kayıt yapılmadı');
+        await importPng(new File([out.blob],target.name,{type:'image/png'}),false);
+        toast('Aktif UV grid dönüştürüldü · 3D kontrol önerilir');
+      }catch(error){console.error(error);toast('Aktif UV içe aktarma: '+error.message)}
+    };
+    const syncActiveGrid=()=>{
+      const allowed=!!active&&isMobUvTexture(active)&&!isAnimatedStrip(active);
+      for(const b of [activeDownload,activeImport]){b.hidden=!allowed;b.style.display=allowed?'':'none';b.disabled=!allowed}
+    };
+    new MutationObserver(syncActiveGrid).observe(gridDownload,{attributes:true,attributeFilter:['hidden','style','disabled']});
+    syncActiveGrid();
+  }
+
   $('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};
   $('seamImport').onclick=()=>$('fileSeam').click();$('fileSeam').onchange=e=>importPng(e.target.files[0],true);
   $('animToggle').onclick=()=>{if(!active||!isAnimatedStrip(active))return;animPlaying=!animPlaying;$('animToggle').textContent=animPlaying?'Durdur':'Oynat'};
