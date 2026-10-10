@@ -846,6 +846,13 @@ body{min-height:100dvh}
  #sheet .compactSection[data-section="ai"]{display:block!important}
  #sheet .compactActionTray{overflow-y:auto!important}
 }
+</style><style>
+@media(max-width:699px){
+ #sheet .compactThumbDock>.mtsBottomBack{font-size:0!important;gap:0!important}
+ #sheet .compactThumbDock>.mtsBottomBack::after{content:'Geri';font-size:14px;font-weight:700}
+ #sheet .mtsRailGroup .mtsDownloadIcon[hidden]{display:none!important}
+ #sheet .mtsDownloadRail{max-height:min(75vh,610px)!important}
+}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -968,4 +975,4 @@ body{min-height:100dvh}
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>\n<script src="js/ordered-contour-warp.js?v=20261008-contour1"></script>\n<script src="js/island-repack.js?v=20261008-repack1"></script>
 <script src="js/prompt-registry.js?v=20261007-canonical2"></script>
-<script src="js/app.js?v=20261010-dualrails2"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
+<script src="js/app.js?v=20261010-activegridfix3"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
