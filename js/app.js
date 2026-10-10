@@ -1266,7 +1266,7 @@ window.MTSIslandBridge={
    return true;
  },
  closeDetailSheet,
- ensurePreview3dLoaded:async()=>{if(window.MTSPreview3D)return window.MTSPreview3D;if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261010-pan3';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});await preview3dLoadPromise;return window.MTSPreview3D}
+ ensurePreview3dLoaded:async()=>{if(window.MTSPreview3D)return window.MTSPreview3D;if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='js/preview3d.js?v=20261010-rig-pivot-correction1';s.async=true;s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)});await preview3dLoadPromise;return window.MTSPreview3D}
 };
 const uvMap={meta:null,rec:null,orig:null,gen:null,work:null,origSel:null,genSel:null,history:[],target:'gen',handle:'move',view:'overlay',globalX:0,globalY:0,globalMode:false,zoom:1,panX:0,panY:0,panMode:false,pointers:new Map(),pinchDist:0,grid:true,autoTarget:null,autoSource:null,autoPairs:[],contours:true,manualLink:false,manualTarget:null,autoBase:null,autoApplied:false,bgMode:'auto',excludeMode:false,excludedTarget:new Set(),excludedSource:new Set(),manualSource:null,edgePairs:[],selectedTargetSegment:null,selectedSourceSegment:null,edgePickSide:'target',islands:[],islandIndex:-1,islandTemplate:null,islandTemplateMap:null,islandMode:false,objectPick:null,selectedSourceComp:null,selectedTargetComp:null,maskLock:true,nudgeStep:1};
 
@@ -2236,7 +2236,7 @@ function open3dPreviewLazy(){
  if(!active)return;
  if(window.MTSPreview3D)return window.MTSPreview3D.open(active);
  if(!preview3dLoadPromise)preview3dLoadPromise=new Promise((resolve,reject)=>{
-  const s=document.createElement('script');s.src='js/preview3d.js?v=20261010-pan3';s.async=true;
+  const s=document.createElement('script');s.src='js/preview3d.js?v=20261010-rig-pivot-correction1';s.async=true;
   s.onload=resolve;s.onerror=()=>reject(Error('3D önizleme modülü yüklenemedi'));document.body.appendChild(s)
  });
  toast('3D önizleme hazırlanıyor…');
