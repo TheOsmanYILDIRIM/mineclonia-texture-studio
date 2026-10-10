@@ -1,0 +1,37 @@
+name: Mobile UI visual regression
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'js/app.js'
+      - 'tests/mobile-visual-regression.mjs'
+      - '.github/workflows/mobile-visual-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install screenshot browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve production files
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/mts-http.log 2>&1 &
+      - name: Capture and assert mobile layouts
+        run: node tests/mobile-visual-regression.mjs
+      - name: Upload screenshots (even on failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-ui-screenshots
+          path: artifacts/mobile-ui/
+          if-no-files-found: warn
