@@ -622,20 +622,44 @@
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
   if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program)||'WebGL link');gl.useProgram(program);
 
-  const P=[
-   -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1,
-    1,-1,-1, -1,-1,-1, -1, 1,-1,  1, 1,-1,
-    1,-1, 1,  1,-1,-1,  1, 1,-1,  1, 1, 1,
-   -1,-1,-1, -1,-1, 1, -1, 1, 1, -1, 1,-1,
-   -1, 1, 1,  1, 1, 1,  1, 1,-1, -1, 1,-1,
-   -1,-1,-1,  1,-1,-1,  1,-1, 1, -1,-1, 1
-  ].map(v=>v*.5);
-  const UV=[];
-  for(let f=0;f<6;f++){
+  const P=[],UV=[],I=[];
+  const name=String(meta?.name||'').toLowerCase();
+  const boxes=[];
+  const addBox=(x0,y0,z0,x1,y1,z1)=>boxes.push([x0,y0,z0,x1,y1,z1]);
+  // Normalized Luanti nodebox proportions; connected fence preview shows all four joins.
+  if(/(?:^|_)fence(?:_|\\.)/.test(name)){
+    addBox(-.125,-.5,-.125,.125,.5,.125);
+    for(const side of [-1,1]){
+      addBox(-.5,-.125,side*.375-.0625,.5,0,side*.375+.0625);
+      addBox(side*.375-.0625,-.125,-.5,side*.375+.0625,0,.5);
+    }
+  }else if(/(?:^|_)(?:slab|halfslab)(?:_|\\.)/.test(name)){
+    addBox(-.5,-.5,-.5,.5,0,.5);
+  }else if(/(?:^|_)stairs?(?:_|\\.)/.test(name)){
+    addBox(-.5,-.5,-.5,.5,0,.5);
+    addBox(-.5,0,0,.5,.5,.5);
+  }else if(/(?:^|_)fence_gate(?:_|\\.)/.test(name)){
+    addBox(-.5,-.5,-.125,-.375,.5,.125);
+    addBox(.375,-.5,-.125,.5,.5,.125);
+    addBox(-.375,.125,-.0625,.375,.25,.0625);
+    addBox(-.375,-.25,-.0625,.375,-.125,.0625);
+  }else if(/(?:^|_)door(?:_|\\.)/.test(name)){
+    addBox(-.5,-.5,.3125,.5,.5,.5);
+  }else addBox(-.5,-.5,-.5,.5,.5,.5);
+  const faces=[
+    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z1,x1,y0,z1,x1,y1,z1,x0,y1,z1],
+    ([x0,y0,z0,x1,y1,z1])=>[x1,y0,z0,x0,y0,z0,x0,y1,z0,x1,y1,z0],
+    ([x0,y0,z0,x1,y1,z1])=>[x1,y0,z1,x1,y0,z0,x1,y1,z0,x1,y1,z1],
+    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z0,x0,y0,z1,x0,y1,z1,x0,y1,z0],
+    ([x0,y0,z0,x1,y1,z1])=>[x0,y1,z1,x1,y1,z1,x1,y1,z0,x0,y1,z0],
+    ([x0,y0,z0,x1,y1,z1])=>[x0,y0,z0,x1,y0,z0,x1,y0,z1,x0,y0,z1]
+  ];
+  for(const box of boxes)for(let f=0;f<6;f++){
+    const o=P.length/3;P.push(...faces[f](box));
     const col=f%3,row=Math.floor(f/3),u0=col/3,u1=(col+1)/3,v0=row/2,v1=(row+1)/2;
     UV.push(u0,v1,u1,v1,u1,v0,u0,v0);
+    I.push(o,o+1,o+2,o,o+2,o+3);
   }
-  const I=[];for(let f=0;f<6;f++){const o=f*4;I.push(o,o+1,o+2,o,o+2,o+3)}
   const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(P),gl.STATIC_DRAW);
   const pa=gl.getAttribLocation(program,'p');gl.enableVertexAttribArray(pa);gl.vertexAttribPointer(pa,3,gl.FLOAT,false,0,0);
   const tb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,tb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(UV),gl.STATIC_DRAW);
