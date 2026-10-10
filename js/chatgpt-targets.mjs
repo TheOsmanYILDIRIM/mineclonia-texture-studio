@@ -14,7 +14,18 @@ export function installChatTargets({getPrompt,notify}){
  const stageSelect=document.createElement('select');stageSelect.className='select';stageSelect.setAttribute('aria-label','Prompt aşaması');for(const [id,label] of STAGES){const option=document.createElement('option');option.value=id;option.textContent=label;stageSelect.append(option)}box.append(stageSelect);
  const actions=document.createElement('div');actions.className='mts-chat-actions';actions.innerHTML='<button type="button" class="btn">Promptu kopyala</button><button type="button" class="btn primary">ChatGPT\'de aç</button>';
  const [copyButton,openButton]=actions.querySelectorAll('button');
- async function act(open){const p=getPrompt(stageSelect.value);if(!p?.text){notify('Bu aşamada prompt yok');return}const copied=await copy(p.text);if(!open){notify(copied?'Prompt kopyalandı':'Kopyalama başarısız');return}const id=load()[p.stage];if(!id){notify('Önce bu aşama için sohbet ID kaydedin');settings.querySelector('details').open=true;fields.querySelector('[data-stage="'+p.stage+'"]')?.focus();return}const url='https://chatgpt.com/c/'+id+'?q='+encodeURIComponent(p.text);if(url.length>7500){notify('Prompt URL için çok uzun; panoya kopyalandı, sohbete yapıştırın');window.open('https://chatgpt.com/c/'+id,'_blank','noopener');return}window.open(url,'_blank','noopener');notify(copied?'Prompt kopyalandı; hedef sohbet açılıyor':'Hedef sohbet açılıyor')}
+ async function act(open){
+  const p=getPrompt(stageSelect.value);if(!p?.text){notify('Bu aşamada prompt yok');return}
+  if(!open){notify(await copy(p.text)?'Prompt kopyalandı':'Kopyalama başarısız');return}
+  const id=load()[p.stage];if(!id){notify('Önce bu aşama için sohbet ID kaydedin');settings.querySelector('details').open=true;fields.querySelector('[data-stage="'+p.stage+'"]')?.focus();return}
+  const base='https://chatgpt.com/c/'+id;
+  const url=base+'?q='+encodeURIComponent(p.text);
+  const long=url.length>7500;
+  const tab=window.open(long?base:url,'_blank','noopener');
+  const copied=await copy(p.text);
+  if(!tab)notify('Tarayıcı yeni sekmeyi engelledi; prompt '+(copied?'panoya kopyalandı':'kopyalanamadı'));
+  else notify(long?'Uzun prompt panoya kopyalandı; sohbete yapıştırın':'Hedef sohbet açıldı; prompt da panoya kopyalandı');
+ }
  copyButton.addEventListener('click',()=>act(false));openButton.addEventListener('click',()=>act(true));
  box.append(settings,actions);
 }
