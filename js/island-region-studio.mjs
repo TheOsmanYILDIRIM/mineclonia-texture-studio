@@ -451,7 +451,7 @@ async function choose(path){
  }catch(e){toast('UV açılamadı: '+e.message)}
 }
 export async function open(path){
- buildUI();const records=(bridge().catalog?.()||[]).filter(x=>legacy().assetTypeOf?.(x)==='Entity');
+ buildUI();const records=(bridge().catalog?.()||[]).filter(x=>typeof x.path==='string' && /\.png$/i.test(x.path));
  const picker=$('regionUvTexture');picker.innerHTML='';
  records.forEach(x=>{const el=document.createElement('option');el.value=x.path;el.textContent=x.name;picker.add(el)});
  if(path&&records.some(x=>x.path===path))picker.value=path;
