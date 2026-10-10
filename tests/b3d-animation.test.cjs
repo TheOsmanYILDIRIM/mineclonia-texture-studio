@@ -115,4 +115,4 @@ const bodyAnimation=parse(scaleFixture('body'));
 const bodyStart=Array.from(bodyAnimation.sample(0));
 const bodyEnd=Array.from(bodyAnimation.sample(10));
 near(distance(bodyEnd,0,1),2*distance(bodyStart,0,1));
-console.log('B3D cow/rabbit uniform head scaling guard with preserved motion: PASS');
+console.log('B3D source head scale preserved with motion: PASS');
