@@ -12,12 +12,10 @@ export function installChatTargets({getPrompt,notify}){
  const fields=settings.querySelector('.mts-chat-fields');
  for(const [id,label] of STAGES){const row=document.createElement('label');row.textContent=label;const input=document.createElement('input');input.type='text';input.autocomplete='off';input.placeholder='Sohbet ID veya URL';input.value=load()[id]||'';input.dataset.stage=id;input.addEventListener('change',()=>{const raw=input.value.trim(),parsed=parseId(raw);if(raw&&!parsed){input.setCustomValidity('Geçerli sohbet ID girin');input.reportValidity();return}input.setCustomValidity('');const data=load();if(parsed)data[id]=parsed;else delete data[id];if(!save(data))notify('Sohbet hedefi kaydedilemedi');else notify('Sohbet hedefi kaydedildi');input.value=parsed});row.append(input);fields.append(row)}
 
- const toggleLabel=document.createElement('label');toggleLabel.className='mts-chat-toggle';
- const toggle=document.createElement('input');toggle.type='checkbox';toggle.checked=localStorage.getItem('mts:chatAutoOpen:v1')==='1';
- const toggleText=document.createElement('span');toggleText.textContent='Prompta dokununca ChatGPT sohbetini aç';
- toggleLabel.append(toggle,toggleText);
+ const toggle=document.getElementById('mtsChatAutoOpen');
+ if(!toggle)return;
+ toggle.checked=localStorage.getItem('mts:chatAutoOpen:v1')==='1';
  toggle.addEventListener('change',()=>{try{localStorage.setItem('mts:chatAutoOpen:v1',toggle.checked?'1':'0')}catch{notify('Tercih kaydedilemedi')}});
- settings.append(toggleLabel);
  box.append(settings);
  let activeStage='general';
  window.addEventListener('mts:chat-stage',event=>{if(STAGES.some(([id])=>id===event.detail?.stage))activeStage=event.detail.stage});
