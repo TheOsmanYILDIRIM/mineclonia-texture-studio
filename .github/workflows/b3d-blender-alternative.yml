@@ -20,7 +20,8 @@ jobs:
       - name: Install Blender
         run: |
           sudo apt-get update
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
+          blender --background --factory-startup --python-expr "import numpy; print('NumPy',numpy.__version__)"
           blender --background --factory-startup --python-expr "import bpy; print('Blender', bpy.app.version_string)"
       - name: Fetch official Mineclonia and animated B3D importer
         run: |
