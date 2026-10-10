@@ -1,5 +1,5 @@
 """Emit bounded, non-sensitive conversion diagnostics without exposing raw Blender logs."""
-import json, sys
+import json, sys, re
 from collections import Counter
 from pathlib import Path
 
@@ -24,7 +24,13 @@ for name in ("creeper","enderman","horse"):
                    "meshes":sum(int(x.get("meshes",0)) for x in matches),
                    "skins":sum(int(x.get("skins",0)) for x in matches),
                    "animations":sum(int(x.get("animations",0)) for x in matches)}
-print(json.dumps({"schema":1,"exit_code":exit_code,"report_present":path.exists(),
+def safe_signature(item):
+    msg=str(item.get("error") or item.get("export_error") or "")
+    # Only expose known Blender API identifiers from AttributeError, never arbitrary text.
+    match=re.search(r"has no attribute ['\\\"]([A-Za-z_][A-Za-z_0-9]{0,63})['\\\"]",msg)
+    return match.group(1) if match else "unspecified"
+signatures=Counter(safe_signature(x) for x in failed)
+print(json.dumps({"api_attribute_signatures":dict(signatures),"schema":2,"exit_code":exit_code,"report_present":path.exists(),
  "total":len(data),"converted":sum(bool(x.get("ok")) for x in data if isinstance(x,dict)),
  "failed":len(failed),"error_categories":dict(Counter(clean_error(x) for x in failed)),
  "models_with_skins":sum(int(x.get("skins",0))>0 for x in data if isinstance(x,dict)),
