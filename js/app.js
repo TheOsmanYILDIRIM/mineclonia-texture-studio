@@ -1909,6 +1909,7 @@ function installPersistedEditFast(edit,{markChanged=false}={}){
   if(markChanged){changedPathsFast.add(edit.path);pendingChangedPaths.delete(edit.path)}
   else if(!changedPathsFast.has(edit.path))pendingChangedPaths.add(edit.path);
   const url=setFastEditUrl(edit.path,edit.blob);
+  scheduleActiveResolutionRefresh();
   const ref=cardRefsFast.get(edit.path);
   if(ref)previewUrl(edit.path,true,THUMB_MAX_EDGE).then(u=>{if(cardRefsFast.get(edit.path)===ref)ref.img.src=u}).catch(()=>{ref.img.src=url});
   if(markChanged)updateCardFast(edit.path,url);
@@ -1985,11 +1986,57 @@ async function putEdit(path,blob){
   const u=setFastEditUrl(path,blob); updateCardFast(path,u); updateStatFast();
   queuePersistFast(path,blob,'changed');
   rebuildEditThumbnail(path,blob,rec.updatedAt);
+  scheduleActiveResolutionRefresh();
   return rec;
 }
+
+// Read the actual stored edit bytes, never export-scaled thumbnails or source catalog dimensions.
+const activeEditDimensions=new Map();
+let activeResolutionScan=0;
+async function storedImageDimensions(blob){
+ const header=new Uint8Array(await blob.slice(0,32).arrayBuffer());
+ if(header.length>=24&&header[0]===137&&header[1]===80&&header[2]===78&&header[3]===71){
+  const view=new DataView(header.buffer,header.byteOffset,header.byteLength);
+  return view.getUint32(16,false)+'×'+view.getUint32(20,false);
+ }
+ if('createImageBitmap' in window){
+  const image=await createImageBitmap(blob);try{return image.width+'×'+image.height}finally{image.close?.()}
+ }
+ const image=await decodeBlobToCanvas(blob);return image.width+'×'+image.height;
+}
+async function refreshActiveResolutionFilter(){
+ const select=$('activeResolutionFilter');if(!select)return;
+ const token=++activeResolutionScan,selected=select.value;
+ const edits=await allEdits();
+ const current=new Set(edits.map(e=>e.path));
+ for(const path of [...activeEditDimensions.keys()])if(!current.has(path))activeEditDimensions.delete(path);
+ const sizes=new Map();
+ for(const edit of edits){
+  let record=activeEditDimensions.get(edit.path);
+  if(!record||record.updatedAt!==edit.updatedAt||record.blob!==edit.blob){
+   try{record={updatedAt:edit.updatedAt,blob:edit.blob,size:await storedImageDimensions(edit.blob)};activeEditDimensions.set(edit.path,record)}
+   catch(error){console.warn('Active resolution unreadable',edit.path,error);continue}
+  }
+  sizes.set(record.size,(sizes.get(record.size)||0)+1);
+  if(token!==activeResolutionScan)return;
+ }
+ const options=[...sizes].sort((a,b)=>{
+  const [aw,ah]=a[0].split('×').map(Number),[bw,bh]=b[0].split('×').map(Number);
+  return aw*ah-bw*bh||aw-bw||ah-bh;
+ });
+ select.replaceChildren(new Option('Aktif çözünürlük · Tümü',''));
+ for(const [size,count] of options)select.add(new Option(size+' ('+count+')',size));
+ select.value=sizes.has(selected)?selected:'';
+ if(selected!==select.value)applyFilter();
+}
+function scheduleActiveResolutionRefresh(){
+ if(!$('activeResolutionFilter'))return;
+ refreshActiveResolutionFilter().catch(error=>console.warn('Active resolution filter',error));
+}
+
 async function applyFilter(){
   const q=$('search').value.trim().toLowerCase(),cat=$('category').value,p=activePriority();
-  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)||isAuthoredItemTexture(x)));
+  filtered=CATALOG.filter(x=>(p==='ALL'||x.priority===p)&&categoryMatches(x,cat)&&(!q||x.path.toLowerCase().includes(q))&&(!changedOnly||changedPathsFast.has(x.path))&&(!promptedOnly||hasAuthoredPrompt(x)||isAuthoredItemTexture(x))&&(!$('activeResolutionFilter')?.value||activeEditDimensions.get(x.path)?.size===$('activeResolutionFilter').value));
   page=0; render();
 }
 async function render(){
@@ -2064,6 +2111,7 @@ async function importPng(file,seam=false){
   }
   toast((seam?'Seam dönüşü':'Yeni texture')+` • 16px→${TARGET_RESOLUTION}px ölçek`+(assetTypeOf(target)==='Entity'?' • kaynak alpha kilitli':''));
   queuePersistFast(target.path,b,'changed');
+  scheduleActiveResolutionRefresh();
   queueScaled(target.path,b,target,BACKGROUND_RESOLUTION);
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
 }
@@ -2103,6 +2151,7 @@ async function deletePersistedEditQuiet(path){
   }
   try{localStorage.removeItem(EDIT_LOCAL_PREFIX+path)}catch(_){}
   await delScaledPath(path);
+  scheduleActiveResolutionRefresh();
 }
 
 const VERIFY_CONCURRENCY=8;
@@ -2470,6 +2519,8 @@ async function init(){
   if(navigator.storage?.persist){try{navigator.storage.persist()}catch(e){}}
 
   $('resolution').value=String(TARGET_RESOLUTION);
+  $('activeResolutionFilter').onchange=()=>applyFilter();
+  $('activeResolutionFilter').addEventListener('focus',scheduleActiveResolutionRefresh);
   $('resolution').onchange=e=>{TARGET_RESOLUTION=Number(e.target.value)||256;try{localStorage.setItem(RESOLUTION_KEY,String(TARGET_RESOLUTION))}catch(_){}toast('Temel 16px ölçeği → '+TARGET_RESOLUTION+'px');refreshExportResolutionPreview()};
   $('search').oninput=()=>applyFilter();$('category').onchange=()=>applyFilter();
   $('changedOnly').onclick=()=>{changedOnly=!changedOnly;$('changedOnly').classList.toggle('primary',changedOnly);applyFilter()};
@@ -2568,6 +2619,7 @@ async function init(){
 
   await renderRecentTextures();
   await applyFilter();
+  scheduleActiveResolutionRefresh();
   // Heavy persistence verification and prompt metadata hydrate after the usable UI is visible.
   bootstrapStorageInBackground();
   PROMPT_STORE_READY.then(()=>{
