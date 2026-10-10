@@ -81,3 +81,15 @@ jobs:
           node-version: '22'
       - name: Verify all authored Mobs reference prompts
         run: node tests/mob-prompt-coverage.test.mjs
+
+  b3d-clip-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify sourced animation clips and adult/child ranges
+        run: node tests/b3d-animation-clips.test.mjs
+      - name: Verify B3D animation controller syntax
+        run: node --check js/b3d-preview-controls.js
