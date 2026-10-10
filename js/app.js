@@ -595,7 +595,6 @@ function renderActivePrompt(){
  promptViewMode='classic';
  const rec=promptRecord(active),p=promptFor(active,'classic');
  const isMob=isMobUvTexture(active),isArmor=isArmorUvTexture(active),isUv=isMob||isArmor,isItem=rec?.family==='items',isP0=active.priority==='P0'&&!isUv&&!isItem;
- window.dispatchEvent(new CustomEvent('mts:chat-stage',{detail:{stage:isUv?'mob_hq':isItem?'item_creative':isP0?'block_ref':'general'}}));
  $('normalPromptBtns').style.display=isUv?'none':'';
  $('mobPromptBtns').classList.toggle('show',isUv);
  $('singlePromptJson').style.display='none';
@@ -2555,27 +2554,6 @@ async function init(){
     if(opt)opt.textContent='Item · '+(window.MTSPromptStore?.authoredCount('items')||0);
   }).catch(err=>console.warn('prompt registry background load',err));
 }
-
-import('./chatgpt-targets.mjs').then(({installChatTargets})=>installChatTargets({
- notify:toast,
- getPrompt:(selectedStage)=>{
-  if(!active)return null;
-  const row=promptRecord(active),isUv=isMobUvTexture(active)||isArmorUvTexture(active);
-  const stage=selectedStage;let text='';
-  if(stage==='mob_hq'||stage==='mob_ref'||stage==='mob_final'){
-   if(!isUv)return null;
-   text=stage==='mob_hq'?mobHqUvPromptFor(active):stage==='mob_final'?mobFinalUvPromptFor(active):referencePromptFor(active);
-   text=tintPromptText(text,active)+(isRuntimeTintTexture(active)?'\\n\\n'+RUNTIME_TINT_PROMPT_LOCK:'');
-  }else if(stage==='item_creative'||stage==='item_correction'){
-   if(row?.family!=='items')return null;
-   text=promptStage(active,stage==='item_creative'?'creative':'correction')||'';
-  }else if(stage==='block_ref'||stage==='block_production'){
-   if(row?.family!=='blocks'&&active.priority!=='P0')return null;
-   text=stage==='block_ref'?promptFor(active,'classic')?.text||'':p0ProductionPromptFor(active);
-  }else text=$('promptText')?.value||promptFor(active,'classic')?.text||'';
-  return {stage,text};
- }
-})).catch(e=>console.warn('ChatGPT target controls unavailable',e));
 
 CATALOG_READY.then(()=>{
  const promoted=applyCanonicalPriorityPromotions();
