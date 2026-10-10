@@ -2557,21 +2557,20 @@ async function init(){
 
 import('./chatgpt-targets.mjs').then(({installChatTargets})=>installChatTargets({
  notify:toast,
- getPrompt:()=>{
+ getPrompt:(selectedStage)=>{
   if(!active)return null;
   const row=promptRecord(active),isUv=isMobUvTexture(active)||isArmorUvTexture(active);
-  const focused=document.activeElement?.id;
-  let stage='general',text='';
-  if(isUv){
-   const button=document.querySelector('#mobPromptBtns button:focus');
-   const id=button?.id||focused;
-   stage=id==='mobHqPrompt'?'mob_hq':id==='mobFinalPrompt'?'mob_final':'mob_ref';
+  const stage=selectedStage;let text='';
+  if(stage==='mob_hq'||stage==='mob_ref'||stage==='mob_final'){
+   if(!isUv)return null;
    text=stage==='mob_hq'?mobHqUvPromptFor(active):stage==='mob_final'?mobFinalUvPromptFor(active):referencePromptFor(active);
    text=tintPromptText(text,active)+(isRuntimeTintTexture(active)?'\\n\\n'+RUNTIME_TINT_PROMPT_LOCK:'');
-  }else if(row?.family==='items'){
-   stage='item_creative';text=promptStage(active,'creative')||'';
-  }else if(row?.family==='blocks'||active.priority==='P0'){
-   stage='block_ref';text=promptFor(active,'classic')?.text||'';
+  }else if(stage==='item_creative'||stage==='item_correction'){
+   if(row?.family!=='items')return null;
+   text=promptStage(active,stage==='item_creative'?'creative':'correction')||'';
+  }else if(stage==='block_ref'||stage==='block_production'){
+   if(row?.family!=='blocks'&&active.priority!=='P0')return null;
+   text=stage==='block_ref'?promptFor(active,'classic')?.text||'':p0ProductionPromptFor(active);
   }else text=$('promptText')?.value||promptFor(active,'classic')?.text||'';
   return {stage,text};
  }
