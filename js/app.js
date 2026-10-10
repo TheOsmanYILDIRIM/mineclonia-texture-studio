@@ -2224,7 +2224,7 @@ function setupCompactMobileDetail(){
   drawer.addEventListener('touchmove',e=>{
     if(!gestureStart||e.touches.length!==1)return;
     const t=e.touches[0],dx=t.clientX-gestureStart.x,dy=t.clientY-gestureStart.y,ax=Math.abs(dx),ay=Math.abs(dy);
-    if(!gestureClaimed&&((dy>34&&ay>ax*1.15)||(ax>34&&ax>ay*1.15)))gestureClaimed=true;
+    if(!gestureClaimed&&((dy>100&&ay>ax*1.8)||(ax>100&&ax>ay*1.8)))gestureClaimed=true;
     if(gestureClaimed)e.preventDefault();
   },{passive:false});
   drawer.addEventListener('touchend',e=>{
@@ -2234,11 +2234,11 @@ function setupCompactMobileDetail(){
     const claimed=gestureClaimed;
     gestureStart=null;gestureClaimed=false;
     if(elapsed>1400)return;
-    if(dy>105&&ay>ax*1.15){
+    if(dy>190&&ay>ax*1.8){
       gestureSuppressClickUntil=performance.now()+450;
       closeDetailSheet();return
     }
-    if(ax>90&&ax>ay*1.2){
+    if(ax>170&&ax>ay*1.8){
       gestureSuppressClickUntil=performance.now()+450;
       const list=(filtered&&filtered.length?filtered:CATALOG)||[];
       const idx=list.findIndex(x=>x?.path===active?.path);
@@ -2251,15 +2251,44 @@ function setupCompactMobileDetail(){
   },{passive:true});
   const upload=$('uploadEdited');
   const clean=drawer.querySelector('label:has(#autoBlackBgClean)');
-  if(upload)main.appendChild(upload);
+  if(upload){upload.hidden=true;main.appendChild(upload)}
   if(clean){clean.classList.add('compactClean');main.appendChild(clean)}
 
+  const downloads=compact.querySelector('#compactDownloads');
+  const selector=document.createElement('div');selector.className='mtsGridSource';selector.innerHTML='<button type="button" class="active" data-source="original">Orijinal</button><button type="button" data-source="active">Aktif</button>';
+  downloads?.before(selector);
+  const syncGridMode=()=>{
+    const selected=selector.querySelector('.active')?.dataset.source||'original';
+    for(const [id,kind] of [['downloadGridUv','original'],['importGridUv','original'],['downloadActiveGridUv','active'],['importActiveGridUv','active']]){
+      const b=$(id);if(!b)continue;
+      b.style.display=selected===kind?'':'none';
+      b.hidden=selected!==kind;
+    }
+  };
+  selector.addEventListener('click',e=>{const b=e.target.closest('[data-source]');if(!b)return;selector.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));syncGridMode()});
+  window.MTSSyncGridMode=syncGridMode;
   move('downloadOriginal','#compactDownloads');
   move('downloadEdited','#compactDownloads');
   move('downloadGridUv','#compactDownloads');
   move('importGridUv','#compactDownloads');
-  move('detailEditUndo','#compactMain');
-  move('detailEditRedo','#compactMain');
+  // Mobile icon rail sits beside the preview, never inside the bottom dock.
+  const editRail=document.createElement('div');editRail.className='mtsEditRail';editRail.setAttribute('aria-label','Texture düzenleme');
+  preview?.before(editRail);
+  const icons={
+    uploadEdited:'<path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v4h16v-4"/>',
+    detailEditUndo:'<path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12"/>',
+    detailEditRedo:'<path d="m15 14 5-5-5-5m5 5H10a6 6 0 0 0 0 12"/>',
+    revert:'<path d="M4 7v5h5M5 12a8 8 0 1 1 2 6"/>'
+  };
+  for(const [id,label] of [['uploadEdited','PNG yükle'],['detailEditUndo','Geri al'],['detailEditRedo','İleri al'],['revert','Sıfırla']]){
+    const original=$(id);if(!original)continue;
+    const b=document.createElement('button');b.type='button';b.className='mtsEditIcon';b.title=label;b.setAttribute('aria-label',label);
+    b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+icons[id]+'</svg>';
+    b.addEventListener('click',()=>original.click());
+    editRail.appendChild(b);
+    if(id==='detailEditUndo'||id==='detailEditRedo')new MutationObserver(()=>{b.disabled=original.disabled}).observe(original,{attributes:true,attributeFilter:['disabled']});
+    b.disabled=original.disabled;
+  }
   const refDownload=document.createElement('button');
   refDownload.className='btn compactRefDownload';
   refDownload.id='downloadMaterialRef';
@@ -2297,7 +2326,7 @@ function setupCompactMobileDetail(){
 
   compact.querySelector('#compactAi').appendChild(promptBox);
   if(animBox)compact.querySelector('#compactAnim').appendChild(animBox);
-  move('revert','#compactAdvanced');
+  // Reset is accessible through the preview-side SVG rail.
   if(hint)compact.querySelector('#compactAdvanced').appendChild(hint);
 
   actions.style.display='none';
@@ -2408,8 +2437,8 @@ async function init(){
       for(const b of [activeDownload,activeImport]){b.hidden=!allowed;b.style.display=allowed?'':'none';b.disabled=!allowed}
     };
     new MutationObserver(syncActiveGrid).observe(gridDownload,{attributes:true,attributeFilter:['hidden','style','disabled']});
-    window.MTSSyncActiveGrid=syncActiveGrid;
-    syncActiveGrid();
+    window.MTSSyncActiveGrid=()=>{syncActiveGrid();window.MTSSyncGridMode?.()};
+    syncActiveGrid();window.MTSSyncGridMode?.();
   }
 
   $('seamExport').onclick=async()=>{const b=await displayBlob(active.path);dl(await imageBlobTransform(b,true),active.name.replace(/\.png$/,'_SEAM_EDIT.png'));toast('Kenarlar merkeze taşındı')};
