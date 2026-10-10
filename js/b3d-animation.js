@@ -9,7 +9,7 @@ function matrix(p,s,q,meshSpace=false){const [w,a,b,c]=q,x=meshSpace?a:-a,y=mesh
 function point(m,v){const x=v[0],y=v[1],z=v[2];return [m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]]}
 const lerp=(a,b,t)=>a.map((x,i)=>x+(b[i]-x)*t);
 function slerp(a,b,t){let d=a.reduce((s,v,i)=>s+v*b[i],0);let bb=b;if(d<0){bb=b.map(v=>-v);d=-d}if(d>.9995){const q=lerp(a,bb,t),n=Math.hypot(...q)||1;return q.map(v=>v/n)}const theta=Math.acos(Math.min(1,d)),s=Math.sin(theta);return a.map((v,i)=>(Math.sin((1-t)*theta)*v+Math.sin(t*theta)*bb[i])/s)}
-function sampleKeys(node,frame){const keys=node.keys;if(!keys.length)return {p:node.pos,s:node.scale,q:node.rot};let lo=keys[0],hi=keys[keys.length-1];for(let i=0;i<keys.length-1;i++)if(frame>=keys[i].frame&&frame<=keys[i+1].frame){lo=keys[i];hi=keys[i+1];break}if(frame<=keys[0].frame)lo=hi=keys[0];else if(frame>=keys[keys.length-1].frame)lo=hi=keys[keys.length-1];const t=lo===hi?0:Math.max(0,Math.min(1,(frame-lo.frame)/(hi.frame-lo.frame)));return {p:lerp(lo.pos||node.pos,hi.pos||node.pos,t),s:lerp(lo.scale||node.scale,hi.scale||node.scale,t),q:slerp(lo.rot||node.rot,hi.rot||node.rot,t)}}
+function sampleKeys(node,frame){const keys=node.keys;if(!keys.length)return {p:node.pos,s:node.scale,q:node.rot};let lo=keys[0],hi=keys[keys.length-1];for(let i=0;i<keys.length-1;i++)if(frame>=keys[i].frame&&frame<=keys[i+1].frame){lo=keys[i];hi=keys[i+1];break}if(frame<=keys[0].frame)lo=hi=keys[0];else if(frame>=keys[keys.length-1].frame)lo=hi=keys[keys.length-1];const t=lo===hi?0:Math.max(0,Math.min(1,(frame-lo.frame)/(hi.frame-lo.frame)));return {p:lerp(lo.pos||node.pos,hi.pos||node.pos,t),s:node.previewHeadScaleGuard?node.scale:lerp(lo.scale||node.scale,hi.scale||node.scale,t),q:slerp(lo.rot||node.rot,hi.rot||node.rot,t)}}
 function parse(buffer){
  const v=new DataView(buffer),len=v.byteLength;let cur=0,frameMax=0,fps=60;const meshes=[],nodes=[],allVertices=[],uvs=[],indices=[],groups=[];const keyFrames=new Set();
  const take=(n,end)=>{if(cur+n>end||cur+n>len)throw Error('Truncated B3D');const p=cur;cur+=n;return p};
@@ -31,7 +31,21 @@ function parse(buffer){
  }
  if(tag(len)!=='BB3D')throw Error('B3D header missing');const rootSize=u32(len),rootEnd=cur+rootSize;if(rootEnd>len)throw Error('Invalid B3D root');i32(rootEnd);chunks(rootEnd,null,null);
  if(!allVertices.length||!indices.length)throw Error('B3D geometry missing');
- for(const n of nodes)n.keys.sort((a,b)=>a.frame-b.frame);
+ for(const n of nodes){
+  n.keys.sort((a,b)=>a.frame-b.frame);
+  // Source B3Ds sometimes animate a *uniform* 1x -> 1.5x/2x head-control scale
+  // (cow, rabbit, pig, cat). In an inspection preview this reads as a head
+  // inflating rather than nodding. Keep original position/rotation keyframes,
+  // and suppress only this specific preview-only uniform head enlargement.
+  // Non-head, nonuniform and source-rest scales remain unchanged.
+  const head=/(?:^|[._-])head(?:$|[._-])/i.test(n.name);
+  n.previewHeadScaleGuard=head&&n.keys.some(key=>{
+   const a=key.scale,b=n.scale;
+   if(!a||!b.every(x=>Number.isFinite(x)&&Math.abs(x)>1e-6))return false;
+   const r=a.map((x,i)=>x/b[i]);
+   return r.every(Number.isFinite)&&Math.max(...r)-Math.min(...r)<1e-4&&r[0]>1.25;
+  });
+ }
  function bindNode(i){const n=nodes[i],parent=n.parent===null?ident():nodes[n.parent].bind,meshParent=n.parent===null?ident():nodes[n.parent].meshBind;n.bind=mul(parent,matrix(n.pos,n.scale,n.rot));n.meshBind=mul(meshParent,matrix(n.pos,n.scale,n.rot,true));n.inverse=inverse(n.bind);for(const j of n.children)bindNode(j)}
  nodes.forEach((n,i)=>{if(n.parent===null)bindNode(i)});
  let lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
