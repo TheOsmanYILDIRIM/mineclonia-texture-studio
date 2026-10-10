@@ -13,7 +13,7 @@ const color = (hex) => {
 };
 function validateImage(image) {
   assert(image && isInt(image.width) && isInt(image.height) && image.width > 0 && image.height > 0 && image.data?.length === image.width * image.height * 4, 'Invalid RGBA image');
-  assert(image.width <= 512 && image.height <= 512, 'Source exceeds supported native size (512px)');
+  assert(image.width <= 1024 && image.height <= 1024, 'Source exceeds supported native size (1024px)');
 }
 function getOptions(options = {}) {
   const scale = Number(options.scale ?? 24), spacing = Number(options.spacing ?? 48);
@@ -39,7 +39,7 @@ function prepareMapping(source, options) {
 }
 function masksFor(source, mapping) {
   const [lw, lh] = mapping.layout, { width: w, height: h } = source;
-  assert(isInt(lw) && isInt(lh) && lw > 0 && lh > 0 && lw <= 512 && lh <= 512, 'Layout exceeds 512px');
+  assert(isInt(lw) && isInt(lh) && lw > 0 && lh > 0 && lw <= 1024 && lh <= 1024, 'Layout exceeds 1024px');
   const occupied = new Uint8Array(lw * lh), seenSource = new Uint8Array(w * h);
   const ids = new Set();
   for (const g of mapping.groups) {
@@ -227,7 +227,9 @@ function isCalico(meta,image){return image.width===64 && image.height===32 && /(
 async function newPlan(image,meta){
  let mapping;
  if(isCalico(meta,image)){const response=await fetch(MAPPING_URL);if(!response.ok)throw Error('Kedi ConnectedNet haritası bulunamadı');mapping=await response.json();}
- return createPlan(image,{scale:24,spacing:48,clearance:8,align:'center',grid:'#ff00ff',matte:'#1c1f27',mapping});
+ const scale=Math.min(24,Math.floor(4096/Math.max(image.width,image.height)));
+ if(scale<1)throw Error('Texture grid sınırını aşıyor');
+ return createPlan(image,{scale,spacing:Math.min(48,scale*2),clearance:Math.min(8,Math.max(0,scale-1)),align:'center',grid:'#ff00ff',matte:'#1c1f27',mapping});
 }
 async function prepare(meta,sourceBlob){
  if(!meta?.path)throw Error('Texture seçilmedi');
