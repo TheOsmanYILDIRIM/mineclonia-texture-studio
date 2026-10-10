@@ -7,7 +7,7 @@ function getManifest(){
  if(!manifestPromise)manifestPromise=fetch('js/data/b3d-animation-clips.json',{cache:'force-cache'}).then(r=>{if(!r.ok)throw Error('B3D Lua klip kataloğu yüklenemedi');return r.json()}).catch(err=>{manifestPromise=null;throw err});
  return manifestPromise;
 }
-function clipLabel(c){const name=clipNames[c.name]||c.name.replace(/_/g,' ');return (c.form==='child'?'Yavru · ':'Yetişkin · ')+name+' ('+c.start+'–'+c.end+')'}
+function clipLabel(c){const name=clipNames[c.name]||c.name.replace(/_/g,' ');return (c.form==='child'?'Yavru · ':'Yetişkin · ')+(c.state==='block'?'Blok taşıma · ':c.state==='normal'?'Normal · ':'')+name+' ('+c.start+'–'+c.end+')'}
 function ensureCSS(){if(styleLoaded)return;styleLoaded=true;const link=document.createElement('link');link.rel='stylesheet';link.href='css/b3d-animation.css';document.head.appendChild(link)}
 function attach({animation,model,gl,positionBuffer,redraw,stage}){
  destroy();if(!animation||!animation.animated||!animation.frames)return null;ensureCSS();
