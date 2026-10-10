@@ -2027,11 +2027,13 @@ async function refreshActiveResolutionFilter(){
  select.replaceChildren(new Option('Aktif çözünürlük · Tümü',''));
  for(const [size,count] of options)select.add(new Option(size+' ('+count+')',size));
  select.value=sizes.has(selected)?selected:'';
- if(selected!==select.value)applyFilter();
+ if(selected)applyFilter();
 }
+let activeResolutionRefreshTimer=null;
 function scheduleActiveResolutionRefresh(){
  if(!$('activeResolutionFilter'))return;
- refreshActiveResolutionFilter().catch(error=>console.warn('Active resolution filter',error));
+ clearTimeout(activeResolutionRefreshTimer);
+ activeResolutionRefreshTimer=setTimeout(()=>refreshActiveResolutionFilter().catch(error=>console.warn('Active resolution filter',error)),120);
 }
 
 async function applyFilter(){
