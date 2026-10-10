@@ -57,3 +57,17 @@ jobs:
         run: |
           node --check js/preview3d.js
           node --check js/preview3d-nodeboxes.mjs
+
+  b3d-rig-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify B3D rig regression and static mesh parity
+        run: node tests/b3d-animation.test.cjs
+      - name: Check B3D renderer syntax
+        run: |
+          node --check js/b3d-animation.js
+          node --check js/preview3d.js
