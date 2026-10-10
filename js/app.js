@@ -785,12 +785,11 @@ async function lockEntityAlphaToSource(blob,meta){
  eg.putImageData(ed,0,0);
  return await canvasPngBlob(edited)
 }
-async function prepareVariantTextureBlob(blob,meta,targetRes=TARGET_RESOLUTION){
- let out=blob;
- // Variant Lab must preserve the uploaded PNG's own alpha so UV repair can compare
- // generated alpha geometry against the original alpha geometry.
- out=await normalizeTextureBlob(out,meta,targetRes);
- return out
+async function prepareVariantTextureBlob(blob,meta){
+ // Variant Lab imports are master edits, not export artifacts.
+ // Never apply TARGET_RESOLUTION here: it irreversibly discards AI source pixels.
+ // The export-only normalization belongs in exportPack/preview, not any save path.
+ return await prepareStoredEditBlob(blob,meta);
 }
 async function removeConnectedBlackBackground(blob){
  const c=await decodeBlobToCanvas(blob),w=c.width,h=c.height,g=c.getContext('2d',{willReadFrequently:true}),im=g.getImageData(0,0,w,h),d=im.data,n=w*h;
