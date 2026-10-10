@@ -33,12 +33,17 @@ async function verify(label){
 }
 const first=await verify('1x1');
 await page.locator('.mtsTileCycle').click();
+await page.waitForFunction(()=>document.querySelector('#tilePreview')?.dataset.tileReady==='3',{timeout:15000});
 await page.screenshot({path:out+'/02-three-by-three.png'});
 const second=await verify('3x3');
+if(!await page.locator('#tilePreview.show').count())throw Error('3x3 tiled overlay is blank');
 await page.locator('.mtsTileCycle').click();
+await page.waitForFunction(()=>document.querySelector('#tilePreview')?.dataset.tileReady==='6',{timeout:15000});
 await page.locator('.mtsTileCycle').click();
+await page.waitForFunction(()=>document.querySelector('#tilePreview')?.dataset.tileReady==='9',{timeout:15000});
 await page.screenshot({path:out+'/03-nine-by-nine.png'});
 const third=await verify('9x9');
+if(!await page.locator('#tilePreview.show').count())throw Error('9x9 tiled overlay is blank');
 if(Math.abs(first.row[1]-second.row[1])>3||Math.abs(first.row[1]-third.row[1])>3)throw Error('Tile toolbar moves vertically between preview sizes');
 if(errors.length)throw Error('Browser JS errors: '+errors.join(' | '));
 console.log('PASS mobile UI visual geometry',JSON.stringify({first,second,third}));
