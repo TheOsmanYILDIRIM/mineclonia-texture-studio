@@ -674,7 +674,7 @@ const RECENT_TEXTURES_KEY='mts_recent_textures_v1';
 function recentTexturePaths(){try{const x=JSON.parse(localStorage.getItem(RECENT_TEXTURES_KEY)||'[]');return Array.isArray(x)?x:[]}catch(_){return[]}}
 function rememberRecentTexture(x){if(!x?.path)return;const list=[x.path,...recentTexturePaths().filter(p=>p!==x.path)].slice(0,10);try{localStorage.setItem(RECENT_TEXTURES_KEY,JSON.stringify(list))}catch(_){}renderRecentTextures()}
 async function renderRecentTextures(){const root=$('recentTextures'),strip=$('recentTextureStrip');if(!root||!strip)return;const items=recentTexturePaths().map(p=>CATALOG.find(x=>x.path===p)).filter(Boolean).slice(0,8);root.classList.add('show');strip.innerHTML='';if(!items.length){const empty=document.createElement('div');empty.className='recentTextureEmpty';empty.textContent='Henüz açılan texture yok';strip.appendChild(empty);return}for(const x of items){const b=document.createElement('button');b.className='recentTexture';b.title=x.path;b.innerHTML='<img><span></span>';b.querySelector('span').textContent=x.name||x.path.split('/').pop();b.onclick=()=>openDetail(x);strip.appendChild(b);try{b.querySelector('img').src=await previewUrl(x.path,true,96)}catch(_){}}}
-async function openDetail(x){active=x;await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);const gridAllowed=isMobUvTexture(x)&&!isAnimatedStrip(x);for(const id of ['downloadGridUv','importGridUv']){const button=$(id);if(button){button.hidden=!gridAllowed;button.style.display=gridAllowed?'':'none';button.disabled=!gridAllowed;}}$('sheet').classList.add('open');await refreshAnimPreview()}
+async function openDetail(x){active=x;refreshEditHistoryButtons();await PROMPT_STORE_READY;await PROMPT_STORE.ensure?.(x);rememberRecentTexture(x);resetPreviewView();const ri=runtimeRoleInfo(x);$('detailName').textContent=`${x.priority} · ${x.name}`;$('detailPath').textContent=`${x.path} · ${x.w}×${x.h}${isAnimatedStrip(x)?' · animated strip':''}`;$('detailRole').textContent='Rol: '+ri.role+(ri.model?' · Model: '+ri.model:'')+(ri.evidence?' · Kaynak: '+ri.evidence:'');$('origImg').src=await previewUrl(x.path,false,EDITOR_PREVIEW_MAX_EDGE);const edit=await getEdit(x.path);$('editImg').src=edit?await previewUrl(x.path,true,EDITOR_PREVIEW_MAX_EDGE):$('origImg').src;$('editImg').style.opacity=edit?1:.35;$('compare').value=edit?50:100;updateCompare();promptViewMode='classic';$('textureId').textContent='ID: '+x.id;renderActivePrompt();$('hint').textContent=isAnimatedStrip(x)?'Bu asset uzun bir animasyon stripidir. Seam offset kapalıdır. GPT için “Strip → Kare atlas” kullan; düzenlenmiş atlası geri yüklediğinde uygulama onu tekrar aynı strip düzenine çevirir.':'Seam düzenleme: “50% Offset PNG” kenar birleşimlerini merkeze taşır. Bu PNG’yi düzenletip “Offset düzenlemeyi geri yükle” ile içe aktar; uygulama aynı yarım kaydırmayı tekrar uygulayıp gerçek tile düzenine döndürür.';$('seamExport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;$('seamImport').disabled=assetTypeOf(x)==='Entity'||isAnimatedStrip(x)||x.w!==x.h;tileN=1;tileEdited=!!edit;$('tileSource').textContent=tileEdited?'Yeni':'Orijinal';$('tilePreview').classList.remove('show');$('preview').style.display='block';updateMaterialReferenceDownload(x);const gridAllowed=isMobUvTexture(x)&&!isAnimatedStrip(x);for(const id of ['downloadGridUv','importGridUv']){const button=$(id);if(button){button.hidden=!gridAllowed;button.style.display=gridAllowed?'':'none';button.disabled=!gridAllowed;}}$('sheet').classList.add('open');await refreshAnimPreview()}
 function updateCompare(){const v=Number($('compare').value);$('editImg').style.clipPath=`inset(0 0 0 ${100-v}%)`}
 function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 
@@ -1907,7 +1907,37 @@ function queuePersistFast(path,blob,verification='changed'){
   });
   return editWriteQueue;
 }
+// Session-scoped, per-texture undo/redo. Null represents the original unedited texture.
+const editHistory=new Map(),editHistoryBusy=new Set();
+function historyState(path){if(!editHistory.has(path))editHistory.set(path,{undo:[],redo:[]});return editHistory.get(path)}
+function refreshEditHistoryButtons(){
+ const h=active?historyState(active.path):null;
+ const undo=$('detailEditUndo'),redo=$('detailEditRedo');
+ if(undo)undo.disabled=!h?.undo.length;
+ if(redo)redo.disabled=!h?.redo.length;
+}
+async function recordEditHistory(path){
+ if(editHistoryBusy.has(path))return;
+ const h=historyState(path),before=await getEdit(path);
+ h.undo.push(before?.blob||null);
+ if(h.undo.length>10)h.undo.shift();
+ h.redo.length=0;refreshEditHistoryButtons();
+}
+async function travelEditHistory(direction){
+ if(!active)return;
+ const path=active.path,h=historyState(path),from=direction==='undo'?h.undo:h.redo,to=direction==='undo'?h.redo:h.undo;
+ if(!from.length||editHistoryBusy.has(path))return;
+ editHistoryBusy.add(path);refreshEditHistoryButtons();
+ try{
+  const current=await getEdit(path),previous=from.pop();to.push(current?.blob||null);
+  if(previous)await putEdit(path,previous);else await delEdit(path);
+  if(active?.path===path){await openDetail(active);await applyFilter()}
+  toast(direction==='undo'?'Aktif değişiklik geri alındı':'Aktif değişiklik ileri alındı');
+ }catch(error){to.pop();from.push(previous);toast('Geçmiş uygulanamadı: '+error.message)}
+ finally{editHistoryBusy.delete(path);refreshEditHistoryButtons()}
+}
 async function putEdit(path,blob){
+  await recordEditHistory(path);
   const rec={path,blob,updatedAt:Date.now()};
   await invalidateDerivedCaches(path);
   hotEdits.set(path,rec); changedPathsFast.add(path); pendingChangedPaths.delete(path);
@@ -1983,6 +2013,7 @@ async function importPng(file,seam=false){
     toast('Dosya orijinalle birebir aynı • değişiklik sayılmadı');
     return;
   }
+  await recordEditHistory(target.path);
   const rec={path:target.path,blob:b,updatedAt:Date.now()};
   hotEdits.set(target.path,rec); changedPathsFast.add(target.path); pendingChangedPaths.delete(target.path);
   const u=setFastEditUrl(target.path,b);
@@ -1996,6 +2027,7 @@ async function importPng(file,seam=false){
   if(TARGET_RESOLUTION!==BACKGROUND_RESOLUTION) queueScaled(target.path,b,target,TARGET_RESOLUTION);
 }
 async function delEdit(path){
+  await recordEditHistory(path);
   hotEdits.delete(path); memoryEdits.delete(path); changedPathsFast.delete(path); pendingChangedPaths.delete(path); revoke(path);
   editWriteQueue=editWriteQueue.catch(()=>{}).then(async()=>{
     setSaveState('Siliniyor…','warn');
@@ -2381,6 +2413,8 @@ async function init(){
   $('exportAtlas').onclick=async()=>{if(!active||!isAnimatedStrip(active))return;const blob=await displayBlob(active.path);const atlas=await stripBlobToAtlasBlob(blob,active);dl(atlas,active.name.replace(/\.png$/,'_ATLAS_EDIT.png'));toast('Kare atlas indirildi')};
   $('importAtlas').onclick=()=>{if(active&&isAnimatedStrip(active))$('fileAnimAtlas').click()};
   $('fileAnimAtlas').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!active||!isAnimatedStrip(active))return;toast('Atlas strip hâline çevriliyor…');const strip=await atlasBlobToStripBlob(f,active);await putEdit(active.path,strip);toast('Atlas geri yüklendi ve strip olarak kaydedildi');await openDetail(active);await applyFilter()};
+  $('detailEditUndo').onclick=()=>travelEditHistory('undo');
+  $('detailEditRedo').onclick=()=>travelEditHistory('redo');
   $('revert').onclick=async()=>{if(!active)return;await delEdit(active.path);toast('Orijinale dönüldü');await openDetail(active);await applyFilter()};
   $('exportPack').onclick=exportPack;$('importZip').onclick=()=>$('fileZip').click();$('fileZip').onchange=e=>importZip(e.target.files[0]);
 
