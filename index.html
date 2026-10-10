@@ -832,6 +832,20 @@ body{min-height:100dvh}
  #sheet .mtsGridSource{margin-bottom:0!important}
  #sheet .compactSectionBody.compactDownloadBody{display:block!important}
 }
+</style><style>
+@media(max-width:699px){
+ #sheet .mtsDownloadRail{right:5px!important;top:28px!important;bottom:auto!important;width:48px!important;max-height:min(70vh,550px)!important;gap:8px!important;overflow-y:auto!important}
+ #sheet .mtsRailGroup{display:flex;flex-direction:column;gap:4px;align-items:center;border:1px solid #37414e;border-radius:12px;padding:4px 2px;background:#171c23}
+ #sheet .mtsRailGroup[data-source="active"]{border-color:#577b43}
+ #sheet .mtsRailHeading{font-size:9px;line-height:1.1;color:#c4cfda;letter-spacing:-.2px}
+ #sheet .mtsDownloadIcon{width:38px!important;height:38px!important;flex:0 0 38px!important;border-radius:9px!important}
+ #sheet .compactThumbDock{display:flex!important;justify-content:flex-end!important;align-items:center!important;min-height:64px!important;padding:6px 8px calc(6px + var(--safe,0px))!important}
+ #sheet .compactThumbDock>.compactModeRow{display:none!important}
+ #sheet .compactThumbDock>.mtsBottomBack{position:static!important;inset:auto!important;display:flex!important;align-items:center;justify-content:center;width:104px!important;height:44px!important;padding:0 10px!important;margin:0!important;flex:none!important}
+ #sheet .compactActionTray .mtsGridSource{display:none!important}
+ #sheet .compactSection[data-section="ai"]{display:block!important}
+ #sheet .compactActionTray{overflow-y:auto!important}
+}
 </style></head><body><div class="app">
 <header class="top"><div class="title"><h1>Mineclonia Texture Studio</h1><div class="stat" id="stat">yükleniyor…</div><div class="stat" id="saveState">kayıt hazırlanıyor…</div><div class="buildCtl"><button class="buildBadge" id="buildBadge" type="button">Build …</button><button class="buildCheck" id="buildCheck" type="button">Güncelle</button></div></div><div class="controls"><input class="search" id="search" placeholder="texture ara…"><select class="select" id="category"><option value="">Tüm envanter</option></select><select class="select" id="resolution"><option value="64">64px</option><option value="128">128px</option><option value="256">256px</option><option value="512">512px</option></select></div><div class="filterRow"><div class="filters" id="filters"></div><button class="chip changedChip" id="promptedOnly">Promptlu</button><button class="chip changedChip" id="changedOnly">Değişenler</button><a class="chip" href="uv-generation.html" style="text-decoration:none;white-space:nowrap">AI UV</a></div></header>
 <div class="recentTextures" id="recentTextures"><div class="recentTexturesHead">Son</div><div class="recentTextureStrip" id="recentTextureStrip"></div></div>
@@ -954,4 +968,4 @@ body{min-height:100dvh}
 <script src="js/image-processing.js"></script>
 <script src="js/uv-warp.js?v=20261006-exactsnap1"></script>\n<script src="js/ordered-contour-warp.js?v=20261008-contour1"></script>\n<script src="js/island-repack.js?v=20261008-repack1"></script>
 <script src="js/prompt-registry.js?v=20261007-canonical2"></script>
-<script src="js/app.js?v=20261010-rails1"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
+<script src="js/app.js?v=20261010-dualrails2"></script><script src="js/variant-lab.js?v=20261007-vuv1"></script><script src="js/island-studio.js?v=20261007-modechooser1"></script><script src="js/vertex-uv-studio.js?v=20261007-contourperimeter1"></script><script src="js/uv-repair-router.js?v=20261009-b3duv1"></script><script src="js/locked-parent-composite.js?v=20261008-1"></script><script src="js/build-status.js?v=1"></script><script type="module" src="js/uv-generation-link.mjs?v=20261009-1"></script></body></html>
