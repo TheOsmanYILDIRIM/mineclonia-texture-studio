@@ -10,6 +10,15 @@ At the end: commit actual code changes first, verify relevant tests/deploys, and
 
 Do not manually dispatch Actions for documentation, UV experiments, or a closeout. A doc-only commit must not be described as a deployed feature. Check whether CI/deploy ran before claiming a result.
 
+## GitHub Extension — safe multi-file writes
+
+- Read the current branch HEAD, base tree, changed-file paths and relevant blob SHAs **before** editing; inspect only needed content in small batches (4–8 calls per orchestration is a heuristic, not a documented limit). Validate JSON/schema/tests and an explicit allowed-path list locally where possible.
+- For related multi-file edits use `create_tree(base_tree_sha=<current tree>, entries)` → verify prepared paths/tree → `create_commit(parent_sha=<current HEAD>)` → `update_ref(expected_sha=<current HEAD>, force=false)`. Separate these into bounded, verifiable tool calls. Never construct a replacement tree without the base tree. Use `create_file`/`update_file` only for genuinely independent small edits.
+- If HEAD moves, `compare_commits` against the pinned base. Rebuild against the new tree **only** for proven disjoint changes; for overlapping paths or uncertain results stop, retain both sides, and do not reset/rebase/force-push or blindly retry.
+- A tool safety block is **not** a GitHub HTTP status: record the exact error and inspect existing Git objects/refs before any safe retry. Do not attempt to bypass security controls. For rate/Code Mode limits, reduce per-call payload and read group size, not verification.
+- After publishing, independently re-read branch HEAD, commit file list and critical content; distinguish isolated tests, complete CI, Pages deployment and real-device proof. Record run IDs and failed steps; pre-existing failures stay explicitly open. Push/commit success alone never proves deployment.
+- Avenox Beyin has its **separate** official `beyin-io` request/status protocol: verify applied source/revision on vault `main`; do not substitute direct Git writes for official semantic task operations.
+
 ## Core texture / model invariants
 
 - Preserve gameplay identity, correct original UV/mask/alpha/void geometry, animation frame topology/order, tileability at literal canvas borders, entity face identity, overlay/tint behavior and game-distance readability.
