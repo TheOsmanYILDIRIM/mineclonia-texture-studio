@@ -1,6 +1,13 @@
 # SESSION_HANDOFF — Mineclonia Texture Studio
 Updated: 2026-10-10. Canonical branch: `main`.
 
+## Closeout verification — 2026-10-11
+- Verified `main` at `f32aa591a252b5712451c4c47a1550ea2656aee7` (latest screenshot-only commit, not a new feature release). Latest feature workflow commit `507ff3c7`: Pages **success** #38120583565; Mobile UI visual regression **success** #38120583518; MTS visual capture **failure** #38120583517; Runtime Guards **failure** #38120583564.
+- Isolated `b3d-clip-catalog`, `nodebox-geometry`, `mob-reference-coverage` jobs **success** on #38120583564. `b3d-rig-parity` and main `runtime-guards` both **failure** at B3D animation regression. Do not present the complete animation work as verified or close the underlying defect until the failure is diagnosed.
+- Current manifest still indexes 85 B3D models: 47 source-backed, 38 unresolved. Adult/child separation and restored source scale keys are present in code; real game/Android animation parity remains unverified.
+- Open PR #15 still exists. Do not merge during closeout. Preserve all IndexedDB, textures, and working model preview data.
+- Next: diagnose failing `tests/b3d-animation.test.cjs` against restored authentic head-scale semantics; verify cow/rabbit/pig/cat adult-child clips, then continue resolving 38 dynamic/unmatched models. Treat visual capture failure separately.
+
 ## B3D Lua animation catalog (2026-10-10)
 - `js/data/b3d-animation-clips.json` indexes all 85 source B3D models against pinned `mineclonia-mirror/mineclonia` tree `b5677549`. 47 models have literal Lua or helper-derived named clips; 38 are explicitly unresolved, **not** guessed.
 - `scripts/extract-b3d-animation-clips.mjs` regenerates source-backed ranges from a local Mineclonia checkout. Three initial extraction shards are retained as extraction evidence; the unified manifest is runtime canonical.
