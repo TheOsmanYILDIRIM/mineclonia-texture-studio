@@ -1,6 +1,12 @@
 # SESSION_HANDOFF — Mineclonia Texture Studio
 Updated: 2026-10-10. Canonical branch: `main`.
 
+## Island editor closeout — 2026-10-11
+- Imported PNG mirroring and compact four-button toolbar alongside 90-degree rotations landed in 08c4dc35.
+- Merge uses replaceAlpha:true, allowing transparent source pixels to clear opaque target pixels inside selected rectangles while preserving pixels outside selection.
+- Code reread, but targeted regression tests, live Android/browser checks, and Pages deployment for this specific change remain unverified. Preserve existing user edits and mts_uv_islands_v1 storage.
+- Next: test alpha and transform behavior, then verify Pages. Unrelated B3D CI failures remain separate.
+
 ## Closeout verification — 2026-10-11
 - Verified `main` at `f32aa591a252b5712451c4c47a1550ea2656aee7` (latest screenshot-only commit, not a new feature release). Latest feature workflow commit `507ff3c7`: Pages **success** #38120583565; Mobile UI visual regression **success** #38120583518; MTS visual capture **failure** #38120583517; Runtime Guards **failure** #38120583564.
 - Isolated `b3d-clip-catalog`, `nodebox-geometry`, `mob-reference-coverage` jobs **success** on #38120583564. `b3d-rig-parity` and main `runtime-guards` both **failure** at B3D animation regression. Do not present the complete animation work as verified or close the underlying defect until the failure is diagnosed.
