@@ -2,9 +2,9 @@
   "schema_version": 2,
   "family": "blocks",
   "id": "tex_c345e6ab75",
-  "path": "ITEMS/mcl_core/mcl_core_glass_cyan_detail.png",
   "name": "mcl_core_glass_cyan_detail.png",
+  "path": "ITEMS/mcl_core/mcl_core_glass_cyan_detail.png",
   "stages": {
-    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThis world is old, harsh, and shaped by climate, time, decay, growth, use, pressure and survival. Its material language is rich in depth, restrained in color, irregular, aged and authored rather than sterile, procedural, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on the detail layer of cyan stained glass, focused on subtle handcrafted waviness, age, edge character and imperfections while preserving transparency.\n\nTreat this exact surface, face or component as its own material problem. Interpret freely how it would naturally exist in this world rather than copying a low-resolution game texture or following a mechanical detail checklist. Let structure, age, tonal variation, wear, imperfections, layering and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+    "reference": "Study the slight imperfections of aged cyan stained glass without changing the appearance established by its companion pane. Show a few hair-fine optical ripples, very small air seeds and quiet variations in mineral pigment density; keep them faint enough to dissolve into translucent aqua material. The sense of craft comes from restrained thickness changes, not decorative drawing or extreme sharpness. Let the color stay between blue and green and allow the existing source alpha to govern the final detail regions. Avoid turning the material into waves, crystal ice, paint streaks, frosted opaque glass, etched patterns, strong bright lines or a filled background. This layer should gently deepen the existing cyan glass, not establish another surface design."
   }
 }

@@ -2,9 +2,9 @@
   "schema_version": 2,
   "family": "blocks",
   "id": "tex_c6fbf57802",
-  "path": "ITEMS/mcl_core/mcl_core_glass_blue_detail.png",
   "name": "mcl_core_glass_blue_detail.png",
+  "path": "ITEMS/mcl_core/mcl_core_glass_blue_detail.png",
   "stages": {
-    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThis world is old, harsh, and shaped by climate, time, decay, growth, use, pressure and survival. Its material language is rich in depth, restrained in color, irregular, aged and authored rather than sterile, procedural, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on the detail layer of blue stained glass, focused on subtle handcrafted waviness, age, edge character and imperfections while preserving transparency.\n\nTreat this exact surface, face or component as its own material problem. Interpret freely how it would naturally exist in this world rather than copying a low-resolution game texture or following a mechanical detail checklist. Let structure, age, tonal variation, wear, imperfections, layering and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+    "reference": "Create a subtle material study of the fine irregularities that belong to the established cobalt-blue stained glass. Within the same deep but translucent blue body, reveal a few delicate cooling ripples, almost hidden air inclusions and minor time-worn abrasion. Their edges should fade softly through the glass instead of reading as separately painted symbols. Keep the blue balanced, neither cyan nor violet, and avoid bright white glints that would force an artificially sharp finish. This is a detail layer: it must complement the corresponding blue glass, preserving unused transparency and source-defined coverage during later application. Avoid new panel geometry, ornamental leadwork, atmospheric cloud designs, intense reflections, large bubbles, deep cracks or opaque blue backgrounds."
   }
 }

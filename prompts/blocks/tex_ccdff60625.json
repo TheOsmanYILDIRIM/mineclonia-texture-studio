@@ -2,9 +2,9 @@
   "schema_version": 2,
   "family": "blocks",
   "id": "tex_ccdff60625",
-  "path": "ITEMS/mcl_core/mcl_core_glass_blue.png",
   "name": "mcl_core_glass_blue.png",
+  "path": "ITEMS/mcl_core/mcl_core_glass_blue.png",
   "stages": {
-    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThis world is old, harsh, and shaped by climate, time, decay, growth, use, pressure and survival. Its material language is rich in depth, restrained in color, irregular, aged and authored rather than sterile, procedural, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on blue stained glass with believable translucent body tint, handcrafted unevenness and ancient wear.\n\nTreat this exact surface, face or component as its own material problem. Interpret freely how it would naturally exist in this world rather than copying a low-resolution game texture or following a mechanical detail checklist. Let structure, age, tonal variation, wear, imperfections, layering and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+    "reference": "Create a close reference for deep blue stained glass cast by a skilled but imperfect old-world craftsperson. The cobalt mineral tint sits inside translucent silica, darkening gently in thick areas and admitting subdued bluish daylight through thinner ones. Broad calm material passages should dominate, animated only by a little handmade waviness and the softest cooling traces. This is architectural glass with age, not a jewel or a decorative stained-glass picture. Use controlled saturation and soft diffuse illumination, balancing color depth with believable transparency. Avoid electric blue light, hard mirror highlights, framed windows, ornamental patterns, heavy scratches, opaque blue paint or glass shards. The matching detail component must extend this same quiet cobalt optical identity."
   }
 }

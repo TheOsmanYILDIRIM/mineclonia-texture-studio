@@ -93,3 +93,13 @@ jobs:
         run: node tests/b3d-animation-clips.test.mjs
       - name: Verify B3D animation controller syntax
         run: node --check js/b3d-preview-controls.js
+
+  block-reference-rewrite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify individually authored block references and queue
+        run: node tests/block-reference-rewrite.test.mjs

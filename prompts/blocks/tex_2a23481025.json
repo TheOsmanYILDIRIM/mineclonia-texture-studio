@@ -2,9 +2,9 @@
   "schema_version": 2,
   "family": "blocks",
   "id": "tex_2a23481025",
-  "path": "ITEMS/mcl_core/mcl_core_glass_black_detail.png",
   "name": "mcl_core_glass_black_detail.png",
+  "path": "ITEMS/mcl_core/mcl_core_glass_black_detail.png",
   "stages": {
-    "reference": "Create a visual reference from a grounded dark-fantasy world where materials feel ancient, weathered, tactile, and physically believable.\n\nThis world is old, harsh, and shaped by climate, time, decay, growth, use, pressure and survival. Its material language is rich in depth, restrained in color, irregular, aged and authored rather than sterile, procedural, plastic or generically photoreal.\n\nCreate a close visual study centered specifically on the detail layer of black stained glass, focused on subtle handcrafted waviness, age, edge character and imperfections while preserving transparency.\n\nTreat this exact surface, face or component as its own material problem. Interpret freely how it would naturally exist in this world rather than copying a low-resolution game texture or following a mechanical detail checklist. Let structure, age, tonal variation, wear, imperfections, layering and material character emerge naturally.\n\nPrioritize material presence, surface depth, natural variation, age, visual richness and cohesive artistic identity. No scene narrative, characters, props, text or interface. Produce a definitive material reference suitable for guiding a game-texture rebuild."
+    "reference": "Study only the restrained secondary optical character of old black stained glass. The matching base layer already establishes a deep smoke-charcoal translucent body; this separate detail material adds slight cooled ripples, a few isolated air seeds, gently worn surface haze and very faint irregularities in thickness. Let each mark disappear naturally into the black glass instead of becoming a white scratch or visible line drawing. Keep the pigment family unchanged, the contrast exceptionally quiet and the transmission of light possible wherever the source permits it. Avoid drawing an entire new pane, borders, lead joints, stone veins, glossy reflections, fractured glass or solid opaque backgrounds. The purpose is to enrich the parent glass, not compete with it."
   }
 }
