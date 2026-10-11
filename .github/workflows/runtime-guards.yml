@@ -103,3 +103,13 @@ jobs:
           node-version: '22'
       - name: Verify individually authored block references and queue
         run: node tests/block-reference-rewrite.test.mjs
+
+  github-tree-cas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate tree entries and HEAD/CAS lease
+        run: node tests/github-tree-guard.test.mjs
