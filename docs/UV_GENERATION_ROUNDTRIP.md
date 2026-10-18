@@ -17,6 +17,26 @@
 - Optional magenta-edge cleanup detects magenta-like pixels **inside** the original UV footprint, within 3 px of the contour; it replaces them using the nearest non-magenta sample from the *same mapped region* within 6 px. It does not remove all violet materials, extrapolate missing semantic features or cross group boundaries. Non-magenta dark-gray matte blending may still need manual inspection.
 - Original alpha is re-applied **only after** sampling the raw AI output into the known original texel addresses. The output alpha being pixel-exact is a mechanical property, **not** evidence the model preserved landmarks, borders or 3D seams. Reports explicitly leave raw-AI geometry IoU unmeasured.
 
+## Alpha-mask inpainting comparison — 2026-10-18 (experimental)
+
+**Current recommendation for the next experiment:** Evaluate native GPT Image edit/inpainting masks *before* investing further in post-generation UV alignment. This does not retire or replace this reversible Grid/ConnectedNet tool; the two approaches must be compared with the same source and original B3D preview.
+
+### Exact mask semantics
+
+- Input: original entity atlas RGBA (or nearest-neighbor enlarged copy) and a **separate RGBA edit mask of identical dimensions**.
+- In the API mask, **alpha 0 / transparent = eligible for AI editing**; **alpha 255 / opaque = protected**. White-versus-black RGB has no masking meaning by itself. The editing mask is not the same as the original atlas occupancy/alpha.
+- Build the edit mask from the trusted *source* UV occupancy: occupied source texels are transparent in the edit mask, unused atlas texels are opaque. Never rely on a visually white screenshot of a mask as evidence that its alpha is correct. Verify saved RGBA pixels programmatically.
+- The model's mask is a **soft editing instruction**, not a pixel-exact preservation guarantee; ChatGPT's brush-based selection is not the API `mask` input. Supplying a mask as an ordinary second chat image does not activate API masking.
+- Preserve the untouched original, generated raw result and the actual mask separately. After generation, perform **deterministic final RGBA composition** using original alpha/UV ownership. Do not mistake that forced output silhouette for independent evidence of correct generative geometry.
+- Avoid resampling final faces. When a nearest-neighbor 64x32→1536x768 presentation was used, evaluate the raw model output first, then restore using exact source pixels/regions; do not silently blur or resize original UV boundaries.
+
+### Evidence status and acceptance
+
+- A Creeper masked-edit trial in chat produced a visually promising richly detailed atlas with recognizable face position. **The prior chat's “100% UV overlap” numeric claim has no retained independent measurement report in this repository and must not be treated as verified benchmark evidence.** Its output appeared to have opaque black background; alpha needs explicit repair/checking.
+- A calico cat original/mask/prompt test package was prepared; **no resulting generated cat atlas has yet been checked against the real B3D model**. Do not claim the previously failing cat face/seam/landmark problem is solved.
+- For comparison, save original/mask/raw generation/prompt/model version, calculate raw occupancy and boundary displacement independently, inspect facial landmarks, seams, true alpha and overlays, and render the authentic B3D with identical views. Run cases: Creeper, calico cat, Enderman and (if available) horse.
+- Treat inpainting masks as a *preferred research direction / optional production workflow*, not a universal replacement for Grid/ConnectedNet, until these acceptance checks pass.
+
 ## Testing and limitations
 
 `node tests/uv-generation-roundtrip.test.mjs` checks synthetic cat ConnectedNet + Enderman dark-texture examples, full native RGBA round-trip including empty/hide-RGB samples, grid exclusion from UV pixels, independent X/Y global offset detection, bounded magenta fringe repair, map/input rejection and accurate output dimensions. `node scripts/build-uv-generation.mjs --check` asserts the checked-in single-file bundle matches the two ESM sources.
