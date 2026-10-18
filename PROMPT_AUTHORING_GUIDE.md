@@ -397,6 +397,17 @@ For true inventory items using the two-pass item workflow, Pass 1 is intentional
 
 Transparency is structural data, not empty canvas.
 
+### GPT Image alpha edit-mask workflow (2026-10-18 experimental update)
+
+For entity UV texture material replacement, try a *native API inpainting mask* alongside the existing A/B reference workflow, while keeping original UV geometry authoritative:
+
+- Source RGBA gives exact UV occupancy; edit mask RGBA has the same dimensions. **Transparent mask pixels (alpha=0) permit edits**, while **opaque mask pixels (alpha=255) are protected**. A solid white opaque mask edits nothing. Mask RGB color itself is not the selection signal.
+- Make source occupied UV pixels editable and source empty pixels protected. Keep anatomical landmarks, per-face identity and fur/marking continuity in the actual prompt.
+- A native API `mask` parameter is different from a second image sent in ChatGPT; ChatGPT's visual selection UI is a separate, manual workflow. Masked image generation does not promise exact UV/landmark preservation.
+- Preserve raw generated PNG before compositing. Independently evaluate landmarks and genuine B3D multi-view output, then restore exact source alpha with deterministic pixel-level composition at the final stage. Forced alpha/mask overlap never proves the generator respected UVs.
+- For the Calico Cat, use the canonical `prompts/mobs/tex_42562c4b34.json` reference prompt's distinct white/orange/black patches, restrained natural short-fur realism, and no anatomy redesign. It is a *creature reference prompt*, not itself a texture-atlas prompt; combine that visual direction with UV-specific rules.
+- Current evidence: visually promising Creeper trial, but numerical overlap was not independently archived; cat B3D seams/landmarks remain unverified. Do not rewrite prior Grid/ConnectedNet claims as validated successes or declare inpainting the proven production default. See `docs/UV_GENERATION_ROUNDTRIP.md`.
+
 ## 15. Prompt construction pattern
 
 A production prompt should normally contain these layers:
