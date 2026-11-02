@@ -112,6 +112,13 @@
       "palette": "mcl_dyes_palette.png",
       "paramtype2": "color"
     },
+    "mcl_beds:straw_bed": {
+      "textures": [
+        "mcl_beds_straw_bed.png"
+      ],
+      "texture_base": "ITEMS/mcl_beds",
+      "paramtype2": "4dir"
+    },
     "mcl_beehives:beehive": {
       "textures": [
         "mcl_beehives_beehive_end.png",
@@ -1132,18 +1139,6 @@
       ],
       "texture_base": "ITEMS/mcl_lush_caves"
     },
-    "mcl_lush_caves:cave_vines": {
-      "textures": [
-        "mcl_lush_caves_cave_vines.png"
-      ],
-      "texture_base": "ITEMS/mcl_lush_caves"
-    },
-    "mcl_lush_caves:cave_vines_lit": {
-      "textures": [
-        "mcl_lush_caves_cave_vines_lit.png"
-      ],
-      "texture_base": "ITEMS/mcl_lush_caves"
-    },
     "mcl_lush_caves:rooted_dirt": {
       "textures": [
         "mcl_lush_caves_rooted_dirt.png"
@@ -1369,6 +1364,13 @@
       ],
       "texture_base": "ITEMS/mcl_pale_oak"
     },
+    "mcl_pale_oak:resin_clump": {
+      "textures": [
+        "mcl_pale_oak_resin_clump_block.png"
+      ],
+      "texture_base": "ITEMS/mcl_pale_oak",
+      "paramtype2": "wallmounted"
+    },
     "mcl_pale_oak:block_of_resin": {
       "textures": [
         "mcl_pale_oak_resin_block.png"
@@ -1386,6 +1388,12 @@
         "mcl_pale_oak_chiseled_resin_bricks.png"
       ],
       "texture_base": "ITEMS/mcl_pale_oak"
+    },
+    "mcl_poplar:red_shrub": {
+      "textures": [
+        "mcl_poplar_red_bush.png"
+      ],
+      "texture_base": "ITEMS/mcl_poplar"
     },
     "mcl_portals:portal_end": {
       "textures": [
@@ -1517,6 +1525,60 @@
       ],
       "texture_base": "ITEMS/mcl_stonecutter",
       "paramtype2": "facedir"
+    },
+    "mcl_sulfur:cinnabar": {
+      "textures": [
+        "mcl_sulfur_cinnabar.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:cinnabar_polished": {
+      "textures": [
+        "mcl_sulfur_cinnabar_polished.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:cinnabar_bricks": {
+      "textures": [
+        "mcl_sulfur_cinnabar_bricks.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:cinnabar_chiseled": {
+      "textures": [
+        "mcl_sulfur_cinnabar_chiseled.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:sulfur": {
+      "textures": [
+        "mcl_sulfur_sulfur.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:sulfur_polished": {
+      "textures": [
+        "mcl_sulfur_sulfur_polished.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:sulfur_bricks": {
+      "textures": [
+        "mcl_sulfur_sulfur_bricks.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:sulfur_chiseled": {
+      "textures": [
+        "mcl_sulfur_sulfur_chiseled.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
+    },
+    "mcl_sulfur:sulfur_potent": {
+      "textures": [
+        "mcl_sulfur_sulfur_potent.png"
+      ],
+      "texture_base": "ITEMS/mcl_sulfur"
     },
     "mcl_tnt:tnt": {
       "textures": [

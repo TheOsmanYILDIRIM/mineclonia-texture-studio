@@ -708,6 +708,50 @@
       }
     },
     {
+      "id": "node:mcl_beds:straw_bed",
+      "match": {
+        "names": [
+          "mcl_beds_straw_bed.png"
+        ]
+      },
+      "node": "mcl_beds:straw_bed",
+      "texture_base": "ITEMS/mcl_beds",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_beds_straw_bed.png"
+          }
+        ]
+      }
+    },
+    {
       "id": "node:mcl_beehives:beehive",
       "match": {
         "names": [
@@ -7159,94 +7203,6 @@
       }
     },
     {
-      "id": "node:mcl_lush_caves:cave_vines",
-      "match": {
-        "names": [
-          "mcl_lush_caves_cave_vines.png"
-        ]
-      },
-      "node": "mcl_lush_caves:cave_vines",
-      "texture_base": "ITEMS/mcl_lush_caves",
-      "geometry": "cube",
-      "projection": "orthographic",
-      "faces": {
-        "top": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ],
-        "bottom": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ],
-        "east": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ],
-        "west": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ],
-        "north": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ],
-        "south": [
-          {
-            "texture": "mcl_lush_caves_cave_vines.png"
-          }
-        ]
-      }
-    },
-    {
-      "id": "node:mcl_lush_caves:cave_vines_lit",
-      "match": {
-        "names": [
-          "mcl_lush_caves_cave_vines_lit.png"
-        ]
-      },
-      "node": "mcl_lush_caves:cave_vines_lit",
-      "texture_base": "ITEMS/mcl_lush_caves",
-      "geometry": "cube",
-      "projection": "orthographic",
-      "faces": {
-        "top": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ],
-        "bottom": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ],
-        "east": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ],
-        "west": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ],
-        "north": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ],
-        "south": [
-          {
-            "texture": "mcl_lush_caves_cave_vines_lit.png"
-          }
-        ]
-      }
-    },
-    {
       "id": "node:mcl_lush_caves:rooted_dirt",
       "match": {
         "names": [
@@ -8775,6 +8731,50 @@
       }
     },
     {
+      "id": "node:mcl_pale_oak:resin_clump",
+      "match": {
+        "names": [
+          "mcl_pale_oak_resin_clump_block.png"
+        ]
+      },
+      "node": "mcl_pale_oak:resin_clump",
+      "texture_base": "ITEMS/mcl_pale_oak",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_pale_oak_resin_clump_block.png"
+          }
+        ]
+      }
+    },
+    {
       "id": "node:mcl_pale_oak:block_of_resin",
       "match": {
         "names": [
@@ -8902,6 +8902,50 @@
         "south": [
           {
             "texture": "mcl_pale_oak_chiseled_resin_bricks.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_poplar:red_shrub",
+      "match": {
+        "names": [
+          "mcl_poplar_red_bush.png"
+        ]
+      },
+      "node": "mcl_poplar:red_shrub",
+      "texture_base": "ITEMS/mcl_poplar",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_poplar_red_bush.png"
           }
         ]
       }
@@ -9642,6 +9686,402 @@
         "south": [
           {
             "texture": "mcl_stonecutter_saw.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:cinnabar",
+      "match": {
+        "names": [
+          "mcl_sulfur_cinnabar.png"
+        ]
+      },
+      "node": "mcl_sulfur:cinnabar",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_cinnabar.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:cinnabar_polished",
+      "match": {
+        "names": [
+          "mcl_sulfur_cinnabar_polished.png"
+        ]
+      },
+      "node": "mcl_sulfur:cinnabar_polished",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_cinnabar_polished.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:cinnabar_bricks",
+      "match": {
+        "names": [
+          "mcl_sulfur_cinnabar_bricks.png"
+        ]
+      },
+      "node": "mcl_sulfur:cinnabar_bricks",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_cinnabar_bricks.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:cinnabar_chiseled",
+      "match": {
+        "names": [
+          "mcl_sulfur_cinnabar_chiseled.png"
+        ]
+      },
+      "node": "mcl_sulfur:cinnabar_chiseled",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_cinnabar_chiseled.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:sulfur",
+      "match": {
+        "names": [
+          "mcl_sulfur_sulfur.png"
+        ]
+      },
+      "node": "mcl_sulfur:sulfur",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_sulfur.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:sulfur_polished",
+      "match": {
+        "names": [
+          "mcl_sulfur_sulfur_polished.png"
+        ]
+      },
+      "node": "mcl_sulfur:sulfur_polished",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_sulfur_polished.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:sulfur_bricks",
+      "match": {
+        "names": [
+          "mcl_sulfur_sulfur_bricks.png"
+        ]
+      },
+      "node": "mcl_sulfur:sulfur_bricks",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_sulfur_bricks.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:sulfur_chiseled",
+      "match": {
+        "names": [
+          "mcl_sulfur_sulfur_chiseled.png"
+        ]
+      },
+      "node": "mcl_sulfur:sulfur_chiseled",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_sulfur_chiseled.png"
+          }
+        ]
+      }
+    },
+    {
+      "id": "node:mcl_sulfur:sulfur_potent",
+      "match": {
+        "names": [
+          "mcl_sulfur_sulfur_potent.png"
+        ]
+      },
+      "node": "mcl_sulfur:sulfur_potent",
+      "texture_base": "ITEMS/mcl_sulfur",
+      "geometry": "cube",
+      "projection": "orthographic",
+      "faces": {
+        "top": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
+          }
+        ],
+        "bottom": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
+          }
+        ],
+        "east": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
+          }
+        ],
+        "west": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
+          }
+        ],
+        "north": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
+          }
+        ],
+        "south": [
+          {
+            "texture": "mcl_sulfur_sulfur_potent.png"
           }
         ]
       }
